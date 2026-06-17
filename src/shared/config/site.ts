@@ -13,7 +13,7 @@ export const SITE = {
   contact: {
     phone: "02-6952-1947",
     email: "contact@aircok.com",
-    address: "서울특별시",
+    address: "서울특별시 성동구 아차산로17길 49 성수 생각공장 데시앙플렉스 815호",
   },
 
   social: {
