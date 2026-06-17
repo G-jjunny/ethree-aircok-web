@@ -1,17 +1,23 @@
 import { HeroSection } from './HeroSection';
-import { AboutSection } from './AboutSection';
-import { FeatureSection } from './FeatureSection';
+import { StatSection } from './StatSection';
+import { WhatYouGetSection } from './WhatYouGetSection';
+import { MethodologySection } from './MethodologySection';
+import { WhyChooseUsSection } from './WhyChooseUsSection';
+import { WhyChooseUsFeatureSection } from './WhyChooseUsFeatureSection';
 import { PartnersSection } from './PartnersSection';
-import { CtaSection } from './CtaSection';
+import { BottomCTASection } from './BottomCTASection';
 
 export function HomeView() {
   return (
     <main>
       <HeroSection />
-      <AboutSection />
-      <FeatureSection />
+      <StatSection />
+      <WhatYouGetSection />
+      <MethodologySection />
+      <WhyChooseUsSection />
+      <WhyChooseUsFeatureSection />
       <PartnersSection />
-      <CtaSection />
+      <BottomCTASection />
     </main>
   );
 }
