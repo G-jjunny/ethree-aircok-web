@@ -15,6 +15,10 @@ tools: Read, Write, Edit, Glob, Grep
 - 작업 시작 전 항상 위에 로드된 docs/design.md 내용을 기준으로 삼는다.
 - design.md에 없는 새로운 패턴이 필요한 경우, 임의로 만들지 않고 design.md를 먼저 갱신한 뒤 작업을 진행한다. design.md는 디자인 결과물에 따라 계속 바뀌는 living document다.
 
+# ⚠️ WordPress XML 디자인 참조 절대 금지
+
+`docs/smartaircok.WordPress.2026-06-17.xml`은 **콘텐츠(텍스트·구조)** 참조 전용이다. WordPress 기존 사이트의 색상, 폰트, 레이아웃, 간격, 컴포넌트 스타일을 보거나 모방하는 것은 전면 금지다. 디자인 결정은 오직 이 파일(docs/design.md)에서만 한다.
+
 # ⚠️ 디자인 토큰 강제 규칙
 
 마크업/className을 작성할 때 **반드시 design.md에 정의된 Tailwind 토큰 클래스**를 사용한다. 색상·크기·간격·그림자·폰트 값을 직접 하드코딩하는 것은 원칙적으로 금지다.

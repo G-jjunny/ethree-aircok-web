@@ -87,6 +87,33 @@ src/
 
 `docs/design.md`는 Apple 스타일의 디자인 토큰/일관성 가이드로, `design` 서브에이전트만 참조합니다. 색상 팔레트, 타이포그래피 스케일, 컴포넌트 스타일, 간격, 반응형 규칙을 문서화합니다. 기존에 없는 새 패턴이 필요할 경우, `design.md`를 먼저 업데이트한 후 구현을 진행합니다.
 
+## 콘텐츠 참조 규칙 (WordPress XML)
+
+`docs/smartaircok.WordPress.2026-06-17.xml`은 기존 홈페이지에서 내보낸 WordPress 내보내기 파일입니다.
+
+**참조 범위: 콘텐츠·구조만 허용**
+- ✅ 허용: 페이지 구조(섹션 구성, 네비게이션 메뉴 항목), 텍스트 콘텐츠(헤드라인 카피, 본문, 회사 소개, 제품 설명), 파트너사 목록, 연락처 정보
+- ❌ 절대 금지: WordPress 테마·플러그인의 색상, 폰트, 레이아웃, 간격, 컴포넌트 스타일을 모방하거나 참고하는 일체의 행위
+
+모든 디자인 결정은 오직 `docs/design.md` 토큰과 Aircok 디자인 시스템을 기준으로 한다. XML의 시각적 표현은 무시한다.
+
+## 상수 관리 규칙 (하드코딩 금지)
+
+회사명·전화번호·주소·슬로건·SNS 링크 등 반복 사용되는 사이트 메타 정보는 **반드시** `src/shared/config/site.ts`에서 import해 사용한다. 컴포넌트 내부에 직접 문자열로 박는 것은 금지다.
+
+```ts
+// ❌ 금지
+<p>전화: 02-6952-1947</p>
+<p>스마트 에어콕</p>
+
+// ✅ 필수
+import { SITE } from '@/shared/config/site'
+<p>전화: {SITE.contact.phone}</p>
+<p>{SITE.name}</p>
+```
+
+`src/shared/config/site.ts`는 `shared` 레이어에 위치하므로 모든 상위 레이어(entities, features, widgets, views, app)에서 import 가능하다.
+
 ## FSD 스킬
 
 구현 및 리뷰 서브에이전트(`frontend-implementer`, `frontend-reviewer`)는 위 규칙에 더해 슬라이스 구조와 Public API 규칙에 대해 [feature-sliced/skills FSD 스킬](https://github.com/feature-sliced/skills/tree/master/feature-sliced-design)을 따릅니다.
