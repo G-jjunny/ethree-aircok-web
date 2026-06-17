@@ -395,6 +395,30 @@ Apple 스타일의 '제품 우선 프레젠테이션'을 Aircok 브랜드에 적
 </section>
 ```
 
+### Full-Blue CTA Section (풀 블루 CTA 섹션)
+
+마지막 CTA 섹션의 강조 변형. 섹션 전체를 Aircok Blue로 채워 강한 행동 유도. 기존 Bottom CTA Section(라이트 배경)과 구별.
+
+- 섹션 배경: `bg-aircok-blue`
+- 구분선: 없음
+- **H2**: `text-heading-light text-3xl font-display font-semibold text-center leading-[1.10] tracking-[-0.3px] [word-break:keep-all]`
+- **본문 p**: `text-heading-light opacity-80 text-[17px] leading-[1.65] [word-break:keep-all]`
+- **CTA 버튼**: `bg-surface-white text-aircok-blue rounded-md px-8 py-3 font-medium hover:bg-surface-light active:scale-[0.97] transition-colors min-h-[44px]`
+- **전화번호**: `text-heading-light opacity-80 text-sm hover:opacity-100 transition-opacity` (`<a href="tel:...">`)
+- 레이아웃: `flex flex-col items-center gap-8 text-center py-20`
+
+```tsx
+// Full-Blue CTA Section 예시
+<section className="bg-aircok-blue">
+  <div className="max-w-[1200px] mx-auto px-5 py-20 flex flex-col items-center gap-8 text-center">
+    <h2 className="text-heading-light text-3xl font-display font-semibold text-center leading-[1.10] tracking-[-0.3px] [word-break:keep-all]">헤딩</h2>
+    <p className="text-heading-light opacity-80 text-[17px] leading-[1.65] [word-break:keep-all] max-w-[640px]">본문</p>
+    <a href="/contact" className="bg-surface-white text-aircok-blue rounded-md px-8 py-3 font-medium hover:bg-surface-light active:scale-[0.97] transition-colors min-h-[44px] inline-flex items-center justify-center">버튼</a>
+    <a href="tel:..." className="text-heading-light opacity-80 text-sm hover:opacity-100 transition-opacity">전화번호</a>
+  </div>
+</section>
+```
+
 ### Case Study Card (도입 사례)
 
 - 이미지 상단, 텍스트 하단
@@ -426,6 +450,32 @@ Apple 스타일의 '제품 우선 프레젠테이션'을 Aircok 브랜드에 적
 </div>
 ```
 
+### Dark Stat Card (다크 섹션 통계 카드)
+
+라이트 Stat Card의 다크 배경 변형. `StatSection`이 `bg-surface-dark` 배경에 배치될 때 사용.
+
+- 섹션 배경: `bg-surface-dark`
+- 카드 배경: `bg-surface-dark-1`
+- Radius: `rounded-xl` (16px)
+- 패딩: `p-8`
+- 테두리: 없음 (다크 섹션에서 배경색 대비로 depth 표현)
+- **category 레이블**: 12px, weight 600, `text-aircok-blue-light` (다크 배경에서 가독성), `uppercase tracking-widest`
+- **핵심 수치**: `text-5xl font-bold text-heading-light leading-none` (카드 상단에 대형 강조 수치 표시)
+- **title**: 21px, weight 700, `text-heading-light`
+- **description**: `text-body-light text-sm leading-[1.65] [word-break:keep-all]`
+- **source (출처)**: `text-body-light opacity-50 text-xs italic` (다크 배경에서 secondary 대체)
+
+```tsx
+// Dark Stat Card 예시
+<div className="bg-surface-dark-1 rounded-xl p-8 flex flex-col gap-4">
+  <span className="text-aircok-blue-light text-xs font-semibold uppercase tracking-widest">category</span>
+  <span className="text-5xl font-bold text-heading-light leading-none">50%</span>
+  <h3 className="text-heading-light text-[21px] font-bold leading-[1.19] mt-2">핵심 수치 제목</h3>
+  <p className="text-body-light text-sm leading-[1.65] [word-break:keep-all] flex-1">설명 텍스트</p>
+  <p className="text-body-light opacity-50 text-xs italic mt-auto">출처</p>
+</div>
+```
+
 ### Step Badge (스텝 원형 배지)
 
 프로세스/순서를 표현하는 단계 배지. `MethodologySection`의 각 스텝 헤더에 사용.
@@ -446,6 +496,27 @@ Apple 스타일의 '제품 우선 프레젠테이션'을 Aircok 브랜드에 적
 </div>
 ```
 
+### Watermark Step Card (워터마크 스텝 카드)
+
+프로세스 단계를 카드 형태로 표현하는 변형. 배경에 대형 반투명 숫자를 워터마크로 사용. 기존 Step Badge(원형 배지)와 달리 카드 전체에 단계 정보를 배치.
+
+- 카드 배경: `bg-surface-white` (`rounded-xl shadow-card p-8 relative`)
+- **워터마크 숫자**: `text-6xl font-bold text-aircok-blue opacity-20 leading-none absolute top-6 right-6 select-none` (장식용, `aria-hidden="true"`)
+- **STEP 레이블**: `text-aircok-blue text-xs font-bold uppercase tracking-widest` (예: `STEP 01`)
+- **제목**: `text-heading-dark text-xl font-semibold leading-[1.14] [word-break:keep-all]`
+- 배경: 섹션은 `bg-surface-white`
+
+```tsx
+// Watermark Step Card 예시
+<div className="bg-surface-white rounded-xl shadow-card p-8 flex flex-col gap-4 relative">
+  <span className="text-6xl font-bold text-aircok-blue opacity-20 leading-none absolute top-6 right-6 select-none" aria-hidden="true">
+    1
+  </span>
+  <span className="text-aircok-blue text-xs font-bold uppercase tracking-widest">STEP 01</span>
+  <h3 className="text-heading-dark text-xl font-semibold leading-[1.14] mt-2 [word-break:keep-all]">스텝 제목</h3>
+</div>
+```
+
 ### Check List Item (체크리스트 아이템)
 
 혜택·포함 항목을 나열하는 체크리스트. `WhatYouGetSection`에서 사용.
@@ -460,6 +531,25 @@ Apple 스타일의 '제품 우선 프레젠테이션'을 Aircok 브랜드에 적
 <li className="flex items-start gap-3">
   <svg className="w-5 h-5 text-aircok-blue shrink-0 mt-0.5" /* ... */ />
   <span className="text-[17px] text-body-dark leading-[1.65] [word-break:keep-all]">항목 텍스트</span>
+</li>
+```
+
+### Filled Check Icon (원형 채움 체크 아이콘)
+
+체크리스트 아이콘의 대안 스타일. 라인 SVG 아이콘 대신 Aircok Blue 배경의 원형 채움 배지 사용.
+
+- 아이콘 컨테이너: `bg-aircok-blue rounded-full w-6 h-6 flex items-center justify-center shrink-0 mt-0.5`
+- 내부 체크 기호: `<span className="text-heading-light text-xs font-bold">✓</span>`
+- 텍스트: 기존 Check List Item 규칙과 동일 (`text-body-dark text-[17px] leading-[1.65] [word-break:keep-all]`)
+- 레이아웃: `flex items-start gap-3`
+
+```tsx
+// Filled Check Icon 아이템 예시
+<li className="flex items-start gap-3">
+  <span className="bg-aircok-blue rounded-full w-6 h-6 flex items-center justify-center shrink-0 mt-0.5">
+    <span className="text-heading-light text-xs font-bold">✓</span>
+  </span>
+  <span className="text-body-dark text-[17px] leading-[1.65] [word-break:keep-all]">항목 텍스트</span>
 </li>
 ```
 

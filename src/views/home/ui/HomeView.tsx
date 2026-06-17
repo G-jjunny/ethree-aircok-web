@@ -1,7 +1,7 @@
 import { HeroSection } from './HeroSection';
 import { StatSection } from './StatSection';
-import { WhatYouGetSection } from './WhatYouGetSection';
 import { MethodologySection } from './MethodologySection';
+import { WhatYouGetSection } from './WhatYouGetSection';
 import { WhyChooseUsSection } from './WhyChooseUsSection';
 import { WhyChooseUsFeatureSection } from './WhyChooseUsFeatureSection';
 import { PartnersSection } from './PartnersSection';
@@ -12,8 +12,8 @@ export function HomeView() {
     <main>
       <HeroSection />
       <StatSection />
-      <WhatYouGetSection />
       <MethodologySection />
+      <WhatYouGetSection />
       <WhyChooseUsSection />
       <WhyChooseUsFeatureSection />
       <PartnersSection />
