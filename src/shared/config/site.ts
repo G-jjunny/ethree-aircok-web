@@ -30,6 +30,7 @@ export const SITE = {
       { label: "서비스", href: "/services" },
       { label: "프로젝트", href: "/projects" },
       { label: "카탈로그", href: "/catalog" },
+      { label: "뉴스", href: "/news" },
       { label: "FAQ", href: "/faq" },
       { label: "연락하기", href: "/contact" },
     ],
