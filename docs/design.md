@@ -97,6 +97,16 @@ Tailwind v4 프로젝트이므로 모든 토큰은 `@theme` 블록 안에 정의
   --shadow-card:    rgba(0, 0, 0, 0.12) 0px 4px 24px 0px;
   --shadow-product: rgba(0, 0, 0, 0.22) 3px 5px 30px 0px;
 
+  /* ── Nav / Overlay ──────────────────────── */
+  --color-nav-bg:           rgba(255, 255, 255, 0.80);
+  --color-nav-bg-mobile:    rgba(255, 255, 255, 0.95);
+  --color-overlay-white-10: rgba(255, 255, 255, 0.10);
+
+  /* ── Border ─────────────────────────────── */
+  --color-border-light:  rgba(0, 0, 0, 0.06);
+  --color-border-subtle: rgba(0, 0, 0, 0.04);
+  --color-border-dark:   rgba(255, 255, 255, 0.08);
+
   /* ── Spacing (8px base) ─────────────────── */
   --spacing-1:  4px;
   --spacing-2:  8px;
@@ -141,6 +151,14 @@ Tailwind v4 프로젝트이므로 모든 토큰은 `@theme` 블록 안에 정의
 | **Shadow** | | |
 | 카드 elevation | `shadow-card` | `--shadow-card` |
 | 제품 이미지 | `shadow-product` | `--shadow-product` |
+| **Nav / Overlay** | | |
+| Nav glass 배경 | `bg-nav-bg` | `--color-nav-bg` |
+| Nav 모바일 배경 | `bg-nav-bg-mobile` | `--color-nav-bg-mobile` |
+| 흰 오버레이 10% | `bg-overlay-white-10` | `--color-overlay-white-10` |
+| **Border (반투명)** | | |
+| 라이트 구분선 | `border-border-light` | `--color-border-light` |
+| 미세 구분선 | `border-border-subtle` | `--color-border-subtle` |
+| 다크 구분선 | `border-border-dark` | `--color-border-dark` |
 | **폰트** | | |
 | 디스플레이 헤딩 | `font-display` | `--font-display` |
 | 본문 | `font-body` | `--font-body` |

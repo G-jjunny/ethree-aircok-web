@@ -5,7 +5,14 @@
       "PowerShell(gh api *)",
       "WebFetch(domain:api.github.com)",
       "WebFetch(domain:raw.githubusercontent.com)",
-      "WebFetch(domain:smartaircok.com)"
+      "WebFetch(domain:smartaircok.com)",
+      "Bash(sed 's/<[^>]*>//g')",
+      "Bash(sed 's/CDATA\\\\[//g')",
+      "Bash(sed 's/\\\\]//g')",
+      "Bash(git checkout *)",
+      "Bash(git push *)",
+      "Bash(npm run *)",
+      "Bash(git add *)"
     ]
   }
 }
