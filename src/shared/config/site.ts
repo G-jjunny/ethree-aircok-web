@@ -30,6 +30,7 @@ export const SITE = {
       { label: "서비스", href: "/services" },
       { label: "프로젝트", href: "/projects" },
       { label: "카탈로그", href: "/catalog" },
+      { label: "뉴스", href: "/news" },
       { label: "FAQ", href: "/faq" },
       { label: "연락하기", href: "/contact" },
     ],
@@ -188,5 +189,56 @@ export const SITE = {
     mailOrderNo: "2020-서울성동-02120",
     fax: "02-552-1948",
     email2: "aircok@aircok.com",
+  },
+
+  pages: {
+    about: {
+      title: '에어콕 소개',
+      description: '스마트 에어콕의 회사 소개, 연혁, 핵심 가치를 알아보세요.',
+    },
+    services: {
+      title: '서비스',
+      description: '실내 공기질 측정·관리·컨설팅 서비스를 소개합니다.',
+    },
+    projects: {
+      title: '프로젝트',
+      description: '스마트 에어콕이 함께한 도입 사례와 레퍼런스를 확인하세요.',
+    },
+    catalog: {
+      title: '카탈로그',
+      description: '스마트 에어콕 제품 카탈로그를 다운로드하세요.',
+    },
+    faq: {
+      title: 'FAQ',
+      description: '스마트 에어콕에 대해 자주 묻는 질문과 답변을 확인하세요.',
+    },
+    contact: {
+      title: '연락하기',
+      description: '스마트 에어콕에 문의하세요. 전화·이메일·온라인 문의 가능합니다.',
+    },
+    pricing: {
+      title: '가격 안내',
+      description: '스마트 에어콕 서비스 요금 안내입니다.',
+    },
+    news: {
+      title: '뉴스',
+      description: '스마트 에어콕의 최신 뉴스와 보도자료를 확인하세요.',
+    },
+    blog: {
+      title: '블로그',
+      description: '실내 공기질과 건강경영에 관한 전문 칼럼과 아티클입니다.',
+    },
+    qa: {
+      title: 'Q&A',
+      description: '고객님의 질문과 스마트 에어콕의 답변을 확인하세요.',
+    },
+    healthReport: {
+      title: '건강경영 레포트',
+      description: '무료 건강경영 레포트로 공기질이 비즈니스에 미치는 영향을 확인하세요.',
+    },
+    freeTrial: {
+      title: '체험 신청',
+      description: '스마트 에어콕 무료 체험을 신청하세요.',
+    },
   },
 } as const;
