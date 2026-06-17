@@ -419,6 +419,86 @@ Apple 스타일의 '제품 우선 프레젠테이션'을 Aircok 브랜드에 적
 </section>
 ```
 
+### Corporate Footer Block (법인 정보 푸터 블록)
+
+전사 Footer의 하단 파트. 법인 등록 정보·연락처·소셜·저작권을 담는 다크 섹션.
+
+- 섹션 배경: `bg-surface-dark`
+- 최대 너비·패딩: `max-w-[1200px] mx-auto px-5 py-10`
+
+**레이아웃 구조 (3행)**
+
+행 1 — 상단 행: 좌측 회사명(법인명), 우측 소셜 링크
+- 회사명(법인명): `text-heading-light font-display font-semibold text-base`
+- 소셜 링크: `text-body-light text-sm hover:text-heading-light transition-colors`
+
+행 2 — 법인 정보 그리드 (2열, `sm:grid-cols-2`):
+- 좌열: 대표 | 사업자등록번호 | 통신판매업신고번호 | 주소
+- 우열: 전화 | 팩스 | 이메일
+- 레이블: `text-body-light opacity-40 text-xs mr-2`
+- 값: `text-body-light text-xs`
+
+행 3 — 구분선 + 저작권
+- 구분선: `border-t border-border-dark`
+- 저작권: `text-body-light opacity-60 text-xs`
+
+```tsx
+// Corporate Footer Block 예시
+<div className="bg-surface-dark">
+  <div className="max-w-[1200px] mx-auto px-5 py-10">
+    {/* 상단 행: 회사명 + 소셜 */}
+    <div className="flex flex-col sm:flex-row justify-between gap-4 mb-6">
+      <p className="text-heading-light font-display font-semibold text-base">
+        (주)에어코크
+      </p>
+      <div className="flex items-center gap-4">
+        <a href="https://instagram.com/..." target="_blank" rel="noopener noreferrer"
+           className="text-body-light text-sm hover:text-heading-light transition-colors">
+          Instagram
+        </a>
+        {/* YouTube, LinkedIn 동일 패턴 */}
+      </div>
+    </div>
+
+    {/* 법인 정보 그리드 */}
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-8">
+      <div className="flex flex-col gap-1.5">
+        <p className="text-body-light text-xs">
+          <span className="opacity-40 mr-2">대표</span>조흔우
+        </p>
+        <p className="text-body-light text-xs">
+          <span className="opacity-40 mr-2">사업자등록번호</span>689-87-00920
+        </p>
+        <p className="text-body-light text-xs">
+          <span className="opacity-40 mr-2">통신판매업신고번호</span>2020-서울성동-02120
+        </p>
+        <p className="text-body-light text-xs">
+          <span className="opacity-40 mr-2">주소</span>서울특별시 성동구 ...
+        </p>
+      </div>
+      <div className="flex flex-col gap-1.5">
+        <p className="text-body-light text-xs">
+          <span className="opacity-40 mr-2">전화</span>02-6952-1947
+        </p>
+        <p className="text-body-light text-xs">
+          <span className="opacity-40 mr-2">팩스</span>02-552-1948
+        </p>
+        <p className="text-body-light text-xs">
+          <span className="opacity-40 mr-2">이메일</span>aircok@aircok.com
+        </p>
+      </div>
+    </div>
+
+    {/* 저작권 */}
+    <div className="border-t border-border-dark pt-5">
+      <p className="text-body-light opacity-60 text-xs">
+        © 2025 스마트에어콕. All rights reserved.
+      </p>
+    </div>
+  </div>
+</div>
+```
+
 ### Case Study Card (도입 사례)
 
 - 이미지 상단, 텍스트 하단

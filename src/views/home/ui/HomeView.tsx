@@ -5,8 +5,6 @@ import { WhatYouGetSection } from './WhatYouGetSection';
 import { WhyChooseUsSection } from './WhyChooseUsSection';
 import { WhyChooseUsFeatureSection } from './WhyChooseUsFeatureSection';
 import { PartnersSection } from './PartnersSection';
-import { BottomCTASection } from './BottomCTASection';
-
 export function HomeView() {
   return (
     <main>
@@ -17,7 +15,6 @@ export function HomeView() {
       <WhyChooseUsSection />
       <WhyChooseUsFeatureSection />
       <PartnersSection />
-      <BottomCTASection />
     </main>
   );
 }
