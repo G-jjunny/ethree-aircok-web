@@ -349,12 +349,139 @@ Apple 스타일의 '제품 우선 프레젠테이션'을 Aircok 브랜드에 적
 - 제목: 21px, weight 600
 - 설명: 17px, weight 400, `rgba(0,0,0,0.80)`
 
+**Feature Strip (다크 배경 카드 변형)**
+
+아이콘 없이 제목 + 설명만으로 구성되는 다크 섹션용 특징 카드.
+
+- 섹션 배경: `bg-surface-dark`
+- 카드 배경: `bg-surface-dark-1` (radius: `rounded-xl`, 패딩: `p-6`)
+- **제목**: Card Title (21px, weight 700), `text-heading-light`
+- **설명**: Body (17px, weight 400), `text-body-light`, `leading-[1.65]`, `[word-break:keep-all]`
+- 그리드: 4열(데스크탑, `lg:grid-cols-4`) → 2열(태블릿, `sm:grid-cols-2`) → 1열(모바일)
+- 카드 간 그림자 없음 (다크 섹션 내부 elevation은 배경색 차이로만 표현)
+
+```tsx
+// Feature Strip 다크 카드 예시
+<div className="bg-surface-dark-1 rounded-xl p-6 flex flex-col gap-3">
+  <h3 className="text-[21px] font-bold text-heading-light leading-[1.19]">카드 제목</h3>
+  <p className="text-[17px] text-body-light leading-[1.65] [word-break:keep-all]">카드 설명 텍스트</p>
+</div>
+```
+
+**Bottom CTA Section**
+
+라이트 배경의 마지막 CTA 섹션.
+
+- 섹션 배경: `bg-surface-light`
+- 레이아웃: 중앙 정렬(`text-center`), 상하 패딩 `py-20`
+- **H2**: Section Heading (40px, weight 600), `text-heading-dark`, `leading-[1.10]`, `tracking-[-0.3px]`
+- **본문 p**: Body (17px, weight 400), `text-body-dark`, `leading-[1.65]`, `[word-break:keep-all]`
+- **CTA 행**: Primary Blue 버튼 + "or" 텍스트(`text-secondary-dark`) + 전화번호 링크(`text-aircok-blue`)
+- 전화번호 링크: `<a href="tel:...">`, `text-aircok-blue`, `font-medium`
+- 섹션 상단에 얇은 구분선(`border-t border-border-light`) 선택적 사용
+
+```tsx
+// Bottom CTA Section 예시 구조
+<section className="bg-surface-light border-t border-border-light">
+  <div className="max-w-[1200px] mx-auto px-5 py-20 flex flex-col items-center gap-6 text-center">
+    <h2 className="text-[40px] font-semibold text-heading-dark leading-[1.10] tracking-[-0.3px] [word-break:keep-all]">헤딩</h2>
+    <p className="text-[17px] text-body-dark leading-[1.65] [word-break:keep-all]">본문</p>
+    <div className="flex items-center gap-4 flex-wrap justify-center">
+      <button className="bg-aircok-blue text-heading-light text-[17px] font-medium rounded-md px-5 py-[10px] hover:bg-aircok-blue-dark active:scale-[0.97] transition-colors">버튼</button>
+      <span className="text-secondary-dark text-[17px]">or</span>
+      <a href="tel:..." className="text-aircok-blue text-[17px] font-medium">전화번호</a>
+    </div>
+  </div>
+</section>
+```
+
 ### Case Study Card (도입 사례)
 
 - 이미지 상단, 텍스트 하단
 - 고객사명 (캡션, weight 600)
 - 성과 수치 강조 (28px, weight 600, Aircok Blue)
 - 설명 1–2줄
+
+### Stat Card (통계 카드)
+
+통계·수치 데이터를 강조하는 정보 카드. `StatSection`에서 4열 그리드로 배치.
+
+- 배경: `bg-surface-white`
+- 테두리: `border border-border-light`
+- Radius: `rounded-lg` (12px)
+- 패딩: `p-6` (32px)
+- **category 레이블**: 12px (Micro), weight 600, `text-aircok-blue`, `uppercase`, letter-spacing 약간 (`tracking-wide`)
+- **title 헤드라인**: 21px (Card Title), weight 700, `text-heading-dark`
+- **description**: 17px (Body), weight 400, `text-body-dark`, `word-break: keep-all`
+- **source (출처)**: 12px (Micro), weight 400, `text-secondary-dark`, italic
+- 그리드: 4열(데스크탑) → 2열(태블릿, `sm:grid-cols-2`) → 1열(모바일)
+
+```tsx
+// Stat Card 예시
+<div className="bg-surface-white border border-border-light rounded-lg p-6">
+  <p className="text-[12px] font-semibold text-aircok-blue uppercase tracking-wide">category</p>
+  <h3 className="text-[21px] font-bold text-heading-dark mt-2">핵심 수치</h3>
+  <p className="text-[17px] text-body-dark mt-3 leading-[1.65] [word-break:keep-all]">설명 텍스트</p>
+  <p className="text-[12px] text-secondary-dark italic mt-4">출처: OOO</p>
+</div>
+```
+
+### Step Badge (스텝 원형 배지)
+
+프로세스/순서를 표현하는 단계 배지. `MethodologySection`의 각 스텝 헤더에 사용.
+
+- **원형 배지**: `w-10 h-10`, `bg-aircok-blue`, `rounded-full`, 숫자 중앙 정렬(`flex items-center justify-center`)
+- **배지 내 숫자**: 17px, weight 700, `text-heading-light`
+- **step title**: 17px, weight 500, `text-heading-dark`
+- 배지와 타이틀: `flex items-center gap-3`
+- 스텝 간 구분선(선택적): 배지 사이 수평 구분 `border-b border-border-light`
+
+```tsx
+// Step Badge 예시
+<div className="flex items-center gap-3">
+  <div className="w-10 h-10 bg-aircok-blue rounded-full flex items-center justify-center shrink-0">
+    <span className="text-[17px] font-bold text-heading-light">1</span>
+  </div>
+  <span className="text-[17px] font-medium text-heading-dark">스텝 제목</span>
+</div>
+```
+
+### Check List Item (체크리스트 아이템)
+
+혜택·포함 항목을 나열하는 체크리스트. `WhatYouGetSection`에서 사용.
+
+- **체크 아이콘**: `text-aircok-blue`, `w-5 h-5`, SVG 체크마크 또는 유니코드 ✓
+- **텍스트**: 17px, weight 400, `text-body-dark`, `word-break: keep-all`, `leading-[1.65]`
+- 레이아웃: `flex flex-row items-start gap-3`
+- 아이콘은 `shrink-0`으로 고정, 텍스트는 여러 줄 허용
+
+```tsx
+// Check List Item 예시
+<li className="flex items-start gap-3">
+  <svg className="w-5 h-5 text-aircok-blue shrink-0 mt-0.5" /* ... */ />
+  <span className="text-[17px] text-body-dark leading-[1.65] [word-break:keep-all]">항목 텍스트</span>
+</li>
+```
+
+### Emphasis Quote (강조 인용)
+
+다크 배경 위에서 핵심 메시지를 크게 강조하는 인용문 블록. `WhyChooseUsSection` 등 다크 섹션에서 사용.
+
+- 배경: `bg-surface-dark` (다크 섹션 내부 사용)
+- **폰트**: Section Heading 수준(40px), weight 600, `text-heading-light`
+- **line-height**: 1.10, **letter-spacing**: -0.3px (Section Heading 규칙 준수)
+- 정렬: 중앙(`text-center`)
+- `word-break: keep-all`
+- 선택적으로 상하 `border-y border-border-dark` 또는 따옴표 장식
+
+```tsx
+// Emphasis Quote 예시
+<blockquote className="text-center [word-break:keep-all]">
+  <p className="text-[40px] font-semibold text-heading-light leading-[1.10] tracking-[-0.3px]">
+    "핵심 메시지를 여기에 배치합니다"
+  </p>
+</blockquote>
+```
 
 ---
 

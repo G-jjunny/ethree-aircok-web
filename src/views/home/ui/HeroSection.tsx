@@ -10,6 +10,12 @@ export function HeroSection() {
             {SITE.tagline}
           </h1>
 
+          <p
+            className="text-body-light text-xl font-normal"
+>
+            {SITE.hero.subtitle}
+          </p>
+
           <div className="flex flex-col sm:flex-row gap-3">
             <Link
               href="/contact"
