@@ -49,10 +49,33 @@
   /* ── Shadows ────────────────────────────── */
   --shadow-card:    rgba(0, 0, 0, 0.12) 0px 4px 24px 0px;
   --shadow-product: rgba(0, 0, 0, 0.22) 3px 5px 30px 0px;
+
+  /* ── Nav / Overlay ──────────────────────── */
+  --color-nav-bg:           rgba(255, 255, 255, 0.80);
+  --color-nav-bg-mobile:    rgba(255, 255, 255, 0.95);
+  --color-overlay-white-10: rgba(255, 255, 255, 0.10);
+
+  /* ── Border ─────────────────────────────── */
+  --color-border-light:  rgba(0, 0, 0, 0.06);
+  --color-border-subtle: rgba(0, 0, 0, 0.04);
+  --color-border-dark:   rgba(255, 255, 255, 0.08);
+
+  /* ── Spacing (8px base) ─────────────────── */
+  --spacing-1:  4px;
+  --spacing-2:  8px;
+  --spacing-3:  12px;
+  --spacing-4:  16px;
+  --spacing-5:  24px;
+  --spacing-6:  32px;
+  --spacing-7:  48px;
+  --spacing-8:  64px;
+  --spacing-9:  80px;
+  --spacing-10: 120px;
 }
 
 body {
   font-family: var(--font-body);
   color: var(--color-heading-dark);
   word-break: keep-all;
+  line-height: 1.65;
 }

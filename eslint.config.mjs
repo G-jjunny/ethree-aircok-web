@@ -41,7 +41,7 @@ const eslintConfig = defineConfig([
           rules: [
             {
               from: { type: "next-app" },
-              allow: { to: { type: ["next-app", "fsd-app", "views", "widgets"] } },
+              allow: { to: { type: ["next-app", "fsd-app", "views", "widgets", "shared"] } },
             },
             {
               from: { type: "fsd-app" },
