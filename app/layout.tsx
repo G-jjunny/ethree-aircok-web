@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { AppProviders } from "@/app/providers";
 import { Nav } from "@/widgets/nav";
 import { Footer } from "@/widgets/footer";
+import { SITE } from "@/shared/config";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -15,38 +16,30 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-// TODO: 실제 도메인으로 변경 (예: https://www.aircok.com)
-const BASE_URL = "https://www.aircok.com";
-
 export const metadata: Metadata = {
-  metadataBase: new URL(BASE_URL),
+  metadataBase: new URL(SITE.url),
 
   title: {
-    // TODO: 회사명으로 변경
-    default: "Aircok",
-    template: "%s | Aircok",
+    default: SITE.nameEn,
+    template: `%s | ${SITE.nameEn}`,
   },
-  // TODO: 실제 사이트 설명으로 변경
-  description: "Aircok 공식 홈페이지입니다.",
+  description: SITE.description,
 
   openGraph: {
     type: "website",
     locale: "ko_KR",
-    url: BASE_URL,
-    // TODO: 회사명으로 변경
-    siteName: "Aircok",
-    title: "Aircok",
-    description: "Aircok 공식 홈페이지입니다.",
-    // app/opengraph-image.png 파일을 추가하면 자동 적용됨
+    url: SITE.url,
+    siteName: SITE.nameEn,
+    title: SITE.nameEn,
+    description: SITE.description,
   },
 
   twitter: {
     card: "summary_large_image",
-    title: "Aircok",
-    description: "Aircok 공식 홈페이지입니다.",
+    title: SITE.nameEn,
+    description: SITE.description,
   },
 
-  // 검색엔진 인덱싱 기본 허용
   robots: {
     index: true,
     follow: true,
