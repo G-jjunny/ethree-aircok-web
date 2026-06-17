@@ -653,6 +653,61 @@ Apple 스타일의 '제품 우선 프레젠테이션'을 Aircok 브랜드에 적
 </blockquote>
 ```
 
+### Page Sub-Hero (페이지 서브 히어로)
+
+About·Services 등 서브 페이지 상단의 텍스트 전용 히어로.
+
+- 배경: `bg-surface-dark`
+- 레이아웃: `min-h-[480px] flex items-center` (full-width)
+- 내부 콘텐츠: left-align (메인 히어로와 달리 center 아님)
+- **소형 레이블**: 12px, weight 600, `text-aircok-blue-light`, `uppercase tracking-widest`
+- **H1**: Section Heading (40px, weight 600), `text-heading-light`, `leading-[1.10]`, `tracking-[-0.3px]`, `[word-break:keep-all]`. 모바일 28px.
+- **본문 p**: Body (17px, weight 400), `text-body-light`, `leading-[1.65]`, `[word-break:keep-all]`
+- 콘텐츠 스택: `flex flex-col gap-4 py-20`
+
+```tsx
+// Page Sub-Hero 예시
+<section className="bg-surface-dark">
+  <div className="max-w-[1200px] mx-auto px-5 min-h-[480px] flex items-center">
+    <div className="flex flex-col gap-4 py-20">
+      <span className="text-aircok-blue-light text-xs font-semibold uppercase tracking-widest">레이블</span>
+      <h1 className="text-[28px] sm:text-[40px] font-semibold text-heading-light leading-[1.10] tracking-[-0.3px] [word-break:keep-all] max-w-[720px]">헤딩</h1>
+      <p className="text-[17px] text-body-light leading-[1.65] [word-break:keep-all] max-w-[640px]">본문</p>
+    </div>
+  </div>
+</section>
+```
+
+### History Timeline (연혁 타임라인)
+
+연도별 이벤트를 나열하는 2컬럼 타임라인 레이아웃.
+
+- 배경: `bg-surface-white`
+- 연도 블록 구분: `border-t border-border-light`
+- 레이아웃: `grid grid-cols-[120px_1fr] gap-8 md:grid-cols-[160px_1fr]`
+- **연도 숫자**: 40px, weight 700, `text-aircok-blue`, `leading-none`
+- **월 레이블**: 14px, weight 500, `text-secondary-dark`, `shrink-0 w-10`
+- **이벤트 텍스트**: Body (17px, weight 400), `text-body-dark`, `leading-[1.65]`, `[word-break:keep-all]`
+
+```tsx
+// History Timeline 예시
+<div className="flex flex-col gap-0">
+  {yearGroups.map((block) => (
+    <div key={block.year} className="border-t border-border-light py-8 grid grid-cols-[120px_1fr] gap-8 md:grid-cols-[160px_1fr]">
+      <div className="text-[40px] font-bold text-aircok-blue leading-none pt-1">{block.year}</div>
+      <ul className="flex flex-col gap-4">
+        {block.events.map((event) => (
+          <li key={event.month + event.text} className="flex gap-3">
+            <span className="text-secondary-dark text-sm font-medium shrink-0 w-10">{event.month}</span>
+            <span className="text-[17px] text-body-dark leading-[1.65] [word-break:keep-all]">{event.text}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  ))}
+</div>
+```
+
 ---
 
 ## 5. Layout Principles
