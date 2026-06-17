@@ -3,7 +3,7 @@ import { SITE } from '@/shared/config'
 
 export default function NotFound() {
   return (
-    <main className="min-h-screen bg-surface-dark flex items-center justify-center px-5">
+    <main className="flex-1 bg-surface-dark flex items-center justify-center px-5">
       {/* 1회성: 404 페이지 전용 콘텐츠 컨테이너 최대 너비. design.md 컨테이너 규격에 없는 값. */}
       <div className="flex flex-col items-center text-center gap-6 max-w-[480px] w-full">
         {/* 1회성: 워터마크 404 전용 크기. design.md 타이포그래피 표에 없는 값. */}
