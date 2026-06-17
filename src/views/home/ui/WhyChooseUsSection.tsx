@@ -1,18 +1,15 @@
 import { SITE } from '@/shared/config';
+import { SectionHeader } from '@/shared/ui';
 
 export function WhyChooseUsSection() {
   return (
     <section className="bg-surface-dark">
       <div className="max-w-[1200px] mx-auto px-5 py-20">
-        {/* 헤더 */}
-        <div className="flex flex-col gap-3">
-          <span className="text-aircok-blue-light text-xs font-semibold uppercase tracking-widest">
-            {SITE.whyUs.label}
-          </span>
-          <h2 className="text-heading-light font-display text-3xl md:text-4xl font-semibold leading-tight tracking-tight mt-3 [word-break:keep-all]">
-            {SITE.whyUs.title}
-          </h2>
-        </div>
+        <SectionHeader
+          label={SITE.whyUs.label}
+          title={SITE.whyUs.title}
+          theme="dark"
+        />
 
         {/* 메인 레이아웃 */}
         <div className="mt-12 flex flex-col lg:flex-row gap-16 items-start">

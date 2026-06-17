@@ -1,21 +1,17 @@
 import { SITE } from '@/shared/config';
+import { SectionHeader } from '@/shared/ui';
 
 export function MethodologySection() {
   return (
     <section className="bg-surface-white">
       <div className="max-w-[1200px] mx-auto px-5 py-20">
-        {/* 헤더 */}
-        <div className="flex flex-col items-center gap-3 text-center">
-          <span className="text-aircok-blue text-xs font-semibold uppercase tracking-widest">
-            {SITE.methodology.label}
-          </span>
-          <h2 className="text-heading-dark font-display text-3xl md:text-4xl font-semibold leading-tight tracking-tight">
-            {SITE.methodology.title}
-          </h2>
-          <p className="text-body-dark text-base leading-relaxed max-w-xl">
-            {SITE.methodology.description}
-          </p>
-        </div>
+        <SectionHeader
+          label={SITE.methodology.label}
+          title={SITE.methodology.title}
+          body={SITE.methodology.description}
+          theme="light"
+          align="center"
+        />
 
         {/* 4단계 스텝 */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 w-full mt-12">

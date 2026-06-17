@@ -1,4 +1,5 @@
 import { SITE } from '@/shared/config'
+import { SectionHeader, FeatureCard } from '@/shared/ui'
 
 type HistoryItem = (typeof SITE.about.history.items)[number]
 
@@ -22,16 +23,14 @@ export function AboutView() {
       {/* ── Section 1: Page Hero ─────────────────────────── */}
       <section className="bg-surface-dark">
         <div className="max-w-[1200px] mx-auto px-5 min-h-[480px] flex items-center">
-          <div className="flex flex-col gap-4 py-20">
-            <span className="text-aircok-blue-light text-xs font-semibold uppercase tracking-widest">
-              {SITE.about.hero.label}
-            </span>
-            <h1 className="text-[28px] sm:text-[40px] font-semibold text-heading-light leading-[1.10] tracking-[-0.3px] [word-break:keep-all] max-w-[720px]">
-              {SITE.about.hero.headline}
-            </h1>
-            <p className="text-[17px] text-body-light leading-[1.65] [word-break:keep-all] max-w-[640px]">
-              {SITE.about.hero.body}
-            </p>
+          <div className="py-20">
+            <SectionHeader
+              label={SITE.about.hero.label}
+              title={SITE.about.hero.headline}
+              body={SITE.about.hero.body}
+              theme="dark"
+              titleAs="h1"
+            />
           </div>
         </div>
       </section>
@@ -39,30 +38,22 @@ export function AboutView() {
       {/* ── Section 2: 스마트 에어콕 소개 ───────────────── */}
       <section className="bg-surface-white py-20">
         <div className="max-w-[1200px] mx-auto px-5">
-          <div className="flex flex-col gap-4 mb-12">
-            <span className="text-aircok-blue text-xs font-semibold uppercase tracking-widest">
-              {SITE.about.intro.label}
-            </span>
-            <h2 className="text-[40px] font-semibold text-heading-dark leading-[1.10] tracking-[-0.3px] [word-break:keep-all] max-w-[720px]">
-              {SITE.about.intro.title}
-            </h2>
-            <p className="text-[17px] text-body-dark leading-[1.65] [word-break:keep-all] max-w-[640px]">
-              {SITE.about.intro.body}
-            </p>
+          <div className="mb-12">
+            <SectionHeader
+              label={SITE.about.intro.label}
+              title={SITE.about.intro.title}
+              body={SITE.about.intro.body}
+              theme="light"
+            />
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {SITE.about.intro.values.map((value) => (
-              <div
+              <FeatureCard
                 key={value.title}
-                className="bg-surface-light rounded-xl p-8 flex flex-col gap-3"
-              >
-                <h3 className="text-[21px] font-bold text-heading-dark leading-[1.19]">
-                  {value.title}
-                </h3>
-                <p className="text-[17px] text-body-dark leading-[1.65] [word-break:keep-all]">
-                  {value.description}
-                </p>
-              </div>
+                title={value.title}
+                description={value.description}
+                theme="light"
+              />
             ))}
           </div>
         </div>
@@ -71,17 +62,12 @@ export function AboutView() {
       {/* ── Section 3: 팀 소개 ──────────────────────────── */}
       <section className="bg-surface-light py-20">
         <div className="max-w-[1200px] mx-auto px-5">
-          <div className="flex flex-col gap-4">
-            <span className="text-aircok-blue text-xs font-semibold uppercase tracking-widest">
-              {SITE.about.team.label}
-            </span>
-            <h2 className="text-[40px] font-semibold text-heading-dark leading-[1.10] tracking-[-0.3px] [word-break:keep-all] max-w-[720px]">
-              {SITE.about.team.title}
-            </h2>
-            <p className="text-[17px] text-body-dark leading-[1.65] [word-break:keep-all] max-w-[640px]">
-              {SITE.about.team.body}
-            </p>
-          </div>
+          <SectionHeader
+            label={SITE.about.team.label}
+            title={SITE.about.team.title}
+            body={SITE.about.team.body}
+            theme="light"
+          />
           {/* 팀 카드 placeholder 3열 그리드 */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-12">
             {(['첫번째 팀원', '두번째 팀원', '세번째 팀원'] as const).map((label) => (
@@ -101,16 +87,13 @@ export function AboutView() {
       {/* ── Section 4: 파트너사 ─────────────────────────── */}
       <section className="bg-surface-dark py-20">
         <div className="max-w-[1200px] mx-auto px-5">
-          <div className="flex flex-col gap-4 mb-8">
-            <span className="text-aircok-blue-light text-xs font-semibold uppercase tracking-widest">
-              Our Partners
-            </span>
-            <h2 className="text-[40px] font-semibold text-heading-light leading-[1.10] tracking-[-0.3px] [word-break:keep-all] max-w-[720px]">
-              {SITE.partners.heading}
-            </h2>
-            <p className="text-[17px] text-body-light leading-[1.65] [word-break:keep-all] max-w-[640px]">
-              우리의 파트너가 여러분이 믿을 수 있는 회사와 기관이라는 점에서 마음의 안심을 줍니다.
-            </p>
+          <div className="mb-8">
+            <SectionHeader
+              label="Our Partners"
+              title={SITE.partners.heading}
+              body="우리의 파트너가 여러분이 믿을 수 있는 회사와 기관이라는 점에서 마음의 안심을 줍니다."
+              theme="dark"
+            />
           </div>
           <div className="flex flex-wrap gap-3 mt-8">
             {SITE.partners.list.map((partner) => (
@@ -128,13 +111,12 @@ export function AboutView() {
       {/* ── Section 5: 연혁 History ─────────────────────── */}
       <section className="bg-surface-white py-20">
         <div className="max-w-[1200px] mx-auto px-5">
-          <div className="flex flex-col gap-4 mb-14">
-            <span className="text-aircok-blue text-xs font-semibold uppercase tracking-widest">
-              {SITE.about.history.label}
-            </span>
-            <h2 className="text-[40px] font-semibold text-heading-dark leading-[1.10] tracking-[-0.3px] [word-break:keep-all] max-w-[720px]">
-              {SITE.about.history.title}
-            </h2>
+          <div className="mb-14">
+            <SectionHeader
+              label={SITE.about.history.label}
+              title={SITE.about.history.title}
+              theme="light"
+            />
           </div>
           <div className="flex flex-col">
             {historyGroups.map((group) => (

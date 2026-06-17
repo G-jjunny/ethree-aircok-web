@@ -36,6 +36,30 @@ tools: Read, Write, Edit, Glob, Grep
 1. 해당 값 옆에 `{/* token 없음: 이유 */}` 주석 추가
 2. 보고서 `unresolvedIssues`에 "토큰 추가 필요: [값]" 항목 포함
 
+# ⚠️ 공용 컴포넌트 우선 사용 규칙
+
+새 카드·섹션 헤더 마크업을 작성하기 **전에 반드시** `src/shared/ui/`에 이미 존재하는 공용 컴포넌트가 있는지 확인한다.
+
+현재 등록된 공용 컴포넌트:
+- `SectionHeader` — label·title·body 조합의 섹션 헤더 (`theme: 'light' | 'dark'`, `titleAs: 'h1' | 'h2'`)
+- `FeatureCard` — title·description 카드 (`theme: 'light' | 'dark'`)
+- `DarkStatCard` — category·stat·title·description·source 통계 카드 (항상 dark)
+
+```
+❌ 절대 금지 — 공용 컴포넌트와 동일한 마크업을 중복 작성
+  <div className="flex flex-col gap-4">
+    <span className="text-aircok-blue ...">label</span>
+    <h2 className="text-heading-dark ...">title</h2>
+    <p className="text-body-dark ...">body</p>
+  </div>
+
+✅ 필수 사용
+  import { SectionHeader } from '@/shared/ui'
+  <SectionHeader label="..." title="..." body="..." theme="light" />
+```
+
+새로운 반복 패턴이 3곳 이상 사용된다면 `src/shared/ui/`에 공용 컴포넌트로 추가하고 `src/shared/ui/index.ts`에 export한다.
+
 # 위임 경로
 
 - frontend-leader가 직접 위임하는 경우
