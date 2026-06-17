@@ -1,0 +1,44 @@
+name: "✨ Feature"
+description: 새로운 기능 요청
+labels: ["feat"]
+body:
+  - type: dropdown
+    id: scope
+    attributes:
+      label: 작업 범위
+      options:
+        - frontend
+        - backend
+        - fullstack
+    validations:
+      required: true
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: 기능 요약
+      description: 어떤 기능을 구현하나요?
+      placeholder: 한 줄로 간결하게 설명해주세요.
+    validations:
+      required: true
+
+  - type: textarea
+    id: details
+    attributes:
+      label: 상세 내용
+      description: 구현 방향, 관련 화면, API 설계 등 추가 컨텍스트
+      placeholder: |
+        - UI: ...
+        - API: ...
+        - 비즈니스 로직: ...
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: 완료 조건
+      description: 이 이슈가 완료됐다고 판단하는 기준
+      placeholder: |
+        - [ ] ...
+        - [ ] ...
+    validations:
+      required: true
