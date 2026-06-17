@@ -1,5 +1,5 @@
-import { SITE } from '@/shared/config';
-import { SectionHeader } from '@/shared/ui';
+import { SITE } from "@/shared/config";
+import { SectionHeader } from "@/shared/ui";
 
 export function MethodologySection() {
   return (
@@ -16,7 +16,10 @@ export function MethodologySection() {
         {/* 4단계 스텝 */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 w-full mt-12">
           {SITE.methodology.steps.map((item) => (
-            <div key={item.step} className="bg-surface-white rounded-xl shadow-card p-8 flex flex-col gap-4 relative">
+            <div
+              key={item.step}
+              className="bg-surface-white rounded-xl shadow-card p-8 flex flex-col gap-4 relative"
+            >
               <span
                 className="text-6xl font-bold text-aircok-blue opacity-20 leading-none absolute top-6 right-6 select-none"
                 aria-hidden="true"
@@ -24,7 +27,7 @@ export function MethodologySection() {
                 {item.step}
               </span>
               <span className="text-aircok-blue text-xs font-bold uppercase tracking-widest">
-                STEP {String(item.step).padStart(2, '0')}
+                STEP {String(item.step).padStart(2, "0")}
               </span>
               <h3 className="text-heading-dark text-xl font-semibold leading-[1.14] mt-2 [word-break:keep-all]">
                 {item.title}

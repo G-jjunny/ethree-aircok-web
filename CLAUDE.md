@@ -139,3 +139,9 @@ orchestrator (Task만 사용, Write 불가)
 - 리뷰어(`frontend-reviewer`, `backend-reviewer`)는 직접 문제를 수정하지 않습니다 — 리더에게 보고하고, 리더가 해당 구현자/디자이너에게 재위임합니다.
 - 모든 리더 → 오케스트레이터, 스페셜리스트 → 리더 보고는 `summary`, `changedFiles`, `complianceCheck`, `unresolvedIssues`, `crossTeamNotes` 구조화 스키마를 사용합니다.
 - 각 에이전트의 정확한 툴 권한과 책임은 `.claude/agents/*.md`의 frontmatter를 참조하세요.
+
+## views 슬라이스 내 섹션 분리 규칙
+
+- `views/<page>/ui/` 안에서 섹션이 3개 이상이면 섹션별로 파일 분리 필수
+- `<PageName>View.tsx`는 섹션 컴포넌트를 조합하는 역할만 하며, 직접 JSX 마크업을 길게 작성하지 않는다
+- 섹션 파일 네이밍: `<SectionName>Section.tsx`
