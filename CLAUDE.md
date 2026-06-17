@@ -1,0 +1,114 @@
+# CLAUDE.md
+
+이 파일은 Claude Code(claude.ai/code)가 이 저장소의 코드를 다룰 때 참고하는 가이드입니다.
+
+@AGENTS.md
+
+## 명령어
+
+```bash
+npm run dev       # 개발 서버 시작 (Turbopack, localhost:3000)
+npm run build     # 프로덕션 빌드
+npm start         # 프로덕션 서버 실행
+npm run lint      # ESLint 실행
+```
+
+> `next build`는 Next.js 16부터 린터를 자동으로 실행하지 않습니다. 린트는 별도로 실행하세요.
+
+## 아키텍처
+
+**Next.js 16.2.9** 프로젝트로, React 19와 TypeScript를 사용하는 **App Router** 기반입니다. 기본 번들러는 Turbopack입니다. 애플리케이션 코드는 `src/` 아래에 **Feature-Sliced Design(FSD)** 구조를 따르며, `app/`은 라우팅 셸 역할만 합니다.
+
+- `app/` — App Router. 모든 라우트는 파일 시스템 기반입니다. 각 세그먼트에서 `layout.tsx`가 `page.tsx`를 감쌉니다. 라우트 파일은 `src/views`(또는 `src/widgets`)에서만 import하고 렌더링만 합니다 — 비즈니스 로직은 여기에 두지 않습니다.
+- `app/globals.css` — Tailwind CSS v4 (`@tailwind base/components/utilities` 대신 `@import "tailwindcss"` 문법 사용).
+- `public/` — 정적 에셋, 루트 경로로 참조합니다 (`/image.png`).
+- `@/*` 경로 별칭은 `./src/*`로 매핑됩니다 (프로젝트 루트가 아님 — FSD 도입 시 변경됨).
+
+### FSD 레이어 (`src/`)
+
+엄격한 단방향 의존성 규칙: 각 레이어는 **아래** 레이어에서만 import할 수 있습니다. 같은 레이어의 슬라이스 간 import(예: `entities` 슬라이스가 다른 `entities` 슬라이스를 import)나 상위 레이어 import는 절대 금지입니다.
+
+```
+src/
+  app/        # 전역 Provider (QueryProvider 등), app/layout.tsx에서 조합 — 최상위 레이어, 무엇이든 import 가능
+  views/      # 페이지 단위 조합 (FSD에서는 "pages"라 부르나, Next.js pages 라우터와 충돌 방지를 위해 이름 변경). widgets/features/entities/shared import 가능
+  widgets/    # features+entities로 조합된 독립적인 UI 블록. features/entities/shared import 가능
+  features/   # 사용자 시나리오/액션 (폼, 뮤테이션). entities/shared import 가능
+  entities/   # 비즈니스 도메인 모델 (엔티티별 api, model, ui). shared만 import 가능
+  shared/     # UI 킷, API 클라이언트, lib, config, hooks, stores. 상위 레이어 import 불가.
+```
+
+각 슬라이스(예: `entities/user/`)는 `index.ts`를 통해 Public API를 노출합니다 — 다른 레이어는 슬라이스 루트에서만 import해야 하며, 내부 파일 직접 접근은 금지입니다 (슬라이스 외부에서 `entities/user/api/userApi` import 불가).
+
+레이어별 스택 규칙:
+- 서버 상태 / 데이터 페칭 → **TanStack Query**, queryOptions는 `entities/*/api` 또는 `features/*/api`에 위치. Provider는 `src/app/providers/query-provider.tsx`.
+- 클라이언트/전역 상태 → **zustand**, store는 `entities/*/model` 또는 `features/*/model`에 위치 (크로스커팅 전용 store만 `shared/stores`에 위치).
+- 폼 → **react-hook-form** + **zod** (`@hookform/resolvers/zod`), 스키마와 폼은 해당 `features/*` 슬라이스에 함께 위치.
+
+## 이전 Next.js 버전과의 주요 API 차이
+
+**캐싱 (새 모델 — `next.config.ts`에 `cacheComponents: true` 필요):**
+- async 함수나 컴포넌트를 캐싱할 때는 `fetch` 캐시 옵션 대신 `'use cache'` 디렉티브를 사용합니다.
+- 캐시된 함수 내부에서는 `next/cache`의 `cacheLife()`와 `cacheTag()`를 사용합니다.
+- 캐시되지 않은 async 컴포넌트는 반드시 `<Suspense>`로 감싸야 합니다 — 그렇지 않으면 빌드 오류가 발생합니다.
+- Server Actions에서 온디맨드 캐시 무효화 시 `revalidateTag()` 대신 `updateTag()`를 사용합니다.
+- Server Actions에서 현재 라우트를 갱신할 때 `router.refresh()` 대신 `next/cache`의 `refresh()`를 사용합니다.
+
+**렌더링:**
+- `cacheComponents: true` 설정 시 기본 렌더링 모델은 **Partial Prerendering(PPR)**입니다. 정적/캐시된 콘텐츠는 셸에, 런타임 동적 콘텐츠는 `<Suspense>`를 통해 스트리밍됩니다.
+- 런타임 API(`cookies()`, `headers()`, `searchParams`, `params`)는 반드시 `await`해야 하며, 이를 사용하는 컴포넌트는 `<Suspense>`로 감싸야 합니다.
+
+**Params/SearchParams:**
+- 페이지 컴포넌트의 `params`와 `searchParams`는 이제 **Promise**입니다 — 항상 `await`하세요:
+  ```tsx
+  export default async function Page({ params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params
+  }
+  ```
+
+**Server Functions (이전 명칭: "Server Actions"):**
+- async 함수 내부 또는 파일 상단에 `'use server'` 디렉티브를 선언합니다.
+- 모든 Server Function 내부에서 반드시 인증을 검증하세요 — 직접 POST 요청으로 접근 가능합니다.
+
+**린팅:**
+- ESLint 9 플랫 설정 (`eslint.config.mjs`) 사용, `.eslintrc` 미사용.
+- `next lint` CLI는 제거됨 — `eslint`를 직접 사용합니다.
+
+**스타일링:**
+- Tailwind CSS v4: CSS에서 `@import "tailwindcss"` 사용. `@theme inline` 디렉티브로 CSS 변수를 정의합니다.
+- 모든 디자인 토큰(색상·간격·radius·shadow·폰트)은 `app/globals.css`의 `@theme inline` 블록에 정의되어 있으며, `design` 에이전트가 단독으로 관리합니다.
+- 색상·크기·간격 등의 값은 반드시 정의된 Tailwind 토큰 클래스(`bg-aircok-blue`, `rounded-md` 등)를 사용하고 하드코딩하지 않습니다.
+
+## 백엔드 (`server/`)
+
+별도의 **NestJS + Prisma + PostgreSQL** 백엔드가 같은 저장소의 `server/`에 위치합니다 (모노레포 방식, 아직 스캐폴딩 전). Next.js 프론트엔드와는 독립적입니다 — 공유 타입 패키지는 없으며, 양측이 각자 타입을 작성하고 `backend-leader`가 문서화한 API 계약(OpenAPI 스펙 등)으로 동기화를 유지합니다.
+
+## 디자인 가이드
+
+`docs/design.md`는 Apple 스타일의 디자인 토큰/일관성 가이드로, `design` 서브에이전트만 참조합니다. 색상 팔레트, 타이포그래피 스케일, 컴포넌트 스타일, 간격, 반응형 규칙을 문서화합니다. 기존에 없는 새 패턴이 필요할 경우, `design.md`를 먼저 업데이트한 후 구현을 진행합니다.
+
+## FSD 스킬
+
+구현 및 리뷰 서브에이전트(`frontend-implementer`, `frontend-reviewer`)는 위 규칙에 더해 슬라이스 구조와 Public API 규칙에 대해 [feature-sliced/skills FSD 스킬](https://github.com/feature-sliced/skills/tree/master/feature-sliced-design)을 따릅니다.
+
+## 서브에이전트 구조
+
+`.claude/agents/`에 정의된 3단계 위임 구조:
+
+```
+orchestrator (Task만 사용, Write 불가)
+├── frontend-leader
+│   ├── design              — docs/design.md 토큰, 마크업/className
+│   ├── frontend-implementer — entities/features/widgets/views 구현
+│   └── frontend-reviewer    — lint/typecheck/build + 디자인 & Next.js 규칙 리뷰
+└── backend-leader
+    ├── backend-api-designer — NestJS 엔드포인트/DTO, Prisma 스키마 설계
+    ├── backend-implementer  — NestJS 모듈/서비스/컨트롤러, 마이그레이션
+    └── backend-reviewer     — lint/typecheck/build + API 계약 리뷰
+```
+
+- `orchestrator`는 위임만 합니다(Task 툴); 파일을 직접 수정하지 않습니다.
+- 리더들은 크로스팀 사안(API 계약)을 오케스트레이터에게 올리지 않고 서로 직접 협의합니다.
+- 리뷰어(`frontend-reviewer`, `backend-reviewer`)는 직접 문제를 수정하지 않습니다 — 리더에게 보고하고, 리더가 해당 구현자/디자이너에게 재위임합니다.
+- 모든 리더 → 오케스트레이터, 스페셜리스트 → 리더 보고는 `summary`, `changedFiles`, `complianceCheck`, `unresolvedIssues`, `crossTeamNotes` 구조화 스키마를 사용합니다.
+- 각 에이전트의 정확한 툴 권한과 책임은 `.claude/agents/*.md`의 frontmatter를 참조하세요.

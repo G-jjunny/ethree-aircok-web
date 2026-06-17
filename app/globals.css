@@ -1,0 +1,58 @@
+@import "tailwindcss";
+
+/* Pretendard — 한글 기본 폰트 */
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css');
+
+@theme inline {
+  /* ── Fonts ─────────────────────────────── */
+  --font-sans:    var(--font-geist-sans);
+  --font-mono:    var(--font-geist-mono);
+  --font-display: 'Pretendard', 'SF Pro Display', -apple-system, 'Helvetica Neue', sans-serif;
+  --font-body:    'Pretendard', 'SF Pro Text',    -apple-system, 'Helvetica Neue', sans-serif;
+
+  /* ── Brand Colors ───────────────────────── */
+  --color-aircok-blue:       #0057ff;
+  --color-aircok-blue-dark:  #0040cc;
+  --color-aircok-blue-light: #3d7fff;
+
+  /* ── Surface ────────────────────────────── */
+  --color-surface-white:  #ffffff;
+  --color-surface-light:  #f5f5f7;
+  --color-surface-dark:   #0a0a0a;
+  --color-surface-dark-1: #1a1a1a;
+  --color-surface-dark-2: #242424;
+
+  /* ── Text ───────────────────────────────── */
+  --color-heading-dark:   #1d1d1f;
+  --color-body-dark:      rgba(0, 0, 0, 0.80);
+  --color-secondary-dark: rgba(0, 0, 0, 0.48);
+  --color-heading-light:  #ffffff;
+  --color-body-light:     rgba(255, 255, 255, 0.86);
+
+  /* ── Link / Focus ───────────────────────── */
+  --color-link-on-light: #0057ff;
+  --color-link-on-dark:  #3d7fff;
+  --color-focus:         #0057ff;
+
+  /* ── Feedback ───────────────────────────── */
+  --color-success: #34c759;
+  --color-warning: #ff9f0a;
+  --color-error:   #ff3b30;
+
+  /* ── Border Radius ──────────────────────── */
+  --radius-sm:   6px;
+  --radius-md:   8px;
+  --radius-lg:   12px;
+  --radius-xl:   16px;
+  --radius-pill: 980px;
+
+  /* ── Shadows ────────────────────────────── */
+  --shadow-card:    rgba(0, 0, 0, 0.12) 0px 4px 24px 0px;
+  --shadow-product: rgba(0, 0, 0, 0.22) 3px 5px 30px 0px;
+}
+
+body {
+  font-family: var(--font-body);
+  color: var(--color-heading-dark);
+  word-break: keep-all;
+}
