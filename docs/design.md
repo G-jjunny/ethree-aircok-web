@@ -789,33 +789,168 @@ Base unit: 8px
 
 ## 8. FAQ 컴포넌트
 
-FAQ 페이지(`/faq`)에서 사용하는 전용 컴포넌트 패턴. 전체 섹션 배경은 `bg-surface-white`(라이트)를 기본으로 하며, 콘텐츠 폭을 `max-w-3xl`로 좁혀 가독성을 확보한다.
+FAQ 페이지(`/faq`)에서 사용하는 전용 컴포넌트 패턴. 전체 섹션 배경은 `bg-surface-white`(라이트)를 기본으로 한다.
 
-### FAQ Section Layout
+### FAQ Section Layout (데스크탑 2컬럼 사이드바 레이아웃)
+
+데스크탑에서는 좌측 sticky 사이드바 + 우측 아코디언의 2컬럼 구조를 사용한다. 모바일에서는 사이드바를 숨기고 상단 탭으로 폴백한다.
 
 - 섹션 배경: `bg-surface-white`
 - 섹션 패딩: `py-20 md:py-28`
-- 내부 컨테이너 최대 너비: `max-w-3xl mx-auto px-5` (가독성을 위해 1200px 아닌 768px 제한)
-- 카테고리 탭과 아코디언 목록 사이 간격: `mt-10`
+- 전체 컨테이너 최대 너비: `max-w-[1000px] mx-auto px-5` {/* token 없음: FAQ 전용 중간 너비, 1200px 보다 좁고 768px 보다 넓은 2컬럼용 */}
+- 검색 입력창과 2컬럼 그리드 사이 간격: `mt-8`
+- 2컬럼 그리드: `grid grid-cols-1 sm:grid-cols-[200px_1fr] gap-10` {/* token 없음: 사이드바 고정 너비 200px */}
+- 사이드바 영역: `hidden sm:block` (모바일 숨김)
+- 사이드바 sticky: `sticky top-20`
+- 모바일 탭 영역: `sm:hidden` (데스크탑 숨김)
 - 전체 구조:
 
 ```tsx
-// FAQ Section Layout 예시
+// FAQ Section Layout 예시 (데스크탑 2컬럼)
 <section className="bg-surface-white py-20 md:py-28">
-  <div className="max-w-3xl mx-auto px-5">
-    {/* SectionHeader 공용 컴포넌트 사용 */}
-    <SectionHeader label="자주 묻는 질문" title="FAQ" theme="light" />
-    {/* 카테고리 탭 */}
+  <div className="max-w-[1000px] mx-auto px-5"> {/* token 없음: FAQ 2컬럼 전용 너비 */}
+    <SectionHeader label="자주 묻는 질문" title="FAQ" theme="light" titleAs="h2" />
+    {/* 검색 input */}
     <div className="mt-8">
-      <CategoryTabList ... />
+      <FaqSearchInput ... />
     </div>
-    {/* 아코디언 목록 */}
-    <div className="mt-10">
-      <AccordionList ... />
+    {/* 2컬럼 그리드 */}
+    <div className="grid grid-cols-1 sm:grid-cols-[200px_1fr] gap-10 mt-8"> {/* token 없음: 사이드바 고정 너비 */}
+      {/* 사이드바 (데스크탑만) */}
+      <FaqSidebar ... />
+      {/* 우측 콘텐츠 */}
+      <div>
+        {/* 모바일 탭 (모바일만) */}
+        <div className="sm:hidden mb-6">
+          <CategoryTabList ... />
+        </div>
+        {/* 아코디언 */}
+        <FaqAccordion ... />
+      </div>
     </div>
   </div>
 </section>
 ```
+
+### FAQ Search Input (검색 입력창)
+
+섹션 상단에 배치되는 키워드 필터링 입력창. 입력 즉시 아코디언 목록을 필터링한다.
+
+- 컨테이너: `relative`
+- input: `w-full bg-surface-light rounded-lg px-4 py-3 pl-10 text-[15px] text-heading-dark placeholder:text-secondary-dark focus:outline-none focus:ring-2 focus:ring-aircok-blue border-none`
+- 검색 아이콘: `absolute left-3 top-1/2 -translate-y-1/2 text-secondary-dark w-5 h-5`
+- 아이콘: SVG 돋보기, `pointer-events-none aria-hidden="true"`
+
+```tsx
+// FAQ Search Input 예시
+<div className="relative">
+  <svg
+    className="absolute left-3 top-1/2 -translate-y-1/2 text-secondary-dark w-5 h-5 pointer-events-none"
+    aria-hidden="true"
+    fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5"
+  >
+    <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607z"/>
+  </svg>
+  <input
+    type="search"
+    placeholder="질문을 검색하세요"
+    className="w-full bg-surface-light rounded-lg px-4 py-3 pl-10 text-[15px] text-heading-dark placeholder:text-secondary-dark focus:outline-none focus:ring-2 focus:ring-aircok-blue border-none"
+  />
+</div>
+```
+
+### FAQ Sidebar (사이드바 카테고리 네비게이션)
+
+데스크탑(sm 이상)에서 좌측에 배치되는 sticky 카테고리 리스트. 모바일에서는 숨긴다.
+
+- 외부 래퍼: `hidden sm:block`
+- 내부 sticky 컨테이너: `sticky top-20`
+- 카테고리 섹션 레이블 (선택적): `text-[12px] font-semibold text-secondary-dark uppercase tracking-wider mb-2`
+- 항목 버튼 목록: `flex flex-col gap-1`
+
+**사이드바 항목 버튼 — 활성 상태:**
+- `w-full flex items-center justify-between text-[15px] font-semibold text-aircok-blue bg-surface-light rounded-md px-3 py-2`
+
+**사이드바 항목 버튼 — 비활성 상태:**
+- `w-full flex items-center justify-between text-[15px] font-medium text-body-dark rounded-md px-3 py-2 hover:bg-surface-light hover:text-heading-dark transition-colors`
+
+**카운트 배지 (항목 수 표시):**
+- `text-[12px] text-secondary-dark bg-surface-light rounded-pill px-2 py-0.5 ml-auto tabular-nums`
+- 활성 상태일 때는 배경 없이: `text-[12px] text-aircok-blue ml-auto tabular-nums`
+
+```tsx
+// FAQ Sidebar 예시
+<div className="hidden sm:block">
+  <div className="sticky top-20">
+    <p className="text-[12px] font-semibold text-secondary-dark uppercase tracking-wider mb-2">카테고리</p>
+    <div className="flex flex-col gap-1">
+      {/* 활성 항목 */}
+      <button className="w-full flex items-center justify-between text-[15px] font-semibold text-aircok-blue bg-surface-light rounded-md px-3 py-2">
+        <span>전체</span>
+        <span className="text-[12px] text-aircok-blue ml-auto tabular-nums">23</span>
+      </button>
+      {/* 비활성 항목 */}
+      <button className="w-full flex items-center justify-between text-[15px] font-medium text-body-dark rounded-md px-3 py-2 hover:bg-surface-light hover:text-heading-dark transition-colors">
+        <span>제품 관련</span>
+        <span className="text-[12px] text-secondary-dark bg-surface-light rounded-pill px-2 py-0.5 ml-auto tabular-nums">10</span>
+      </button>
+    </div>
+  </div>
+</div>
+```
+
+### Q Number Badge (질문 번호 배지)
+
+각 아코디언 질문 앞에 카테고리별 순번을 표시하는 소형 배지. Step Badge보다 작은 크기로 인라인 배치한다.
+
+- 배지 컨테이너: `shrink-0 w-8 h-8 rounded-full bg-surface-light flex items-center justify-center`
+- 배지 텍스트: `text-[11px] font-semibold text-aircok-blue leading-none`
+- 아코디언 질문 버튼 내 배치 순서: 배지 → 질문 텍스트 → 토글 아이콘
+- **형식 규칙**:
+  - 카테고리 '제품 관련': `P${String(index+1).padStart(2,'0')}` (예: P01, P02)
+  - 카테고리 '실내공기질': `A${String(index+1).padStart(2,'0')}` (예: A01, A02)
+  - '전체' 보기: 각 카테고리 내 원래 순번 유지
+  - 검색 결과: 카테고리 내 원래 순번 유지 (필터된 인덱스 기준이 아닌, 카테고리 내 순번 기준)
+
+```tsx
+// Q Number Badge가 포함된 아코디언 질문 버튼 예시
+<button
+  className="flex items-center justify-between w-full gap-4 py-5 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:rounded-sm"
+  aria-expanded={isOpen}
+>
+  {/* 배지 + 질문 텍스트 묶음 */}
+  <span className="flex items-center gap-3 min-w-0">
+    <span className="shrink-0 w-8 h-8 rounded-full bg-surface-light flex items-center justify-center" aria-hidden="true">
+      <span className="text-[11px] font-semibold text-aircok-blue leading-none">P01</span>
+    </span>
+    <span className="text-[17px] font-semibold text-heading-dark leading-[1.47] [word-break:keep-all] text-left">
+      Q. 질문 텍스트
+    </span>
+  </span>
+  {/* 토글 아이콘 */}
+  <span className="shrink-0 w-6 h-6 flex items-center justify-center text-secondary-dark transition-colors" aria-hidden="true">
+    {/* plus / minus SVG */}
+  </span>
+</button>
+```
+
+### 검색 결과 없음 상태
+
+검색어 입력 후 일치하는 항목이 없을 때 표시하는 빈 상태 메시지.
+
+- 컨테이너: `py-12 text-center`
+- 메시지 텍스트: `text-[17px] text-secondary-dark [word-break:keep-all]`
+- 부연 설명(선택): `text-[15px] text-secondary-dark mt-2`
+
+```tsx
+// 검색 결과 없음 상태 예시
+<div className="py-12 text-center">
+  <p className="text-[17px] text-secondary-dark [word-break:keep-all]">검색 결과가 없습니다.</p>
+  <p className="text-[15px] text-secondary-dark mt-2">다른 키워드로 검색해 보세요.</p>
+</div>
+```
+
+### Category Tab (카테고리 필터 탭)
 
 ### Category Tab (카테고리 필터 탭)
 
