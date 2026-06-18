@@ -787,7 +787,190 @@ Base unit: 8px
 
 ---
 
-## 8. Responsive Behavior
+## 8. FAQ 컴포넌트
+
+FAQ 페이지(`/faq`)에서 사용하는 전용 컴포넌트 패턴. 전체 섹션 배경은 `bg-surface-white`(라이트)를 기본으로 하며, 콘텐츠 폭을 `max-w-3xl`로 좁혀 가독성을 확보한다.
+
+### FAQ Section Layout
+
+- 섹션 배경: `bg-surface-white`
+- 섹션 패딩: `py-20 md:py-28`
+- 내부 컨테이너 최대 너비: `max-w-3xl mx-auto px-5` (가독성을 위해 1200px 아닌 768px 제한)
+- 카테고리 탭과 아코디언 목록 사이 간격: `mt-10`
+- 전체 구조:
+
+```tsx
+// FAQ Section Layout 예시
+<section className="bg-surface-white py-20 md:py-28">
+  <div className="max-w-3xl mx-auto px-5">
+    {/* SectionHeader 공용 컴포넌트 사용 */}
+    <SectionHeader label="자주 묻는 질문" title="FAQ" theme="light" />
+    {/* 카테고리 탭 */}
+    <div className="mt-8">
+      <CategoryTabList ... />
+    </div>
+    {/* 아코디언 목록 */}
+    <div className="mt-10">
+      <AccordionList ... />
+    </div>
+  </div>
+</section>
+```
+
+### Category Tab (카테고리 필터 탭)
+
+수평 스크롤 가능한 탭 리스트. 모바일에서 가로 스크롤로 overflow 처리한다.
+
+**탭 리스트 컨테이너:**
+- `flex flex-row gap-2 overflow-x-auto pb-1 scrollbar-none`
+- 스크롤바 숨김: `[&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]`
+
+**탭 버튼 — 활성 상태:**
+- 배경: `bg-aircok-blue`
+- 텍스트: `text-heading-light`
+- Radius: `rounded-pill`
+- 패딩: `px-5 py-2`
+- 폰트: `text-[15px] font-medium`
+- 최소 높이: `min-h-[44px]` (터치 타깃)
+- `shrink-0` 필수 (flex 축소 방지)
+
+**탭 버튼 — 비활성 상태:**
+- 배경: `bg-transparent`
+- 텍스트: `text-body-dark`
+- Radius: `rounded-pill`
+- 패딩: `px-5 py-2`
+- 폰트: `text-[15px] font-medium`
+- hover: `hover:bg-surface-light`
+- 트랜지션: `transition-colors`
+- 최소 높이: `min-h-[44px]` (터치 타깃)
+- `shrink-0` 필수
+
+```tsx
+// Category Tab 예시
+<div className="flex flex-row gap-2 overflow-x-auto pb-1 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+  {/* 활성 탭 */}
+  <button
+    className="shrink-0 rounded-pill px-5 py-2 min-h-[44px] text-[15px] font-medium bg-aircok-blue text-heading-light transition-colors"
+  >
+    전체
+  </button>
+  {/* 비활성 탭 */}
+  <button
+    className="shrink-0 rounded-pill px-5 py-2 min-h-[44px] text-[15px] font-medium bg-transparent text-body-dark hover:bg-surface-light transition-colors"
+  >
+    제품 관련
+  </button>
+</div>
+```
+
+### Accordion Item (FAQ 아코디언 항목)
+
+질문(Q) 헤더 클릭 시 답변(A) 영역을 토글하는 아코디언. 항목 간 구분은 `border-b border-border-light`로 처리한다.
+
+**아코디언 래퍼 (`<div>` 또는 `<details>`):**
+- `border-b border-border-light`
+
+**질문(Q) 헤더 버튼 (`<button>`):**
+- 레이아웃: `flex items-center justify-between w-full gap-4`
+- 패딩: `py-5`
+- 질문 텍스트: `text-[17px] font-semibold text-heading-dark leading-[1.47] [word-break:keep-all] text-left`
+- 인터랙션: `cursor-pointer`
+- 포커스: `focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:rounded-sm`
+
+**토글 아이콘:**
+- 컨테이너: `shrink-0 w-6 h-6 flex items-center justify-center text-secondary-dark`
+- 열린 상태: "–" (minus) 또는 위쪽 chevron SVG — 색상 `text-aircok-blue`
+- 닫힌 상태: "+" (plus) 또는 아래쪽 chevron SVG — 색상 `text-secondary-dark`
+- 트랜지션: `transition-colors`
+
+**답변(A) 영역:**
+- 패딩: `pb-5`
+- 텍스트: `text-[17px] text-body-dark leading-[1.65] [word-break:keep-all]`
+- 열린 상태 배경 변화: 별도 배경 없음 (구분선만으로 depth 표현). 열린 항목의 배경이 필요한 경우에만 래퍼에 `bg-surface-light rounded-lg`를 `px-4`와 함께 적용한다.
+- 닫힌 상태: `hidden` 또는 CSS 애니메이션(`max-height` 트랜지션)으로 처리
+
+```tsx
+// Accordion Item 예시 (열린 상태)
+<div className="border-b border-border-light">
+  <button
+    className="flex items-center justify-between w-full gap-4 py-5 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:rounded-sm"
+    aria-expanded={isOpen}
+  >
+    <span className="text-[17px] font-semibold text-heading-dark leading-[1.47] [word-break:keep-all] text-left">
+      Q. 질문 텍스트를 여기에 작성합니다
+    </span>
+    <span className="shrink-0 w-6 h-6 flex items-center justify-center text-aircok-blue transition-colors" aria-hidden="true">
+      {/* 열린 상태: minus 아이콘 */}
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <path d="M2 8h12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+      </svg>
+    </span>
+  </button>
+  {/* 답변 영역 (열린 상태) */}
+  <div className="pb-5">
+    <p className="text-[17px] text-body-dark leading-[1.65] [word-break:keep-all]">
+      A. 답변 텍스트를 여기에 작성합니다.
+    </p>
+  </div>
+</div>
+
+// Accordion Item 예시 (닫힌 상태) — 답변 영역만 변경
+<div className="border-b border-border-light">
+  <button
+    className="flex items-center justify-between w-full gap-4 py-5 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:rounded-sm"
+    aria-expanded={false}
+  >
+    <span className="text-[17px] font-semibold text-heading-dark leading-[1.47] [word-break:keep-all] text-left">
+      Q. 질문 텍스트를 여기에 작성합니다
+    </span>
+    <span className="shrink-0 w-6 h-6 flex items-center justify-center text-secondary-dark transition-colors" aria-hidden="true">
+      {/* 닫힌 상태: plus 아이콘 */}
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <path d="M8 2v12M2 8h12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+      </svg>
+    </span>
+  </button>
+  {/* 답변 영역 숨김 */}
+</div>
+```
+
+### 아코디언 애니메이션 (선택 옵션)
+
+CSS `grid-template-rows` 트릭을 사용한 부드러운 열림/닫힘 애니메이션:
+
+```tsx
+// 답변 래퍼에 적용 — grid-rows 트랜지션
+<div
+  className={`grid transition-all duration-300 ease-in-out ${
+    isOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
+  }`}
+>
+  <div className="overflow-hidden">
+    <p className="pb-5 text-[17px] text-body-dark leading-[1.65] [word-break:keep-all]">
+      답변 텍스트
+    </p>
+  </div>
+</div>
+```
+
+- `grid-rows-[1fr]` / `grid-rows-[0fr]` 는 Tailwind v4 arbitrary value이며 토큰 없음 — 애니메이션 전용 레이아웃 수치로 허용.
+
+### 아코디언 목록 래퍼
+
+아코디언 항목 전체를 감싸는 래퍼. 최상단에만 `border-t border-border-light`를 추가해 목록 시작을 표시한다.
+
+```tsx
+// 아코디언 목록 래퍼
+<div className="border-t border-border-light">
+  {faqItems.map((item) => (
+    <AccordionItem key={item.id} {...item} />
+  ))}
+</div>
+```
+
+---
+
+## 9. Responsive Behavior
 
 ### Breakpoints
 
@@ -815,7 +998,7 @@ Base unit: 8px
 
 ---
 
-## 9. Agent Prompt Guide
+## 10. Agent Prompt Guide
 
 ### Quick Color Reference
 
