@@ -28,7 +28,7 @@ export const SITE = {
     cta: "도입 문의",
     links: [
       { label: "에어콕 소개", href: "/about" },
-      { label: "서비스", href: "/services" },
+      { label: "공기질 관리 제품군", href: "/services" },
       { label: "프로젝트", href: "/projects" },
       { label: "카탈로그", href: "/catalog" },
       { label: "뉴스", href: "/news" },
@@ -500,8 +500,8 @@ export const SITE = {
       description: "스마트 에어콕의 회사 소개, 연혁, 핵심 가치를 알아보세요.",
     },
     services: {
-      title: "서비스",
-      description: "실내 공기질 측정·관리·컨설팅 서비스를 소개합니다.",
+      title: "공기질 관리 제품군",
+      description: "에어콕의 공기질 관리 제품 라인업을 확인하세요.",
     },
     projects: {
       title: "프로젝트",
