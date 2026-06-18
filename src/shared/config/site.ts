@@ -29,7 +29,7 @@ export const SITE = {
     links: [
       { label: "에어콕 소개", href: "/about" },
       { label: "공기질 관리 제품군", href: "/services" },
-      { label: "프로젝트", href: "/projects" },
+      { label: "진단서비스 신청", href: "/diagnosis" },
       { label: "카탈로그", href: "/catalog" },
       { label: "뉴스", href: "/news" },
       { label: "FAQ", href: "/faq" },
@@ -494,6 +494,12 @@ export const SITE = {
     },
   },
 
+  diagnosis: {
+    hero: {
+      label: "Diagnosis Service",
+    },
+  },
+
   pages: {
     about: {
       title: "에어콕 소개",
@@ -503,9 +509,14 @@ export const SITE = {
       title: "공기질 관리 제품군",
       description: "에어콕의 공기질 관리 제품 라인업을 확인하세요.",
     },
+    /** @deprecated 프로젝트 페이지는 diagnosis로 이전됨 */
     projects: {
       title: "프로젝트",
       description: "스마트 에어콕이 함께한 도입 사례와 레퍼런스를 확인하세요.",
+    },
+    diagnosis: {
+      title: "진단서비스 신청",
+      description: "스마트 에어콕 진단서비스를 신청하세요.",
     },
     catalog: {
       title: "카탈로그",
