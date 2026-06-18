@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { SITE } from '@/shared/config';
+import { SectionHeader } from '@/shared/ui';
 
 const STAT_HIGHLIGHTS = [
   { value: '50%', label: '집중력 향상' },
@@ -14,12 +15,11 @@ export function WhatYouGetSection() {
         <div className="flex flex-col lg:flex-row gap-16 items-start">
           {/* 좌측 콘텐츠 */}
           <div className="lg:w-[60%] flex flex-col">
-            <span className="text-aircok-blue text-xs font-semibold uppercase tracking-widest">
-              {SITE.whatYouGet.label}
-            </span>
-            <h2 className="text-heading-dark font-display text-3xl md:text-4xl font-semibold leading-tight tracking-tight [word-break:keep-all] mt-3">
-              {SITE.whatYouGet.title}
-            </h2>
+            <SectionHeader
+              label={SITE.whatYouGet.label}
+              title={SITE.whatYouGet.title}
+              theme="light"
+            />
 
             <ul className="mt-8 flex flex-col gap-4">
               {SITE.whatYouGet.bullets.map((bullet, index) => (
