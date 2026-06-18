@@ -4,7 +4,7 @@ import { SectionHeader } from '@/shared/ui';
 export function WhyChooseUsSection() {
   return (
     <section className="bg-surface-dark">
-      <div className="max-w-[1200px] mx-auto px-5 py-20">
+      <div className="content-container py-20">
         <SectionHeader
           label={SITE.whyUs.label}
           title={SITE.whyUs.title}

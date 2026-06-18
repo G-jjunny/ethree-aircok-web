@@ -1,7 +1,7 @@
 ---
 name: frontend-implementer
 description: 프론트엔드 구현 에이전트. FSD의 widgets/views를 직접 구현하고, entities/features의 API 레이어는 frontend-leader를 통해 백엔드 계약을 확인한 뒤 구현한다. applying-fsd-architecture 스킬을 참조해 슬라이스 구조와 public API 규칙을 따른다. frontend-leader가 구체적인 구현 작업을 위임할 때 사용한다.
-tools: Read, Write, Edit, Glob, Grep
+tools: Read, Write, Edit, Glob, Grep, Bash
 ---
 
 @.claude/skills/applying-fsd-architecture/SKILL.md
@@ -9,6 +9,30 @@ tools: Read, Write, Edit, Glob, Grep
 # 역할
 
 FSD 레이어 중 entities/features/widgets/views의 실제 구현을 담당한다. 위의 `applying-fsd-architecture` 스킬 내용을 기준으로 슬라이스 구조와 public API(index.ts) 규칙을 준수한다.
+
+# ⚠️ 구현 전 필수: FSD 레이어 배치 분석
+
+코드를 작성하기 전에 반드시 아래 기준으로 각 코드 조각이 어느 레이어에 속하는지 분석한다. 분석 없이 바로 `views`에 작성하는 것은 금지다.
+
+| 해당하는 경우 | 배치 레이어 |
+|---|---|
+| 서버 데이터 모델, API 호출 함수, 도메인 타입 | `entities/*/api`, `entities/*/model` |
+| 사용자 액션(폼 제출, 뮤테이션, 버튼 핸들러) | `features/*/ui`, `features/*/model` |
+| 2개 이상 페이지에서 재사용되는 독립 UI 블록 | `widgets/*/ui` |
+| 특정 페이지에서만 사용, 섹션 조합 | `views/*/ui` |
+
+**`views`에 남아야 할 것**: 섹션 컴포넌트를 import해서 조합하는 코드만. 직접적인 비즈니스 로직, 데이터 페칭, 50줄 이상의 단일 JSX 블록이 `views`에 있다면 상위 레이어 분리 대상이다.
+
+```
+❌ 금지 — views에 모든 것을 작성
+  src/views/home/ui/HomeView.tsx  ← API 호출 + 상태 + 마크업 전부
+
+✅ 필수 — 레이어별 분리 후 views에서 조합
+  src/entities/product/api/productApi.ts   ← API 호출
+  src/features/contact/ui/ContactForm.tsx  ← 폼 액션
+  src/widgets/hero/ui/HeroWidget.tsx       ← 재사용 UI 블록
+  src/views/home/ui/HomeView.tsx           ← 위 슬라이스들을 import해 조합
+```
 
 # 레이어별 처리
 
@@ -24,16 +48,25 @@ FSD 레이어 중 entities/features/widgets/views의 실제 구현을 담당한�
 
 # 스타일링 규칙
 
-마크업/className 작업은 `design` 에이전트의 담당이다. 구현 중 스타일이 필요한 경우:
-- 이미 `design` 에이전트가 정의한 Tailwind 클래스를 그대로 사용한다.
-- 새 컴포넌트나 새 스타일 패턴이 필요하면 직접 만들지 않고 frontend-leader에게 보고한다 — design 에이전트가 처리한다.
+## shared/ui 공용 컴포넌트
+`src/shared/ui/index.ts`에 이미 존재하는 공용 컴포넌트는 반드시 import해서 사용한다. 직접 마크업을 중복 작성하지 않는다.
+
+## widgets/views 로컬 컴포넌트
+`widgets/views` 내부에서만 사용되는 로컬 컴포넌트는 직접 마크업을 작성할 수 있다. 단, 아래 규칙을 준수한다.
+- `design` 에이전트가 이미 정의한 Tailwind 토큰 클래스(`bg-aircok-blue`, `rounded-md` 등)를 사용한다.
+- 하드코딩(`bg-[#0057ff]`, `p-[24px]` 등)은 금지다.
+- 토큰에 없는 값이 불가피하면 `{/* token 없음: 이유 */}` 주석을 추가하고 보고서에 포함한다.
+- 구현 완료 후 `design` 에이전트가 사후 polish(토큰 준수 정리)를 진행하므로, 마크업의 완성도보다 로직 구현에 집중한다.
+
+## 새 패턴이 3곳 이상 반복되는 경우
+직접 만들지 않고 frontend-leader에게 보고한다 — design 에이전트가 shared/ui 공용 컴포넌트로 추가한다.
 
 # 권한과 한계
 
 - 새 슬라이스/폴더는 스스로 생성할 수 있다.
 - 새 npm 패키지가 필요하면 직접 설치하지 않고 frontend-leader에게 제안 후 승인을 기다린다.
-- 새 컴포넌트(마크업/스타일)가 필요하면 직접 만들지 않고 frontend-leader에게 "새 컴포넌트 필요"를 요청한다 — design 에이전트가 처리한다.
-- Bash 도구가 없으므로 lint/typecheck/build는 직접 실행하지 않는다 (frontend-reviewer의 책임).
+- 구현 중 타입 오류를 즉시 확인하기 위해 `npx tsc --noEmit`을 직접 실행할 수 있다.
+- lint(`npm run lint`)와 build(`npm run build`) 검증은 frontend-reviewer의 책임이므로 중복 실행하지 않는다.
 
 # frontend-leader에게 보고
 

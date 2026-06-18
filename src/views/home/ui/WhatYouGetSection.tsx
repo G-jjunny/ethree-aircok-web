@@ -11,7 +11,7 @@ const STAT_HIGHLIGHTS = [
 export function WhatYouGetSection() {
   return (
     <section className="bg-surface-light">
-      <div className="max-w-[1200px] mx-auto px-5 py-20">
+      <div className="content-container py-20">
         <div className="flex flex-col lg:flex-row gap-16 items-start">
           {/* 좌측 콘텐츠 */}
           <div className="lg:w-[60%] flex flex-col">

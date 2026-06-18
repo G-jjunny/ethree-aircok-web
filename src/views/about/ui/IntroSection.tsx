@@ -4,7 +4,7 @@ import { SectionHeader, FeatureCard } from '@/shared/ui'
 export function IntroSection() {
   return (
     <section className="bg-surface-white py-20">
-      <div className="max-w-[1200px] mx-auto px-5">
+      <div className="content-container">
         <div className="mb-12">
           <SectionHeader
             label={SITE.about.intro.label}

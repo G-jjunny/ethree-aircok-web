@@ -79,3 +79,11 @@ body {
   word-break: keep-all;
   line-height: 1.65;
 }
+
+@layer utilities {
+  .content-container {
+    max-width: 1200px;
+    margin-inline: auto;
+    padding-inline: 1.25rem; /* px-5 */
+  }
+}

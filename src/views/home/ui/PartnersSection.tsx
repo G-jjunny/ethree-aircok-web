@@ -3,7 +3,7 @@ import { SITE } from '@/shared/config';
 export function PartnersSection() {
   return (
     <section className="bg-surface-light">
-      <div className="max-w-[1200px] mx-auto px-5 py-20">
+      <div className="content-container py-20">
         <h2 className="text-heading-dark font-display text-2xl md:text-3xl font-semibold text-center mb-10 [word-break:keep-all]">
           {SITE.partners.heading}
         </h2>

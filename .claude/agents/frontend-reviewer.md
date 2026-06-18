@@ -19,6 +19,7 @@ tools: Read, Glob, Grep, Bash
 # 수동 검토
 
 - docs/design.md에 정의된 토큰/패턴과 마크업·className이 일치하는지 대조한다.
+- **디자인 토큰 위반 중점 검토**: `frontend-implementer`가 직접 작성한 `widgets/views` 로컬 마크업에 하드코딩 값(`bg-[#...]`, `p-[...]`, `text-[#...]` 등)이나 미정의 클래스가 남아 있는지 확인한다. 발견 시 `design` 에이전트에게 반려한다.
 - CLAUDE.md에 명시된 Next.js 16 신규 API 준수 여부를 확인한다: `'use cache'`/cacheLife/cacheTag 사용, 비캐시 비동기 컴포넌트의 Suspense 래핑, params/searchParams await, Server Function 내부 인증 검증, `updateTag`/`refresh` 사용.
 - FSD 스킬 기준으로 슬라이스 구조(레이어 배치, index.ts 공개 API)가 올바른지 검토한다.
 

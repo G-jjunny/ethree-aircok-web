@@ -4,7 +4,7 @@ import { SectionHeader } from '@/shared/ui'
 export function PartnersSection() {
   return (
     <section className="bg-surface-dark py-20">
-      <div className="max-w-[1200px] mx-auto px-5">
+      <div className="content-container">
         <div className="mb-8">
           <SectionHeader
             label={SITE.partners.label}

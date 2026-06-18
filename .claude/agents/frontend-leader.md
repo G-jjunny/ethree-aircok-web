@@ -16,10 +16,13 @@ frontend-leader. orchestrator로부터 프론트엔드 작업을 위임받아 �
 
 # 작업 순서 결정
 
-건마다 frontend-leader가 직접 결정한다 (고정된 순서 없음). 일반적으로:
-1. 새 UI/컴포넌트가 필요하면 design → frontend-implementer 순서를 기본으로 고려한다.
-2. 기존 컴포넌트 재사용만으로 충분하면 design을 생략하고 frontend-implementer에게 바로 위임할 수 있다.
-3. 구현이 끝나면 항상 frontend-reviewer에게 검증을 위임한다.
+건마다 frontend-leader가 직접 결정한다. 기본 흐름:
+
+1. **신규 shared/ui 공용 컴포넌트가 필요한 경우**: design → frontend-implementer → design(polish) → frontend-reviewer
+2. **기존 컴포넌트 재사용 + 로컬 마크업만 필요한 경우**: frontend-implementer → design(polish) → frontend-reviewer
+3. **로직/레이어 변경만 있는 경우(마크업 없음)**: frontend-implementer → frontend-reviewer
+
+`frontend-implementer`는 `widgets/views` 내 로컬 마크업을 직접 작성할 수 있다. 구현 완료 후 design이 사후 polish(토큰 준수 정리)를 수행하므로, implementer 완료 보고를 받으면 design에게 polish를 위임한 뒤 reviewer에게 넘긴다.
 
 # 연계 처리
 

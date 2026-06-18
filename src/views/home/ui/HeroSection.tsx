@@ -5,7 +5,7 @@ export function HeroSection() {
   return (
     <section className="bg-surface-dark min-h-[calc(100vh-52px)]">
       {/* min-h-[calc(100vh-52px)]: Nav 높이 52px 제외 — 1회성 레이아웃 수치 */}
-      <div className="max-w-[1200px] mx-auto px-5 flex items-center min-h-[calc(100vh-52px)]">
+      <div className="content-container flex items-center min-h-[calc(100vh-52px)]">
         <div className="flex flex-col lg:flex-row gap-16 items-center py-20 w-full">
           {/* 좌측 콘텐츠 */}
           <div className="lg:w-3/5 flex flex-col">

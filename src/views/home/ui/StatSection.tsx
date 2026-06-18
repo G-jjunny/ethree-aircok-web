@@ -11,7 +11,7 @@ const STAT_NUMBERS: Record<string, string> = {
 export function StatSection() {
   return (
     <section className="bg-surface-dark">
-      <div className="max-w-[1200px] mx-auto px-5 py-20">
+      <div className="content-container py-20">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {SITE.stats.map((stat) => (
             <DarkStatCard

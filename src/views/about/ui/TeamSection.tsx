@@ -4,7 +4,7 @@ import { SectionHeader } from '@/shared/ui'
 export function TeamSection() {
   return (
     <section className="bg-surface-light py-20">
-      <div className="max-w-[1200px] mx-auto px-5">
+      <div className="content-container">
         <SectionHeader
           label={SITE.about.team.label}
           title={SITE.about.team.title}

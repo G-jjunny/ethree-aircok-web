@@ -4,7 +4,7 @@ import { SectionHeader } from "@/shared/ui";
 export function MethodologySection() {
   return (
     <section className="bg-surface-white">
-      <div className="max-w-[1200px] mx-auto px-5 py-20">
+      <div className="content-container py-20">
         <SectionHeader
           label={SITE.methodology.label}
           title={SITE.methodology.title}

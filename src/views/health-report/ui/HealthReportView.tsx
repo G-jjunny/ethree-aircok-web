@@ -3,7 +3,7 @@ import { SITE } from '@/shared/config'
 export function HealthReportView() {
   return (
     <main className="min-h-screen bg-surface-white">
-      <div className="max-w-[1200px] mx-auto px-5 py-20">
+      <div className="content-container py-20">
         <h1 className="text-heading-dark font-display text-[40px] font-semibold">
           {SITE.pages.healthReport.title}
         </h1>

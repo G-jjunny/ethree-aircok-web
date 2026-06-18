@@ -162,6 +162,8 @@ Tailwind v4 프로젝트이므로 모든 토큰은 `@theme` 블록 안에 정의
 | **폰트** | | |
 | 디스플레이 헤딩 | `font-display` | `--font-display` |
 | 본문 | `font-body` | `--font-body` |
+| **레이아웃** | | |
+| 콘텐츠 컨테이너 | `content-container` | `max-w-[1200px] mx-auto px-5` |
 
 ---
 
@@ -735,6 +737,20 @@ Base unit: 8px
 - Hero: full-viewport-width, 콘텐츠 중앙 정렬
 - Product grid: 3열 (데스크탑) → 2열 (태블릿) → 1열 (모바일)
 - Feature strip: 4열 → 2열 → 1열
+
+**콘텐츠 컨테이너 (`content-container`)**
+
+섹션 내부에서 콘텐츠를 1200px 내에 중앙 정렬할 때 반드시 `content-container` 유틸리티를 사용한다. `max-w-[1200px] mx-auto px-5`를 직접 인라인 작성하는 것은 금지다.
+
+```tsx
+// ❌ 금지
+<div className="max-w-[1200px] mx-auto px-5">
+
+// ✅ 필수
+<div className="content-container">
+```
+
+FAQ 등 페이지 전용 너비(1000px 등)는 예외로 허용하되 주석을 명시한다.
 
 ### Border Radius Scale
 
