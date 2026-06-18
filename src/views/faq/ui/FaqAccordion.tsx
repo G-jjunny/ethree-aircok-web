@@ -25,7 +25,7 @@ function AccordionItem({ item, badge, isOpen, onToggle }: AccordionItemProps) {
   const paragraphs = item.answer.split('\n\n')
 
   return (
-    <div className="border-b border-border-light">
+    <div className={`border-b border-border-light transition-colors ${isOpen ? 'bg-surface-light rounded-lg px-4' : ''}`}>
       <button
         type="button"
         className="flex items-center justify-between w-full gap-4 py-5 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:rounded-sm"
@@ -37,12 +37,10 @@ function AccordionItem({ item, badge, isOpen, onToggle }: AccordionItemProps) {
         {/* 배지 + 질문 텍스트 묶음 */}
         <span className="flex items-center gap-3 min-w-0">
           <span
-            className="shrink-0 w-8 h-8 rounded-full bg-surface-light flex items-center justify-center"
+            className="shrink-0 text-[13px] font-bold text-aircok-blue leading-none tabular-nums"
             aria-hidden="true"
           >
-            <span className="text-[11px] font-semibold text-aircok-blue leading-none">
-              {badge}
-            </span>
+            {badge}
           </span>
           <span className="text-[17px] font-semibold text-heading-dark leading-[1.47] [word-break:keep-all] text-left">
             Q. {item.question}
@@ -81,7 +79,7 @@ function AccordionItem({ item, badge, isOpen, onToggle }: AccordionItemProps) {
         }`}
       >
         <div className="overflow-hidden">
-          <div className="pb-5 pl-11 flex flex-col gap-3">
+          <div className="pb-5 border-l-2 border-aircok-blue pl-4 flex flex-col gap-3"> {/* token 없음: border-l-2, FAQ 답변 좌측 액센트 라인 전용 2px */}
             {paragraphs.map((paragraph, index) => (
               <p
                 key={index}
