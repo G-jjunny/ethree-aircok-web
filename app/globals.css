@@ -55,6 +55,7 @@
   --color-nav-bg-mobile:    rgba(255, 255, 255, 0.95);
   --color-overlay-white-10: rgba(255, 255, 255, 0.10);
   --color-overlay-dark:     rgba(0, 0, 0, 0.80);
+  --color-overlay-dark-60:   rgba(0, 0, 0, 0.60);
 
   /* ── Border ─────────────────────────────── */
   --color-border-light:  rgba(0, 0, 0, 0.06);
