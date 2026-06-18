@@ -1,7 +1,6 @@
 import { SITE } from '@/shared/config'
 import { SubHeroSection } from './SubHeroSection'
 import { DiagnosisImageSection } from './DiagnosisImageSection'
-import { DiagnosisSubPagesSection } from './DiagnosisSubPagesSection'
 import { DiagnosisFormSection } from './DiagnosisFormSection'
 
 export function DiagnosisView() {
@@ -13,7 +12,6 @@ export function DiagnosisView() {
         description={SITE.pages.diagnosis.description}
       />
       <DiagnosisImageSection />
-      <DiagnosisSubPagesSection />
       <DiagnosisFormSection />
     </main>
   )

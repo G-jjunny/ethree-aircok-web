@@ -497,16 +497,6 @@ export const SITE = {
   diagnosis: {
     hero: {
       label: "Diagnosis Service",
-      freeTest1: {
-        label: "Free Test 1",
-        title: "무료 테스트 신청 1",
-        description: "무료 테스트1 서비스를 신청하세요.",
-      },
-      freeTest2: {
-        label: "Free Test 2",
-        title: "무료 테스트 신청 2",
-        description: "무료 테스트2 서비스를 신청하세요.",
-      },
     },
   },
 
@@ -527,14 +517,6 @@ export const SITE = {
     diagnosis: {
       title: "진단서비스 신청",
       description: "스마트 에어콕 진단서비스를 신청하세요.",
-    },
-    diagnosisFreeTest1: {
-      title: "무료 테스트 신청 1",
-      description: "스마트 에어콕 무료 테스트1 서비스를 신청하세요.",
-    },
-    diagnosisFreeTest2: {
-      title: "무료 테스트 신청 2",
-      description: "스마트 에어콕 무료 테스트2 서비스를 신청하세요.",
     },
     catalog: {
       title: "카탈로그",
