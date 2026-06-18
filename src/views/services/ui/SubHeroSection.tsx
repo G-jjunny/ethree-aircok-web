@@ -1,10 +1,10 @@
-import { SITE } from '@/shared/config'
+import { SITE } from "@/shared/config";
 
 export function SubHeroSection() {
   return (
     /* min-h-[480px]: Page Sub-Hero 패턴 최소 높이 — design.md "Page Sub-Hero" 참조 */
-    <section className="bg-surface-dark min-h-[480px] flex items-center">
-      <div className="content-container">
+    <section className="bg-surface-dark">
+      <div className="content-container min-h-[480px] flex items-center">
         <div className="flex flex-col gap-4 py-20">
           <span className="text-aircok-blue-light text-xs font-semibold uppercase tracking-widest">
             Products
@@ -20,5 +20,5 @@ export function SubHeroSection() {
         </div>
       </div>
     </section>
-  )
+  );
 }
