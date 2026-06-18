@@ -787,7 +787,336 @@ Base unit: 8px
 
 ---
 
-## 8. Responsive Behavior
+## 8. FAQ 컴포넌트
+
+FAQ 페이지(`/faq`)에서 사용하는 전용 컴포넌트 패턴. 전체 섹션 배경은 `bg-surface-white`(라이트)를 기본으로 한다.
+
+### FAQ Section Layout (데스크탑 2컬럼 사이드바 레이아웃)
+
+데스크탑에서는 좌측 sticky 사이드바 + 우측 아코디언의 2컬럼 구조를 사용한다. 모바일에서는 사이드바를 숨기고 상단 탭으로 폴백한다.
+
+- 섹션 배경: `bg-surface-white`
+- 섹션 패딩: `py-20 md:py-28`
+- 전체 컨테이너 최대 너비: `max-w-[1000px] mx-auto px-5` {/* token 없음: FAQ 전용 중간 너비, 1200px 보다 좁고 768px 보다 넓은 2컬럼용 */}
+- 검색 입력창과 2컬럼 그리드 사이 간격: `mt-8`
+- 2컬럼 그리드: `grid grid-cols-1 sm:grid-cols-[200px_1fr] gap-10` {/* token 없음: 사이드바 고정 너비 200px */}
+- 사이드바 영역: `hidden sm:block` (모바일 숨김)
+- 사이드바 sticky: `sticky top-20`
+- 모바일 탭 영역: `sm:hidden` (데스크탑 숨김)
+- 전체 구조:
+
+```tsx
+// FAQ Section Layout 예시 (데스크탑 2컬럼)
+<section className="bg-surface-white py-20 md:py-28">
+  <div className="max-w-[1000px] mx-auto px-5"> {/* token 없음: FAQ 2컬럼 전용 너비 */}
+    <SectionHeader label="자주 묻는 질문" title="FAQ" theme="light" titleAs="h2" />
+    {/* 검색 input */}
+    <div className="mt-8">
+      <FaqSearchInput ... />
+    </div>
+    {/* 2컬럼 그리드 */}
+    <div className="grid grid-cols-1 sm:grid-cols-[200px_1fr] gap-10 mt-8"> {/* token 없음: 사이드바 고정 너비 */}
+      {/* 사이드바 (데스크탑만) */}
+      <FaqSidebar ... />
+      {/* 우측 콘텐츠 */}
+      <div>
+        {/* 모바일 탭 (모바일만) */}
+        <div className="sm:hidden mb-6">
+          <CategoryTabList ... />
+        </div>
+        {/* 아코디언 */}
+        <FaqAccordion ... />
+      </div>
+    </div>
+  </div>
+</section>
+```
+
+### FAQ Search Input (검색 입력창)
+
+섹션 상단에 배치되는 키워드 필터링 입력창. 입력 즉시 아코디언 목록을 필터링한다.
+
+- 컨테이너: `relative`
+- input: `w-full bg-surface-light rounded-lg px-4 py-3 pl-10 text-[15px] text-heading-dark placeholder:text-secondary-dark focus:outline-none focus:ring-2 focus:ring-aircok-blue border-none`
+- 검색 아이콘: `absolute left-3 top-1/2 -translate-y-1/2 text-secondary-dark w-5 h-5`
+- 아이콘: SVG 돋보기, `pointer-events-none aria-hidden="true"`
+
+```tsx
+// FAQ Search Input 예시
+<div className="relative">
+  <svg
+    className="absolute left-3 top-1/2 -translate-y-1/2 text-secondary-dark w-5 h-5 pointer-events-none"
+    aria-hidden="true"
+    fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5"
+  >
+    <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607z"/>
+  </svg>
+  <input
+    type="search"
+    placeholder="질문을 검색하세요"
+    className="w-full bg-surface-light rounded-lg px-4 py-3 pl-10 text-[15px] text-heading-dark placeholder:text-secondary-dark focus:outline-none focus:ring-2 focus:ring-aircok-blue border-none"
+  />
+</div>
+```
+
+### FAQ Sidebar (사이드바 카테고리 네비게이션)
+
+데스크탑(sm 이상)에서 좌측에 배치되는 sticky 카테고리 리스트. 모바일에서는 숨긴다.
+
+- 외부 래퍼: `hidden sm:block`
+- 내부 sticky 컨테이너: `sticky top-20`
+- 카테고리 섹션 레이블 (선택적): `text-[12px] font-semibold text-secondary-dark uppercase tracking-wider mb-2`
+- 항목 버튼 목록: `flex flex-col gap-1`
+
+**사이드바 항목 버튼 — 활성 상태:**
+- `w-full flex items-center justify-between text-[15px] font-semibold text-aircok-blue bg-surface-light rounded-md px-3 py-2`
+
+**사이드바 항목 버튼 — 비활성 상태:**
+- `w-full flex items-center justify-between text-[15px] font-medium text-body-dark rounded-md px-3 py-2 hover:bg-surface-light hover:text-heading-dark transition-colors`
+
+**카운트 배지 (항목 수 표시):**
+- `text-[12px] text-secondary-dark bg-surface-light rounded-pill px-2 py-0.5 ml-auto tabular-nums`
+- 활성 상태일 때는 배경 없이: `text-[12px] text-aircok-blue ml-auto tabular-nums`
+
+```tsx
+// FAQ Sidebar 예시
+<div className="hidden sm:block">
+  <div className="sticky top-20">
+    <p className="text-[12px] font-semibold text-secondary-dark uppercase tracking-wider mb-2">카테고리</p>
+    <div className="flex flex-col gap-1">
+      {/* 활성 항목 */}
+      <button className="w-full flex items-center justify-between text-[15px] font-semibold text-aircok-blue bg-surface-light rounded-md px-3 py-2">
+        <span>전체</span>
+        <span className="text-[12px] text-aircok-blue ml-auto tabular-nums">23</span>
+      </button>
+      {/* 비활성 항목 */}
+      <button className="w-full flex items-center justify-between text-[15px] font-medium text-body-dark rounded-md px-3 py-2 hover:bg-surface-light hover:text-heading-dark transition-colors">
+        <span>제품 관련</span>
+        <span className="text-[12px] text-secondary-dark bg-surface-light rounded-pill px-2 py-0.5 ml-auto tabular-nums">10</span>
+      </button>
+    </div>
+  </div>
+</div>
+```
+
+### Q Number Label (질문 번호 인라인 레이블)
+
+각 아코디언 질문 앞에 카테고리별 순번을 표시하는 인라인 텍스트 레이블. 이전의 원형 배지(`w-8 h-8 rounded-full`)는 여백이 과도하여 subtle한 인라인 레이블로 대체한다.
+
+- 배지 컨테이너 없음 — `<span>` 인라인 텍스트만 사용
+- 레이블 스타일: `shrink-0 text-[13px] font-bold text-aircok-blue leading-none tabular-nums`
+- 아코디언 질문 버튼 내 배치 순서: 번호 레이블 → 질문 텍스트 → 토글 아이콘
+- **형식 규칙**:
+  - 카테고리 '제품 관련': `P${String(index+1).padStart(2,'0')}` (예: P01, P02)
+  - 카테고리 '실내공기질': `A${String(index+1).padStart(2,'0')}` (예: A01, A02)
+  - '전체' 보기: 각 카테고리 내 원래 순번 유지
+  - 검색 결과: 카테고리 내 원래 순번 유지 (필터된 인덱스 기준이 아닌, 카테고리 내 순번 기준)
+
+```tsx
+// Q Number Label이 포함된 아코디언 질문 버튼 예시
+<button
+  className="flex items-center justify-between w-full gap-4 py-5 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:rounded-sm"
+  aria-expanded={isOpen}
+>
+  {/* 번호 레이블 + 질문 텍스트 묶음 */}
+  <span className="flex items-center gap-3 min-w-0">
+    <span className="shrink-0 text-[13px] font-bold text-aircok-blue leading-none tabular-nums" aria-hidden="true">
+      P01
+    </span>
+    <span className="text-[17px] font-semibold text-heading-dark leading-[1.47] [word-break:keep-all] text-left">
+      Q. 질문 텍스트
+    </span>
+  </span>
+  {/* 토글 아이콘 */}
+  <span className="shrink-0 w-6 h-6 flex items-center justify-center text-secondary-dark transition-colors" aria-hidden="true">
+    {/* plus / minus SVG */}
+  </span>
+</button>
+```
+
+### 검색 결과 없음 상태
+
+검색어 입력 후 일치하는 항목이 없을 때 표시하는 빈 상태 메시지.
+
+- 컨테이너: `py-12 text-center`
+- 메시지 텍스트: `text-[17px] text-secondary-dark [word-break:keep-all]`
+- 부연 설명(선택): `text-[15px] text-secondary-dark mt-2`
+
+```tsx
+// 검색 결과 없음 상태 예시
+<div className="py-12 text-center">
+  <p className="text-[17px] text-secondary-dark [word-break:keep-all]">검색 결과가 없습니다.</p>
+  <p className="text-[15px] text-secondary-dark mt-2">다른 키워드로 검색해 보세요.</p>
+</div>
+```
+
+### Category Tab (카테고리 필터 탭)
+
+### Category Tab (카테고리 필터 탭)
+
+수평 스크롤 가능한 탭 리스트. 모바일에서 가로 스크롤로 overflow 처리한다.
+
+**탭 리스트 컨테이너:**
+- `flex flex-row gap-2 overflow-x-auto pb-1 scrollbar-none`
+- 스크롤바 숨김: `[&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]`
+
+**탭 버튼 — 활성 상태:**
+- 배경: `bg-aircok-blue`
+- 텍스트: `text-heading-light`
+- Radius: `rounded-pill`
+- 패딩: `px-5 py-2`
+- 폰트: `text-[15px] font-medium`
+- 최소 높이: `min-h-[44px]` (터치 타깃)
+- `shrink-0` 필수 (flex 축소 방지)
+
+**탭 버튼 — 비활성 상태:**
+- 배경: `bg-transparent`
+- 텍스트: `text-body-dark`
+- Radius: `rounded-pill`
+- 패딩: `px-5 py-2`
+- 폰트: `text-[15px] font-medium`
+- hover: `hover:bg-surface-light`
+- 트랜지션: `transition-colors`
+- 최소 높이: `min-h-[44px]` (터치 타깃)
+- `shrink-0` 필수
+
+```tsx
+// Category Tab 예시
+<div className="flex flex-row gap-2 overflow-x-auto pb-1 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+  {/* 활성 탭 */}
+  <button
+    className="shrink-0 rounded-pill px-5 py-2 min-h-[44px] text-[15px] font-medium bg-aircok-blue text-heading-light transition-colors"
+  >
+    전체
+  </button>
+  {/* 비활성 탭 */}
+  <button
+    className="shrink-0 rounded-pill px-5 py-2 min-h-[44px] text-[15px] font-medium bg-transparent text-body-dark hover:bg-surface-light transition-colors"
+  >
+    제품 관련
+  </button>
+</div>
+```
+
+### Accordion Item (FAQ 아코디언 항목)
+
+질문(Q) 헤더 클릭 시 답변(A) 영역을 토글하는 아코디언. 항목 간 구분은 `border-b border-border-light`로 처리한다.
+
+**아코디언 래퍼 (`<div>`):**
+- 닫힌 상태: `border-b border-border-light`
+- 열린 상태: `border-b border-border-light bg-surface-light rounded-lg px-4` — 열린 항목에 `bg-surface-light` 배경과 `rounded-lg` 적용으로 시각적 계층감 부여. 나머지 닫힌 항목들과 구분되어 현재 선택 항목이 명확히 부각됨.
+
+**질문(Q) 헤더 버튼 (`<button>`):**
+- 레이아웃: `flex items-center justify-between w-full gap-4`
+- 패딩: `py-5`
+- 질문 텍스트: `text-[17px] font-semibold text-heading-dark leading-[1.47] [word-break:keep-all] text-left`
+- 인터랙션: `cursor-pointer`
+- 포커스: `focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:rounded-sm`
+
+**토글 아이콘:**
+- 컨테이너: `shrink-0 w-6 h-6 flex items-center justify-center text-secondary-dark`
+- 열린 상태: "–" (minus) 또는 위쪽 chevron SVG — 색상 `text-aircok-blue`
+- 닫힌 상태: "+" (plus) 또는 아래쪽 chevron SVG — 색상 `text-secondary-dark`
+- 트랜지션: `transition-colors`
+
+**답변(A) 영역:**
+- 패딩: `pb-5`
+- 좌측 액센트 라인: `border-l-2 border-aircok-blue pl-4` — Q와 A의 시각적 구분을 Aircok Blue 세로 선으로 명확히 표현
+- 텍스트: `text-[17px] text-body-dark leading-[1.65] [word-break:keep-all]`
+- 닫힌 상태: CSS 애니메이션(`grid-rows` 트랜지션)으로 처리
+
+```tsx
+// Accordion Item 예시 (열린 상태)
+<div className="border-b border-border-light bg-surface-light rounded-lg px-4">
+  <button
+    className="flex items-center justify-between w-full gap-4 py-5 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:rounded-sm"
+    aria-expanded={true}
+  >
+    <span className="flex items-center gap-3 min-w-0">
+      <span className="shrink-0 text-[13px] font-bold text-aircok-blue leading-none tabular-nums" aria-hidden="true">
+        P01
+      </span>
+      <span className="text-[17px] font-semibold text-heading-dark leading-[1.47] [word-break:keep-all] text-left">
+        Q. 질문 텍스트를 여기에 작성합니다
+      </span>
+    </span>
+    <span className="shrink-0 w-6 h-6 flex items-center justify-center text-aircok-blue transition-colors" aria-hidden="true">
+      {/* 열린 상태: minus 아이콘 */}
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <path d="M2 8h12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+      </svg>
+    </span>
+  </button>
+  {/* 답변 영역 (열린 상태) — 좌측 액센트 라인으로 Q/A 구분 */}
+  <div className="pb-5 border-l-2 border-aircok-blue pl-4 flex flex-col gap-3">
+    <p className="text-[17px] text-body-dark leading-[1.65] [word-break:keep-all]">
+      A. 답변 텍스트를 여기에 작성합니다.
+    </p>
+  </div>
+</div>
+
+// Accordion Item 예시 (닫힌 상태)
+<div className="border-b border-border-light">
+  <button
+    className="flex items-center justify-between w-full gap-4 py-5 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:rounded-sm"
+    aria-expanded={false}
+  >
+    <span className="flex items-center gap-3 min-w-0">
+      <span className="shrink-0 text-[13px] font-bold text-aircok-blue leading-none tabular-nums" aria-hidden="true">
+        P01
+      </span>
+      <span className="text-[17px] font-semibold text-heading-dark leading-[1.47] [word-break:keep-all] text-left">
+        Q. 질문 텍스트를 여기에 작성합니다
+      </span>
+    </span>
+    <span className="shrink-0 w-6 h-6 flex items-center justify-center text-secondary-dark transition-colors" aria-hidden="true">
+      {/* 닫힌 상태: plus 아이콘 */}
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <path d="M8 2v12M2 8h12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+      </svg>
+    </span>
+  </button>
+  {/* 답변 영역 숨김 (grid-rows-[0fr] 트랜지션) */}
+</div>
+```
+
+### 아코디언 애니메이션 (선택 옵션)
+
+CSS `grid-template-rows` 트릭을 사용한 부드러운 열림/닫힘 애니메이션:
+
+```tsx
+// 답변 래퍼에 적용 — grid-rows 트랜지션
+<div
+  className={`grid transition-all duration-300 ease-in-out ${
+    isOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
+  }`}
+>
+  <div className="overflow-hidden">
+    <p className="pb-5 text-[17px] text-body-dark leading-[1.65] [word-break:keep-all]">
+      답변 텍스트
+    </p>
+  </div>
+</div>
+```
+
+- `grid-rows-[1fr]` / `grid-rows-[0fr]` 는 Tailwind v4 arbitrary value이며 토큰 없음 — 애니메이션 전용 레이아웃 수치로 허용.
+
+### 아코디언 목록 래퍼
+
+아코디언 항목 전체를 감싸는 래퍼. 최상단에만 `border-t border-border-light`를 추가해 목록 시작을 표시한다.
+
+```tsx
+// 아코디언 목록 래퍼
+<div className="border-t border-border-light">
+  {faqItems.map((item) => (
+    <AccordionItem key={item.id} {...item} />
+  ))}
+</div>
+```
+
+---
+
+## 9. Responsive Behavior
 
 ### Breakpoints
 
@@ -815,7 +1144,7 @@ Base unit: 8px
 
 ---
 
-## 9. Agent Prompt Guide
+## 10. Agent Prompt Guide
 
 ### Quick Color Reference
 
