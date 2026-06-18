@@ -6,6 +6,13 @@ import { useState } from 'react'
 import { diagnosisSchema, type DiagnosisFormValues } from '../model/diagnosisSchema'
 import { submitDiagnosis } from '../api/submitDiagnosis'
 
+function formatPhone(value: string): string {
+  const digits = value.replace(/\D/g, '').slice(0, 11)
+  if (digits.length <= 3) return digits
+  if (digits.length <= 7) return `${digits.slice(0, 3)}-${digits.slice(3)}`
+  return `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7)}`
+}
+
 export function DiagnosisForm() {
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle')
 
@@ -17,6 +24,8 @@ export function DiagnosisForm() {
   } = useForm<DiagnosisFormValues>({
     resolver: zodResolver(diagnosisSchema),
   })
+
+  const phoneRegister = register('phone')
 
   const onSubmit = async (data: DiagnosisFormValues) => {
     try {
@@ -65,7 +74,11 @@ export function DiagnosisForm() {
           type="tel"
           autoComplete="tel"
           placeholder="010-0000-0000"
-          {...register('phone')}
+          {...phoneRegister}
+          onChange={(e) => {
+            e.target.value = formatPhone(e.target.value)
+            phoneRegister.onChange(e)
+          }}
           aria-invalid={!!errors.phone}
           aria-describedby={errors.phone ? 'diagnosis-phone-error' : undefined}
           className="w-full bg-surface-light rounded-md px-4 py-3 text-[17px] text-heading-dark placeholder:text-secondary-dark focus:outline-none focus:ring-2 focus:ring-aircok-blue border-none"

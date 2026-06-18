@@ -5,7 +5,7 @@ export const diagnosisSchema = z.object({
   phone: z
     .string()
     .min(1, '전화번호를 입력해주세요.')
-    .regex(/^[0-9\-+\s()]{7,20}$/, '올바른 전화번호 형식으로 입력해주세요.'),
+    .regex(/^\d{3}-\d{4}-\d{4}$/, '전화번호를 올바르게 입력해 주세요 (예: 010-1234-5678)'),
 })
 
 export type DiagnosisFormValues = z.infer<typeof diagnosisSchema>
