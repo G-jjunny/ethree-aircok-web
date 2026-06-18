@@ -1,34 +1,36 @@
-'use client'
+"use client";
 
-import { type FaqItem } from '../model/faqData'
+import { type FaqItem } from "../model/faqData";
 
 // 카테고리별 질문 번호 접두어 및 순번을 계산하는 헬퍼
 function getQuestionBadge(item: FaqItem, categoryIndex: number): string {
-  if (item.category === '제품 관련') {
-    return `P${String(categoryIndex + 1).padStart(2, '0')}`
+  if (item.category === "제품 관련") {
+    return `P${String(categoryIndex + 1).padStart(2, "0")}`;
   }
-  if (item.category === '실내공기질') {
-    return `A${String(categoryIndex + 1).padStart(2, '0')}`
+  if (item.category === "실내공기질") {
+    return `A${String(categoryIndex + 1).padStart(2, "0")}`;
   }
-  return String(categoryIndex + 1).padStart(2, '0')
+  return String(categoryIndex + 1).padStart(2, "0");
 }
 
 interface AccordionItemProps {
-  item: FaqItem
-  badge: string
-  isOpen: boolean
-  onToggle: () => void
+  item: FaqItem;
+  badge: string;
+  isOpen: boolean;
+  onToggle: () => void;
 }
 
 function AccordionItem({ item, badge, isOpen, onToggle }: AccordionItemProps) {
-  const answerId = `faq-answer-${item.id}`
-  const paragraphs = item.answer.split('\n\n')
+  const answerId = `faq-answer-${item.id}`;
+  const paragraphs = item.answer.split("\n\n");
 
   return (
-    <div className={`border-b border-border-light transition-colors ${isOpen ? 'bg-surface-light rounded-lg px-4' : ''}`}>
+    <div
+      className={`border-b border-border-light transition-colors ${isOpen ? "bg-surface-light rounded-lg px-4" : ""}`}
+    >
       <button
         type="button"
-        className="flex items-center justify-between w-full gap-4 py-5 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:rounded-sm"
+        className="flex items-center justify-between w-full gap-4 py-4 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:rounded-sm"
         id={`faq-question-${item.id}`}
         aria-expanded={isOpen}
         aria-controls={answerId}
@@ -50,17 +52,27 @@ function AccordionItem({ item, badge, isOpen, onToggle }: AccordionItemProps) {
         {/* 토글 아이콘 */}
         <span
           className={`shrink-0 w-6 h-6 flex items-center justify-center transition-colors ${
-            isOpen ? 'text-aircok-blue' : 'text-secondary-dark'
+            isOpen ? "text-aircok-blue" : "text-secondary-dark"
           }`}
           aria-hidden="true"
         >
           {isOpen ? (
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path d="M2 8h12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+              <path
+                d="M2 8h12"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+              />
             </svg>
           ) : (
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path d="M8 2v12M2 8h12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+              <path
+                d="M8 2v12M2 8h12"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+              />
             </svg>
           )}
         </span>
@@ -75,34 +87,37 @@ function AccordionItem({ item, badge, isOpen, onToggle }: AccordionItemProps) {
         role="region"
         aria-labelledby={`faq-question-${item.id}`}
         className={`grid transition-all duration-300 ease-in-out ${
-          isOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
+          isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
         }`}
       >
         <div className="overflow-hidden">
-          <div className="pb-5 border-l-2 border-aircok-blue pl-4 flex flex-col gap-3"> {/* token 없음: border-l-2, FAQ 답변 좌측 액센트 라인 전용 2px */}
-            {paragraphs.map((paragraph, index) => (
-              <p
-                key={index}
-                className="text-[17px] text-body-dark leading-[1.65] [word-break:keep-all]"
-              >
-                {index === 0 ? `A. ${paragraph}` : paragraph}
-              </p>
-            ))}
+          <div className="pb-5">
+            {/* border는 텍스트 높이에만 걸리도록 래퍼를 분리 — pb-5는 border 바깥 */}
+            <div className="border-l-2 border-aircok-blue pl-4 py-1 flex flex-col gap-3">
+              {paragraphs.map((paragraph, index) => (
+                <p
+                  key={index}
+                  className="text-[17px] text-body-dark leading-[1.65] [word-break:keep-all]"
+                >
+                  {index === 0 ? `A. ${paragraph}` : paragraph}
+                </p>
+              ))}
+            </div>
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 interface FaqAccordionProps {
   /** 표시할 FAQ 아이템 목록 (이미 카테고리·검색 필터가 적용된 상태) */
-  items: FaqItem[]
+  items: FaqItem[];
   /** 각 아이템의 카테고리 내 원래 순번 (배지 계산용, items와 동일 길이) */
-  categoryIndexes: number[]
-  openItemId: string | null
-  onToggle: (id: string) => void
-  searchQuery: string
+  categoryIndexes: number[];
+  openItemId: string | null;
+  onToggle: (id: string) => void;
+  searchQuery: string;
 }
 
 export function FaqAccordion({
@@ -124,7 +139,7 @@ export function FaqAccordion({
           </p>
         )}
       </div>
-    )
+    );
   }
 
   return (
@@ -139,5 +154,5 @@ export function FaqAccordion({
         />
       ))}
     </div>
-  )
+  );
 }

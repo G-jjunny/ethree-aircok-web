@@ -899,13 +899,13 @@ FAQ 페이지(`/faq`)에서 사용하는 전용 컴포넌트 패턴. 전체 섹�
 </div>
 ```
 
-### Q Number Badge (질문 번호 배지)
+### Q Number Label (질문 번호 인라인 레이블)
 
-각 아코디언 질문 앞에 카테고리별 순번을 표시하는 소형 배지. Step Badge보다 작은 크기로 인라인 배치한다.
+각 아코디언 질문 앞에 카테고리별 순번을 표시하는 인라인 텍스트 레이블. 이전의 원형 배지(`w-8 h-8 rounded-full`)는 여백이 과도하여 subtle한 인라인 레이블로 대체한다.
 
-- 배지 컨테이너: `shrink-0 w-8 h-8 rounded-full bg-surface-light flex items-center justify-center`
-- 배지 텍스트: `text-[11px] font-semibold text-aircok-blue leading-none`
-- 아코디언 질문 버튼 내 배치 순서: 배지 → 질문 텍스트 → 토글 아이콘
+- 배지 컨테이너 없음 — `<span>` 인라인 텍스트만 사용
+- 레이블 스타일: `shrink-0 text-[13px] font-bold text-aircok-blue leading-none tabular-nums`
+- 아코디언 질문 버튼 내 배치 순서: 번호 레이블 → 질문 텍스트 → 토글 아이콘
 - **형식 규칙**:
   - 카테고리 '제품 관련': `P${String(index+1).padStart(2,'0')}` (예: P01, P02)
   - 카테고리 '실내공기질': `A${String(index+1).padStart(2,'0')}` (예: A01, A02)
@@ -913,15 +913,15 @@ FAQ 페이지(`/faq`)에서 사용하는 전용 컴포넌트 패턴. 전체 섹�
   - 검색 결과: 카테고리 내 원래 순번 유지 (필터된 인덱스 기준이 아닌, 카테고리 내 순번 기준)
 
 ```tsx
-// Q Number Badge가 포함된 아코디언 질문 버튼 예시
+// Q Number Label이 포함된 아코디언 질문 버튼 예시
 <button
   className="flex items-center justify-between w-full gap-4 py-5 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:rounded-sm"
   aria-expanded={isOpen}
 >
-  {/* 배지 + 질문 텍스트 묶음 */}
+  {/* 번호 레이블 + 질문 텍스트 묶음 */}
   <span className="flex items-center gap-3 min-w-0">
-    <span className="shrink-0 w-8 h-8 rounded-full bg-surface-light flex items-center justify-center" aria-hidden="true">
-      <span className="text-[11px] font-semibold text-aircok-blue leading-none">P01</span>
+    <span className="shrink-0 text-[13px] font-bold text-aircok-blue leading-none tabular-nums" aria-hidden="true">
+      P01
     </span>
     <span className="text-[17px] font-semibold text-heading-dark leading-[1.47] [word-break:keep-all] text-left">
       Q. 질문 텍스트
@@ -1002,8 +1002,9 @@ FAQ 페이지(`/faq`)에서 사용하는 전용 컴포넌트 패턴. 전체 섹�
 
 질문(Q) 헤더 클릭 시 답변(A) 영역을 토글하는 아코디언. 항목 간 구분은 `border-b border-border-light`로 처리한다.
 
-**아코디언 래퍼 (`<div>` 또는 `<details>`):**
-- `border-b border-border-light`
+**아코디언 래퍼 (`<div>`):**
+- 닫힌 상태: `border-b border-border-light`
+- 열린 상태: `border-b border-border-light bg-surface-light rounded-lg px-4` — 열린 항목에 `bg-surface-light` 배경과 `rounded-lg` 적용으로 시각적 계층감 부여. 나머지 닫힌 항목들과 구분되어 현재 선택 항목이 명확히 부각됨.
 
 **질문(Q) 헤더 버튼 (`<button>`):**
 - 레이아웃: `flex items-center justify-between w-full gap-4`
@@ -1020,19 +1021,24 @@ FAQ 페이지(`/faq`)에서 사용하는 전용 컴포넌트 패턴. 전체 섹�
 
 **답변(A) 영역:**
 - 패딩: `pb-5`
+- 좌측 액센트 라인: `border-l-2 border-aircok-blue pl-4` — Q와 A의 시각적 구분을 Aircok Blue 세로 선으로 명확히 표현
 - 텍스트: `text-[17px] text-body-dark leading-[1.65] [word-break:keep-all]`
-- 열린 상태 배경 변화: 별도 배경 없음 (구분선만으로 depth 표현). 열린 항목의 배경이 필요한 경우에만 래퍼에 `bg-surface-light rounded-lg`를 `px-4`와 함께 적용한다.
-- 닫힌 상태: `hidden` 또는 CSS 애니메이션(`max-height` 트랜지션)으로 처리
+- 닫힌 상태: CSS 애니메이션(`grid-rows` 트랜지션)으로 처리
 
 ```tsx
 // Accordion Item 예시 (열린 상태)
-<div className="border-b border-border-light">
+<div className="border-b border-border-light bg-surface-light rounded-lg px-4">
   <button
     className="flex items-center justify-between w-full gap-4 py-5 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:rounded-sm"
-    aria-expanded={isOpen}
+    aria-expanded={true}
   >
-    <span className="text-[17px] font-semibold text-heading-dark leading-[1.47] [word-break:keep-all] text-left">
-      Q. 질문 텍스트를 여기에 작성합니다
+    <span className="flex items-center gap-3 min-w-0">
+      <span className="shrink-0 text-[13px] font-bold text-aircok-blue leading-none tabular-nums" aria-hidden="true">
+        P01
+      </span>
+      <span className="text-[17px] font-semibold text-heading-dark leading-[1.47] [word-break:keep-all] text-left">
+        Q. 질문 텍스트를 여기에 작성합니다
+      </span>
     </span>
     <span className="shrink-0 w-6 h-6 flex items-center justify-center text-aircok-blue transition-colors" aria-hidden="true">
       {/* 열린 상태: minus 아이콘 */}
@@ -1041,22 +1047,27 @@ FAQ 페이지(`/faq`)에서 사용하는 전용 컴포넌트 패턴. 전체 섹�
       </svg>
     </span>
   </button>
-  {/* 답변 영역 (열린 상태) */}
-  <div className="pb-5">
+  {/* 답변 영역 (열린 상태) — 좌측 액센트 라인으로 Q/A 구분 */}
+  <div className="pb-5 border-l-2 border-aircok-blue pl-4 flex flex-col gap-3">
     <p className="text-[17px] text-body-dark leading-[1.65] [word-break:keep-all]">
       A. 답변 텍스트를 여기에 작성합니다.
     </p>
   </div>
 </div>
 
-// Accordion Item 예시 (닫힌 상태) — 답변 영역만 변경
+// Accordion Item 예시 (닫힌 상태)
 <div className="border-b border-border-light">
   <button
     className="flex items-center justify-between w-full gap-4 py-5 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:rounded-sm"
     aria-expanded={false}
   >
-    <span className="text-[17px] font-semibold text-heading-dark leading-[1.47] [word-break:keep-all] text-left">
-      Q. 질문 텍스트를 여기에 작성합니다
+    <span className="flex items-center gap-3 min-w-0">
+      <span className="shrink-0 text-[13px] font-bold text-aircok-blue leading-none tabular-nums" aria-hidden="true">
+        P01
+      </span>
+      <span className="text-[17px] font-semibold text-heading-dark leading-[1.47] [word-break:keep-all] text-left">
+        Q. 질문 텍스트를 여기에 작성합니다
+      </span>
     </span>
     <span className="shrink-0 w-6 h-6 flex items-center justify-center text-secondary-dark transition-colors" aria-hidden="true">
       {/* 닫힌 상태: plus 아이콘 */}
@@ -1065,7 +1076,7 @@ FAQ 페이지(`/faq`)에서 사용하는 전용 컴포넌트 패턴. 전체 섹�
       </svg>
     </span>
   </button>
-  {/* 답변 영역 숨김 */}
+  {/* 답변 영역 숨김 (grid-rows-[0fr] 트랜지션) */}
 </div>
 ```
 
