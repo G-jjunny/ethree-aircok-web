@@ -1,10 +1,21 @@
+import Image from 'next/image';
 import { SITE } from '@/shared/config';
 import { SectionHeader } from '@/shared/ui';
 
 export function WhyChooseUsSection() {
   return (
-    <section className="bg-surface-dark">
-      <div className="content-container py-20">
+    <section className="relative bg-surface-dark">
+      {/* 배경 이미지 */}
+      <Image
+        src="/images/home/aircok_solution_bg.png"
+        alt=""
+        fill
+        priority
+        className="object-cover"
+      />
+      {/* 오버레이 — bg-overlay-dark-60(60%) 배경 이미지 일부 노출용 토큰 */}
+      <div className="absolute inset-0 bg-overlay-dark-60" />
+      <div className="content-container py-20 relative z-10">
         <SectionHeader
           label={SITE.whyUs.label}
           title={SITE.whyUs.title}
@@ -14,6 +25,7 @@ export function WhyChooseUsSection() {
         {/* 메인 레이아웃 */}
         <div className="mt-12 flex flex-col lg:flex-row gap-16 items-start">
           {/* 좌측 포인트 리스트 */}
+          {/* token 없음: 좌우 60:40 비율 레이아웃 — 텍스트와 인용구 비율 조정용 1회성 수치 */}
           <div className="lg:w-[60%] flex flex-col gap-6">
             {SITE.whyUs.points.map((point, index) => (
               <div key={index} className="border-l-2 border-aircok-blue pl-4">
@@ -25,6 +37,7 @@ export function WhyChooseUsSection() {
           </div>
 
           {/* 우측 강조 인용구 */}
+          {/* token 없음: 우측 40% 너비 — 좌우 60:40 비율 레이아웃 1회성 수치 */}
           <div className="lg:w-[40%] flex flex-col items-center text-center gap-4">
             <span
               className="text-aircok-blue-light text-6xl font-display leading-none select-none"

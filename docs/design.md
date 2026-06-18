@@ -98,10 +98,11 @@ Tailwind v4 프로젝트이므로 모든 토큰은 `@theme` 블록 안에 정의
   --shadow-product: rgba(0, 0, 0, 0.22) 3px 5px 30px 0px;
 
   /* ── Nav / Overlay ──────────────────────── */
-  --color-nav-bg:           rgba(255, 255, 255, 0.80);
-  --color-nav-bg-mobile:    rgba(255, 255, 255, 0.95);
-  --color-overlay-white-10: rgba(255, 255, 255, 0.10);
-  --color-overlay-dark:     rgba(0, 0, 0, 0.80);
+  --color-nav-bg:            rgba(255, 255, 255, 0.80);
+  --color-nav-bg-mobile:     rgba(255, 255, 255, 0.95);
+  --color-overlay-white-10:  rgba(255, 255, 255, 0.10);
+  --color-overlay-dark:      rgba(0, 0, 0, 0.80);
+  --color-overlay-dark-60:   rgba(0, 0, 0, 0.60);
 
   /* ── Border ─────────────────────────────── */
   --color-border-light:  rgba(0, 0, 0, 0.06);
@@ -157,6 +158,7 @@ Tailwind v4 프로젝트이므로 모든 토큰은 `@theme` 블록 안에 정의
 | Nav 모바일 배경 | `bg-nav-bg-mobile` | `--color-nav-bg-mobile` |
 | 흰 오버레이 10% | `bg-overlay-white-10` | `--color-overlay-white-10` |
 | 다크 모달 오버레이 | `bg-overlay-dark` | `--color-overlay-dark` |
+| 배경 이미지 오버레이 60% | `bg-overlay-dark-60` | `--color-overlay-dark-60` |
 | **Border (반투명)** | | |
 | 라이트 구분선 | `border-border-light` | `--color-border-light` |
 | 미세 구분선 | `border-border-subtle` | `--color-border-subtle` |
