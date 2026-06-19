@@ -13,6 +13,10 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Backend (server/) is a separate NestJS project with its own
+    // eslint.config.mjs and its own lint command; it must not be
+    // linted by this frontend config.
+    "server/**",
   ]),
   // FSD architecture boundaries: enforces the layer-direction import rule
   // and slice public-API (index.ts) entry points described in CLAUDE.md
