@@ -246,9 +246,13 @@ Apple 스타일의 '제품 우선 프레젠테이션'을 Aircok 브랜드에 적
 | Role | Size | Weight | Line Height | Letter Spacing | Notes |
 |------|------|--------|-------------|----------------|-------|
 | Display Hero | 56px (3.50rem) | 600 | 1.07 | -0.5px | 메인 히어로 헤드라인 |
+| Article Hero | 48px (3.00rem) | 700 | 1.10 | -0.3px | 뉴스/아티클 상세 페이지 H1 (데스크탑) |
+| Article Hero Mobile | 36px (2.25rem) | 700 | 1.14 | -0.2px | 뉴스/아티클 상세 페이지 H1 (모바일) |
 | Section Heading | 40px (2.50rem) | 600 | 1.10 | -0.3px | 섹션 타이틀 |
 | Tile Heading | 28px (1.75rem) | 500 | 1.14 | -0.1px | 제품 타일 헤드라인 |
+| Article Sub-heading | 22px (1.375rem) | 600 | 1.14 | 0px | 아티클 본문 내 H3 |
 | Card Title | 21px (1.31rem) | 700 | 1.19 | 0px | 카드 강조 헤딩 |
+| Card News Title | 18px (1.125rem) | 600 | 1.35 | 0px | 뉴스 카드 제목 |
 | Sub-heading | 21px (1.31rem) | 400 | 1.19 | 0px | 일반 카드 헤딩 |
 | Body | 17px (1.06rem) | 400 | 1.65 | -0.2px | 한글 가독성을 위해 line-height 1.47→1.65 |
 | Body Emphasis | 17px (1.06rem) | 600 | 1.47 | -0.2px | 강조 본문, 레이블 |
@@ -511,6 +515,61 @@ Apple 스타일의 '제품 우선 프레젠테이션'을 Aircok 브랜드에 적
 - 고객사명 (캡션, weight 600)
 - 성과 수치 강조 (28px, weight 600, Aircok Blue)
 - 설명 1–2줄
+
+### News Card (뉴스 카드)
+
+뉴스 목록 페이지에서 3열 그리드로 배치되는 카드. 커버 이미지 + 텍스트 구조.
+
+- 카드 래퍼: `bg-surface-white rounded-xl shadow-card overflow-hidden hover:shadow-product hover:-translate-y-1 transition-all duration-200`
+- 커버 이미지: `aspect-video w-full object-cover`
+- 이미지 없음 플레이스홀더: `aspect-video bg-surface-light flex items-center justify-center` + SVG 아이콘(`text-secondary-dark w-6 h-6`)
+- 하단 패딩: `p-6`
+- **날짜**: `text-aircok-blue text-xs font-body tracking-wide` (Aircok Blue — 날짜가 카테고리/레이블 역할)
+- **카드 제목**: `text-heading-dark font-display font-semibold text-[18px] leading-snug mt-2` (Card News Title, 18px)
+- **설명**: `text-body-dark text-sm font-body line-clamp-2 mt-2`
+- **장소**: `text-secondary-dark text-xs mt-3` (있을 때만, 📍 문자 prefix)
+- **"자세히 보기 →"**: `text-aircok-blue text-sm font-body mt-4 inline-block`
+
+```tsx
+// News Card 예시
+<Link href={`/news/${item.id}`} className="block group">
+  <article className="bg-surface-white rounded-xl shadow-card overflow-hidden hover:shadow-product hover:-translate-y-1 transition-all duration-200">
+    <img src="..." alt="..." className="aspect-video w-full object-cover" />
+    <div className="p-6">
+      <time className="text-aircok-blue text-xs font-body tracking-wide">2025.01.01</time>
+      <h2 className="text-heading-dark font-display font-semibold text-[18px] leading-snug mt-2">카드 제목</h2>
+      <p className="text-body-dark text-sm font-body line-clamp-2 mt-2">설명 텍스트</p>
+      <p className="text-secondary-dark text-xs mt-3">📍 장소</p>
+      <span className="text-aircok-blue text-sm font-body mt-4 inline-block">자세히 보기 →</span>
+    </div>
+  </article>
+</Link>
+```
+
+### News Detail Hero (뉴스 상세 히어로)
+
+뉴스 상세 페이지 상단 히어로. 날짜/장소 뱃지 + H1 + 설명 구조.
+
+- 배경 섹션: `bg-surface-light py-14`
+- 날짜·장소 뱃지: `bg-surface-white rounded-pill px-3 py-1 text-xs text-secondary-dark border border-border-light`
+- **H1 (데스크탑)**: Article Hero (48px, weight 700), `text-heading-dark font-display font-bold md:text-[48px] leading-tight [word-break:keep-all]`
+- **H1 (모바일)**: Article Hero Mobile (36px, weight 700), `text-[36px]` (responsive 적용)
+- **설명 p**: Body (17px, weight 400), `text-body-dark font-body text-lg mt-4 max-w-2xl [word-break:keep-all]`
+- 클래스 조합: `text-[36px] md:text-[48px]`
+
+### News Content (Rich Text 렌더러)
+
+TipTap 등 rich text 에디터의 HTML 출력을 렌더링하는 스타일 가이드.
+
+- 기본 텍스트: `text-body-dark font-body text-[17px] leading-[1.65]`, `style={{ wordBreak: 'keep-all' }}`
+- `[&_h2]`: Section Heading 수준 — `text-heading-dark font-display font-semibold text-[28px] mt-12 mb-4`
+- `[&_h3]`: Article Sub-heading (22px) — `text-heading-dark font-display font-semibold text-[22px] mt-8 mb-3`
+- `[&_p]`: `mb-5`
+- `[&_ul]`, `[&_ol]`: `list-disc / list-decimal pl-6 mb-5`
+- `[&_li]`: `mb-2`
+- `[&_strong]`: `font-semibold text-heading-dark`
+- `[&_img]`: `rounded-xl w-full my-8 shadow-card`
+- `[&_a]`: `text-aircok-blue hover:underline`
 
 ### Stat Card (통계 카드)
 
