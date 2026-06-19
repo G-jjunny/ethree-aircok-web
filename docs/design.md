@@ -1339,3 +1339,36 @@ Nav BG:             rgba(255,255,255,0.80) + backdrop-filter: saturate(180%) blu
 6. 제품 이미지: 솔리드 배경(그라디언트·텍스처 금지)
 7. 그림자: 제품 이미지에만 `rgba(0,0,0,0.22) 3px 5px 30px`, 카드에는 `rgba(0,0,0,0.12) 0px 4px 24px`
 8. "자세히 보기" 링크: 980px radius pill 형태 유지
+
+---
+
+## 12. 뉴스 게시판 패턴
+
+### NewsCard (목록 카드)
+- 컨테이너: `bg-surface-white rounded-xl shadow-card overflow-hidden`
+- 커버 이미지 영역: `aspect-video w-full object-cover` (이미지 없을 때: `bg-surface-light flex items-center justify-center`)
+- 날짜 포맷: `YYYY.MM.DD` — `text-secondary-dark text-sm font-body`
+- 제목: `text-heading-dark font-display font-semibold text-lg leading-snug`
+- 설명: `text-body-dark text-sm line-clamp-2 font-body`
+- 장소 배지: `text-secondary-dark text-xs` (없으면 미표시)
+- 카드 전체에 `<Link>` 감싸기, hover: `hover:shadow-product transition-shadow duration-200`
+
+### NewsDetail (상세 본문)
+- prose 영역 wrapper: `prose prose-lg max-w-none font-body text-body-dark`
+- 제목: `text-heading-dark font-display font-bold text-[40px] leading-tight`
+- 메타 정보(날짜·장소): `text-secondary-dark text-sm font-body`
+- 구분선: `border-t border-border-light my-8`
+
+### AdminNewsForm (콘솔 폼)
+- 폼 컨테이너: `bg-surface-white rounded-xl p-8 shadow-card`
+- 레이블: `text-heading-dark text-sm font-semibold font-body`
+- 인풋 기본: `w-full rounded-md border border-border-light px-4 py-2 text-body-dark text-sm focus:outline-none focus:ring-2 focus:ring-aircok-blue`
+- 체크박스 레이블: `flex items-center gap-2 text-body-dark text-sm`
+- 제출 버튼: `bg-aircok-blue text-heading-light rounded-md px-6 py-2 font-semibold text-sm hover:bg-aircok-blue-dark transition-colors`
+- 취소/보조 버튼: `bg-surface-light text-heading-dark rounded-md px-6 py-2 font-semibold text-sm hover:bg-border-light transition-colors`
+
+### TipTap 에디터 툴바
+- 툴바 컨테이너: `flex gap-1 flex-wrap border border-border-light rounded-t-md bg-surface-light px-2 py-1`
+- 툴바 버튼 기본: `px-2 py-1 rounded text-body-dark text-sm hover:bg-border-light transition-colors`
+- 툴바 버튼 활성: `bg-aircok-blue text-heading-light`
+- 에디터 본문 영역: `min-h-[300px] border border-t-0 border-border-light rounded-b-md px-4 py-3 focus:outline-none text-body-dark text-sm font-body`
