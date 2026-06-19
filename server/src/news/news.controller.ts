@@ -46,7 +46,7 @@ export class NewsController {
 
   @UseGuards(JwtAuthGuard)
   @Post('images')
-  @UseInterceptors(FileInterceptor('file', multerOptions))
+  @UseInterceptors(FileInterceptor('image', multerOptions))
   uploadImage(@UploadedFile() file: Express.Multer.File) {
     return { url: `/uploads/${file.filename}` };
   }
