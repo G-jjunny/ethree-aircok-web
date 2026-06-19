@@ -1136,7 +1136,134 @@ CSS `grid-template-rows` 트릭을 사용한 부드러운 열림/닫힘 애니�
 
 ---
 
-## 9. Responsive Behavior
+## 9. Admin / Console UI 패턴
+
+어드민 콘솔(`/console/*`)은 공개 마케팅 페이지와 분리된 내부 도구 페이지이다. 동일한 디자인 토큰을 사용하되, 콘텐츠 컨테이너(`content-container`)는 사용하지 않으며 독립적인 레이아웃 패턴을 따른다.
+
+### Admin Login Layout (어드민 로그인 전체 레이아웃)
+
+전체 화면 중앙 정렬. 흰 배경 위에 카드를 배치하는 고전적인 로그인 UI.
+
+- 페이지 래퍼: `min-h-screen bg-surface-light flex items-center justify-center px-5 py-12`
+- 로그인 카드: `bg-surface-white rounded-xl shadow-card w-full max-w-[400px] px-8 py-10 flex flex-col gap-8`
+  - `max-w-[400px]` — 로그인 카드 전용 너비. 콘텐츠 컨테이너(1200px)와 무관하며 폼 입력 UI에 최적화된 1회성 수치.
+
+**카드 내부 구조 (3영역)**
+
+1. 헤더 영역 (`flex flex-col gap-2 items-center text-center`)
+   - 사이트명: `text-[21px] font-bold text-heading-dark leading-[1.19]`
+   - 폼 제목/설명: `text-[15px] text-secondary-dark leading-[1.43]`
+
+2. 폼 슬롯 — `children` prop 위치. 실제 `<form>` 마크업은 `AdminLoginForm`이 담당.
+
+3. (선택) 하단 안내 텍스트: `text-[13px] text-secondary-dark text-center`
+
+```tsx
+// AdminLoginView 예시
+<main className="min-h-screen bg-surface-light flex items-center justify-center px-5 py-12">
+  <div className="bg-surface-white rounded-xl shadow-card w-full max-w-[400px] px-8 py-10 flex flex-col gap-8"> {/* token 없음: 로그인 카드 전용 너비 400px */}
+    {/* 헤더 */}
+    <div className="flex flex-col gap-2 items-center text-center">
+      <p className="text-[21px] font-bold text-heading-dark leading-[1.19]">{SITE.name}</p>
+      <p className="text-[15px] text-secondary-dark leading-[1.43]">관리자 로그인</p>
+    </div>
+    {/* 폼 슬롯 */}
+    {children}
+  </div>
+</main>
+```
+
+### Admin Form Input (어드민 폼 입력 필드)
+
+공개 사이트에는 폼 입력 컴포넌트가 없으므로 어드민 전용으로 정의한다.
+
+**입력 그룹 (`<div>` 컨테이너):**
+- `flex flex-col gap-1.5`
+
+**레이블 (`<label>`):**
+- `text-[14px] font-medium text-heading-dark`
+
+**인풋 — 기본 상태:**
+- `w-full bg-surface-light border border-border-light rounded-md px-4 py-3 text-[15px] text-heading-dark placeholder:text-secondary-dark focus:outline-none focus:ring-2 focus:ring-aircok-blue focus:border-transparent transition-shadow`
+- 최소 높이: `min-h-[44px]` (터치 타깃)
+
+**인풋 — 에러 상태:**
+- 기본 상태에서 `border-border-light` → `border-error` 로 교체, `focus:ring-aircok-blue` → `focus:ring-error` 로 교체
+- `w-full bg-surface-light border border-error rounded-md px-4 py-3 text-[15px] text-heading-dark placeholder:text-secondary-dark focus:outline-none focus:ring-2 focus:ring-error focus:border-transparent transition-shadow min-h-[44px]`
+
+**에러 메시지 (`<p>`):**
+- `text-[13px] text-error leading-[1.33] mt-1`
+- 에러 상태일 때만 조건부 렌더링. `role="alert"` 접근성 속성 필수.
+
+**제출 버튼 — 기본 상태:**
+- `w-full bg-aircok-blue text-heading-light text-[17px] font-medium rounded-md py-3 min-h-[44px] hover:bg-aircok-blue-dark active:scale-[0.97] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:ring-offset-2`
+
+**제출 버튼 — disabled/로딩 상태:**
+- 기본 상태에서 `hover:bg-aircok-blue-dark active:scale-[0.97]` 제거, `opacity-60 cursor-not-allowed` 추가
+- `w-full bg-aircok-blue text-heading-light text-[17px] font-medium rounded-md py-3 min-h-[44px] opacity-60 cursor-not-allowed transition-colors focus:outline-none`
+
+**폼 전체 래퍼 (`<form>`):**
+- `flex flex-col gap-5` — 입력 그룹과 버튼 사이 `space-5` (24px) 간격
+
+```tsx
+// AdminLoginForm 예시
+<form className="flex flex-col gap-5">
+  {/* 입력 그룹 */}
+  <div className="flex flex-col gap-1.5">
+    <label htmlFor="username" className="text-[14px] font-medium text-heading-dark">
+      아이디
+    </label>
+    <input
+      id="username"
+      type="text"
+      placeholder="아이디를 입력하세요"
+      className="w-full bg-surface-light border border-border-light rounded-md px-4 py-3 text-[15px] text-heading-dark placeholder:text-secondary-dark focus:outline-none focus:ring-2 focus:ring-aircok-blue focus:border-transparent transition-shadow min-h-[44px]"
+    />
+  </div>
+
+  <div className="flex flex-col gap-1.5">
+    <label htmlFor="password" className="text-[14px] font-medium text-heading-dark">
+      비밀번호
+    </label>
+    <input
+      id="password"
+      type="password"
+      placeholder="비밀번호를 입력하세요"
+      className="w-full bg-surface-light border border-border-light rounded-md px-4 py-3 text-[15px] text-heading-dark placeholder:text-secondary-dark focus:outline-none focus:ring-2 focus:ring-aircok-blue focus:border-transparent transition-shadow min-h-[44px]"
+    />
+    {/* 에러 상태일 때 */}
+    <p role="alert" className="text-[13px] text-error leading-[1.33] mt-1">
+      에러 메시지
+    </p>
+  </div>
+
+  {/* 폼 레벨 에러 */}
+  <p role="alert" className="text-[13px] text-error leading-[1.33] -mt-1">
+    아이디 또는 비밀번호가 올바르지 않습니다.
+  </p>
+
+  {/* 제출 버튼 (기본) */}
+  <button
+    type="submit"
+    className="w-full bg-aircok-blue text-heading-light text-[17px] font-medium rounded-md py-3 min-h-[44px] hover:bg-aircok-blue-dark active:scale-[0.97] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:ring-offset-2"
+  >
+    로그인
+  </button>
+
+  {/* 제출 버튼 (disabled/로딩) */}
+  <button
+    type="submit"
+    disabled
+    className="w-full bg-aircok-blue text-heading-light text-[17px] font-medium rounded-md py-3 min-h-[44px] opacity-60 cursor-not-allowed transition-colors focus:outline-none"
+  >
+    로그인 중...
+  </button>
+</form>
+```
+
+---
+
+## 10. Responsive Behavior (구 §9)
 
 ### Breakpoints
 
@@ -1164,7 +1291,7 @@ CSS `grid-template-rows` 트릭을 사용한 부드러운 열림/닫힘 애니�
 
 ---
 
-## 10. Agent Prompt Guide
+## 11. Agent Prompt Guide (구 §10)
 
 ### Quick Color Reference
 
