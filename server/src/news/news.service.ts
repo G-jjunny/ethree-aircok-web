@@ -34,6 +34,32 @@ export class NewsService {
     return { data, total, page, limit };
   }
 
+  async findAllAdmin(page: number, limit: number) {
+    const skip = (page - 1) * limit;
+
+    const [data, total] = await this.prisma.$transaction([
+      this.prisma.newsPost.findMany({
+        skip,
+        take: limit,
+        orderBy: { date: 'desc' },
+        select: {
+          id: true,
+          title: true,
+          description: true,
+          date: true,
+          location: true,
+          published: true,
+          coverImage: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      }),
+      this.prisma.newsPost.count(),
+    ]);
+
+    return { data, total, page, limit };
+  }
+
   async findOne(id: string) {
     const post = await this.prisma.newsPost.findUnique({ where: { id } });
     if (!post) {

@@ -46,9 +46,18 @@ export class NewsController {
 
   @UseGuards(JwtAuthGuard)
   @Post('images')
-  @UseInterceptors(FileInterceptor('image', multerOptions))
+  @UseInterceptors(FileInterceptor('file', multerOptions))
   uploadImage(@UploadedFile() file: Express.Multer.File) {
     return { url: `/uploads/${file.filename}` };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('admin')
+  findAllAdmin(
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
+  ) {
+    return this.newsService.findAllAdmin(page, limit);
   }
 
   @Get(':id')
