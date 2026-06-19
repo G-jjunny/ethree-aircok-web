@@ -560,5 +560,6 @@ export const SITE = {
   admin: {
     basePath: '/console',
     loginPath: '/console/login',
+    homePath: '/',
   },
 } as const;
