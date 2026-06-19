@@ -109,6 +109,10 @@ Tailwind v4 프로젝트이므로 모든 토큰은 `@theme` 블록 안에 정의
   --color-border-subtle: rgba(0, 0, 0, 0.04);
   --color-border-dark:   rgba(255, 255, 255, 0.08);
 
+  /* ── Aspect Ratios (매거진 레이아웃) ────── */
+  --aspect-featured:  16 / 7;  /* News Featured Hero / Detail overlay hero 와이드 비율 */
+  --aspect-row-thumb: 4 / 3;   /* News Horizontal Row 썸네일 비율 */
+
   /* ── Spacing (8px base) ─────────────────── */
   --spacing-1:  4px;
   --spacing-2:  8px;
@@ -122,6 +126,8 @@ Tailwind v4 프로젝트이므로 모든 토큰은 `@theme` 블록 안에 정의
   --spacing-10: 120px;
 }
 ```
+
+> **Aspect 토큰 사용**: `--aspect-featured`는 `aspect-featured`, `--aspect-row-thumb`는 `aspect-row-thumb` 유틸리티로 사용한다. 기존 카드의 `aspect-video`(16/9)는 유지하며, 매거진 와이드 영역에만 신규 토큰을 적용한다.
 
 ---
 
@@ -168,6 +174,8 @@ Tailwind v4 프로젝트이므로 모든 토큰은 `@theme` 블록 안에 정의
 | 본문 | `font-body` | `--font-body` |
 | **레이아웃** | | |
 | 콘텐츠 컨테이너 | `content-container` | `max-w-[1200px] mx-auto px-5` |
+| 매거진 와이드 비율 | `aspect-featured` | `--aspect-featured` (16/7) |
+| 가로 리스트 썸네일 비율 | `aspect-row-thumb` | `--aspect-row-thumb` (4/3) |
 
 ---
 
@@ -516,18 +524,71 @@ Apple 스타일의 '제품 우선 프레젠테이션'을 Aircok 브랜드에 적
 - 성과 수치 강조 (28px, weight 600, Aircok Blue)
 - 설명 1–2줄
 
+### Location Pin Icon (장소 핀 아이콘) — 공통 SVG
+
+뉴스 카드·가로형 row·상세 히어로 등에서 `location`을 표시할 때 사용하는 인라인 SVG 핀 아이콘. **📍 이모지 사용 금지** — 반드시 아래 SVG로 표시한다. 색상은 `currentColor`로 부모 텍스트 색을 상속하며, 라이트/다크 배경 모두에서 동작한다.
+
+- 권장 크기: 캡션/메타에서는 `w-3.5 h-3.5`, 본문 메타에서는 `w-4 h-4`
+- `aria-hidden="true"`, `shrink-0` 권장 (텍스트와 `inline-flex items-center gap-1`로 배치)
+- 색상: 부모가 `text-secondary-dark`/`text-body-light` 등이면 핀도 동일 색을 상속
+
+```tsx
+// Location Pin SVG (currentColor 상속, 외곽선 스타일)
+<svg
+  className="w-3.5 h-3.5 shrink-0"
+  aria-hidden="true"
+  fill="none"
+  viewBox="0 0 24 24"
+  stroke="currentColor"
+  strokeWidth="1.5"
+>
+  <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+  <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+</svg>
+```
+
+장소 표기 마크업 패턴 (라이트 배경 캡션):
+
+```tsx
+<span className="inline-flex items-center gap-1 text-secondary-dark text-xs">
+  <svg className="w-3.5 h-3.5 shrink-0" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+    <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+  </svg>
+  {location}
+</span>
+```
+
+### Image Placeholder (빈 커버 이미지 플레이스홀더) — 공통
+
+`coverImage`가 없을 때 표시하는 빈 이미지 영역. 카드·row·hero 등 모든 뉴스 표면에서 동일한 시각 언어를 사용한다.
+
+- 라이트 변형: `bg-surface-light flex items-center justify-center` + 아이콘 `text-secondary-dark`
+- 다크 변형: `bg-surface-dark-1 flex items-center justify-center` + 아이콘 `text-body-light opacity-40`
+- 컨테이너의 `aspect-*` 비율은 사용처(카드=`aspect-video`, row 썸네일=`aspect-row-thumb`, hero=`aspect-featured`)를 따른다
+- 아이콘 크기: 소형(row 썸네일) `w-6 h-6`, 대형(hero) `w-10 h-10`
+
+```tsx
+// Image Placeholder SVG (image-off 스타일 외곽선 아이콘)
+<div className="aspect-video bg-surface-light flex items-center justify-center">
+  <svg className="w-6 h-6 text-secondary-dark" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+  </svg>
+</div>
+```
+
 ### News Card (뉴스 카드)
 
-뉴스 목록 페이지에서 3열 그리드로 배치되는 카드. 커버 이미지 + 텍스트 구조.
+뉴스 목록 페이지에서 3열 그리드로 배치되는 카드. 커버 이미지 + 텍스트 구조. 매거진형 레이아웃에서는 **보조 2열 그리드**의 기본 단위로도 사용한다.
 
 - 카드 래퍼: `bg-surface-white rounded-xl shadow-card overflow-hidden hover:shadow-product hover:-translate-y-1 transition-all duration-200`
 - 커버 이미지: `aspect-video w-full object-cover`
-- 이미지 없음 플레이스홀더: `aspect-video bg-surface-light flex items-center justify-center` + SVG 아이콘(`text-secondary-dark w-6 h-6`)
+- 이미지 없음 플레이스홀더: 위 **Image Placeholder** 라이트 변형(`aspect-video bg-surface-light ...`) 사용
 - 하단 패딩: `p-6`
 - **날짜**: `text-aircok-blue text-xs font-body tracking-wide` (Aircok Blue — 날짜가 카테고리/레이블 역할)
 - **카드 제목**: `text-heading-dark font-display font-semibold text-[18px] leading-snug mt-2` (Card News Title, 18px)
 - **설명**: `text-body-dark text-sm font-body line-clamp-2 mt-2`
-- **장소**: `text-secondary-dark text-xs mt-3` (있을 때만, 📍 문자 prefix)
+- **장소**: 위 **Location Pin Icon** 패턴 사용, `mt-3` (있을 때만, 📍 이모지 금지)
 - **"자세히 보기 →"**: `text-aircok-blue text-sm font-body mt-4 inline-block`
 
 ```tsx
@@ -539,8 +600,130 @@ Apple 스타일의 '제품 우선 프레젠테이션'을 Aircok 브랜드에 적
       <time className="text-aircok-blue text-xs font-body tracking-wide">2025.01.01</time>
       <h2 className="text-heading-dark font-display font-semibold text-[18px] leading-snug mt-2">카드 제목</h2>
       <p className="text-body-dark text-sm font-body line-clamp-2 mt-2">설명 텍스트</p>
-      <p className="text-secondary-dark text-xs mt-3">📍 장소</p>
+      <span className="inline-flex items-center gap-1 text-secondary-dark text-xs mt-3">
+        <svg className="w-3.5 h-3.5 shrink-0" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+          <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+        </svg>
+        장소
+      </span>
       <span className="text-aircok-blue text-sm font-body mt-4 inline-block">자세히 보기 →</span>
+    </div>
+  </article>
+</Link>
+```
+
+### News Horizontal Row (가로형 리스트 row)
+
+매거진형 목록에서 featured hero 아래에 배치하는 가로형 기사 row. 좌측 썸네일 + 우측 텍스트 2단 구성. 라이트/다크 섹션 모두에 사용할 수 있도록 두 변형을 정의한다. 데스크탑은 좌우 분할, 모바일(`< sm`)에서는 썸네일이 위로 가는 세로 스택으로 폴백한다.
+
+**공통 구조**
+- 래퍼: `group flex flex-col sm:flex-row gap-5 sm:gap-6 items-start`
+- 썸네일 영역: `w-full sm:w-[280px] shrink-0 rounded-lg overflow-hidden` (`sm:w-[280px]` {/* token 없음: row 썸네일 고정 너비, 매거진 가로형 전용 1회성 수치 */})
+- 썸네일 이미지: `aspect-row-thumb w-full object-cover group-hover:scale-[1.02] transition-transform duration-200`
+- 썸네일 없음: Image Placeholder(`aspect-row-thumb` 적용) — 라이트 섹션은 라이트 변형, 다크 섹션은 다크 변형
+- 텍스트 영역: `flex flex-col gap-2 min-w-0 flex-1`
+- 날짜: `text-aircok-blue text-xs font-body tracking-wide`
+- 제목: `font-display font-semibold text-[21px] leading-snug [word-break:keep-all]` (Card Title 수준, hover 시 색 변화 없음 — 카드 전체 hover는 썸네일 scale로만)
+- 설명: `text-sm font-body line-clamp-2 [word-break:keep-all]`
+- 장소: Location Pin Icon 패턴, `text-xs mt-1`
+
+**라이트 변형** (`bg-surface-white` / `bg-surface-light` 섹션)
+- 제목: `text-heading-dark`
+- 설명: `text-body-dark`
+- 장소: `text-secondary-dark`
+- 썸네일 placeholder: Image Placeholder 라이트 변형
+
+**다크 변형** (`bg-surface-dark` 섹션)
+- 날짜: `text-aircok-blue-light` (다크 배경 가독성)
+- 제목: `text-heading-light`
+- 설명: `text-body-light`
+- 장소: `text-body-light opacity-60`
+- 썸네일 placeholder: Image Placeholder 다크 변형
+
+```tsx
+// News Horizontal Row 예시 (라이트 변형)
+<Link href={`/news/${item.id}`} className="block">
+  <article className="group flex flex-col sm:flex-row gap-5 sm:gap-6 items-start">
+    {/* 썸네일 (고정 너비) */}
+    <div className="w-full sm:w-[280px] shrink-0 rounded-lg overflow-hidden"> {/* token 없음: row 썸네일 고정 너비 280px */}
+      <img src="..." alt="..." className="aspect-row-thumb w-full object-cover group-hover:scale-[1.02] transition-transform duration-200" />
+    </div>
+    {/* 텍스트 */}
+    <div className="flex flex-col gap-2 min-w-0 flex-1">
+      <time className="text-aircok-blue text-xs font-body tracking-wide">2025.01.01</time>
+      <h3 className="font-display font-semibold text-[21px] leading-snug text-heading-dark [word-break:keep-all]">기사 제목</h3>
+      <p className="text-sm font-body line-clamp-2 text-body-dark [word-break:keep-all]">설명 텍스트</p>
+      <span className="inline-flex items-center gap-1 text-secondary-dark text-xs mt-1">
+        <svg className="w-3.5 h-3.5 shrink-0" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+          <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+        </svg>
+        장소
+      </span>
+    </div>
+  </article>
+</Link>
+```
+
+### News Featured Hero (매거진 대표 기사)
+
+목록 페이지 최상단에 대표 기사 1건을 대형으로 노출하는 매거진형 히어로. 두 가지 변형을 정의하며, implementer가 `coverImage` 유무·디자인 의도에 따라 선택한다. **두 변형 모두 `coverImage`가 없으면 텍스트 분리형으로 폴백**한다.
+
+#### 변형 (1) Overlay 변형 — 이미지 위 텍스트 오버레이
+
+큰 커버 이미지 위에 `bg-overlay-dark-60`(기존 토큰 재활용)을 깔고 흰 텍스트를 오버레이한다. 신규 색상 토큰 없음.
+
+- 래퍼: `relative rounded-xl overflow-hidden group`
+- 이미지: `aspect-featured w-full object-cover` (16/7 와이드)
+- 오버레이: `absolute inset-0 bg-overlay-dark-60` (텍스트 대비 확보)
+- 텍스트 블록: `absolute inset-0 flex flex-col justify-end p-8 md:p-12 gap-3`
+- 날짜: `text-aircok-blue-light text-xs font-body tracking-widest uppercase` (다크 위 가독성)
+- 제목: `text-heading-light font-display font-bold text-[28px] md:text-[40px] leading-[1.10] tracking-[-0.3px] max-w-3xl [word-break:keep-all]`
+- 설명: `text-body-light font-body text-base md:text-lg line-clamp-2 max-w-2xl [word-break:keep-all]`
+- 장소: Location Pin Icon, `text-body-light opacity-80 text-xs`
+- 이미지 hover(선택): `group-hover:scale-[1.02] transition-transform duration-300` (이미지에만)
+
+```tsx
+// News Featured Hero — Overlay 변형
+<Link href={`/news/${item.id}`} className="block">
+  <article className="relative rounded-xl overflow-hidden group">
+    <img src="..." alt="..." className="aspect-featured w-full object-cover group-hover:scale-[1.02] transition-transform duration-300" />
+    <div className="absolute inset-0 bg-overlay-dark-60" />
+    <div className="absolute inset-0 flex flex-col justify-end p-8 md:p-12 gap-3">
+      <time className="text-aircok-blue-light text-xs font-body tracking-widest uppercase">2025.01.01</time>
+      <h2 className="text-heading-light font-display font-bold text-[28px] md:text-[40px] leading-[1.10] tracking-[-0.3px] max-w-3xl [word-break:keep-all]">대표 기사 제목</h2>
+      <p className="text-body-light font-body text-base md:text-lg line-clamp-2 max-w-2xl [word-break:keep-all]">설명 텍스트</p>
+    </div>
+  </article>
+</Link>
+```
+
+#### 변형 (2) 텍스트 분리형 — 좌우 split
+
+이미지와 텍스트를 좌우로 분리한다. 라이트 섹션에서 사용. `coverImage` 없을 때의 폴백이기도 하다(이 경우 이미지 칼럼 자리에 Image Placeholder 또는 텍스트 단독 풀폭).
+
+- 래퍼: `grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center`
+- 이미지 칼럼: `rounded-xl overflow-hidden` + 이미지 `aspect-video w-full object-cover` (이미지 없으면 Image Placeholder 라이트, `aspect-video`)
+- 텍스트 칼럼: `flex flex-col gap-4`
+- 날짜: `text-aircok-blue text-xs font-body tracking-widest uppercase`
+- 제목: `text-heading-dark font-display font-bold text-[32px] md:text-[40px] leading-[1.10] tracking-[-0.3px] [word-break:keep-all]`
+- 설명: `text-body-dark font-body text-lg line-clamp-3 [word-break:keep-all]`
+- 장소: Location Pin Icon, `text-secondary-dark text-xs`
+- 하단 "자세히 보기 →": `text-aircok-blue text-sm font-body mt-2 inline-block`
+
+```tsx
+// News Featured Hero — 텍스트 분리형
+<Link href={`/news/${item.id}`} className="block group">
+  <article className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
+    <div className="rounded-xl overflow-hidden">
+      <img src="..." alt="..." className="aspect-video w-full object-cover group-hover:scale-[1.02] transition-transform duration-300" />
+    </div>
+    <div className="flex flex-col gap-4">
+      <time className="text-aircok-blue text-xs font-body tracking-widest uppercase">2025.01.01</time>
+      <h2 className="text-heading-dark font-display font-bold text-[32px] md:text-[40px] leading-[1.10] tracking-[-0.3px] [word-break:keep-all]">대표 기사 제목</h2>
+      <p className="text-body-dark font-body text-lg line-clamp-3 [word-break:keep-all]">설명 텍스트</p>
+      <span className="text-aircok-blue text-sm font-body mt-2 inline-block">자세히 보기 →</span>
     </div>
   </article>
 </Link>
@@ -548,14 +731,202 @@ Apple 스타일의 '제품 우선 프레젠테이션'을 Aircok 브랜드에 적
 
 ### News Detail Hero (뉴스 상세 히어로)
 
-뉴스 상세 페이지 상단 히어로. 날짜/장소 뱃지 + H1 + 설명 구조.
+뉴스 상세 페이지 상단 히어로. 두 변형을 정의한다. `coverImage`가 있으면 목록 featured hero와 통일감을 주는 **Overlay 변형**을, 없으면 기존 **라이트 변형**을 폴백으로 사용한다.
+
+#### 변형 A — 라이트 변형 (coverImage 없음, 폴백)
+
+날짜/장소 뱃지 + H1 + 설명 구조.
 
 - 배경 섹션: `bg-surface-light py-14`
-- 날짜·장소 뱃지: `bg-surface-white rounded-pill px-3 py-1 text-xs text-secondary-dark border border-border-light`
+- 날짜·장소 뱃지: `bg-surface-white rounded-pill px-3 py-1 text-xs text-secondary-dark border border-border-light` (장소 뱃지는 Location Pin Icon을 `inline-flex items-center gap-1`로 포함)
 - **H1 (데스크탑)**: Article Hero (48px, weight 700), `text-heading-dark font-display font-bold md:text-[48px] leading-tight [word-break:keep-all]`
 - **H1 (모바일)**: Article Hero Mobile (36px, weight 700), `text-[36px]` (responsive 적용)
 - **설명 p**: Body (17px, weight 400), `text-body-dark font-body text-lg mt-4 max-w-2xl [word-break:keep-all]`
 - 클래스 조합: `text-[36px] md:text-[48px]`
+
+#### 변형 B — Overlay 변형 (coverImage 있음, 목록 featured hero와 통일)
+
+커버 이미지를 full-bleed로 깔고 `bg-overlay-dark-60` 위에 흰 텍스트를 배치. 목록 페이지의 News Featured Hero(Overlay) 변형과 동일한 비주얼 언어로 목록↔상세 통일감을 만든다. 신규 색상 토큰 없이 기존 `bg-overlay-dark-60` 재활용.
+
+- 섹션 래퍼: `relative` (full-width 섹션)
+- 이미지: `aspect-featured w-full object-cover` (모바일은 비율이 너무 납작하면 `max-h-[520px]`로 캡 가능 — 기존 상세에서 쓰던 수치)
+- 오버레이: `absolute inset-0 bg-overlay-dark-60`
+- 콘텐츠 컨테이너: `absolute inset-0 flex items-end` 내부에 `content-container` + `pb-10 md:pb-14`
+- 날짜·장소 뱃지: `bg-overlay-white-10 backdrop-blur-sm rounded-pill px-3 py-1 text-xs text-body-light border border-border-dark` (다크 위 글래스 뱃지, 기존 `bg-overlay-white-10`/`border-border-dark` 토큰 재활용)
+- **H1**: `text-heading-light font-display font-bold text-[36px] md:text-[48px] leading-tight max-w-3xl [word-break:keep-all]`
+- **설명 p**: `text-body-light font-body text-lg mt-4 max-w-2xl [word-break:keep-all]`
+
+```tsx
+// News Detail Hero — Overlay 변형 (coverImage 있을 때)
+<section className="relative">
+  <img src="..." alt={post.title} className="aspect-featured w-full object-cover max-h-[640px]" /> {/* token 없음: overlay hero 모바일 높이 캡 */}
+  <div className="absolute inset-0 bg-overlay-dark-60" />
+  <div className="absolute inset-0 flex items-end">
+    <div className="content-container pb-10 md:pb-14 w-full">
+      <div className="flex items-center gap-2 flex-wrap">
+        <time className="bg-overlay-white-10 backdrop-blur-sm rounded-pill px-3 py-1 text-xs text-body-light border border-border-dark">2025.01.01</time>
+        <span className="inline-flex items-center gap-1 bg-overlay-white-10 backdrop-blur-sm rounded-pill px-3 py-1 text-xs text-body-light border border-border-dark">
+          <svg className="w-3.5 h-3.5 shrink-0" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+          </svg>
+          장소
+        </span>
+      </div>
+      <h1 className="text-heading-light font-display font-bold text-[36px] md:text-[48px] leading-tight mt-4 max-w-3xl [word-break:keep-all]">기사 제목</h1>
+      <p className="text-body-light font-body text-lg mt-4 max-w-2xl [word-break:keep-all]">설명 텍스트</p>
+    </div>
+  </div>
+</section>
+```
+
+> **뒤로가기 바**: Overlay 변형 위에 뒤로가기 링크를 둘 경우, 다크 이미지 위 가독성을 위해 `text-body-light hover:text-heading-light` 변형을 사용한다(라이트 변형에서는 기존 `text-secondary-dark hover:text-body-dark` 유지).
+
+### News Magazine Layout (매거진형 목록 페이지 구성)
+
+뉴스 목록 페이지(`/news`)의 전체 섹션 리듬. §1/§7 섹션 교차 원칙을 따라 라이트↔다크 섹션을 교차해 시네마틱 리듬을 만든다. 카테고리/태그 분류는 도입하지 않으며, 가용 데이터(id·title·description·date·location·coverImage)만 사용한다.
+
+**섹션 순서·배경 리듬**
+
+> **연도 필터 적용 시**: Featured 섹션의 페이지 타이틀 바로 아래에 **News Year Filter Tab**(아래 패턴 참조)을 배치하고, 선택된 연도(또는 "전체")에 해당하는 기사 집합으로 featured + row + grid를 재구성한다. 즉 필터링된 목록의 첫 기사가 featured(맨 위 대형)가 되고, 나머지가 row/grid 섹션으로 분배된다. 탭은 라이트 Featured 섹션 안에 있으므로 라이트 변형만 사용한다.
+
+1. **Featured 섹션** (`bg-surface-light py-16 md:py-20`) — 상단 페이지 레이블(`text-aircok-blue ... uppercase` NEWS) + 페이지 타이틀(H1, Section Heading) 후, (연도 필터 사용 시 News Year Filter Tab을 배치한 뒤) 대표 기사 1건을 **News Featured Hero**로 노출. 데이터 1건일 때는 featured만 렌더.
+2. **주요 기사 row 섹션** (`bg-surface-white py-16`) — 다음 N건(예: 2~5번째)을 **News Horizontal Row 라이트 변형**으로 세로 나열. row 사이 구분선: `divide-y divide-border-light`(각 row에 상하 패딩 `py-8`).
+3. **보조 그리드 섹션** (`bg-surface-dark py-16 md:py-20`) — 나머지 기사를 **News Horizontal Row 다크 변형**으로 2열(`md:grid-cols-2`)로 배치. 다크 섹션이므로 카드 대신 다크 row를 사용한다. 이 섹션이 라이트↔다크 교차 리듬을 완성한다.
+4. (선택) 기사 수가 많을 때 라이트/다크 교차를 한 번 더 반복.
+
+- 각 섹션 내부 콘텐츠는 반드시 `content-container` 사용.
+- 빈 상태: 데이터 0건이면 Featured 섹션 자리에 빈 상태 메시지(`py-24 text-center` + `text-secondary-dark`).
+- 모바일에서는 모든 그리드/row가 1열로 폴백.
+
+```tsx
+// News Magazine Layout 골격 (구성만 — 데이터 분배는 implementer)
+<main className="min-h-screen bg-surface-white">
+  {/* 1. Featured (라이트) */}
+  <section className="bg-surface-light py-16 md:py-20">
+    <div className="content-container flex flex-col gap-8">
+      <div className="flex flex-col gap-3">
+        <p className="text-aircok-blue text-sm font-body tracking-widest uppercase">NEWS</p>
+        <h1 className="text-[40px] font-display font-semibold text-heading-dark leading-[1.10] tracking-[-0.3px] [word-break:keep-all]">페이지 타이틀</h1>
+      </div>
+      {/* News Featured Hero (overlay 또는 텍스트 분리형) */}
+    </div>
+  </section>
+
+  {/* 2. 주요 기사 row (라이트 화이트) */}
+  <section className="bg-surface-white py-16">
+    <div className="content-container flex flex-col divide-y divide-border-light">
+      {/* News Horizontal Row 라이트 변형 * N (각 row에 py-8) */}
+    </div>
+  </section>
+
+  {/* 3. 보조 그리드 (다크) */}
+  <section className="bg-surface-dark py-16 md:py-20">
+    <div className="content-container grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-12">
+      {/* News Horizontal Row 다크 변형 * N */}
+    </div>
+  </section>
+</main>
+```
+
+### News Year Filter Tab (연도별 필터 탭)
+
+뉴스 매거진 목록(`/news`) 상단에서 연도(year)를 기준으로 기사를 필터링하는 타임라인형 탭. 카테고리/태그 분류가 아니라 **연도 단일 축** 필터다. 사용자가 연도를 "시간축"처럼 인지하도록, §8 "Category Tab"의 pill 스타일을 기반으로 하되 연도 항목 사이에 미세한 축 구분선을 더해 타임라인 맥락을 부여한다. 색상은 §8 / §4.5 History Timeline과 동일하게 **Aircok Blue 단일**만 사용하며 신규 색상 토큰은 도입하지 않는다.
+
+> **클라이언트 인터랙션**: 탭 선택 상태와 onChange 핸들링이 필요하므로 이 탭을 포함하는 컴포넌트(또는 그 부모)는 `'use client'` 컴포넌트여야 한다. 선택 상태(`selectedYear`)와 필터링·featured 재배치 로직은 frontend-implementer가 담당하며, 본 가이드는 탭 UI 마크업·상태 클래스만 정의한다.
+
+**항목 구성**
+- 첫 항목은 항상 **"전체"**(value: `'all'`).
+- 이후 항목은 **데이터에 존재하는 연도들**을 `date`(ISO)에서 추출해 **중복 제거 + 내림차순(최신 연도 우선)** 정렬. 예: `[전체, 2026, 2025, 2024]`.
+- 연도 라벨은 4자리 숫자 문자열(`2026`) 그대로 표시. 숫자 정렬·정렬 안정성을 위해 라벨에 `tabular-nums` 적용.
+
+**리스트 컨테이너 (§8 Category Tab 재활용 + 타임라인 변형)**
+- §8 Category Tab과 동일한 수평 스크롤 컨테이너를 사용: `flex flex-row items-center gap-2 overflow-x-auto pb-1 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]`
+- **타임라인 축 표현(선택, 권장)**: "전체" 칩과 연도 칩 그룹 사이를 시각적으로 분리하기 위해 얇은 세로 구분선 1개(`<span aria-hidden="true" className="shrink-0 w-px h-5 bg-border-light mx-1" />`)를 둘 수 있다. 신규 토큰 없이 기존 `bg-border-light` 재활용. 칩마다 구분선을 반복하지는 않는다(과한 장식 금지).
+- `role="tablist"` + `aria-label="연도별 필터"` 를 컨테이너에 부여.
+
+**탭 버튼 — 활성 상태** (§8 Category Tab 활성 그대로)
+- `shrink-0 rounded-pill px-5 py-2 min-h-[44px] text-[15px] font-medium bg-aircok-blue text-heading-light transition-colors tabular-nums`
+- `role="tab"`, `aria-selected={true}`
+
+**탭 버튼 — 비활성 상태** (§8 Category Tab 비활성 그대로)
+- `shrink-0 rounded-pill px-5 py-2 min-h-[44px] text-[15px] font-medium bg-transparent text-body-dark hover:bg-surface-light transition-colors tabular-nums`
+- `role="tab"`, `aria-selected={false}`
+- 키보드 포커스: `focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:ring-offset-2`
+
+**카운트 배지 (선택 — 권장)**
+연도별 기사 수를 칩 우측에 표시하면 타임라인 밀도(어느 해에 기사가 많은지)를 직관적으로 전달한다. §8 FAQ Sidebar 카운트 배지 톤을 인라인 pill로 재활용한다. 칩이 가로 스크롤 영역이므로 `ml-auto` 대신 `ml-1.5`로 라벨 옆에 붙인다.
+- 비활성 칩의 배지: `text-[12px] text-secondary-dark bg-surface-light rounded-pill px-1.5 py-0.5 ml-1.5 tabular-nums`
+- 활성 칩의 배지(파란 배경 위 가독성): 배경 없이 `text-[12px] text-heading-light/70 ml-1.5 tabular-nums` — 기존 `text-heading-light` opacity 변형(신규 토큰 아님). 또는 `bg-overlay-white-10 rounded-pill px-1.5 py-0.5` 글래스 배지로 대체 가능.
+- 배지는 칩 라벨과 함께 한 버튼 내부에 둔다(별도 클릭 대상 아님). 배지에는 `aria-hidden="true"`를 부여하고, 칩 라벨에 스크린리더용 설명을 포함(예: `aria-label="2025년 기사 12건"`).
+- **권장/선택 명시**: 카운트 배지는 **선택 사항**이다. 기사 수가 적거나 연도 수가 많아 가로 폭이 빠듯하면 생략한다. 도입할 경우 "전체" 칩에도 총 기사 수 배지를 동일 톤으로 붙여 일관성을 유지한다.
+
+**접근성 (a11y)**
+- 컨테이너: `role="tablist"`, `aria-label="연도별 필터"`.
+- 각 칩: `role="tab"`, `aria-selected`(활성=`true`/비활성=`false`), `type="button"`.
+- 선택 시 보여지는 목록 영역에는 `role="tabpanel"`을 부여하고, 활성 탭과 `aria-labelledby`/`id`로 연결하는 것을 권장(목록 패널은 implementer 구현 범위).
+- 키보드: 좌우 화살표로 탭 이동(implementer), 포커스 링은 `focus-visible:ring-2 focus-visible:ring-aircok-blue`.
+- 터치 타깃: 모든 칩 `min-h-[44px]` 보장(§10 Touch Targets).
+- 모바일 overflow: 컨테이너 `overflow-x-auto` + 칩 `shrink-0`로 가로 스크롤. 스크롤바는 위 유틸리티로 숨김.
+
+```tsx
+// News Year Filter Tab 예시 ('use client' 컴포넌트 내부)
+// years: 내림차순 정렬된 연도 배열 (예: [2026, 2025, 2024]), 추출·정렬은 implementer
+// selectedYear: 'all' | number,  counts: Record<'all' | number, number> (선택)
+<div
+  role="tablist"
+  aria-label="연도별 필터"
+  className="flex flex-row items-center gap-2 overflow-x-auto pb-1 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+>
+  {/* "전체" 칩 (활성 예시) */}
+  <button
+    type="button"
+    role="tab"
+    aria-selected={selectedYear === 'all'}
+    aria-label={`전체 기사 ${counts.all}건`}
+    onClick={() => onSelectYear('all')}
+    className="shrink-0 rounded-pill px-5 py-2 min-h-[44px] text-[15px] font-medium bg-aircok-blue text-heading-light transition-colors tabular-nums focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:ring-offset-2"
+  >
+    전체
+    <span aria-hidden="true" className="text-[12px] text-heading-light/70 ml-1.5 tabular-nums">{counts.all}</span>
+  </button>
+
+  {/* 타임라인 축 구분선 (선택, 권장) */}
+  <span aria-hidden="true" className="shrink-0 w-px h-5 bg-border-light mx-1" />
+
+  {/* 연도 칩 (비활성 예시) */}
+  {years.map((year) => (
+    <button
+      key={year}
+      type="button"
+      role="tab"
+      aria-selected={selectedYear === year}
+      aria-label={`${year}년 기사 ${counts[year]}건`}
+      onClick={() => onSelectYear(year)}
+      className={
+        selectedYear === year
+          ? 'shrink-0 rounded-pill px-5 py-2 min-h-[44px] text-[15px] font-medium bg-aircok-blue text-heading-light transition-colors tabular-nums focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:ring-offset-2'
+          : 'shrink-0 rounded-pill px-5 py-2 min-h-[44px] text-[15px] font-medium bg-transparent text-body-dark hover:bg-surface-light transition-colors tabular-nums focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:ring-offset-2'
+      }
+    >
+      {year}
+      {/* 카운트 배지 — 선택. 활성/비활성 톤 분기 */}
+      <span
+        aria-hidden="true"
+        className={
+          selectedYear === year
+            ? 'text-[12px] text-heading-light/70 ml-1.5 tabular-nums'
+            : 'text-[12px] text-secondary-dark bg-surface-light rounded-pill px-1.5 py-0.5 ml-1.5 tabular-nums'
+        }
+      >
+        {counts[year]}
+      </span>
+    </button>
+  ))}
+</div>
+```
+
+> **재활용 메모**: 본 탭은 §8 Category Tab의 활성/비활성 칩 클래스를 그대로 사용하므로, 향후 두 패턴을 묶어 `shared/ui`의 단일 `<FilterTabs>` 공용 컴포넌트로 추출하는 것을 검토할 수 있다(연도 필터 + FAQ 카테고리 필터 = 2곳, 3곳째 등장 시 추출). 현 단계에서는 가이드만 정의한다.
 
 ### News Content (Rich Text 렌더러)
 
@@ -1403,20 +1774,17 @@ Nav BG:             rgba(255,255,255,0.80) + backdrop-filter: saturate(180%) blu
 
 ## 12. 뉴스 게시판 패턴
 
-### NewsCard (목록 카드)
-- 컨테이너: `bg-surface-white rounded-xl shadow-card overflow-hidden`
-- 커버 이미지 영역: `aspect-video w-full object-cover` (이미지 없을 때: `bg-surface-light flex items-center justify-center`)
-- 날짜 포맷: `YYYY.MM.DD` — `text-secondary-dark text-sm font-body`
-- 제목: `text-heading-dark font-display font-semibold text-lg leading-snug`
-- 설명: `text-body-dark text-sm line-clamp-2 font-body`
-- 장소 배지: `text-secondary-dark text-xs` (없으면 미표시)
-- 카드 전체에 `<Link>` 감싸기, hover: `hover:shadow-product transition-shadow duration-200`
+> **뉴스 표면 컴포넌트(NewsCard / NewsHorizontalRow / NewsFeaturedHero / NewsDetailHero / NewsContent / Location Pin / Image Placeholder)의 단일 기준은 §4 "Component Stylings"이다.** 아래 §12의 NewsCard·NewsDetail 항목은 §4로 통합되었으므로 §4를 따른다. 본 섹션에는 콘솔 전용(AdminNewsForm·TipTap)만 유지한다.
 
-### NewsDetail (상세 본문)
-- prose 영역 wrapper: `prose prose-lg max-w-none font-body text-body-dark`
-- 제목: `text-heading-dark font-display font-bold text-[40px] leading-tight`
-- 메타 정보(날짜·장소): `text-secondary-dark text-sm font-body`
-- 구분선: `border-t border-border-light my-8`
+### NewsCard / NewsDetail / 매거진 패턴 → §4 참조
+- **NewsCard (목록 카드)** → §4 "News Card" 기준. (날짜 = `text-aircok-blue` 레이블, 제목 18px `text-[18px]`, hover `-translate-y-1` 등.)
+- **News Horizontal Row (가로형 리스트)** → §4 "News Horizontal Row" (라이트/다크 변형).
+- **News Featured Hero (매거진 대표 기사)** → §4 "News Featured Hero" (overlay / 텍스트 분리형).
+- **News Detail Hero (상세 히어로)** → §4 "News Detail Hero" (라이트 변형 A / overlay 변형 B).
+- **News 상세 본문 렌더링** → §4 "News Content".
+- **목록 페이지 섹션 리듬** → §4 "News Magazine Layout".
+- **연도별 필터 탭** → §4 "News Year Filter Tab" (§8 Category Tab 재활용 + 타임라인 변형, `'use client'`).
+- **장소 표기** → §4 "Location Pin Icon" (📍 이모지 금지). **빈 이미지** → §4 "Image Placeholder".
 
 ### AdminNewsForm (콘솔 폼)
 - 폼 컨테이너: `bg-surface-white rounded-xl p-8 shadow-card`
@@ -1431,3 +1799,56 @@ Nav BG:             rgba(255,255,255,0.80) + backdrop-filter: saturate(180%) blu
 - 툴바 버튼 기본: `px-2 py-1 rounded text-body-dark text-sm hover:bg-border-light transition-colors`
 - 툴바 버튼 활성: `bg-aircok-blue text-heading-light`
 - 에디터 본문 영역: `min-h-[300px] border border-t-0 border-border-light rounded-b-md px-4 py-3 focus:outline-none text-body-dark text-sm font-body`
+
+---
+
+## 13. shared/ui 공용 컴포넌트화 후보 (뉴스 매거진)
+
+뉴스 매거진 리뉴얼에서 3곳 이상 반복되는 요소를 `src/shared/ui/`로 추출하기 위한 props/스타일 계약. **실제 `.tsx` 생성·`index.ts` export는 frontend-implementer가 수행**하며, 본 섹션은 구현 가이드이다. 추출 시 §4의 토큰·클래스를 그대로 사용한다.
+
+### 13.1 `<DateLabel>` (날짜 레이블)
+NewsCard·NewsHorizontalRow·NewsFeaturedHero·NewsDetailHero 등 4곳+에서 반복되는 Aircok Blue 날짜 레이블.
+
+- props:
+  - `date: string` (ISO 문자열) — 컴포넌트 내부에서 `YYYY.MM.DD` 포맷
+  - `theme?: 'light' | 'dark'` (기본 `'light'`)
+  - `size?: 'xs' | 'sm'` (기본 `'xs'`) — 카드/row는 `xs`, hero는 `xs`+`tracking-widest uppercase`
+  - `className?: string`
+- 스타일:
+  - light: `text-aircok-blue text-xs font-body tracking-wide`
+  - dark: `text-aircok-blue-light text-xs font-body tracking-wide`
+  - hero 변형(레이블형): `tracking-widest uppercase` 추가 (prop 또는 className으로 조정)
+- 렌더: `<time dateTime={date}>{formatted}</time>` — 시맨틱 `<time>` 사용, `dateTime`에 원본 ISO 유지
+
+### 13.2 `<LocationTag>` (장소 + 핀 아이콘)
+NewsCard·NewsHorizontalRow·NewsDetailHero(뱃지) 등 3곳+. 📍 이모지를 SVG 핀으로 대체하는 단일 출처.
+
+- props:
+  - `location: string`
+  - `theme?: 'light' | 'dark'` (기본 `'light'`)
+  - `variant?: 'plain' | 'badge'` (기본 `'plain'`) — `plain`은 인라인 텍스트, `badge`는 상세 hero의 pill 뱃지
+  - `iconSize?: 'sm' | 'md'` (기본 `'sm'` = `w-3.5 h-3.5`)
+  - `className?: string`
+- 스타일:
+  - 래퍼: `inline-flex items-center gap-1`
+  - plain/light: `text-secondary-dark text-xs` · plain/dark: `text-body-light opacity-60 text-xs`
+  - badge/light: `bg-surface-white rounded-pill px-3 py-1 text-xs text-secondary-dark border border-border-light`
+  - badge/dark(overlay hero): `bg-overlay-white-10 backdrop-blur-sm rounded-pill px-3 py-1 text-xs text-body-light border border-border-dark`
+- 내부 SVG: §4 "Location Pin Icon" path 그대로(`currentColor` 상속, `aria-hidden`, `shrink-0`)
+- `location`이 falsy면 `null` 반환(렌더 안 함)
+
+### 13.3 `<NewsImage>` (커버 이미지 + 폴백 placeholder)
+NewsCard·NewsHorizontalRow·NewsFeaturedHero·NewsDetailHero 등 4곳+에서 반복되는 "이미지 있으면 `<img>`, 없으면 placeholder" 분기 + `API_BASE` URL 정규화 로직.
+
+- props:
+  - `src: string | null` (coverImage, nullable)
+  - `alt: string`
+  - `ratio?: 'video' | 'featured' | 'row-thumb'` (기본 `'video'`) → `aspect-video` / `aspect-featured` / `aspect-row-thumb`
+  - `theme?: 'light' | 'dark'` (기본 `'light'`) — placeholder 배경 변형
+  - `className?: string` (object-cover/scale 등 추가)
+- 이미지 분기:
+  - `src` 있음: `<img className="{aspect} w-full object-cover ...">`, URL은 `src.startsWith('http') ? src : ${API_BASE}${src}` (현재 view들과 동일 규칙 — `NewsImage` 내부에서 env(`NEXT_PUBLIC_API_URL`)를 직접 읽어 URL을 정규화한다. FSD eslint-plugin-boundaries의 shared→shared 슬라이스 간 import 금지 규칙 때문에 `API_BASE` 상수를 `shared/config`로 중앙화하지는 않는다)
+  - `src` 없음: §4 "Image Placeholder" — light(`bg-surface-light` + `text-secondary-dark`) / dark(`bg-surface-dark-1` + `text-body-light opacity-40`)
+- 주의: `next/image` 대신 현재 코드처럼 `<img>` + eslint-disable 유지(외부/동적 호스트). 비즈니스 로직(URL 결합)은 단순 문자열 처리이므로 마크업 컴포넌트 범위로 간주.
+
+> 추출 우선순위: (1) `LocationTag`(이모지 제거가 즉시 필요), (2) `DateLabel`, (3) `NewsImage`. 세 컴포넌트 모두 `entities/news` 데이터(`NewsSummary`/`NewsPost`)에 의존하지 않는 순수 표현 컴포넌트로 설계해 `shared/ui`에 위치 가능하게 한다.

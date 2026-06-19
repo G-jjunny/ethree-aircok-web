@@ -1,16 +1,73 @@
 import Link from 'next/link';
+import { DateLabel, LocationTag, NewsImage } from '@/shared/ui';
 import type { NewsPost } from '@/entities/news';
 
 interface Props {
   post: NewsPost;
-  API_BASE: string;
 }
 
-function formatDate(dateStr: string): string {
-  return dateStr.slice(0, 10).replace(/-/g, '.');
+/**
+ * 뉴스 상세 히어로.
+ * coverImage 있으면 Overlay 변형 B(목록 featured hero와 통일), 없으면 라이트 변형 A 폴백.
+ * design.md §4 "News Detail Hero".
+ */
+export function NewsDetailHeroSection({ post }: Props) {
+  if (post.coverImage) {
+    return <DetailHeroOverlay post={post} />;
+  }
+  return <DetailHeroLight post={post} />;
 }
 
-export function NewsDetailHeroSection({ post, API_BASE }: Props) {
+/** 변형 B — Overlay (coverImage 있음) */
+function DetailHeroOverlay({ post }: Props) {
+  return (
+    <section className="relative">
+      {/* token 없음: overlay hero 모바일 높이 캡 (기존 상세에서 쓰던 수치 계열) */}
+      <NewsImage
+        src={post.coverImage}
+        alt={post.title}
+        ratio="featured"
+        className="max-h-[640px]"
+      />
+      <div className="absolute inset-0 bg-overlay-dark-60" />
+      <div className="absolute inset-0 flex flex-col">
+        {/* 뒤로가기 (다크 이미지 위 가독성) */}
+        <div className="content-container py-5 w-full">
+          <Link
+            href="/news"
+            className="text-body-light text-sm hover:text-heading-light transition-colors"
+          >
+            ← 뉴스 목록
+          </Link>
+        </div>
+        {/* 콘텐츠 (하단 정렬) */}
+        <div className="flex-1 flex items-end">
+          <div className="content-container pb-10 md:pb-14 w-full">
+            <div className="flex items-center gap-2 flex-wrap">
+              <DateLabel
+                date={post.date}
+                theme="dark"
+                className="bg-overlay-white-10 backdrop-blur-sm rounded-pill px-3 py-1 border border-border-dark text-body-light tracking-normal normal-case"
+              />
+              <LocationTag location={post.location} theme="dark" variant="badge" />
+            </div>
+            <h1 className="text-heading-light font-display font-bold text-[36px] md:text-[48px] leading-tight mt-4 max-w-3xl [word-break:keep-all]">
+              {post.title}
+            </h1>
+            {post.description && (
+              <p className="text-body-light font-body text-lg mt-4 max-w-2xl [word-break:keep-all]">
+                {post.description}
+              </p>
+            )}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/** 변형 A — 라이트 (coverImage 없음, 폴백) */
+function DetailHeroLight({ post }: Props) {
   return (
     <>
       {/* 뒤로가기 바 */}
@@ -23,27 +80,20 @@ export function NewsDetailHeroSection({ post, API_BASE }: Props) {
         </Link>
       </div>
 
-      {/* Hero 영역 */}
       <section className="bg-surface-light py-14">
         <div className="content-container">
-          {/* 날짜 + 장소 뱃지 row */}
           <div className="flex items-center gap-2 flex-wrap">
-            <time className="bg-surface-white rounded-pill px-3 py-1 text-xs text-secondary-dark border border-border-light">
-              {formatDate(post.date)}
-            </time>
-            {post.location && (
-              <span className="bg-surface-white rounded-pill px-3 py-1 text-xs text-secondary-dark border border-border-light">
-                📍 {post.location}
-              </span>
-            )}
+            <DateLabel
+              date={post.date}
+              className="bg-surface-white rounded-pill px-3 py-1 border border-border-light text-secondary-dark tracking-normal"
+            />
+            <LocationTag location={post.location} variant="badge" />
           </div>
 
-          {/* 제목 */}
           <h1 className="text-heading-dark font-display font-bold text-[36px] md:text-[48px] leading-tight mt-4 max-w-3xl [word-break:keep-all]">
             {post.title}
           </h1>
 
-          {/* 설명 */}
           {post.description && (
             <p className="text-body-dark font-body text-lg mt-4 max-w-2xl [word-break:keep-all]">
               {post.description}
@@ -51,24 +101,6 @@ export function NewsDetailHeroSection({ post, API_BASE }: Props) {
           )}
         </div>
       </section>
-
-      {/* 커버 이미지 */}
-      {post.coverImage && (
-        <div className="content-container">
-          <div className="mt-10 rounded-xl overflow-hidden">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={
-                post.coverImage.startsWith('http')
-                  ? post.coverImage
-                  : `${API_BASE}${post.coverImage}`
-              }
-              alt={post.title}
-              className="w-full max-h-[520px] object-cover"
-            />
-          </div>
-        </div>
-      )}
     </>
   );
 }

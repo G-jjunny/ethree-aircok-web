@@ -1,3 +1,6 @@
 export { SectionHeader } from './SectionHeader'
 export { FeatureCard } from './FeatureCard'
 export { DarkStatCard } from './DarkStatCard'
+export { DateLabel } from './DateLabel'
+export { LocationTag } from './LocationTag'
+export { NewsImage } from './NewsImage'
