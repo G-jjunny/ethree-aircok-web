@@ -1,15 +1,12 @@
 import { defineConfig } from 'prisma/config'
-import pg from 'pg'
-import { PrismaPg } from '@prisma/adapter-pg'
+import 'dotenv/config'
 
 export default defineConfig({
   schema: './prisma/schema.prisma',
-  migrate: {
-    adapter: () => {
-      const pool = new pg.Pool({
-        connectionString: process.env.DATABASE_URL,
-      })
-      return new PrismaPg(pool)
-    },
+  migrations: {
+    seed: 'ts-node --project ./tsconfig.json ./prisma/seed.ts',
+  },
+  datasource: {
+    url: process.env.DATABASE_URL as string,
   },
 })

@@ -9,7 +9,9 @@ apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     if (typeof window !== 'undefined' && error?.response?.status === 401) {
-      window.location.href = '/console/login';
+      if (!window.location.pathname.startsWith('/console/login')) {
+        window.location.href = '/console/login';
+      }
     }
     return Promise.reject(error);
   }

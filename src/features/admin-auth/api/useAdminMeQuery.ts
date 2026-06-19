@@ -9,4 +9,5 @@ export const adminMeQueryOptions = () => ({
   staleTime: 1000 * 60 * 5, // 5분
 });
 
-export const useAdminMeQuery = () => useQuery(adminMeQueryOptions());
+export const useAdminMeQuery = (options?: { enabled?: boolean }) =>
+  useQuery({ ...adminMeQueryOptions(), ...options });

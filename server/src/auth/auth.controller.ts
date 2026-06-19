@@ -31,10 +31,11 @@ export class AuthController {
       loginDto.password,
     );
 
+    const isProd = process.env.NODE_ENV === 'production';
     res.cookie('access_token', token, {
       httpOnly: true,
-      secure: true,
-      sameSite: 'strict',
+      secure: isProd,
+      sameSite: (isProd ? 'strict' : 'lax') as 'strict' | 'lax',
       path: '/api',
       maxAge: 8 * 60 * 60 * 1000,
     });
@@ -45,10 +46,11 @@ export class AuthController {
   @Post('logout')
   @HttpCode(HttpStatus.OK)
   async logout(@Res({ passthrough: true }) res: Response) {
+    const isProd = process.env.NODE_ENV === 'production';
     res.cookie('access_token', '', {
       httpOnly: true,
-      secure: true,
-      sameSite: 'strict',
+      secure: isProd,
+      sameSite: (isProd ? 'strict' : 'lax') as 'strict' | 'lax',
       path: '/api',
       maxAge: 0,
     });
