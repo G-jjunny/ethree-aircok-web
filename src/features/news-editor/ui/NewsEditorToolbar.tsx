@@ -2,6 +2,7 @@
 
 import type { Editor } from '@tiptap/core';
 import { useRef } from 'react';
+import { toast } from 'sonner';
 import { uploadNewsImage } from '../api/uploadImage';
 
 interface Props {
@@ -20,7 +21,7 @@ export function NewsEditorToolbar({ editor }: Props) {
       const url = await uploadNewsImage(file);
       editor.chain().focus().setImage({ src: url }).run();
     } catch {
-      alert('이미지 업로드에 실패했습니다.');
+      toast.error('이미지 업로드에 실패했습니다.');
     } finally {
       // 같은 파일 재선택 가능하도록 초기화
       if (fileInputRef.current) fileInputRef.current.value = '';

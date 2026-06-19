@@ -1852,3 +1852,145 @@ NewsCard·NewsHorizontalRow·NewsFeaturedHero·NewsDetailHero 등 4곳+에서 �
 - 주의: `next/image` 대신 현재 코드처럼 `<img>` + eslint-disable 유지(외부/동적 호스트). 비즈니스 로직(URL 결합)은 단순 문자열 처리이므로 마크업 컴포넌트 범위로 간주.
 
 > 추출 우선순위: (1) `LocationTag`(이모지 제거가 즉시 필요), (2) `DateLabel`, (3) `NewsImage`. 세 컴포넌트 모두 `entities/news` 데이터(`NewsSummary`/`NewsPost`)에 의존하지 않는 순수 표현 컴포넌트로 설계해 `shared/ui`에 위치 가능하게 한다.
+
+---
+
+## 14. 피드백 / 확인 UI 패턴 (다이얼로그 · 토스트)
+
+사용자 행동에 대한 확인(confirmation)과 결과 피드백(feedback)을 일관된 비주얼 언어로 제공하기 위한 패턴. 브라우저 native `confirm()`/`alert()`은 디자인 토큰을 적용할 수 없으므로 **사용을 지양**하고, 아래 `ConfirmDialog`(확인) + Toaster(결과 알림) 조합으로 대체한다. 신규 색상 토큰은 도입하지 않으며 §2 Feedback 토큰(`success`/`error`)과 기존 surface/overlay/radius/shadow 토큰만 사용한다.
+
+### 14.1 ConfirmDialog (공용 확인 다이얼로그)
+
+`shared/ui`에 신설되는 공용 확인 다이얼로그. 위험·비가역 행동을 실행하기 전에 사용자에게 한 번 더 확인을 받는 모달이다. **마크업·className·variant 스타일만 본 가이드의 범위**이며, 포커스 트랩·`Escape` 닫기·열림 상태(open/onConfirm/onCancel)·body 스크롤 락 등 동작 로직은 frontend-implementer가 담당한다(`'use client'` 컴포넌트).
+
+**용도**
+- (a) 로그아웃 확인 — "정말 로그아웃 하시겠습니까?" (기본 variant)
+- (b) 뉴스 삭제 확인 — "이 뉴스를 삭제하시겠습니까? 삭제 후 되돌릴 수 없습니다." (위험 variant)
+- 그 외 비가역 콘솔 액션 일반에 재사용.
+
+**props 계약 (구현 가이드, 실제 타입은 implementer)**
+- `open: boolean` — 열림 여부
+- `title: string` — 제목 (예: "로그아웃", "뉴스 삭제")
+- `description?: string` — 설명/경고 문구
+- `confirmLabel?: string` (기본 `'확인'`) · `cancelLabel?: string` (기본 `'취소'`)
+- `variant?: 'default' | 'destructive'` (기본 `'default'`) — 확인 버튼의 색을 결정
+- `onConfirm: () => void` · `onCancel: () => void`
+- `loading?: boolean` (선택) — 확인 처리 중 버튼 비활성/스피너
+
+**오버레이 (딤드 배경)**
+- `fixed inset-0 z-50 bg-overlay-dark flex items-center justify-center px-5` — 기존 "다크 모달 오버레이" 토큰(`bg-overlay-dark` = rgba(0,0,0,0.80)) 재활용. 신규 색상 없음.
+- 클릭 시 닫힘(취소)은 implementer 처리. 오버레이는 `aria-hidden` 배경, 실제 포커스는 카드로 이동.
+
+**다이얼로그 카드 (중앙)**
+- `bg-surface-white rounded-xl shadow-card w-full max-w-[400px] p-8 flex flex-col gap-5` — 모달이므로 §5 Border Radius Scale의 "xl(16px) = 대형 카드·모달" 적용. `shadow-card`로 elevation. `max-w-[400px]` {/* token 없음: 확인 다이얼로그 카드 전용 너비, Admin Login Card와 동일 1회성 수치 */}
+- 접근성: 카드에 `role="dialog"`, `aria-modal="true"`, `aria-labelledby`(제목 id)·`aria-describedby`(설명 id) 부여.
+
+**텍스트 영역**
+- 제목 (`<h2 id=...>`): Card Title 수준 — `text-[21px] font-bold text-heading-dark leading-[1.19] [word-break:keep-all]`
+- 설명 (`<p id=...>`): `text-[15px] text-secondary-dark leading-[1.43] [word-break:keep-all]`
+- 위험(destructive) variant라도 설명 문구는 동일 `text-secondary-dark`를 쓴다. 위험 신호는 "확인 버튼 색"으로만 표현하고, 본문까지 빨갛게 칠하지 않는다(과한 경고색 금지).
+
+**버튼 행 (`<div>`)**
+- `flex justify-end gap-3` — 취소(좌) → 확인(우) 순서. 모바일에서 폭이 좁으면 `flex-col-reverse sm:flex-row sm:justify-end`로 확인 버튼을 하단에 두는 것을 허용.
+
+**취소 버튼 (보조)** — §12 AdminNewsForm 취소 버튼 톤 재활용
+- `bg-surface-light text-heading-dark rounded-md px-5 py-2.5 min-h-[44px] text-[15px] font-medium hover:bg-border-light active:scale-[0.97] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:ring-offset-2`
+
+**확인 버튼 — `default` variant (로그아웃 등 비파괴 액션)**
+- `bg-aircok-blue text-heading-light rounded-md px-5 py-2.5 min-h-[44px] text-[15px] font-medium hover:bg-aircok-blue-dark active:scale-[0.97] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:ring-offset-2`
+
+**확인 버튼 — `destructive` variant (삭제 등 비가역 액션)**
+- 기본 variant에서 색만 교체: `bg-aircok-blue` → `bg-error`(§2 Error 토큰, #ff3b30), `hover:bg-aircok-blue-dark` → `hover:opacity-90`, `focus-visible:ring-aircok-blue` → `focus-visible:ring-error`
+- `bg-error text-heading-light rounded-md px-5 py-2.5 min-h-[44px] text-[15px] font-medium hover:opacity-90 active:scale-[0.97] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-error focus-visible:ring-offset-2`
+- > Error 토큰은 신규 토큰이 아니다 — §2 Feedback에 정의되어 있고 이미 Admin Form Input 에러 상태(`border-error`/`focus:ring-error`)와 §13에서 `bg-error`로 사용 중이다. hover에 `aircok-blue-dark` 같은 별도 어두운 error 토큰이 없으므로 `hover:opacity-90`으로 대체한다.
+
+**확인 버튼 — `loading`/disabled 상태**
+- 두 variant 공통: hover/active 제거 후 `opacity-60 cursor-not-allowed` 추가(§9 Admin 제출 버튼 disabled 규칙과 동일 톤). 라벨을 "삭제 중...", "로그아웃 중..." 등으로 교체.
+
+```tsx
+// ConfirmDialog 예시 ('use client' 컴포넌트 — open일 때만 렌더)
+// variant === 'destructive' → 확인 버튼 bg-error, 그 외 bg-aircok-blue
+<div className="fixed inset-0 z-50 bg-overlay-dark flex items-center justify-center px-5">
+  <div
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="confirm-title"
+    aria-describedby="confirm-desc"
+    className="bg-surface-white rounded-xl shadow-card w-full max-w-[400px] p-8 flex flex-col gap-5"
+  > {/* token 없음: 확인 다이얼로그 카드 전용 너비 400px */}
+    <div className="flex flex-col gap-2">
+      <h2 id="confirm-title" className="text-[21px] font-bold text-heading-dark leading-[1.19] [word-break:keep-all]">
+        뉴스 삭제
+      </h2>
+      <p id="confirm-desc" className="text-[15px] text-secondary-dark leading-[1.43] [word-break:keep-all]">
+        이 뉴스를 삭제하시겠습니까? 삭제 후 되돌릴 수 없습니다.
+      </p>
+    </div>
+    <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+      <button
+        type="button"
+        onClick={onCancel}
+        className="bg-surface-light text-heading-dark rounded-md px-5 py-2.5 min-h-[44px] text-[15px] font-medium hover:bg-border-light active:scale-[0.97] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:ring-offset-2"
+      >
+        취소
+      </button>
+      {/* destructive variant — 삭제 */}
+      <button
+        type="button"
+        onClick={onConfirm}
+        className="bg-error text-heading-light rounded-md px-5 py-2.5 min-h-[44px] text-[15px] font-medium hover:opacity-90 active:scale-[0.97] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-error focus-visible:ring-offset-2"
+      >
+        삭제
+      </button>
+      {/* default variant — 로그아웃 등 (아래 클래스로 교체)
+      <button
+        type="button"
+        onClick={onConfirm}
+        className="bg-aircok-blue text-heading-light rounded-md px-5 py-2.5 min-h-[44px] text-[15px] font-medium hover:bg-aircok-blue-dark active:scale-[0.97] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:ring-offset-2"
+      >
+        로그아웃
+      </button>
+      */}
+    </div>
+  </div>
+</div>
+```
+
+> **공용화 메모**: `ConfirmDialog`는 `shared/ui`에 추가하고 `src/shared/ui/index.ts`에 export한다. 로그아웃·뉴스 삭제 등 2곳 이상에서 즉시 재사용되며 콘솔 비가역 액션 일반의 단일 출처가 된다. `entities`/`features` 데이터에 의존하지 않는 순수 표현 컴포넌트로 설계한다.
+
+### 14.2 Toaster / 토스트 피드백 (sonner)
+
+비동기 액션(로그인, 뉴스 생성/수정/삭제, 로그아웃 등)의 **결과**를 비차단(non-blocking) 토스트로 알린다. `sonner` 라이브러리를 사용하며 이미 `app/(main)/layout.tsx`에 마운트되어 있다. 토스트는 결과 피드백 전용이고, 행동 전 확인은 §14.1 `ConfirmDialog`가 담당한다(역할 분리).
+
+**Toaster 마운트 (레이아웃당 1개)**
+- 공개 사이트: `app/(main)/layout.tsx`에 `<Toaster position="top-center" richColors />` (현행 유지)
+- 콘솔(어드민): 콘솔 레이아웃(`app/(console)/.../layout.tsx` 등)에도 **동일한 props**로 `<Toaster position="top-center" richColors />`를 둔다. 콘솔 액션(뉴스 CRUD, 로그아웃)의 결과도 동일 위치·동일 스타일로 노출해 사이트 전체 피드백 경험을 통일한다.
+- **일관성 규칙(필수)**: 모든 Toaster는 `position="top-center"` + `richColors`로 통일한다. 레이아웃마다 위치/색상 옵션을 다르게 두지 않는다. `richColors`는 sonner가 success/error/warning에 §2 Feedback 팔레트와 동일 계열(green/red/amber)의 색을 자동 적용하므로, 토스트 색을 className으로 따로 하드코딩하지 않는다.
+
+**토스트 종류·사용 규칙 (success / error)**
+- `toast.success(message)` — 액션이 **성공적으로 완료**되었을 때.
+  - 예: "로그인되었습니다", "뉴스가 등록되었습니다", "뉴스가 수정되었습니다", "뉴스가 삭제되었습니다", "로그아웃되었습니다"
+- `toast.error(message)` — 액션이 **실패**했거나 검증/네트워크 오류가 발생했을 때.
+  - 예: "아이디 또는 비밀번호가 올바르지 않습니다", "뉴스 등록에 실패했습니다. 다시 시도해 주세요", "삭제 중 오류가 발생했습니다"
+- (선택) `toast.warning` — 비차단 주의 환기에 한해 사용하되 남용하지 않는다. 폼 인라인 검증 오류는 토스트가 아니라 §9 Admin Form Input의 인라인 에러 메시지(`text-error`)로 처리하고, 토스트는 제출 후 서버 측 실패 같은 "완료 시점" 피드백에 쓴다.
+
+**작성 컨벤션**
+- 메시지는 한국어 완결형 문장, 사용자 관점 결과 중심(기술 용어·HTTP 코드 노출 금지).
+- 성공/실패 메시지를 동일 액션에서 쌍으로 정의한다(예: 삭제 성공/삭제 실패).
+- 토스트는 호출형 API(`toast.success(...)`)이므로 **호출 시점·메시지 결정은 frontend-implementer**가 담당하며, 본 가이드는 마운트 props 일관성과 success/error 사용 기준만 정의한다(토스트 색상·위치는 토큰/옵션으로 고정, 추가 className 금지).
+
+```tsx
+// Toaster 마운트 — 공개 + 콘솔 레이아웃 동일 props
+import { Toaster } from 'sonner'
+
+// app/(main)/layout.tsx / 콘솔 layout.tsx 공통
+<Toaster position="top-center" richColors />
+
+// 호출 예시 (implementer 범위 — 결과 피드백)
+import { toast } from 'sonner'
+
+toast.success('뉴스가 등록되었습니다')
+toast.error('뉴스 등록에 실패했습니다. 다시 시도해 주세요')
+```
+
+> **역할 분리 요약**: 비가역 행동 직전 확인 → §14.1 `ConfirmDialog`(딤드 모달). 행동 결과 알림 → §14.2 Toaster(`toast.success`/`toast.error`). native `confirm`/`alert`은 두 경우 모두에서 대체한다.

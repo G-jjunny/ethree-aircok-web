@@ -1,10 +1,12 @@
 'use client';
 
 import dynamic from 'next/dynamic';
+import Link from 'next/link';
 import { useForm, Controller, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useRef } from 'react';
+import { toast } from 'sonner';
 import { uploadNewsImage } from '@/features/news-editor';
 
 const NewsEditor = dynamic(
@@ -75,7 +77,7 @@ export function AdminNewsForm({ initialData, onSuccess }: Props) {
       const url = await uploadNewsImage(file);
       setValue('coverImage', url);
     } catch {
-      alert('커버 이미지 업로드에 실패했습니다.');
+      toast.error('커버 이미지 업로드에 실패했습니다.');
     } finally {
       if (coverImageInputRef.current) coverImageInputRef.current.value = '';
     }
@@ -103,10 +105,17 @@ export function AdminNewsForm({ initialData, onSuccess }: Props) {
     });
 
     if (!res.ok) {
-      alert('저장에 실패했습니다. 다시 시도해 주세요.');
+      toast.error(
+        initialData
+          ? '뉴스 수정에 실패했습니다. 다시 시도해 주세요.'
+          : '뉴스 등록에 실패했습니다. 다시 시도해 주세요.',
+      );
       return;
     }
 
+    toast.success(
+      initialData ? '뉴스가 수정되었습니다' : '뉴스가 등록되었습니다',
+    );
     onSuccess?.();
   };
 
@@ -246,6 +255,12 @@ export function AdminNewsForm({ initialData, onSuccess }: Props) {
         >
           {isSubmitting ? '저장 중...' : initialData ? '수정 저장' : '작성 완료'}
         </button>
+        <Link
+          href="/console/news"
+          className="bg-surface-light text-heading-dark rounded-md px-6 py-2 font-semibold text-sm font-body hover:bg-border-light transition-colors"
+        >
+          목록으로
+        </Link>
       </div>
     </form>
   );

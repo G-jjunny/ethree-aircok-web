@@ -561,5 +561,9 @@ export const SITE = {
     basePath: '/console',
     loginPath: '/console/login',
     homePath: '/',
+    nav: [
+      { label: '대시보드', href: '/console' },
+      { label: '뉴스 관리', href: '/console/news' },
+    ],
   },
 } as const;

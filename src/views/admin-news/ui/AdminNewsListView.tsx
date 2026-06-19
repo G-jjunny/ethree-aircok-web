@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { getNewsList } from '@/entities/news';
+import { getAdminNewsList } from '@/entities/news';
 import { DeleteButton } from './DeleteButton';
 
 function formatDate(dateStr: string): string {
@@ -9,7 +9,7 @@ function formatDate(dateStr: string): string {
 export async function AdminNewsListView() {
   let newsData;
   try {
-    newsData = await getNewsList(1, 100);
+    newsData = await getAdminNewsList(1, 100);
   } catch {
     newsData = { data: [], total: 0, page: 1, limit: 100 };
   }
