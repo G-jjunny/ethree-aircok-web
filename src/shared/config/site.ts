@@ -557,4 +557,8 @@ export const SITE = {
       description: "스마트 에어콕 무료 체험을 신청하세요.",
     },
   },
+  admin: {
+    basePath: '/console',
+    loginPath: '/console/login',
+  },
 } as const;
