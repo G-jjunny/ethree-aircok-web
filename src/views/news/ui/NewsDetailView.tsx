@@ -2,8 +2,6 @@ import { getNewsPost } from '@/entities/news';
 import { NewsDetailHeroSection } from './NewsDetailHeroSection';
 import { NewsDetailContentSection } from './NewsDetailContentSection';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
-
 interface Props {
   params: Promise<{ id: string }>;
 }
@@ -14,7 +12,7 @@ export async function NewsDetailView({ params }: Props) {
 
   return (
     <main className="min-h-screen bg-surface-white">
-      <NewsDetailHeroSection post={post} API_BASE={API_BASE} />
+      <NewsDetailHeroSection post={post} />
       <NewsDetailContentSection content={post.content} />
     </main>
   );
