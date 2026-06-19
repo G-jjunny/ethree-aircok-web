@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import type { Metadata } from 'next'
 import { SITE } from '@/shared/config'
 import { NewsView } from '@/views/news'
@@ -13,5 +14,9 @@ export const metadata: Metadata = {
 }
 
 export default function NewsPage() {
-  return <NewsView />
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-surface-white" />}>
+      <NewsView />
+    </Suspense>
+  )
 }

@@ -1,0 +1,103 @@
+import Link from 'next/link';
+import { DateLabel, LocationTag, NewsImage } from '@/shared/ui';
+import { SITE } from '@/shared/config';
+import type { NewsSummary } from '@/entities/news';
+
+interface Props {
+  item: NewsSummary;
+}
+
+interface SectionProps extends Props {
+  /** 페이지 타이틀과 대표 기사 사이에 배치할 슬롯 (연도 필터 탭 등). design.md §4. */
+  filterSlot?: React.ReactNode;
+}
+
+/**
+ * 매거진 목록 최상단 Featured 섹션.
+ * 페이지 레이블 + 타이틀 + (선택) 필터 슬롯 + 대표 기사 1건(News Featured Hero).
+ * coverImage 있으면 Overlay 변형, 없으면 텍스트 분리형 폴백.
+ */
+export function NewsFeaturedSection({ item, filterSlot }: SectionProps) {
+  return (
+    <section className="bg-surface-light py-16 md:py-20">
+      <div className="content-container flex flex-col gap-8">
+        {/* 페이지 헤더 */}
+        <div className="flex flex-col gap-3">
+          <p className="text-aircok-blue text-sm font-body tracking-widest uppercase">
+            NEWS
+          </p>
+          <h1 className="text-[40px] font-display font-semibold text-heading-dark leading-[1.10] tracking-[-0.3px] [word-break:keep-all]">
+            {SITE.pages.news.title}
+          </h1>
+        </div>
+
+        {filterSlot}
+
+        {item.coverImage ? (
+          <FeaturedOverlay item={item} />
+        ) : (
+          <FeaturedSplit item={item} />
+        )}
+      </div>
+    </section>
+  );
+}
+
+/** Overlay 변형 — 커버 이미지 위 텍스트 오버레이 */
+function FeaturedOverlay({ item }: Props) {
+  return (
+    <Link href={`/news/${item.id}`} className="block">
+      <article className="relative rounded-xl overflow-hidden group">
+        <NewsImage
+          src={item.coverImage}
+          alt={item.title}
+          ratio="featured"
+          className="group-hover:scale-[1.02] transition-transform duration-300"
+        />
+        <div className="absolute inset-0 bg-overlay-dark-60" />
+        <div className="absolute inset-0 flex flex-col justify-end p-8 md:p-12 gap-3">
+          <DateLabel date={item.date} theme="dark" emphasis />
+          <h2 className="text-heading-light font-display font-bold text-[28px] md:text-[40px] leading-[1.10] tracking-[-0.3px] max-w-3xl [word-break:keep-all]">
+            {item.title}
+          </h2>
+          <p className="text-body-light font-body text-base md:text-lg line-clamp-2 max-w-2xl [word-break:keep-all]">
+            {item.description}
+          </p>
+          {item.location && (
+            <LocationTag
+              location={item.location}
+              theme="dark"
+              className="opacity-80"
+            />
+          )}
+        </div>
+      </article>
+    </Link>
+  );
+}
+
+/** 텍스트 분리형 — coverImage 없을 때 폴백 (좌우 split, 이미지 칼럼은 placeholder) */
+function FeaturedSplit({ item }: Props) {
+  return (
+    <Link href={`/news/${item.id}`} className="block group">
+      <article className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
+        <div className="rounded-xl overflow-hidden">
+          <NewsImage src={item.coverImage} alt={item.title} ratio="video" />
+        </div>
+        <div className="flex flex-col gap-4">
+          <DateLabel date={item.date} emphasis />
+          <h2 className="text-heading-dark font-display font-bold text-[32px] md:text-[40px] leading-[1.10] tracking-[-0.3px] [word-break:keep-all]">
+            {item.title}
+          </h2>
+          <p className="text-body-dark font-body text-lg line-clamp-3 [word-break:keep-all]">
+            {item.description}
+          </p>
+          {item.location && <LocationTag location={item.location} />}
+          <span className="text-aircok-blue text-sm font-body mt-2 inline-block">
+            자세히 보기 →
+          </span>
+        </div>
+      </article>
+    </Link>
+  );
+}

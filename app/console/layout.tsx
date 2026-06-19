@@ -1,6 +1,10 @@
-import type { ReactNode } from 'react';
+import { Suspense, type ReactNode } from 'react';
 import { ConsoleLayout } from '@/widgets/console-layout';
 
 export default function Layout({ children }: { children: ReactNode }) {
-  return <ConsoleLayout>{children}</ConsoleLayout>;
+  return (
+    <Suspense fallback={null}>
+      <ConsoleLayout>{children}</ConsoleLayout>
+    </Suspense>
+  );
 }
