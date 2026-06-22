@@ -67,6 +67,11 @@ export function AdminNewsForm({ initialData, onSuccess }: Props) {
   });
 
   const coverImageValue = useWatch({ control, name: 'coverImage' });
+  const coverImageSrc = coverImageValue
+    ? coverImageValue.startsWith('http')
+      ? coverImageValue
+      : `${API_BASE}${coverImageValue}`
+    : '';
 
   const handleCoverImageChange = async (
     e: React.ChangeEvent<HTMLInputElement>,
@@ -84,14 +89,23 @@ export function AdminNewsForm({ initialData, onSuccess }: Props) {
   };
 
   const onSubmit = async (values: FormValues) => {
-    const formData = new FormData();
-    formData.append('title', values.title);
-    formData.append('description', values.description);
-    formData.append('content', values.content);
-    formData.append('date', values.date);
-    if (values.location) formData.append('location', values.location);
-    formData.append('published', String(values.published));
-    if (values.coverImage) formData.append('coverImage', values.coverImage);
+    const payload: {
+      title: string;
+      description: string;
+      content: string;
+      date: string;
+      published: boolean;
+      location?: string;
+      coverImage?: string;
+    } = {
+      title: values.title,
+      description: values.description,
+      content: values.content,
+      date: values.date,
+      published: values.published,
+    };
+    if (values.location) payload.location = values.location;
+    if (values.coverImage) payload.coverImage = values.coverImage;
 
     const url = initialData
       ? `${API_BASE}/api/news/${initialData.id}`
@@ -101,7 +115,8 @@ export function AdminNewsForm({ initialData, onSuccess }: Props) {
     const res = await fetch(url, {
       method,
       credentials: 'include',
-      body: formData,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
     });
 
     if (!res.ok) {
@@ -187,7 +202,7 @@ export function AdminNewsForm({ initialData, onSuccess }: Props) {
         {coverImageValue && (
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            src={coverImageValue}
+            src={coverImageSrc}
             alt="커버 이미지 미리보기"
             className="w-48 h-28 object-cover rounded-md border border-border-light"
           />

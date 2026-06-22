@@ -1691,6 +1691,56 @@ CSS `grid-template-rows` 트릭을 사용한 부드러운 열림/닫힘 애니�
 </form>
 ```
 
+### Admin Button Hierarchy (어드민 버튼 위계)
+
+콘솔 페이지(목록·폼·상태 분기)에서 버튼 위계를 일관되게 적용하기 위한 단일 기준. 신규 색상 토큰 없이 §4 Buttons + §9·§14 기존 톤을 콘솔 맥락으로 정리한 것이다. 한 화면에 동급 primary 버튼이 여러 개 떠서 위계가 무너지는 것을 방지한다.
+
+**위계 원칙**
+- 화면당 시각적 무게가 가장 큰 **primary(파란 채움)** 버튼은 "그 화면의 대표 행동" 1개에 한정한다(목록 페이지의 "새 뉴스 작성", 인증 실패 시 "로그인 페이지로 이동" 등 사용자를 다음 단계로 보내는 진입 행동).
+- 같은 블록 안의 **복구/보조 행동**(에러 상태의 "다시 시도" 등 현재 화면에 머무르는 재시도)은 primary가 아니라 **secondary(라이트 채움)**로 낮춰, primary와 시각적으로 구분한다.
+
+**Admin Primary 버튼 (파란 채움)** — §9 제출 버튼·§14 default 확인 버튼과 동일 톤
+- `inline-flex items-center justify-center bg-aircok-blue text-heading-light text-sm font-medium rounded-md px-4 py-2 min-h-[44px] hover:bg-aircok-blue-dark active:scale-[0.97] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:ring-offset-2`
+- disabled/로딩: `hover:bg-aircok-blue-dark active:scale-[0.97]` 제거 후 `opacity-60 cursor-not-allowed` 추가
+
+**Admin Secondary 버튼 (라이트 채움)** — §12 AdminNewsForm 취소·§14 취소 버튼 톤 재활용
+- `inline-flex items-center justify-center bg-surface-light text-heading-dark text-sm font-medium rounded-md px-4 py-2 min-h-[44px] hover:bg-border-light active:scale-[0.97] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:ring-offset-2`
+- disabled/로딩: `hover:bg-border-light active:scale-[0.97]` 제거 후 `opacity-60 cursor-not-allowed` 추가
+
+### Admin List State (어드민 목록 상태 분기 UI)
+
+콘솔 목록 페이지(`/console/news` 등)에서 데이터 로딩·인증 실패·일반 실패·빈 목록을 표시하는 상태 블록. 정상 데이터(테이블)와 달리, 상태 블록은 화면 안에서 한 덩어리로 인지되도록 **중앙 정렬 카드형 블록**으로 통일한다(좌측 정렬 인라인 텍스트로 흩뿌리지 않는다).
+
+**상태 블록 컨테이너 (4종 공통)**
+- `flex flex-col items-center justify-center text-center gap-4 rounded-xl border border-border-light bg-surface-white px-6 py-16`
+- 안내 문구: `text-body-dark font-body text-[15px] leading-[1.43] [word-break:keep-all]`
+- 에러 강조 문구(인증 실패·일반 실패): 위 문구에서 색만 `text-error`로 교체
+- 보조 설명(선택, 한 줄 더): `text-secondary-dark font-body text-sm leading-[1.43] [word-break:keep-all]`
+- 액션 버튼(있을 때): 위 **Admin Button Hierarchy** 사용 — 진입 행동은 primary, 같은 화면 재시도는 secondary
+
+**상태별 적용**
+1. **로딩**: 컨테이너 + 안내 문구만(`불러오는 중...`), 색은 `text-secondary-dark`. 버튼 없음.
+2. **인증 실패**: `text-error` 안내 문구(`로그인이 필요합니다.`) + **primary** 진입 버튼(`로그인 페이지로 이동` — 다음 단계로 보내는 진입 행동).
+3. **일반 실패**: `text-error` 안내 문구 + **secondary** 복구 버튼(`다시 시도` — 현재 화면에 머무르는 재시도이므로 primary로 띄우지 않는다). 로딩 중 라벨은 `다시 시도 중...` + disabled.
+4. **빈 목록**: `text-body-dark` 안내 문구(`등록된 뉴스가 없습니다.`) + (선택) **primary** 진입 버튼으로 작성 유도 가능. 에러가 아니므로 `text-error` 사용 금지.
+
+```tsx
+// Admin List State 예시 (일반 실패 — secondary 재시도)
+<div className="flex flex-col items-center justify-center text-center gap-4 rounded-xl border border-border-light bg-surface-white px-6 py-16">
+  <p className="text-error font-body text-[15px] leading-[1.43] [word-break:keep-all]">
+    뉴스 목록을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.
+  </p>
+  <button
+    type="button"
+    onClick={() => refetch()}
+    disabled={isRefetching}
+    className="inline-flex items-center justify-center bg-surface-light text-heading-dark text-sm font-medium rounded-md px-4 py-2 min-h-[44px] hover:bg-border-light active:scale-[0.97] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:bg-surface-light disabled:active:scale-100"
+  >
+    {isRefetching ? '다시 시도 중...' : '다시 시도'}
+  </button>
+</div>
+```
+
 ---
 
 ## 10. Responsive Behavior (구 §9)

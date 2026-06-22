@@ -1,9 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { ConfirmDialog } from '@/shared/ui';
+import { adminNewsKeys } from '@/entities/news';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
 
@@ -12,7 +13,7 @@ interface Props {
 }
 
 export function DeleteButton({ id }: Props) {
-  const router = useRouter();
+  const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -26,7 +27,7 @@ export function DeleteButton({ id }: Props) {
       if (!res.ok) throw new Error('삭제 실패');
       toast.success('뉴스가 삭제되었습니다');
       setOpen(false);
-      router.refresh();
+      await queryClient.invalidateQueries({ queryKey: adminNewsKeys.all });
     } catch {
       toast.error('삭제 중 오류가 발생했습니다');
     } finally {

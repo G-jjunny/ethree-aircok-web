@@ -67,23 +67,14 @@ export class NewsController {
 
   @UseGuards(JwtAuthGuard)
   @Post()
-  @UseInterceptors(FileInterceptor('coverImage', multerOptions))
-  create(
-    @Body() dto: CreateNewsDto,
-    @UploadedFile() file?: Express.Multer.File,
-  ) {
-    return this.newsService.create(dto, file?.filename ? `/uploads/${file.filename}` : undefined);
+  create(@Body() dto: CreateNewsDto) {
+    return this.newsService.create(dto);
   }
 
   @UseGuards(JwtAuthGuard)
   @Patch(':id')
-  @UseInterceptors(FileInterceptor('coverImage', multerOptions))
-  update(
-    @Param('id') id: string,
-    @Body() dto: UpdateNewsDto,
-    @UploadedFile() file?: Express.Multer.File,
-  ) {
-    return this.newsService.update(id, dto, file?.filename ? `/uploads/${file.filename}` : undefined);
+  update(@Param('id') id: string, @Body() dto: UpdateNewsDto) {
+    return this.newsService.update(id, dto);
   }
 
   @UseGuards(JwtAuthGuard)
