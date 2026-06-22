@@ -38,3 +38,29 @@ model Inquiry {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+/// 문의 접수 알림 메일 설정 (싱글톤).
+///
+/// 운용 방식 (고정 PK 싱글톤):
+/// - 이 테이블에는 항상 id = 'singleton' 인 행 1개만 존재한다.
+/// - GET /api/inquiry/mail-setting: service 는 upsert({ where: { id: 'singleton' } })
+///   로 조회한다. 행이 없으면 기본값으로 lazy 생성 후 반환한다(아래 기본값 참고).
+/// - PUT /api/inquiry/mail-setting: upsert 로 id 'singleton' 행을 갱신(없으면 생성)한다.
+/// - 고정 PK 상수('singleton')를 사용해 항상 결과 1행을 유지한다.
+///
+/// lazy 생성 시 기본값:
+/// - recipientEmail: env INQUIRY_RECIPIENT_EMAIL 폴백, 없으면 빈 문자열
+/// - subjectTemplate: "[스마트에어콕] 새 문의가 접수되었습니다"
+/// - bodyTemplate: 기본 본문 템플릿 ({{...}} 치환 변수 포함)
+///
+/// 템플릿 치환 변수 (subjectTemplate / bodyTemplate 공통):
+/// - {{company}} {{name}} {{phone}} {{email}} {{message}}
+/// - MailService 가 발송 시 위 토큰을 해당 Inquiry 값으로 치환한다.
+model MailSetting {
+  id              String   @id @default("singleton")
+  recipientEmail  String
+  subjectTemplate String   @db.Text
+  bodyTemplate    String   @db.Text
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}

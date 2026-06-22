@@ -2,13 +2,24 @@ import { Injectable, Logger } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
 import type { Transporter } from 'nodemailer';
 import type { Inquiry } from '@prisma/client';
+import { PrismaService } from '../prisma/prisma.service';
+import {
+  MAIL_SETTING_ID,
+  DEFAULT_SUBJECT_TEMPLATE,
+  DEFAULT_BODY_TEMPLATE,
+} from './mail-setting.constants';
 
 /**
  * 문의 접수 알림 메일 발송 서비스 (nodemailer).
  *
+ * 수신주소/제목/본문 템플릿은 DB(MailSetting 싱글톤) 우선, 없으면 env/기본 상수로 폴백한다.
+ * SMTP 접속 정보(host/port/user/pass) 및 from 은 계속 env 에서 읽는다.
+ *
  * graceful 정책:
- * - SMTP_HOST / INQUIRY_RECIPIENT_EMAIL 등 필수 env 가 없으면 transporter 를
- *   생성하지 않고, 발송 메서드는 warn 로그만 남긴 뒤 조용히 return 한다.
+ * - SMTP_HOST / MAIL_FROM 가 없으면 transporter 를 생성하지 않고, 발송 메서드는
+ *   warn 로그만 남긴 뒤 조용히 return 한다. (수신주소는 발송 시점에 DB/env 로 결정하므로
+ *   transporter 생성 조건에서 제외한다.)
+ * - 수신주소가 DB/env 어디에도 없으면 발송 시점에 warn 후 return 한다.
  * - 발송 시도는 try/catch 로 감싸 실패해도 throw 하지 않고 error 로그만 남긴다.
  * - 즉, 메일 미설정/실패가 문의 접수(POST 응답)를 절대 막지 않는다.
  */
@@ -17,21 +28,19 @@ export class MailService {
   private readonly logger = new Logger(MailService.name);
   private readonly transporter: Transporter | null;
   private readonly from: string | undefined;
-  private readonly recipient: string | undefined;
 
-  constructor() {
+  constructor(private readonly prisma: PrismaService) {
     const host = process.env.SMTP_HOST;
     const port = process.env.SMTP_PORT;
     const user = process.env.SMTP_USER;
     const pass = process.env.SMTP_PASS;
 
     this.from = process.env.MAIL_FROM;
-    this.recipient = process.env.INQUIRY_RECIPIENT_EMAIL;
 
-    if (!host || !this.from || !this.recipient) {
+    if (!host || !this.from) {
       this.transporter = null;
       this.logger.warn(
-        'SMTP 설정(SMTP_HOST/MAIL_FROM/INQUIRY_RECIPIENT_EMAIL)이 없어 메일 발송이 비활성화됩니다. 문의 접수는 정상 동작합니다.',
+        'SMTP 설정(SMTP_HOST/MAIL_FROM)이 없어 메일 발송이 비활성화됩니다. 문의 접수는 정상 동작합니다.',
       );
       return;
     }
@@ -47,44 +56,51 @@ export class MailService {
   }
 
   async sendInquiryNotification(inquiry: Inquiry): Promise<void> {
-    if (!this.transporter || !this.from || !this.recipient) {
+    if (!this.transporter || !this.from) {
       this.logger.warn(
-        `메일 미발송(설정 없음): 문의 #${inquiry.id} 알림을 건너뜁니다.`,
+        `메일 미발송(SMTP 설정 없음): 문의 #${inquiry.id} 알림을 건너뜁니다.`,
       );
       return;
     }
 
-    const subject = '[스마트에어콕] 새 문의가 접수되었습니다';
+    // 수신주소/템플릿은 DB(MailSetting 싱글톤) 우선, 없으면 env/기본 상수 폴백.
+    const setting = await this.prisma.mailSetting.findUnique({
+      where: { id: MAIL_SETTING_ID },
+    });
 
-    const lines = [
-      '새 문의가 접수되었습니다.',
-      '',
-      `회사/기관명: ${inquiry.company}`,
-      `담당자명: ${inquiry.name}`,
-      `전화: ${inquiry.phone}`,
-      `이메일: ${inquiry.email}`,
-      '',
-      '요청사항:',
-      inquiry.message,
-    ];
-    const text = lines.join('\n');
+    const recipient =
+      setting?.recipientEmail || process.env.INQUIRY_RECIPIENT_EMAIL;
+    if (!recipient) {
+      this.logger.warn(
+        `메일 미발송(수신주소 없음): 문의 #${inquiry.id} 알림을 건너뜁니다.`,
+      );
+      return;
+    }
 
-    const html = `
-      <h2>새 문의가 접수되었습니다</h2>
-      <table cellpadding="6" style="border-collapse:collapse;">
-        <tr><td><strong>회사/기관명</strong></td><td>${escapeHtml(inquiry.company)}</td></tr>
-        <tr><td><strong>담당자명</strong></td><td>${escapeHtml(inquiry.name)}</td></tr>
-        <tr><td><strong>전화</strong></td><td>${escapeHtml(inquiry.phone)}</td></tr>
-        <tr><td><strong>이메일</strong></td><td>${escapeHtml(inquiry.email)}</td></tr>
-      </table>
-      <h3>요청사항</h3>
-      <p style="white-space:pre-wrap;">${escapeHtml(inquiry.message)}</p>
-    `;
+    const subjectTemplate = setting?.subjectTemplate || DEFAULT_SUBJECT_TEMPLATE;
+    const bodyTemplate = setting?.bodyTemplate || DEFAULT_BODY_TEMPLATE;
+
+    const valueMap: Record<string, string> = {
+      company: inquiry.company,
+      name: inquiry.name,
+      phone: inquiry.phone,
+      email: inquiry.email,
+      message: inquiry.message,
+    };
+
+    // subject/text 는 치환값 그대로, html 은 치환되는 동적 값만 escape.
+    const subject = renderTemplate(subjectTemplate, valueMap, false);
+    const text = renderTemplate(bodyTemplate, valueMap, false);
+    const html = `<div style="white-space:pre-wrap;">${renderTemplate(
+      bodyTemplate,
+      valueMap,
+      true,
+    )}</div>`;
 
     try {
       await this.transporter.sendMail({
         from: this.from,
-        to: this.recipient,
+        to: recipient,
         subject,
         text,
         html,
@@ -97,6 +113,25 @@ export class MailService {
       );
     }
   }
+}
+
+/**
+ * {{token}} 토큰을 valueMap 값으로 치환한다.
+ * - escape=true 면 치환되는 동적 값만 HTML 이스케이프한다(템플릿 정적 텍스트는 그대로).
+ * - valueMap 에 없는 토큰은 원본 그대로 둔다.
+ */
+function renderTemplate(
+  template: string,
+  valueMap: Record<string, string>,
+  escape: boolean,
+): string {
+  return template.replace(/\{\{(\w+)\}\}/g, (match, key: string) => {
+    if (!(key in valueMap)) {
+      return match;
+    }
+    const value = valueMap[key];
+    return escape ? escapeHtml(value) : value;
+  });
 }
 
 function escapeHtml(value: string): string {
