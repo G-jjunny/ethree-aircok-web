@@ -2,3 +2,7 @@ node_modules/
 dist/
 .env
 *.env.local
+
+# 런타임 업로드 산출물 (디렉터리는 유지, 내용물은 추적 제외)
+public/uploads/*
+!public/uploads/.gitkeep
