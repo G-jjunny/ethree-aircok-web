@@ -565,7 +565,11 @@ export const SITE = {
       { label: '대시보드', href: '/console' },
       { label: '뉴스 관리', href: '/console/news' },
       { label: '문의 관리', href: '/console/inquiries' },
-      { label: '이메일 설정', href: '/console/mail-settings' },
+    ],
+    inquiryTabs: [
+      { key: 'list', label: '문의 내역' },
+      { key: 'mail', label: '이메일 설정' },
+      { key: 'map', label: '지도 설정' },
     ],
   },
 } as const;

@@ -31,13 +31,7 @@ export function AdminInquiryListView() {
   const isAuthError = error instanceof InquiryApiError && error.isAuthError;
 
   return (
-    <div className="p-8">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-heading-dark font-display font-semibold text-2xl">
-          문의 관리
-        </h1>
-      </div>
-
+    <div>
       {isPending ? (
         <div className="flex flex-col items-center justify-center text-center gap-4 rounded-xl border border-border-light bg-surface-white px-6 py-16">
           <p className="text-secondary-dark font-body text-[15px] leading-[1.43] [word-break:keep-all]">

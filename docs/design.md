@@ -1741,6 +1741,195 @@ CSS `grid-template-rows` 트릭을 사용한 부드러운 열림/닫힘 애니�
 </div>
 ```
 
+### Admin Console Sidebar Layout (어드민 콘솔 사이드바 레이아웃)
+
+콘솔 전역 셸 레이아웃. 기존 상단 가로 nav 헤더(§ConsoleLayout)를 **좌측 고정 사이드바 + 우측 메인 콘텐츠** 2단 구조로 대체한다. 마케팅 페이지와 달리 `content-container`를 사용하지 않고 풀폭 셸을 쓰며, 사이드바는 데스크탑에서 고정·모바일에서 드로어로 접힌다.
+
+**신규 레이아웃 수치 (토큰 없음 — 콘솔 셸 전용 1회성 수치)**
+- 사이드바 폭: `w-60` (240px). Tailwind 기본 스페이싱 스케일(`w-60`)을 사용하므로 임의 하드코딩이 아니며, 콘솔 셸의 단일 출처로 고정한다. 메인 콘텐츠의 좌측 여백(`lg:pl-60`)도 동일 값을 참조한다.
+- 데스크탑 분기점: `lg`(1024px). `lg` 이상은 고정 사이드바 + 메인 좌측 패딩, `lg` 미만은 사이드바를 화면 밖으로 숨기고(`-translate-x-full`) 상단 모바일 바 + 드로어로 전환한다. 콘솔은 업무용 화면이라 풀 사이드바 노출 기준을 마케팅(834px)보다 높은 1024px로 둔다.
+
+**활성 메뉴 강조 (신규 색상 토큰 없음)**
+- 활성 항목 배경은 Aircok Blue의 저채도 틴트를 Tailwind 불투명도 모디파이어로 표현: `bg-aircok-blue/10` (신규 CSS 변수 없이 기존 `--color-aircok-blue`에서 파생). 텍스트·아이콘은 `text-aircok-blue font-semibold`.
+- 비활성 항목: `text-secondary-dark`, hover 시 `hover:bg-surface-light hover:text-heading-dark`.
+
+**전체 구조 (전제 마크업)**
+
+`ConsoleLayout`은 `'use client'` 컴포넌트로, 모바일 드로어 열림 상태(`drawerOpen: boolean`)를 보유한다. 마크업은 (1) 모바일 상단 바, (2) 사이드바(`<aside>`), (3) 모바일 드로어 오버레이, (4) 메인 콘텐츠(`<main>`) 4파트로 구성한다. 사이드바는 데스크탑/모바일 드로어에서 동일한 단일 마크업을 공유하고, 위치 클래스(`lg:translate-x-0` vs `-translate-x-full`)만 상태로 토글한다.
+
+- **셸 래퍼**: `min-h-screen bg-surface-light`
+- **사이드바(`<aside>`)**: 
+  `fixed inset-y-0 left-0 z-50 w-60 bg-surface-white border-r border-border-light flex flex-col transition-transform duration-200 lg:translate-x-0`
+  + 모바일 토글: 닫힘일 때 `-translate-x-full`, 열림일 때 `translate-x-0` (둘 다 `lg:translate-x-0`로 데스크탑에서는 항상 노출). `aria-label="콘솔 메뉴"` 권장.
+- **사이드바 타이틀/로고 영역**: `flex items-center h-14 px-5 border-b border-border-light shrink-0` 내부에 `text-heading-dark font-body font-semibold text-sm` 로 "어드민 콘솔".
+- **메뉴 목록(`<nav>`)**: `flex flex-col gap-1 p-3 flex-1 overflow-y-auto` (`SITE.admin.nav` 순회). `aria-label="콘솔 내비게이션"`.
+- **메뉴 아이템 — 활성**: `flex items-center gap-3 rounded-md px-3 py-2.5 min-h-[44px] text-sm font-body font-semibold bg-aircok-blue/10 text-aircok-blue transition-colors`
+- **메뉴 아이템 — 비활성**: `flex items-center gap-3 rounded-md px-3 py-2.5 min-h-[44px] text-sm font-body text-secondary-dark hover:bg-surface-light hover:text-heading-dark transition-colors`
+- **사이드바 하단 사용자 영역**: `mt-auto border-t border-border-light p-3 flex flex-col gap-2 shrink-0`
+  - username: `text-secondary-dark text-sm px-3 truncate`
+  - 로그아웃 버튼: `flex items-center gap-2 rounded-md px-3 py-2.5 min-h-[44px] text-sm font-body text-error hover:bg-surface-light transition-colors text-left`
+- **모바일 상단 바(`lg:hidden`)**: `sticky top-0 z-30 flex items-center justify-between h-14 px-4 bg-surface-white border-b border-border-light`
+  - 햄버거 버튼: `inline-flex items-center justify-center w-11 h-11 -ml-2 rounded-md text-heading-dark hover:bg-surface-light transition-colors` (`aria-label="메뉴 열기"`, `aria-expanded={drawerOpen}`, `aria-controls="console-sidebar"`)
+  - 타이틀: `text-heading-dark font-body font-semibold text-sm`
+- **모바일 드로어 오버레이**: `fixed inset-0 z-40 bg-overlay-dark-60 lg:hidden` — `drawerOpen`일 때만 렌더, 클릭 시 닫힘. 사이드바 `<aside>`에는 `id="console-sidebar"` 부여.
+- **메인 콘텐츠(`<main>`)**: `lg:pl-60` (사이드바 폭만큼 좌측 패딩)만 부여한다. **콘텐츠 내부 패딩은 셸이 갖지 않는다.**
+
+> **⚠️ 콘솔 콘텐츠 패딩 단일 출처 정책 (정책 (b) — 뷰 자체 패딩)**: 셸(`<main>`)은 좌측 사이드바 오프셋(`lg:pl-60`)만 책임지고 콘텐츠 패딩을 갖지 않는다. **각 콘솔 뷰(views/widgets)가 자신의 최상위 래퍼에 `p-6 lg:p-8` 패딩을 직접 갖는다.** 이는 기존 콘솔 뷰들(뉴스 관리·로그인 등)이 이미 자체 패딩을 갖는 현실과 일치시키고, 셸과 뷰가 패딩을 이중으로 거는 충돌을 방지하기 위함이다. 콘솔 뷰 신규 작성 시 최상위 래퍼는 `p-6 lg:p-8`(반응형)을 표준으로 한다(과거 일부 뷰의 고정 `p-8`은 점진적으로 `p-6 lg:p-8`로 수렴).
+
+```tsx
+// Admin Console Sidebar Layout 골격 ('use client', 상태/인증 로직은 implementer)
+<div className="min-h-screen bg-surface-light">
+  {/* 모바일 상단 바 */}
+  <div className="sticky top-0 z-30 flex items-center justify-between h-14 px-4 bg-surface-white border-b border-border-light lg:hidden">
+    <button
+      type="button"
+      onClick={() => setDrawerOpen(true)}
+      aria-label="메뉴 열기"
+      aria-expanded={drawerOpen}
+      aria-controls="console-sidebar"
+      className="inline-flex items-center justify-center w-11 h-11 -ml-2 rounded-md text-heading-dark hover:bg-surface-light transition-colors"
+    >
+      <svg className="w-6 h-6" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5" />
+      </svg>
+    </button>
+    <span className="text-heading-dark font-body font-semibold text-sm">어드민 콘솔</span>
+    <span className="w-11" aria-hidden="true" /> {/* 좌우 대칭용 스페이서 */}
+  </div>
+
+  {/* 드로어 오버레이 (모바일, 열림 시) */}
+  {drawerOpen && (
+    <div
+      className="fixed inset-0 z-40 bg-overlay-dark-60 lg:hidden"
+      onClick={() => setDrawerOpen(false)}
+      aria-hidden="true"
+    />
+  )}
+
+  {/* 사이드바 (데스크탑 고정 / 모바일 드로어) */}
+  <aside
+    id="console-sidebar"
+    aria-label="콘솔 메뉴"
+    className={`fixed inset-y-0 left-0 z-50 w-60 bg-surface-white border-r border-border-light flex flex-col transition-transform duration-200 lg:translate-x-0 ${
+      drawerOpen ? 'translate-x-0' : '-translate-x-full'
+    }`}
+  >
+    <div className="flex items-center h-14 px-5 border-b border-border-light shrink-0">
+      <span className="text-heading-dark font-body font-semibold text-sm">어드민 콘솔</span>
+    </div>
+    <nav aria-label="콘솔 내비게이션" className="flex flex-col gap-1 p-3 flex-1 overflow-y-auto">
+      {SITE.admin.nav.map((item) => (
+        <Link
+          key={item.href}
+          href={item.href}
+          aria-current={isNavActive(item.href) ? 'page' : undefined}
+          onClick={() => setDrawerOpen(false)}
+          className={
+            isNavActive(item.href)
+              ? 'flex items-center gap-3 rounded-md px-3 py-2.5 min-h-[44px] text-sm font-body font-semibold bg-aircok-blue/10 text-aircok-blue transition-colors'
+              : 'flex items-center gap-3 rounded-md px-3 py-2.5 min-h-[44px] text-sm font-body text-secondary-dark hover:bg-surface-light hover:text-heading-dark transition-colors'
+          }
+        >
+          {item.label}
+        </Link>
+      ))}
+    </nav>
+    <div className="mt-auto border-t border-border-light p-3 flex flex-col gap-2 shrink-0">
+      {user && <span className="text-secondary-dark text-sm px-3 truncate">{user.username}</span>}
+      <button
+        type="button"
+        onClick={() => setLogoutOpen(true)}
+        className="flex items-center gap-2 rounded-md px-3 py-2.5 min-h-[44px] text-sm font-body text-error hover:bg-surface-light transition-colors text-left"
+      >
+        로그아웃
+      </button>
+    </div>
+  </aside>
+
+  {/* 메인 콘텐츠 — 셸은 사이드바 오프셋만, 콘텐츠 패딩은 각 뷰가 자체 보유 (정책 (b)) */}
+  <main className="lg:pl-60">{children}</main>
+</div>
+```
+
+> **모바일 동작 전제**: `drawerOpen` 상태는 `ConsoleLayout` 내부 `useState`로 관리한다. (1) 햄버거 클릭 → `true`, (2) 오버레이 클릭 / 메뉴 항목 클릭 / 라우트 변경 시 → `false`. `lg` 이상에서는 사이드바가 항상 `lg:translate-x-0`로 노출되므로 `drawerOpen` 값과 무관하게 보인다(오버레이·모바일 상단 바는 `lg:hidden`으로 숨김). 라우트 변경 시 자동 닫힘(`useEffect`로 `pathname` 변화 감지)은 implementer가 붙인다.
+
+### Admin Subtab Navigation (어드민 서브탭 내비게이션)
+
+콘솔 단일 페이지 내부에서 여러 패널을 전환하는 **탭 바**. 문의 관리 페이지의 "문의 내역 / 이메일 설정 / 지도 설정" 전환에 사용한다. 사이드바(전역 메뉴)와 구별되는 **페이지 내 로컬 탭**으로, 활성 탭은 하단 밑줄(언더라인) 강조를 사용해 사이드바의 pill/틴트 강조와 시각적으로 구분한다.
+
+**탭 바 컨테이너 (`role="tablist"`)**
+- `flex items-center gap-1 border-b border-border-light overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]`
+- `role="tablist"`, `aria-label`(예: `"문의 관리 탭"`).
+
+**탭 버튼 — 활성** (`aria-selected={true}`)
+- `shrink-0 -mb-px border-b-2 border-aircok-blue px-4 py-3 min-h-[44px] text-sm font-body font-semibold text-aircok-blue transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:ring-offset-2 rounded-t-md`
+- `-mb-px` 로 컨테이너의 `border-b`와 활성 탭의 `border-b-2`를 겹쳐 밑줄이 구분선 위에 정확히 얹히도록 한다.
+
+**탭 버튼 — 비활성** (`aria-selected={false}`)
+- `shrink-0 -mb-px border-b-2 border-transparent px-4 py-3 min-h-[44px] text-sm font-body text-secondary-dark hover:text-heading-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:ring-offset-2 rounded-t-md`
+
+**접근성 마크업 규칙**
+- 컨테이너: `role="tablist"`, `aria-label`.
+- 각 탭 버튼: `role="tab"`, `type="button"`, `aria-selected`(활성 `true`/비활성 `false`), `id="tab-<key>"`, `aria-controls="panel-<key>"`.
+- 각 패널: `role="tabpanel"`, `id="panel-<key>"`, `aria-labelledby="tab-<key>"`, 비활성 패널은 `hidden`.
+- 키보드: 좌우 화살표로 탭 이동(implementer), 활성 탭만 `tabIndex={0}`·비활성은 `tabIndex={-1}` 권장(roving tabindex). 포커스 링은 `focus-visible:ring-2 focus-visible:ring-aircok-blue`.
+
+**준비 중 placeholder (지도 설정 탭)**
+- 아직 구현되지 않은 패널을 톤다운된 안내 블록으로 표시한다. §Admin List State의 카드형 블록과 동일 톤을 재활용하되, 에러가 아니므로 `text-error`를 쓰지 않고 `text-secondary-dark`로 낮춘다.
+- 블록 컨테이너: `flex flex-col items-center justify-center text-center gap-3 rounded-xl border border-border-light bg-surface-white px-6 py-16`
+- "준비 중" 배지(선택): `inline-flex items-center rounded-pill bg-surface-light px-3 py-1 text-xs font-medium text-secondary-dark`
+- 안내 문구: `text-secondary-dark font-body text-[15px] leading-[1.43] [word-break:keep-all]`
+
+```tsx
+// Admin Subtab Navigation 골격 ('use client', activeTab 상태는 implementer)
+<div>
+  {/* 탭 바 */}
+  <div role="tablist" aria-label="문의 관리 탭" className="flex items-center gap-1 border-b border-border-light overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+    {tabs.map((tab) => {
+      const active = tab.key === activeTab;
+      return (
+        <button
+          key={tab.key}
+          type="button"
+          role="tab"
+          id={`tab-${tab.key}`}
+          aria-selected={active}
+          aria-controls={`panel-${tab.key}`}
+          tabIndex={active ? 0 : -1}
+          onClick={() => setActiveTab(tab.key)}
+          className={
+            active
+              ? 'shrink-0 -mb-px border-b-2 border-aircok-blue px-4 py-3 min-h-[44px] text-sm font-body font-semibold text-aircok-blue transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:ring-offset-2 rounded-t-md'
+              : 'shrink-0 -mb-px border-b-2 border-transparent px-4 py-3 min-h-[44px] text-sm font-body text-secondary-dark hover:text-heading-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:ring-offset-2 rounded-t-md'
+          }
+        >
+          {tab.label}
+        </button>
+      );
+    })}
+  </div>
+
+  {/* 패널들 (비활성은 hidden) */}
+  <div role="tabpanel" id="panel-inquiries" aria-labelledby="tab-inquiries" hidden={activeTab !== 'inquiries'} className="pt-6">
+    {/* 문의 내역 */}
+  </div>
+  <div role="tabpanel" id="panel-mail" aria-labelledby="tab-mail" hidden={activeTab !== 'mail'} className="pt-6">
+    {/* 이메일 설정 */}
+  </div>
+  <div role="tabpanel" id="panel-map" aria-labelledby="tab-map" hidden={activeTab !== 'map'} className="pt-6">
+    {/* 지도 설정 — 준비 중 placeholder */}
+    <div className="flex flex-col items-center justify-center text-center gap-3 rounded-xl border border-border-light bg-surface-white px-6 py-16">
+      <span className="inline-flex items-center rounded-pill bg-surface-light px-3 py-1 text-xs font-medium text-secondary-dark">준비 중</span>
+      <p className="text-secondary-dark font-body text-[15px] leading-[1.43] [word-break:keep-all]">
+        지도 설정 기능은 준비 중입니다.
+      </p>
+    </div>
+  </div>
+</div>
+```
+
+> **탭 상태 전제**: `activeTab` 상태는 서브탭 컨테이너 컴포넌트(`'use client'`)의 `useState`로 관리한다. URL 쿼리(`?tab=mail`) 동기화가 필요하면 implementer가 `useSearchParams`로 연결한다(본 가이드는 UI 마크업·상태 클래스만 정의). 사이드바의 `SITE.admin.nav`에 "이메일 설정"이 별도 항목으로 있으나, 문의 관리 페이지 내부 서브탭과는 별개 진입로이며, 서브탭 도입 시 nav 항목 정리는 implementer/leader가 결정한다.
+
 ---
 
 ## 10. Responsive Behavior (구 §9)
