@@ -36,7 +36,7 @@ export class AuthController {
       httpOnly: true,
       secure: isProd,
       sameSite: (isProd ? 'strict' : 'lax') as 'strict' | 'lax',
-      path: '/api',
+      path: '/',
       maxAge: 8 * 60 * 60 * 1000,
     });
 
@@ -51,7 +51,7 @@ export class AuthController {
       httpOnly: true,
       secure: isProd,
       sameSite: (isProd ? 'strict' : 'lax') as 'strict' | 'lax',
-      path: '/api',
+      path: '/',
       maxAge: 0,
     });
 

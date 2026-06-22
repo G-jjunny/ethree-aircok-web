@@ -2,7 +2,7 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
 
 export async function uploadNewsImage(file: File): Promise<string> {
   const formData = new FormData();
-  formData.append('file', file);
+  formData.append('image', file);
   const res = await fetch(`${API_BASE}/api/news/images`, {
     method: 'POST',
     credentials: 'include',

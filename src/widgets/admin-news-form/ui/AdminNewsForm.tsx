@@ -1,10 +1,12 @@
 'use client';
 
 import dynamic from 'next/dynamic';
+import Link from 'next/link';
 import { useForm, Controller, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useRef } from 'react';
+import { toast } from 'sonner';
 import { uploadNewsImage } from '@/features/news-editor';
 
 const NewsEditor = dynamic(
@@ -65,6 +67,11 @@ export function AdminNewsForm({ initialData, onSuccess }: Props) {
   });
 
   const coverImageValue = useWatch({ control, name: 'coverImage' });
+  const coverImageSrc = coverImageValue
+    ? coverImageValue.startsWith('http')
+      ? coverImageValue
+      : `${API_BASE}${coverImageValue}`
+    : '';
 
   const handleCoverImageChange = async (
     e: React.ChangeEvent<HTMLInputElement>,
@@ -75,21 +82,30 @@ export function AdminNewsForm({ initialData, onSuccess }: Props) {
       const url = await uploadNewsImage(file);
       setValue('coverImage', url);
     } catch {
-      alert('커버 이미지 업로드에 실패했습니다.');
+      toast.error('커버 이미지 업로드에 실패했습니다.');
     } finally {
       if (coverImageInputRef.current) coverImageInputRef.current.value = '';
     }
   };
 
   const onSubmit = async (values: FormValues) => {
-    const formData = new FormData();
-    formData.append('title', values.title);
-    formData.append('description', values.description);
-    formData.append('content', values.content);
-    formData.append('date', values.date);
-    if (values.location) formData.append('location', values.location);
-    formData.append('published', String(values.published));
-    if (values.coverImage) formData.append('coverImage', values.coverImage);
+    const payload: {
+      title: string;
+      description: string;
+      content: string;
+      date: string;
+      published: boolean;
+      location?: string;
+      coverImage?: string;
+    } = {
+      title: values.title,
+      description: values.description,
+      content: values.content,
+      date: values.date,
+      published: values.published,
+    };
+    if (values.location) payload.location = values.location;
+    if (values.coverImage) payload.coverImage = values.coverImage;
 
     const url = initialData
       ? `${API_BASE}/api/news/${initialData.id}`
@@ -99,14 +115,22 @@ export function AdminNewsForm({ initialData, onSuccess }: Props) {
     const res = await fetch(url, {
       method,
       credentials: 'include',
-      body: formData,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
     });
 
     if (!res.ok) {
-      alert('저장에 실패했습니다. 다시 시도해 주세요.');
+      toast.error(
+        initialData
+          ? '뉴스 수정에 실패했습니다. 다시 시도해 주세요.'
+          : '뉴스 등록에 실패했습니다. 다시 시도해 주세요.',
+      );
       return;
     }
 
+    toast.success(
+      initialData ? '뉴스가 수정되었습니다' : '뉴스가 등록되었습니다',
+    );
     onSuccess?.();
   };
 
@@ -178,7 +202,7 @@ export function AdminNewsForm({ initialData, onSuccess }: Props) {
         {coverImageValue && (
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            src={coverImageValue}
+            src={coverImageSrc}
             alt="커버 이미지 미리보기"
             className="w-48 h-28 object-cover rounded-md border border-border-light"
           />
@@ -246,6 +270,12 @@ export function AdminNewsForm({ initialData, onSuccess }: Props) {
         >
           {isSubmitting ? '저장 중...' : initialData ? '수정 저장' : '작성 완료'}
         </button>
+        <Link
+          href="/console/news"
+          className="bg-surface-light text-heading-dark rounded-md px-6 py-2 font-semibold text-sm font-body hover:bg-border-light transition-colors"
+        >
+          목록으로
+        </Link>
       </div>
     </form>
   );

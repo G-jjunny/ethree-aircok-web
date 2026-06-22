@@ -1,2 +1,9 @@
 export type { NewsSummary, NewsPost, NewsListResponse } from './model/types';
-export { getNewsList, getNewsPost } from './api/newsApi';
+export {
+  getNewsList,
+  getAdminNewsList,
+  getNewsPost,
+  adminNewsQueryOptions,
+  adminNewsKeys,
+  AdminNewsApiError,
+} from './api/newsApi';

@@ -17,6 +17,7 @@ export function AdminNewsFormWrapper({ initialData }: Props) {
 
   return (
     <AdminNewsForm
+      key={initialData?.id ?? 'new'}
       initialData={
         initialData
           ? {

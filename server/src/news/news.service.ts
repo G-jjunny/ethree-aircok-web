@@ -34,6 +34,32 @@ export class NewsService {
     return { data, total, page, limit };
   }
 
+  async findAllAdmin(page: number, limit: number) {
+    const skip = (page - 1) * limit;
+
+    const [data, total] = await this.prisma.$transaction([
+      this.prisma.newsPost.findMany({
+        skip,
+        take: limit,
+        orderBy: { date: 'desc' },
+        select: {
+          id: true,
+          title: true,
+          description: true,
+          date: true,
+          location: true,
+          published: true,
+          coverImage: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      }),
+      this.prisma.newsPost.count(),
+    ]);
+
+    return { data, total, page, limit };
+  }
+
   async findOne(id: string) {
     const post = await this.prisma.newsPost.findUnique({ where: { id } });
     if (!post) {
@@ -42,7 +68,7 @@ export class NewsService {
     return post;
   }
 
-  async create(dto: CreateNewsDto, coverImagePath?: string) {
+  async create(dto: CreateNewsDto) {
     return this.prisma.newsPost.create({
       data: {
         title: dto.title,
@@ -50,13 +76,13 @@ export class NewsService {
         content: dto.content,
         date: new Date(dto.date),
         location: dto.location,
-        published: dto.published === 'true',
-        coverImage: coverImagePath ?? null,
+        published: dto.published ?? false,
+        coverImage: dto.coverImage || null,
       },
     });
   }
 
-  async update(id: string, dto: UpdateNewsDto, coverImagePath?: string) {
+  async update(id: string, dto: UpdateNewsDto) {
     await this.findOne(id);
 
     const data: Record<string, unknown> = {};
@@ -65,8 +91,8 @@ export class NewsService {
     if (dto.content !== undefined) data.content = dto.content;
     if (dto.date !== undefined) data.date = new Date(dto.date);
     if (dto.location !== undefined) data.location = dto.location;
-    if (dto.published !== undefined) data.published = dto.published === 'true';
-    if (coverImagePath !== undefined) data.coverImage = coverImagePath;
+    if (dto.published !== undefined) data.published = dto.published;
+    if (dto.coverImage !== undefined) data.coverImage = dto.coverImage || null;
 
     return this.prisma.newsPost.update({ where: { id }, data });
   }
