@@ -19,6 +19,7 @@ import { InquiryService } from './inquiry.service';
 import { CreateInquiryDto } from './dto/create-inquiry.dto';
 import { UpdateInquiryDto } from './dto/update-inquiry.dto';
 import { UpdateMailSettingDto } from './dto/update-mail-setting.dto';
+import { UpdateMapSettingDto } from './dto/update-map-setting.dto';
 
 @Controller('inquiry')
 export class InquiryController {
@@ -41,6 +42,23 @@ export class InquiryController {
   @Put('mail-setting')
   updateMailSetting(@Body() dto: UpdateMailSettingDto) {
     return this.inquiryService.updateMailSetting(dto);
+  }
+
+  // 정적 경로 'map-setting' 도 'mail-setting' 과 동일하게 ':id' path-param
+  // 라우트보다 위에 두어 라우트 매칭 충돌(모호성)을 명확히 회피한다.
+  //
+  // 주의: mail-setting GET 은 어드민 전용이지만, map-setting GET 은 문의하기
+  // 페이지가 지도 주소를 노출하기 위한 공개 엔드포인트(인증 불필요)이므로
+  // JwtAuthGuard 를 붙이지 않는다. 수정(PUT)만 어드민 전용으로 가드한다.
+  @Get('map-setting')
+  getMapSetting() {
+    return this.inquiryService.getMapSetting();
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Put('map-setting')
+  updateMapSetting(@Body() dto: UpdateMapSettingDto) {
+    return this.inquiryService.updateMapSetting(dto);
   }
 
   @UseGuards(JwtAuthGuard)

@@ -4,11 +4,13 @@ import { MailService } from './mail.service';
 import { CreateInquiryDto } from './dto/create-inquiry.dto';
 import { UpdateInquiryDto } from './dto/update-inquiry.dto';
 import { UpdateMailSettingDto } from './dto/update-mail-setting.dto';
+import { UpdateMapSettingDto } from './dto/update-map-setting.dto';
 import {
   MAIL_SETTING_ID,
   DEFAULT_SUBJECT_TEMPLATE,
   DEFAULT_BODY_TEMPLATE,
 } from './mail-setting.constants';
+import { MAP_SETTING_ID, DEFAULT_MAP_ADDRESS } from './map-setting.constants';
 
 @Injectable()
 export class InquiryService {
@@ -107,6 +109,41 @@ export class InquiryService {
         recipientEmail: dto.recipientEmail,
         subjectTemplate: dto.subjectTemplate,
         bodyTemplate: dto.bodyTemplate,
+      },
+    });
+  }
+
+  /**
+   * 문의하기 지도 주소 설정(고정 PK 싱글톤) 조회.
+   * - upsert 로 id = 'singleton' 행을 조회한다.
+   * - 행이 없으면 기본 주소(DEFAULT_MAP_ADDRESS)로 lazy 생성 후 반환한다.
+   * - 공개 엔드포인트(GET /api/inquiry/map-setting)에서 호출된다.
+   */
+  async getMapSetting() {
+    return this.prisma.mapSetting.upsert({
+      where: { id: MAP_SETTING_ID },
+      update: {},
+      create: {
+        id: MAP_SETTING_ID,
+        address: DEFAULT_MAP_ADDRESS,
+      },
+    });
+  }
+
+  /**
+   * 문의하기 지도 주소 설정(고정 PK 싱글톤) 수정 — upsert.
+   * - id = 'singleton' 행이 있으면 update, 없으면 create 한다.
+   * - update/create 모두 dto 의 address 를 사용한다.
+   */
+  async updateMapSetting(dto: UpdateMapSettingDto) {
+    return this.prisma.mapSetting.upsert({
+      where: { id: MAP_SETTING_ID },
+      update: {
+        address: dto.address,
+      },
+      create: {
+        id: MAP_SETTING_ID,
+        address: dto.address,
       },
     });
   }

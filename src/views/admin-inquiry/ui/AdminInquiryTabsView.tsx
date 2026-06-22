@@ -4,6 +4,7 @@ import { useCallback, useRef } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { AdminInquiryListView } from '@/widgets/admin-inquiry-list';
 import { AdminMailSettingView } from '@/widgets/admin-mail-setting';
+import { AdminMapSettingView } from '@/widgets/admin-map-setting';
 import { SITE } from '@/shared/config/site';
 
 type TabKey = (typeof SITE.admin.inquiryTabs)[number]['key'];
@@ -123,24 +124,8 @@ export function AdminInquiryTabsView() {
         hidden={activeTab !== 'map'}
         className="pt-6"
       >
-        <MapSettingPlaceholder />
+        {activeTab === 'map' && <AdminMapSettingView />}
       </div>
-    </div>
-  );
-}
-
-function MapSettingPlaceholder() {
-  return (
-    <div className="flex flex-col items-center justify-center text-center gap-3 rounded-xl border border-border-light bg-surface-white px-6 py-16">
-      <span className="inline-flex items-center rounded-pill bg-surface-light px-3 py-1 text-xs font-medium text-secondary-dark">
-        준비 중
-      </span>
-      <p className="text-secondary-dark font-body text-[15px] leading-[1.43] [word-break:keep-all]">
-        지도(회사 주소) 설정 기능은 준비 중입니다.
-      </p>
-      <p className="text-secondary-dark font-body text-[15px] leading-[1.43] [word-break:keep-all]">
-        현재 등록된 회사 주소: {SITE.contact.address}
-      </p>
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import { SectionHeader } from '@/shared/ui'
 import { SITE } from '@/shared/config'
 import { InquiryForm } from '@/features/inquiry-form'
+import { ContactMap } from './ContactMap'
 
 // 연락처 안내 4블록 — 이 페이지(우측 칼럼)에서만 사용되므로 로컬 유지(공용 분리 대상 아님)
 const infoBlocks = [
@@ -12,11 +13,6 @@ const infoBlocks = [
 ] as const
 
 export function ContactInquirySection() {
-  // Embed API 키 불필요한 일반 Google Maps 임베드 (output=embed)
-  const mapSrc = `https://maps.google.com/maps?q=${encodeURIComponent(
-    SITE.contact.address,
-  )}&output=embed`
-
   return (
     <section className="bg-surface-white">
       <div className="content-container py-20">
@@ -38,15 +34,8 @@ export function ContactInquirySection() {
           {/* 우측 칼럼: 지도 + 연락처 안내 세로 스택 — 좌측 폼 칼럼과 높이 균형 */}
           {/* max-w-[640px]: lg 미만에서 폼 카드와 동일 가독 폭 정렬, 1회성 레이아웃 수치 — 토큰 없음 */}
           <div className="flex flex-col gap-8 max-w-[640px] mx-auto lg:max-w-none lg:mx-0 w-full">
-            {/* 지도 — 카드 장식(shadow) 없이 절제: 둥근 모서리 + 얇은 보더만 */}
-            <div className="rounded-xl overflow-hidden border border-border-light aspect-video">
-              <iframe
-                title={`${SITE.name} 본사 위치 지도`}
-                src={mapSrc}
-                loading="lazy"
-                className="w-full h-full border-none"
-              />
-            </div>
+            {/* 지도 — 어드민 설정 주소를 공개 GET으로 조회하는 클라이언트 컴포넌트 */}
+            <ContactMap />
 
             {/* 연락처 안내 — 카드/박스 없이 타이포 위계로만 구분 (홈 WhatYouGet 톤) */}
             <div>

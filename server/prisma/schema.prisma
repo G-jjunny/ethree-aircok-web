@@ -64,3 +64,28 @@ model MailSetting {
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 }
+
+/// 문의하기 페이지 지도 표시용 주소 설정 (싱글톤).
+///
+/// 운용 방식 (고정 PK 싱글톤):
+/// - 이 테이블에는 항상 id = 'singleton' 인 행 1개만 존재한다.
+/// - GET /api/inquiry/map-setting: service 는 upsert({ where: { id: 'singleton' } })
+///   로 조회한다. 행이 없으면 기본 주소값으로 lazy 생성 후 반환한다(아래 기본값 참고).
+///   이 GET 은 공개 엔드포인트(인증 불필요)로, 문의하기 페이지에서 지도 주소를 노출한다.
+/// - PUT /api/inquiry/map-setting: 어드민 전용. upsert 로 id 'singleton' 행을
+///   갱신(없으면 생성)한다.
+/// - 고정 PK 상수('singleton')를 사용해 항상 결과 1행을 유지한다.
+///
+/// lazy 생성 시 기본값:
+/// - address: "서울특별시 성동구 아차산로17길 49 성수 생각공장 데시앙플렉스 815호"
+///   (프론트 SITE 상수를 import 할 수 없으므로 백엔드 상수로 동일 값을 보유한다)
+///
+/// 컬럼 정책:
+/// - 주소 문자열(address) 만 보관한다. 지도 SDK 가 주소 → 좌표 변환을 담당하므로
+///   lat/lng 등 좌표 컬럼은 두지 않는다.
+model MapSetting {
+  id        String   @id @default("singleton")
+  address   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
