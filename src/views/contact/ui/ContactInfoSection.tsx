@@ -1,3 +1,4 @@
+import { SectionHeader } from '@/shared/ui'
 import { SITE } from '@/shared/config'
 
 const blocks = [
@@ -12,7 +13,13 @@ export function ContactInfoSection() {
   return (
     <section className="bg-surface-white py-20">
       <div className="content-container">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <SectionHeader
+          label="Contact Info"
+          title="연락처 안내"
+          theme="light"
+          titleAs="h2"
+        />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-10">
           {blocks.map((block) => (
             <div
               key={block.label}
