@@ -33,7 +33,7 @@ export const SITE = {
       { label: "카탈로그", href: "/catalog" },
       { label: "뉴스", href: "/news" },
       { label: "FAQ", href: "/faq" },
-      { label: "연락하기", href: "/contact" },
+      { label: "문의하기", href: "/contact" },
     ],
   },
 
@@ -527,9 +527,9 @@ export const SITE = {
       description: "스마트 에어콕에 대해 자주 묻는 질문과 답변을 확인하세요.",
     },
     contact: {
-      title: "연락하기",
+      title: "문의하기",
       description:
-        "스마트 에어콕에 문의하세요. 전화·이메일·온라인 문의 가능합니다.",
+        "스마트 에어콕에 문의하세요. 전화·이메일·온라인 문의 폼으로 편하게 문의하실 수 있습니다.",
     },
     pricing: {
       title: "가격 안내",
@@ -564,6 +564,7 @@ export const SITE = {
     nav: [
       { label: '대시보드', href: '/console' },
       { label: '뉴스 관리', href: '/console/news' },
+      { label: '문의 관리', href: '/console/inquiries' },
     ],
   },
 } as const;
