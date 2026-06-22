@@ -1,1 +1,1 @@
-export { AdminInquiryListView } from './ui/AdminInquiryListView';
+export { AdminInquiryTabsView } from './ui/AdminInquiryTabsView';

@@ -1,15 +1,11 @@
 import { ContactHeroSection } from './ContactHeroSection'
-import { ContactFormSection } from './ContactFormSection'
-import { ContactMapSection } from './ContactMapSection'
-import { ContactInfoSection } from './ContactInfoSection'
+import { ContactInquirySection } from './ContactInquirySection'
 
 export function ContactView() {
   return (
     <main>
       <ContactHeroSection />
-      <ContactFormSection />
-      <ContactMapSection />
-      <ContactInfoSection />
+      <ContactInquirySection />
     </main>
   )
 }
