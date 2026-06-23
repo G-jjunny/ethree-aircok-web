@@ -1,11 +1,13 @@
 import axios from 'axios';
 
-const apiClient = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001',
+const axiosInstance = axios.create({
+  baseURL: '/api',
+  timeout: 10000,
   withCredentials: true,
+  headers: { 'Content-Type': 'application/json' },
 });
 
-apiClient.interceptors.response.use(
+axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
     if (typeof window !== 'undefined' && error?.response?.status === 401) {
@@ -13,8 +15,8 @@ apiClient.interceptors.response.use(
         window.location.href = '/console/login';
       }
     }
-    return Promise.reject(error);
-  }
+    return Promise.reject(error instanceof Error ? error : new Error(String(error)));
+  },
 );
 
-export default apiClient;
+export { axiosInstance };

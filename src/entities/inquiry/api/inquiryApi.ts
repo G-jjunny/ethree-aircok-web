@@ -1,12 +1,12 @@
+import axios from 'axios';
 import { queryOptions } from '@tanstack/react-query';
+import { axiosInstance } from '@/shared/api';
 import type {
   CreateInquiryBody,
   InquiryListResponse,
   InquiryStatus,
   InquirySummary,
 } from '../model/types';
-
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
 
 /**
  * 어드민 문의 관련 TanStack Query 키의 단일 출처(팩토리).
@@ -52,20 +52,15 @@ export class InquiryApiError extends Error {
 }
 
 /**
- * 응답 본문에서 백엔드 검증 메시지를 안전하게 추출한다.
+ * axios 에러 응답 본문에서 백엔드 검증 메시지를 안전하게 추출한다.
  * NestJS ValidationPipe는 message를 string 또는 string[]로 내려주므로
  * 둘 다 string[]로 정규화한다.
  */
-async function parseMessages(res: Response): Promise<string[] | undefined> {
-  try {
-    const data: unknown = await res.json();
-    if (data && typeof data === 'object' && 'message' in data) {
-      const message = (data as { message: unknown }).message;
-      if (Array.isArray(message)) return message as string[];
-      if (typeof message === 'string') return [message];
-    }
-  } catch {
-    // 본문 파싱 실패는 무시 — 상태코드 기반으로 처리
+function parseAxiosMessages(data: unknown): string[] | undefined {
+  if (data && typeof data === 'object' && 'message' in data) {
+    const rawMessages = (data as { message: unknown }).message;
+    if (Array.isArray(rawMessages)) return rawMessages as string[];
+    if (typeof rawMessages === 'string') return [rawMessages];
   }
   return undefined;
 }
@@ -77,34 +72,29 @@ async function parseMessages(res: Response): Promise<string[] | undefined> {
  * 성공 시 생성 객체 전체(201)를 반환하나 프론트는 무시 가능하다.
  */
 export async function createInquiry(body: CreateInquiryBody): Promise<void> {
-  let res: Response;
   try {
-    res = await fetch(`${API_BASE}/api/inquiry`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({ answers: body.answers }),
-    });
-  } catch {
+    await axiosInstance.post('/inquiry', { answers: body.answers });
+  } catch (err) {
+    if (axios.isAxiosError(err)) {
+      const status = err.response?.status ?? 0;
+      const messages = parseAxiosMessages(err.response?.data);
+      const message =
+        status === 429
+          ? '요청이 많아 잠시 후 다시 시도해 주세요.'
+          : status === 400
+            ? '입력값을 다시 확인해 주세요.'
+            : status === 0
+              ? '네트워크 오류로 문의를 전송하지 못했습니다.'
+              : '문의 전송에 실패했습니다.';
+      throw new InquiryApiError(status, message, messages);
+    }
     throw new InquiryApiError(0, '네트워크 오류로 문의를 전송하지 못했습니다.');
-  }
-
-  if (!res.ok) {
-    const messages = await parseMessages(res);
-
-    const message =
-      res.status === 429
-        ? '요청이 많아 잠시 후 다시 시도해 주세요.'
-        : res.status === 400
-          ? '입력값을 다시 확인해 주세요.'
-          : '문의 전송에 실패했습니다.';
-    throw new InquiryApiError(res.status, message, messages);
   }
 }
 
 /**
  * 어드민 문의 목록을 브라우저에서 직접 호출한다.
- * `credentials: 'include'`로 access_token 쿠키를 전송하며,
+ * axiosInstance는 withCredentials: true이므로 쿠키가 자동 전송된다.
  * 실패 시 상태코드를 담은 {@link InquiryApiError}를 throw한다.
  * (클라이언트 컴포넌트 전용 — 서버에서 호출하지 않는다.)
  */
@@ -112,31 +102,24 @@ export async function getAdminInquiryList(
   page: number = 1,
   limit: number = 10,
 ): Promise<InquiryListResponse> {
-  let res: Response;
   try {
-    res = await fetch(
-      `${API_BASE}/api/inquiry?page=${page}&limit=${limit}`,
-      {
-        cache: 'no-store',
-        credentials: 'include',
-      },
-    );
-  } catch {
-    throw new InquiryApiError(
-      0,
-      '네트워크 오류로 문의 목록을 불러오지 못했습니다.',
-    );
+    const { data } = await axiosInstance.get<InquiryListResponse>('/inquiry', {
+      params: { page, limit },
+    });
+    return data;
+  } catch (err) {
+    if (axios.isAxiosError(err)) {
+      const status = err.response?.status ?? 0;
+      const message =
+        status === 401 || status === 403
+          ? '로그인이 필요합니다.'
+          : status === 0
+            ? '네트워크 오류로 문의 목록을 불러오지 못했습니다.'
+            : '문의 목록을 불러오는 데 실패했습니다.';
+      throw new InquiryApiError(status, message);
+    }
+    throw new InquiryApiError(0, '네트워크 오류로 문의 목록을 불러오지 못했습니다.');
   }
-
-  if (!res.ok) {
-    const message =
-      res.status === 401 || res.status === 403
-        ? '로그인이 필요합니다.'
-        : '문의 목록을 불러오는 데 실패했습니다.';
-    throw new InquiryApiError(res.status, message);
-  }
-
-  return res.json() as Promise<InquiryListResponse>;
 }
 
 /**
@@ -163,29 +146,24 @@ export async function updateInquiryStatus(
   id: string,
   status: InquiryStatus,
 ): Promise<InquirySummary> {
-  let res: Response;
   try {
-    res = await fetch(`${API_BASE}/api/inquiry/${id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({ status }),
-    });
-  } catch {
+    const { data } = await axiosInstance.patch<InquirySummary>(`/inquiry/${id}`, { status });
+    return data;
+  } catch (err) {
+    if (axios.isAxiosError(err)) {
+      const httpStatus = err.response?.status ?? 0;
+      const message =
+        httpStatus === 401 || httpStatus === 403
+          ? '로그인이 필요합니다.'
+          : httpStatus === 404
+            ? '문의를 찾을 수 없습니다.'
+            : httpStatus === 0
+              ? '네트워크 오류로 상태를 변경하지 못했습니다.'
+              : '상태 변경에 실패했습니다.';
+      throw new InquiryApiError(httpStatus, message);
+    }
     throw new InquiryApiError(0, '네트워크 오류로 상태를 변경하지 못했습니다.');
   }
-
-  if (!res.ok) {
-    const message =
-      res.status === 401 || res.status === 403
-        ? '로그인이 필요합니다.'
-        : res.status === 404
-          ? '문의를 찾을 수 없습니다.'
-          : '상태 변경에 실패했습니다.';
-    throw new InquiryApiError(res.status, message);
-  }
-
-  return res.json() as Promise<InquirySummary>;
 }
 
 /**
@@ -193,23 +171,21 @@ export async function updateInquiryStatus(
  * 성공 시 204(본문 없음).
  */
 export async function deleteInquiry(id: string): Promise<void> {
-  let res: Response;
   try {
-    res = await fetch(`${API_BASE}/api/inquiry/${id}`, {
-      method: 'DELETE',
-      credentials: 'include',
-    });
-  } catch {
+    await axiosInstance.delete(`/inquiry/${id}`);
+  } catch (err) {
+    if (axios.isAxiosError(err)) {
+      const status = err.response?.status ?? 0;
+      const message =
+        status === 401 || status === 403
+          ? '로그인이 필요합니다.'
+          : status === 404
+            ? '문의를 찾을 수 없습니다.'
+            : status === 0
+              ? '네트워크 오류로 삭제하지 못했습니다.'
+              : '삭제에 실패했습니다.';
+      throw new InquiryApiError(status, message);
+    }
     throw new InquiryApiError(0, '네트워크 오류로 삭제하지 못했습니다.');
-  }
-
-  if (!res.ok) {
-    const message =
-      res.status === 401 || res.status === 403
-        ? '로그인이 필요합니다.'
-        : res.status === 404
-          ? '문의를 찾을 수 없습니다.'
-          : '삭제에 실패했습니다.';
-    throw new InquiryApiError(res.status, message);
   }
 }

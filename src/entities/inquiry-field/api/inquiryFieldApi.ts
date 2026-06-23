@@ -1,11 +1,11 @@
+import axios from 'axios';
 import { queryOptions } from '@tanstack/react-query';
+import { axiosInstance } from '@/shared/api';
 import type {
   CreateInquiryFieldBody,
   InquiryField,
   UpdateInquiryFieldBody,
 } from '../model/types';
-
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
 
 /**
  * 문의 필드 정의 TanStack Query 키의 단일 출처(팩토리).
@@ -48,20 +48,15 @@ export class InquiryFieldApiError extends Error {
 }
 
 /**
- * 응답 본문에서 백엔드 검증 메시지를 안전하게 추출한다.
+ * axios 에러 응답 본문에서 백엔드 검증 메시지를 안전하게 추출한다.
  * NestJS ValidationPipe는 message를 string 또는 string[]로 내려주므로
  * 둘 다 string[]로 정규화한다.
  */
-async function parseMessages(res: Response): Promise<string[] | undefined> {
-  try {
-    const data: unknown = await res.json();
-    if (data && typeof data === 'object' && 'message' in data) {
-      const message = (data as { message: unknown }).message;
-      if (Array.isArray(message)) return message as string[];
-      if (typeof message === 'string') return [message];
-    }
-  } catch {
-    // 본문 파싱 실패는 무시 — 상태코드 기반으로 처리
+function parseAxiosMessages(data: unknown): string[] | undefined {
+  if (data && typeof data === 'object' && 'message' in data) {
+    const rawMessages = (data as { message: unknown }).message;
+    if (Array.isArray(rawMessages)) return rawMessages as string[];
+    if (typeof rawMessages === 'string') return [rawMessages];
   }
   return undefined;
 }
@@ -71,27 +66,22 @@ async function parseMessages(res: Response): Promise<string[] | undefined> {
  * 응답은 order 오름차순 정렬된 비래핑 배열이다.
  */
 export async function getInquiryFields(): Promise<InquiryField[]> {
-  let res: Response;
   try {
-    res = await fetch(`${API_BASE}/api/inquiry/fields`, {
-      cache: 'no-store',
-    });
-  } catch {
-    throw new InquiryFieldApiError(
-      0,
-      '네트워크 오류로 문의 필드를 불러오지 못했습니다.',
-    );
+    const { data } = await axiosInstance.get<InquiryField[]>('/inquiry/fields');
+    return data;
+  } catch (err) {
+    if (axios.isAxiosError(err)) {
+      const status = err.response?.status ?? 0;
+      const message =
+        status === 401 || status === 403
+          ? '로그인이 필요합니다.'
+          : status === 0
+            ? '네트워크 오류로 문의 필드를 불러오지 못했습니다.'
+            : '문의 필드를 불러오는 데 실패했습니다.';
+      throw new InquiryFieldApiError(status, message);
+    }
+    throw new InquiryFieldApiError(0, '네트워크 오류로 문의 필드를 불러오지 못했습니다.');
   }
-
-  if (!res.ok) {
-    const message =
-      res.status === 401 || res.status === 403
-        ? '로그인이 필요합니다.'
-        : '문의 필드를 불러오는 데 실패했습니다.';
-    throw new InquiryFieldApiError(res.status, message);
-  }
-
-  return res.json() as Promise<InquiryField[]>;
 }
 
 /**
@@ -128,35 +118,27 @@ export async function createInquiryField(
   if (body.placeholder !== undefined) payload.placeholder = body.placeholder;
   if (body.order !== undefined) payload.order = body.order;
 
-  let res: Response;
   try {
-    res = await fetch(`${API_BASE}/api/inquiry/fields`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify(payload),
-    });
-  } catch {
-    throw new InquiryFieldApiError(
-      0,
-      '네트워크 오류로 필드를 추가하지 못했습니다.',
-    );
+    const { data } = await axiosInstance.post<InquiryField>('/inquiry/fields', payload);
+    return data;
+  } catch (err) {
+    if (axios.isAxiosError(err)) {
+      const status = err.response?.status ?? 0;
+      const messages = parseAxiosMessages(err.response?.data);
+      const message =
+        status === 401 || status === 403
+          ? '로그인이 필요합니다.'
+          : status === 409
+            ? '이미 사용 중인 키입니다.'
+            : status === 400
+              ? '입력값을 다시 확인해 주세요.'
+              : status === 0
+                ? '네트워크 오류로 필드를 추가하지 못했습니다.'
+                : '필드 추가에 실패했습니다.';
+      throw new InquiryFieldApiError(status, message, messages);
+    }
+    throw new InquiryFieldApiError(0, '네트워크 오류로 필드를 추가하지 못했습니다.');
   }
-
-  if (!res.ok) {
-    const messages = await parseMessages(res);
-    const message =
-      res.status === 401 || res.status === 403
-        ? '로그인이 필요합니다.'
-        : res.status === 409
-          ? '이미 사용 중인 키입니다.'
-          : res.status === 400
-            ? '입력값을 다시 확인해 주세요.'
-            : '필드 추가에 실패했습니다.';
-    throw new InquiryFieldApiError(res.status, message, messages);
-  }
-
-  return res.json() as Promise<InquiryField>;
 }
 
 /**
@@ -174,35 +156,27 @@ export async function updateInquiryField(
   if (body.placeholder !== undefined) payload.placeholder = body.placeholder;
   if (body.order !== undefined) payload.order = body.order;
 
-  let res: Response;
   try {
-    res = await fetch(`${API_BASE}/api/inquiry/fields/${id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify(payload),
-    });
-  } catch {
-    throw new InquiryFieldApiError(
-      0,
-      '네트워크 오류로 필드를 수정하지 못했습니다.',
-    );
+    const { data } = await axiosInstance.patch<InquiryField>(`/inquiry/fields/${id}`, payload);
+    return data;
+  } catch (err) {
+    if (axios.isAxiosError(err)) {
+      const status = err.response?.status ?? 0;
+      const messages = parseAxiosMessages(err.response?.data);
+      const message =
+        status === 401 || status === 403
+          ? '로그인이 필요합니다.'
+          : status === 404
+            ? '필드를 찾을 수 없습니다.'
+            : status === 400
+              ? '입력값을 다시 확인해 주세요.'
+              : status === 0
+                ? '네트워크 오류로 필드를 수정하지 못했습니다.'
+                : '필드 수정에 실패했습니다.';
+      throw new InquiryFieldApiError(status, message, messages);
+    }
+    throw new InquiryFieldApiError(0, '네트워크 오류로 필드를 수정하지 못했습니다.');
   }
-
-  if (!res.ok) {
-    const messages = await parseMessages(res);
-    const message =
-      res.status === 401 || res.status === 403
-        ? '로그인이 필요합니다.'
-        : res.status === 404
-          ? '필드를 찾을 수 없습니다.'
-          : res.status === 400
-            ? '입력값을 다시 확인해 주세요.'
-            : '필드 수정에 실패했습니다.';
-    throw new InquiryFieldApiError(res.status, message, messages);
-  }
-
-  return res.json() as Promise<InquiryField>;
 }
 
 /**
@@ -210,26 +184,21 @@ export async function updateInquiryField(
  * 성공 시 204(본문 없음). 미존재는 404.
  */
 export async function deleteInquiryField(id: string): Promise<void> {
-  let res: Response;
   try {
-    res = await fetch(`${API_BASE}/api/inquiry/fields/${id}`, {
-      method: 'DELETE',
-      credentials: 'include',
-    });
-  } catch {
-    throw new InquiryFieldApiError(
-      0,
-      '네트워크 오류로 필드를 삭제하지 못했습니다.',
-    );
-  }
-
-  if (!res.ok) {
-    const message =
-      res.status === 401 || res.status === 403
-        ? '로그인이 필요합니다.'
-        : res.status === 404
-          ? '필드를 찾을 수 없습니다.'
-          : '필드 삭제에 실패했습니다.';
-    throw new InquiryFieldApiError(res.status, message);
+    await axiosInstance.delete(`/inquiry/fields/${id}`);
+  } catch (err) {
+    if (axios.isAxiosError(err)) {
+      const status = err.response?.status ?? 0;
+      const message =
+        status === 401 || status === 403
+          ? '로그인이 필요합니다.'
+          : status === 404
+            ? '필드를 찾을 수 없습니다.'
+            : status === 0
+              ? '네트워크 오류로 필드를 삭제하지 못했습니다.'
+              : '필드 삭제에 실패했습니다.';
+      throw new InquiryFieldApiError(status, message);
+    }
+    throw new InquiryFieldApiError(0, '네트워크 오류로 필드를 삭제하지 못했습니다.');
   }
 }

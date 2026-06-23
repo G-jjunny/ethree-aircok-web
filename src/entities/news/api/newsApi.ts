@@ -1,7 +1,7 @@
+import axios from 'axios';
 import { queryOptions } from '@tanstack/react-query';
+import { axiosInstance } from '@/shared/api';
 import type { NewsListResponse, NewsPost } from '../model/types';
-
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
 
 /**
  * 어드민 뉴스 관련 TanStack Query 키의 단일 출처(팩토리).
@@ -37,17 +37,25 @@ export async function getNewsList(
   page: number = 1,
   limit: number = 10,
 ): Promise<NewsListResponse> {
-  const res = await fetch(
-    `${API_BASE}/api/news?page=${page}&limit=${limit}`,
-    { cache: 'no-store' },
-  );
-  if (!res.ok) throw new Error('뉴스 목록을 불러오는 데 실패했습니다.');
-  return res.json() as Promise<NewsListResponse>;
+  try {
+    const { data } = await axiosInstance.get<NewsListResponse>('/news', {
+      params: { page, limit },
+    });
+    return data;
+  } catch (err) {
+    if (axios.isAxiosError(err)) {
+      throw new AdminNewsApiError(
+        err.response?.status ?? 0,
+        '뉴스 목록을 불러오는 데 실패했습니다.',
+      );
+    }
+    throw new AdminNewsApiError(0, '네트워크 오류');
+  }
 }
 
 /**
  * 어드민 뉴스 목록을 브라우저에서 직접 호출한다.
- * `credentials: 'include'`로 access_token 쿠키를 전송하며,
+ * axiosInstance는 withCredentials: true이므로 쿠키가 자동 전송된다.
  * 실패 시 상태코드를 담은 {@link AdminNewsApiError}를 throw한다.
  * (클라이언트 컴포넌트 전용 — 서버에서 호출하지 않는다.)
  */
@@ -55,29 +63,24 @@ export async function getAdminNewsList(
   page: number = 1,
   limit: number = 100,
 ): Promise<NewsListResponse> {
-  let res: Response;
   try {
-    res = await fetch(
-      `${API_BASE}/api/news/admin?page=${page}&limit=${limit}`,
-      {
-        cache: 'no-store',
-        credentials: 'include',
-      },
-    );
-  } catch {
-    // 네트워크 단절 등 fetch 자체 실패
+    const { data } = await axiosInstance.get<NewsListResponse>('/news/admin', {
+      params: { page, limit },
+    });
+    return data;
+  } catch (err) {
+    if (axios.isAxiosError(err)) {
+      const status = err.response?.status ?? 0;
+      const message =
+        status === 401 || status === 403
+          ? '로그인이 필요합니다.'
+          : status === 0
+            ? '네트워크 오류로 뉴스 목록을 불러오지 못했습니다.'
+            : '어드민 뉴스 목록을 불러오는 데 실패했습니다.';
+      throw new AdminNewsApiError(status, message);
+    }
     throw new AdminNewsApiError(0, '네트워크 오류로 뉴스 목록을 불러오지 못했습니다.');
   }
-
-  if (!res.ok) {
-    const message =
-      res.status === 401 || res.status === 403
-        ? '로그인이 필요합니다.'
-        : '어드민 뉴스 목록을 불러오는 데 실패했습니다.';
-    throw new AdminNewsApiError(res.status, message);
-  }
-
-  return res.json() as Promise<NewsListResponse>;
 }
 
 /**
@@ -97,7 +100,16 @@ export function adminNewsQueryOptions(page: number = 1, limit: number = 100) {
 }
 
 export async function getNewsPost(id: string): Promise<NewsPost> {
-  const res = await fetch(`${API_BASE}/api/news/${id}`, { cache: 'no-store' });
-  if (!res.ok) throw new Error('뉴스 상세를 불러오는 데 실패했습니다.');
-  return res.json() as Promise<NewsPost>;
+  try {
+    const { data } = await axiosInstance.get<NewsPost>(`/news/${id}`);
+    return data;
+  } catch (err) {
+    if (axios.isAxiosError(err)) {
+      throw new AdminNewsApiError(
+        err.response?.status ?? 0,
+        '뉴스 상세를 불러오는 데 실패했습니다.',
+      );
+    }
+    throw new AdminNewsApiError(0, '네트워크 오류');
+  }
 }
