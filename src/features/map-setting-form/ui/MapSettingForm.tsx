@@ -1,5 +1,7 @@
 'use client';
 
+import { useState } from 'react';
+import Script from 'next/script';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQueryClient } from '@tanstack/react-query';
@@ -14,6 +16,11 @@ import {
   mapSettingSchema,
   type MapSettingFormValues,
 } from '../model/mapSettingSchema';
+// Window.daum 전역 타입 augmentation (슬라이스 로컬)
+import '../model/daum';
+
+const DAUM_POSTCODE_SRC =
+  'https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js';
 
 interface Props {
   initialData: MapSetting;
@@ -22,11 +29,15 @@ interface Props {
 export function MapSettingForm({ initialData }: Props) {
   const queryClient = useQueryClient();
 
+  // Daum 우편번호 스크립트 로드 완료 여부
+  const [isPostcodeReady, setIsPostcodeReady] = useState(false);
+
   const {
     register,
     handleSubmit,
     reset,
     watch,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<MapSettingFormValues>({
     resolver: zodResolver(mapSettingSchema),
@@ -34,6 +45,26 @@ export function MapSettingForm({ initialData }: Props) {
       address: initialData.address,
     },
   });
+
+  // 주소 검색 팝업 실행: 스크립트 로드 + window.daum 존재 가드
+  const handleSearchAddress = () => {
+    if (!window.daum?.Postcode) {
+      toast.error('주소 검색 모듈을 불러오는 중입니다. 잠시 후 다시 시도해 주세요.');
+      return;
+    }
+
+    new window.daum.Postcode({
+      oncomplete: (data) => {
+        // 도로명 주소 우선, 없으면 지번 주소 사용
+        const selected = data.roadAddress || data.jibunAddress;
+        // RHF setValue로 채워야 watch('address') 미리보기가 자동 갱신됨
+        setValue('address', selected, {
+          shouldValidate: true,
+          shouldDirty: true,
+        });
+      },
+    }).open();
+  };
 
   // 입력 중 주소를 실시간 구독해 미리보기 지도를 갱신
   const watchedAddress = watch('address');
@@ -69,17 +100,35 @@ export function MapSettingForm({ initialData }: Props) {
       onSubmit={handleSubmit(onSubmit)}
       className="flex flex-col gap-6 max-w-3xl"
     >
+      {/* Daum 우편번호 스크립트: 클라이언트에서 지연 로드, 완료 시 상태 갱신 */}
+      <Script
+        src={DAUM_POSTCODE_SRC}
+        strategy="lazyOnload"
+        onLoad={() => setIsPostcodeReady(true)}
+      />
+
       {/* 회사 주소 */}
       <div className="flex flex-col gap-1">
         <label className="text-body-dark text-sm font-body font-medium">
           회사 주소 <span className="text-error">*</span>
         </label>
-        <input
-          type="text"
-          {...register('address')}
-          className="border border-border-light rounded-md px-3 py-2 text-body-dark text-sm font-body focus:outline-none focus:ring-1 focus:ring-aircok-blue"
-          placeholder="지도에 표시할 회사 주소"
-        />
+        <div className="flex gap-2">
+          <input
+            type="text"
+            readOnly
+            {...register('address')}
+            className="flex-1 border border-border-light bg-surface-light rounded-md px-3 py-2 text-body-dark text-sm font-body cursor-default focus:outline-none"
+            placeholder="주소 검색 버튼으로 입력하세요"
+          />
+          <button
+            type="button"
+            onClick={handleSearchAddress}
+            disabled={!isPostcodeReady}
+            className="shrink-0 px-4 py-2 bg-aircok-blue text-heading-light text-sm font-body rounded-md hover:bg-aircok-blue-dark transition-colors disabled:opacity-50"
+          >
+            {isPostcodeReady ? '주소 검색' : '로딩 중...'}
+          </button>
+        </div>
         {errors.address && (
           <p className="text-error text-xs">{errors.address.message}</p>
         )}
