@@ -1,6 +1,11 @@
 import axios from 'axios';
 import { queryOptions } from '@tanstack/react-query';
-import { axiosInstance } from '@/shared/api';
+import {
+  axiosInstance,
+  ApiError,
+  authAwareRetry,
+  parseAxiosMessages,
+} from '@/shared/api';
 import type {
   CreateInquiryBody,
   InquiryListResponse,
@@ -21,49 +26,10 @@ export const adminInquiryKeys = {
 
 /**
  * 문의 API 호출 실패를 나타내는 에러.
- * `status`로 인증 실패(401/403)와 일반 실패를 구분한다.
+ * 공통 판별(`isAuthError`/`isValidationError`/`isRateLimited` 등)은
+ * 베이스 {@link ApiError}에서 제공한다.
  */
-export class InquiryApiError extends Error {
-  readonly status: number;
-  /** 검증 실패(400) 시 백엔드가 내려준 메시지 배열 */
-  readonly messages?: string[];
-
-  constructor(status: number, message: string, messages?: string[]) {
-    super(message);
-    this.name = 'InquiryApiError';
-    this.status = status;
-    this.messages = messages;
-  }
-
-  /** 인증/인가 실패 여부 (로그인 필요) */
-  get isAuthError(): boolean {
-    return this.status === 401 || this.status === 403;
-  }
-
-  /** 검증 실패 여부 */
-  get isValidationError(): boolean {
-    return this.status === 400;
-  }
-
-  /** 요청 과다(Throttler) 여부 */
-  get isRateLimited(): boolean {
-    return this.status === 429;
-  }
-}
-
-/**
- * axios 에러 응답 본문에서 백엔드 검증 메시지를 안전하게 추출한다.
- * NestJS ValidationPipe는 message를 string 또는 string[]로 내려주므로
- * 둘 다 string[]로 정규화한다.
- */
-function parseAxiosMessages(data: unknown): string[] | undefined {
-  if (data && typeof data === 'object' && 'message' in data) {
-    const rawMessages = (data as { message: unknown }).message;
-    if (Array.isArray(rawMessages)) return rawMessages as string[];
-    if (typeof rawMessages === 'string') return [rawMessages];
-  }
-  return undefined;
-}
+export class InquiryApiError extends ApiError {}
 
 /**
  * 공개 문의 제출. 인증 불필요.
@@ -131,10 +97,7 @@ export function adminInquiryQueryOptions(page: number = 1, limit: number = 10) {
     queryKey: adminInquiryKeys.list(page, limit),
     queryFn: () => getAdminInquiryList(page, limit),
     staleTime: 0,
-    retry: (failureCount, error) => {
-      if (error instanceof InquiryApiError && error.isAuthError) return false;
-      return failureCount < 1;
-    },
+    retry: authAwareRetry,
   });
 }
 

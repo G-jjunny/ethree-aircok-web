@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { queryOptions } from '@tanstack/react-query';
-import { axiosInstance } from '@/shared/api';
+import { axiosInstance, ApiError, authAwareRetry } from '@/shared/api';
 import type { NewsListResponse, NewsPost } from '../model/types';
 
 /**
@@ -16,22 +16,9 @@ export const adminNewsKeys = {
 
 /**
  * 어드민 뉴스 API 호출 실패를 나타내는 에러.
- * `status`로 인증 실패(401/403)와 일반 실패를 구분한다.
+ * 공통 판별(`isAuthError` 등)은 베이스 {@link ApiError}에서 제공한다.
  */
-export class AdminNewsApiError extends Error {
-  readonly status: number;
-
-  constructor(status: number, message: string) {
-    super(message);
-    this.name = 'AdminNewsApiError';
-    this.status = status;
-  }
-
-  /** 인증/인가 실패 여부 (로그인 필요) */
-  get isAuthError(): boolean {
-    return this.status === 401 || this.status === 403;
-  }
-}
+export class AdminNewsApiError extends ApiError {}
 
 export async function getNewsList(
   page: number = 1,
@@ -92,10 +79,7 @@ export function adminNewsQueryOptions(page: number = 1, limit: number = 100) {
     queryKey: adminNewsKeys.list(page, limit),
     queryFn: () => getAdminNewsList(page, limit),
     staleTime: 0,
-    retry: (failureCount, error) => {
-      if (error instanceof AdminNewsApiError && error.isAuthError) return false;
-      return failureCount < 1;
-    },
+    retry: authAwareRetry,
   });
 }
 

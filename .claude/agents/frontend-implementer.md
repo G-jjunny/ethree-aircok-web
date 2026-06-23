@@ -44,6 +44,25 @@ const { data } = useQuery(productDetailOptions(id))
 const update = useUpdateProductMutation(id)
 ```
 
+### 에러 처리: 메커니즘은 shared, 도메인 지식은 slice
+
+API 에러의 **공통 메커니즘**은 `src/shared/api`(`apiError.ts`)에 단 한 번 정의돼 있다. 새 도메인 API를 만들 때 `status` 필드·`isAuthError`·`parseAxiosMessages`·retry 로직을 **다시 작성하지 말고 import**한다.
+
+- 도메인 에러 클래스는 베이스 `ApiError`를 **상속만** 한다. 공통 판별 getter(`isAuthError`/`isValidationError`/`isConflict`/`isRateLimited`/`isNotFound`)는 베이스가 제공하므로, 도메인 특화 분기가 없으면 빈 클래스로 둔다.
+- queryOptions의 `retry`에는 `authAwareRetry`를 그대로 전달한다.
+- 검증 메시지 추출은 `parseAxiosMessages(err.response?.data)`를 쓴다.
+- 슬라이스에는 **도메인 한글 메시지와 `instanceof` 분기**만 남긴다. 쿼리키·queryOptions·도메인 메시지를 shared로 끌어올리는 것은 의존성 역전이므로 **금지**.
+
+```ts
+// ✅ entities/inquiry/api/inquiryApi.ts
+import { axiosInstance, ApiError, authAwareRetry, parseAxiosMessages } from '@/shared/api'
+export class InquiryApiError extends ApiError {}              // 상속만
+export function adminInquiryQueryOptions() {
+  return queryOptions({ /* ... */ retry: authAwareRetry })    // 공용 정책 재사용
+}
+
+// ❌ 금지: 슬라이스마다 status/isAuthError/parseAxiosMessages/retry 복붙 재정의
+```
 
 @.claude/skills/applying-fsd-architecture/SKILL.md
 

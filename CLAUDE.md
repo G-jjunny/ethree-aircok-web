@@ -162,6 +162,31 @@ const { data } = useQuery(newsListQueryOptions())
 const deleteMutation = useDeleteNewsMutation()
 ```
 
+### 에러 처리 / 공통 메커니즘 (메커니즘은 shared, 도메인 지식은 slice)
+
+API 에러의 **공통 메커니즘**은 `src/shared/api/apiError.ts`에서 단일 관리하고, 도메인별 **메시지·분기**만 각 슬라이스에 둔다. 쿼리키·queryOptions·도메인 메시지를 shared로 모으면 `shared`가 상위 도메인을 알게 되어 **의존성 방향이 역전되므로 금지**한다.
+
+| 항목 | 위치 | 이유 |
+|------|------|------|
+| axios 인스턴스 | `shared/api` | 도메인 무관 단일 진입점 |
+| 베이스 `ApiError`, `parseAxiosMessages`, `authAwareRetry` | `shared/api` | HTTP 상태 기반 공통 판별/재시도 — 도메인 무관 |
+| 도메인 에러 클래스 (`InquiryApiError` 등), 쿼리키, queryOptions, 한글 메시지 | `entities/*/api` | 도메인 정체성. `instanceof`로 슬라이스 분기 |
+
+- 도메인 에러는 베이스 `ApiError`를 **상속**만 한다 (`isAuthError`/`isValidationError`/`isConflict`/`isRateLimited`/`isNotFound`는 베이스 제공):
+
+```ts
+// ✅ entities/inquiry/api — 상속만, 도메인 특화가 없으면 빈 클래스
+import { ApiError, authAwareRetry, parseAxiosMessages } from '@/shared/api'
+export class InquiryApiError extends ApiError {}
+
+// queryOptions의 retry는 공용 정책 재사용
+export function adminInquiryQueryOptions() {
+  return queryOptions({ /* ... */ retry: authAwareRetry })
+}
+```
+
+- ❌ 각 슬라이스에서 `status`/`isAuthError`/`parseAxiosMessages`/retry 로직을 복붙 재정의 금지 — 베이스에서 import.
+
 ## 상수 관리 규칙 (하드코딩 금지)
 
 회사명·전화번호·주소·슬로건·SNS 링크 등 반복 사용되는 사이트 메타 정보는 **반드시** `src/shared/config/site.ts`에서 import해 사용한다.
