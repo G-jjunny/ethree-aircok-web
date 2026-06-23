@@ -80,13 +80,15 @@ export class MailService {
     const subjectTemplate = setting?.subjectTemplate || DEFAULT_SUBJECT_TEMPLATE;
     const bodyTemplate = setting?.bodyTemplate || DEFAULT_BODY_TEMPLATE;
 
-    const valueMap: Record<string, string> = {
-      company: inquiry.company,
-      name: inquiry.name,
-      phone: inquiry.phone,
-      email: inquiry.email,
-      message: inquiry.message,
-    };
+    // answers(Record<string, string>)의 모든 key 가 템플릿 치환 변수가 된다.
+    // Prisma 의 Json 타입은 JsonValue 이므로 객체로 가드 후 값을 문자열로 정규화한다.
+    // 기본 5필드 key(company/name/phone/email/message)가 answers 에 있으면
+    // 기존 템플릿({{company}} 등)이 그대로 동작한다.
+    const answers = (inquiry.answers ?? {}) as Record<string, unknown>;
+    const valueMap: Record<string, string> = {};
+    for (const [key, value] of Object.entries(answers)) {
+      valueMap[key] = value == null ? '' : String(value);
+    }
 
     // subject/text 는 치환값 그대로, html 은 치환되는 동적 값만 escape.
     const subject = renderTemplate(subjectTemplate, valueMap, false);

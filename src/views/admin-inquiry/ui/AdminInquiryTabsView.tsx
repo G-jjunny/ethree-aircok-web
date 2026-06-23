@@ -3,6 +3,7 @@
 import { useCallback, useRef } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { AdminInquiryListView } from '@/widgets/admin-inquiry-list';
+import { AdminInquiryFormBuilderView } from '@/widgets/admin-inquiry-form-builder';
 import { AdminMailSettingView } from '@/widgets/admin-mail-setting';
 import { AdminMapSettingView } from '@/widgets/admin-map-setting';
 import { SITE } from '@/shared/config/site';
@@ -105,6 +106,16 @@ export function AdminInquiryTabsView() {
         className="pt-6"
       >
         {activeTab === 'list' && <AdminInquiryListView />}
+      </div>
+
+      <div
+        role="tabpanel"
+        id="panel-form"
+        aria-labelledby="tab-form"
+        hidden={activeTab !== 'form'}
+        className="pt-6"
+      >
+        {activeTab === 'form' && <AdminInquiryFormBuilderView />}
       </div>
 
       <div

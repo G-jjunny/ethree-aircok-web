@@ -568,6 +568,7 @@ export const SITE = {
     ],
     inquiryTabs: [
       { key: 'list', label: '문의 내역' },
+      { key: 'form', label: '폼 설정' },
       { key: 'mail', label: '이메일 설정' },
       { key: 'map', label: '지도 설정' },
     ],

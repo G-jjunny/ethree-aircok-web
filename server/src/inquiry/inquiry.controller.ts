@@ -20,6 +20,8 @@ import { CreateInquiryDto } from './dto/create-inquiry.dto';
 import { UpdateInquiryDto } from './dto/update-inquiry.dto';
 import { UpdateMailSettingDto } from './dto/update-mail-setting.dto';
 import { UpdateMapSettingDto } from './dto/update-map-setting.dto';
+import { CreateInquiryFieldDto } from './dto/create-inquiry-field.dto';
+import { UpdateInquiryFieldDto } from './dto/update-inquiry-field.dto';
 
 @Controller('inquiry')
 export class InquiryController {
@@ -59,6 +61,35 @@ export class InquiryController {
   @Put('map-setting')
   updateMapSetting(@Body() dto: UpdateMapSettingDto) {
     return this.inquiryService.updateMapSetting(dto);
+  }
+
+  // 정적 경로 'fields' 세그먼트 라우트들도 'mail-setting'/'map-setting' 과 동일하게
+  // ':id' path-param 라우트보다 위에 두어 라우트 매칭 충돌(모호성)을 회피한다.
+  //
+  // 주의: GET 'fields' 는 공개 폼이 필드 구성을 렌더링하기 위한 공개 엔드포인트
+  // (인증 불필요)이다. 생성/수정/삭제만 어드민 전용으로 가드한다.
+  @Get('fields')
+  findAllFields() {
+    return this.inquiryService.findAllFields();
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('fields')
+  createField(@Body() dto: CreateInquiryFieldDto) {
+    return this.inquiryService.createField(dto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch('fields/:id')
+  updateField(@Param('id') id: string, @Body() dto: UpdateInquiryFieldDto) {
+    return this.inquiryService.updateField(id, dto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete('fields/:id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  removeField(@Param('id') id: string) {
+    return this.inquiryService.removeField(id);
   }
 
   @UseGuards(JwtAuthGuard)
