@@ -52,9 +52,28 @@ export class InquiryApiError extends Error {
 }
 
 /**
+ * 응답 본문에서 백엔드 검증 메시지를 안전하게 추출한다.
+ * NestJS ValidationPipe는 message를 string 또는 string[]로 내려주므로
+ * 둘 다 string[]로 정규화한다.
+ */
+async function parseMessages(res: Response): Promise<string[] | undefined> {
+  try {
+    const data: unknown = await res.json();
+    if (data && typeof data === 'object' && 'message' in data) {
+      const message = (data as { message: unknown }).message;
+      if (Array.isArray(message)) return message as string[];
+      if (typeof message === 'string') return [message];
+    }
+  } catch {
+    // 본문 파싱 실패는 무시 — 상태코드 기반으로 처리
+  }
+  return undefined;
+}
+
+/**
  * 공개 문의 제출. 인증 불필요.
- * 정확히 { company, name, phone, email, message } 5개 키만 전송한다
- * (백엔드 ValidationPipe whitelist + forbidNonWhitelisted).
+ * 정확히 { answers } 1개 키만 전송한다
+ * (백엔드 ValidationPipe whitelist + forbidNonWhitelisted — answers 내부 값은 모두 문자열).
  * 성공 시 생성 객체 전체(201)를 반환하나 프론트는 무시 가능하다.
  */
 export async function createInquiry(body: CreateInquiryBody): Promise<void> {
@@ -64,33 +83,14 @@ export async function createInquiry(body: CreateInquiryBody): Promise<void> {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
-      body: JSON.stringify({
-        company: body.company,
-        name: body.name,
-        phone: body.phone,
-        email: body.email,
-        message: body.message,
-      }),
+      body: JSON.stringify({ answers: body.answers }),
     });
   } catch {
     throw new InquiryApiError(0, '네트워크 오류로 문의를 전송하지 못했습니다.');
   }
 
   if (!res.ok) {
-    let messages: string[] | undefined;
-    try {
-      const data: unknown = await res.json();
-      if (
-        data &&
-        typeof data === 'object' &&
-        'message' in data &&
-        Array.isArray((data as { message: unknown }).message)
-      ) {
-        messages = (data as { message: string[] }).message;
-      }
-    } catch {
-      // 본문 파싱 실패는 무시 — 상태코드 기반으로 처리
-    }
+    const messages = await parseMessages(res);
 
     const message =
       res.status === 429

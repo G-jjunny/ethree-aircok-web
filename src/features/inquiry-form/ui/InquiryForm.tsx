@@ -1,33 +1,127 @@
 'use client'
 
-import { useForm } from 'react-hook-form'
+import { useMemo } from 'react'
+import {
+  useForm,
+  type Resolver,
+  type UseFormRegisterReturn,
+} from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useQuery } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { createInquiry, InquiryApiError } from '@/entities/inquiry'
-import { inquirySchema, type InquiryFormValues } from '../model/inquirySchema'
+import {
+  inquiryFieldsQueryOptions,
+  type InquiryField,
+} from '@/entities/inquiry-field'
+import { buildInquirySchema, type InquiryFormValues } from '../model/inquirySchema'
 
-/** 입력값에서 숫자와 하이픈만 허용 — 대표번호/유선/휴대폰 모두 입력 가능 */
+/** tel 입력 sanitize: 계약 허용 문자(숫자/공백/+ - ( ))만 남긴다 */
 function sanitizePhone(value: string): string {
-  return value.replace(/[^\d-]/g, '').slice(0, 20)
+  return value.replace(/[^0-9+\-() ]/g, '').slice(0, 30)
+}
+
+/**
+ * 동적 텍스트/이메일/전화 입력.
+ * tel은 입력 즉시 허용 문자로 sanitize하되 RHF onChange를 그대로 체이닝한다.
+ */
+function TextInput({
+  id,
+  type,
+  placeholder,
+  register,
+  invalid,
+  errorId,
+}: {
+  id: string
+  type: 'text' | 'email' | 'tel'
+  placeholder?: string
+  register: UseFormRegisterReturn
+  invalid: boolean
+  errorId?: string
+}) {
+  return (
+    <input
+      id={id}
+      type={type}
+      placeholder={placeholder}
+      {...register}
+      onChange={(e) => {
+        if (type === 'tel') e.target.value = sanitizePhone(e.target.value)
+        register.onChange(e)
+      }}
+      aria-invalid={invalid}
+      aria-describedby={errorId}
+      className="w-full bg-surface-light rounded-md px-4 py-3 text-[17px] text-heading-dark placeholder:text-secondary-dark focus:outline-none focus:ring-2 focus:ring-aircok-blue border-none"
+    />
+  )
 }
 
 export function InquiryForm() {
+  const { data: fields, isPending, isError } = useQuery(
+    inquiryFieldsQueryOptions(),
+  )
+
+  if (isPending) {
+    return (
+      <div className="flex items-center justify-center py-16">
+        <p className="text-secondary-dark font-body text-[15px] leading-[1.43] [word-break:keep-all]">
+          불러오는 중...
+        </p>
+      </div>
+    )
+  }
+
+  if (isError) {
+    return (
+      <div className="flex items-center justify-center py-16">
+        <p className="text-error font-body text-[15px] leading-[1.43] [word-break:keep-all]">
+          문의 폼을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.
+        </p>
+      </div>
+    )
+  }
+
+  if (fields.length === 0) {
+    return (
+      <div className="flex items-center justify-center py-16">
+        <p className="text-body-dark font-body text-[15px] leading-[1.43] [word-break:keep-all]">
+          현재 문의 폼을 사용할 수 없습니다.
+        </p>
+      </div>
+    )
+  }
+
+  return <InquiryFormFields fields={fields} />
+}
+
+function InquiryFormFields({ fields }: { fields: InquiryField[] }) {
+  const schema = useMemo(() => buildInquirySchema(fields), [fields])
+
+  const defaultValues = useMemo<InquiryFormValues>(() => {
+    const values: InquiryFormValues = {}
+    for (const field of fields) values[field.key] = ''
+    return values
+  }, [fields])
+
   const {
     register,
     handleSubmit,
     reset,
     formState: { errors, isSubmitting },
   } = useForm<InquiryFormValues>({
-    resolver: zodResolver(inquirySchema),
+    // 동적 z.object 추론 타입은 Record<string, unknown>이므로 폼 값 타입으로 맞춘다.
+    resolver: zodResolver(schema) as unknown as Resolver<InquiryFormValues>,
+    defaultValues,
   })
-
-  const phoneRegister = register('phone')
 
   const onSubmit = async (data: InquiryFormValues) => {
     try {
-      await createInquiry(data)
-      toast.success('메시지를 보내주셔서 감사합니다. 24시간 이내에 답변드리겠습니다.')
-      reset()
+      await createInquiry({ answers: data })
+      toast.success(
+        '메시지를 보내주셔서 감사합니다. 24시간 이내에 답변드리겠습니다.',
+      )
+      reset(defaultValues)
     } catch (error) {
       if (error instanceof InquiryApiError && error.isRateLimited) {
         toast.error('요청이 많아 잠시 후 다시 시도해 주세요.')
@@ -46,131 +140,64 @@ export function InquiryForm() {
       aria-label="문의하기 폼"
       className="flex flex-col gap-6"
     >
-      {/* 회사/기관명 필드 */}
-      <div className="flex flex-col gap-1">
-        {/* text-[15px]: 폼 라벨 전용 크기, Link/Caption(14px)보다 크고 Body(17px)보다 작은 1회성 수치 */}
-        <label htmlFor="inquiry-company" className="text-[15px] font-medium text-heading-dark">
-          회사/기관명 <span className="text-error" aria-hidden="true">*</span>
-        </label>
-        <input
-          id="inquiry-company"
-          type="text"
-          autoComplete="organization"
-          placeholder="(주)에어콕"
-          {...register('company')}
-          aria-invalid={!!errors.company}
-          aria-describedby={errors.company ? 'inquiry-company-error' : undefined}
-          className="w-full bg-surface-light rounded-md px-4 py-3 text-[17px] text-heading-dark placeholder:text-secondary-dark focus:outline-none focus:ring-2 focus:ring-aircok-blue border-none"
-        />
-        {/* h-5(20px): 에러 텍스트 예약 공간 — spacing 토큰 없음(16px/24px 사이 1회성 레이아웃 수치) */}
-        {/* text-[13px]: 폼 에러 전용 크기 — Micro(12px)보다 크고 Caption(14px)보다 작은 1회성 수치 */}
-        <div className="h-5 mt-1">
-          {errors.company && (
-            <p id="inquiry-company-error" role="alert" className="text-[13px] text-error leading-none">
-              {errors.company.message}
-            </p>
-          )}
-        </div>
-      </div>
+      {fields.map((field) => {
+        const fieldId = `inquiry-${field.key}`
+        const errorId = `${fieldId}-error`
+        const fieldError = errors[field.key]
+        const placeholder = field.placeholder ?? undefined
 
-      {/* 담당자명 필드 */}
-      <div className="flex flex-col gap-1">
-        <label htmlFor="inquiry-name" className="text-[15px] font-medium text-heading-dark">
-          담당자명 <span className="text-error" aria-hidden="true">*</span>
-        </label>
-        <input
-          id="inquiry-name"
-          type="text"
-          autoComplete="name"
-          placeholder="홍길동"
-          {...register('name')}
-          aria-invalid={!!errors.name}
-          aria-describedby={errors.name ? 'inquiry-name-error' : undefined}
-          className="w-full bg-surface-light rounded-md px-4 py-3 text-[17px] text-heading-dark placeholder:text-secondary-dark focus:outline-none focus:ring-2 focus:ring-aircok-blue border-none"
-        />
-        <div className="h-5 mt-1">
-          {errors.name && (
-            <p id="inquiry-name-error" role="alert" className="text-[13px] text-error leading-none">
-              {errors.name.message}
-            </p>
-          )}
-        </div>
-      </div>
+        return (
+          <div key={field.id} className="flex flex-col gap-1">
+            {/* text-[15px]: 폼 라벨 전용 크기, Link/Caption(14px)보다 크고 Body(17px)보다 작은 1회성 수치 */}
+            <label
+              htmlFor={fieldId}
+              className="text-[15px] font-medium text-heading-dark"
+            >
+              {field.label}{' '}
+              {field.required && (
+                <span className="text-error" aria-hidden="true">
+                  *
+                </span>
+              )}
+            </label>
 
-      {/* 전화번호 필드 */}
-      <div className="flex flex-col gap-1">
-        <label htmlFor="inquiry-phone" className="text-[15px] font-medium text-heading-dark">
-          전화번호 <span className="text-error" aria-hidden="true">*</span>
-        </label>
-        <input
-          id="inquiry-phone"
-          type="tel"
-          autoComplete="tel"
-          placeholder="02-6952-1947"
-          {...phoneRegister}
-          onChange={(e) => {
-            e.target.value = sanitizePhone(e.target.value)
-            phoneRegister.onChange(e)
-          }}
-          aria-invalid={!!errors.phone}
-          aria-describedby={errors.phone ? 'inquiry-phone-error' : undefined}
-          className="w-full bg-surface-light rounded-md px-4 py-3 text-[17px] text-heading-dark placeholder:text-secondary-dark focus:outline-none focus:ring-2 focus:ring-aircok-blue border-none"
-        />
-        <div className="h-5 mt-1">
-          {errors.phone && (
-            <p id="inquiry-phone-error" role="alert" className="text-[13px] text-error leading-none">
-              {errors.phone.message}
-            </p>
-          )}
-        </div>
-      </div>
+            {field.type === 'textarea' ? (
+              <textarea
+                id={fieldId}
+                rows={6}
+                placeholder={placeholder}
+                {...register(field.key)}
+                aria-invalid={!!fieldError}
+                aria-describedby={fieldError ? errorId : undefined}
+                className="w-full bg-surface-light rounded-md px-4 py-3 text-[17px] text-heading-dark placeholder:text-secondary-dark focus:outline-none focus:ring-2 focus:ring-aircok-blue border-none resize-y"
+              />
+            ) : (
+              <TextInput
+                id={fieldId}
+                type={field.type}
+                placeholder={placeholder}
+                register={register(field.key)}
+                invalid={!!fieldError}
+                errorId={fieldError ? errorId : undefined}
+              />
+            )}
 
-      {/* 이메일 필드 */}
-      <div className="flex flex-col gap-1">
-        <label htmlFor="inquiry-email" className="text-[15px] font-medium text-heading-dark">
-          이메일 <span className="text-error" aria-hidden="true">*</span>
-        </label>
-        <input
-          id="inquiry-email"
-          type="email"
-          autoComplete="email"
-          placeholder="example@company.com"
-          {...register('email')}
-          aria-invalid={!!errors.email}
-          aria-describedby={errors.email ? 'inquiry-email-error' : undefined}
-          className="w-full bg-surface-light rounded-md px-4 py-3 text-[17px] text-heading-dark placeholder:text-secondary-dark focus:outline-none focus:ring-2 focus:ring-aircok-blue border-none"
-        />
-        <div className="h-5 mt-1">
-          {errors.email && (
-            <p id="inquiry-email-error" role="alert" className="text-[13px] text-error leading-none">
-              {errors.email.message}
-            </p>
-          )}
-        </div>
-      </div>
-
-      {/* 요청사항 필드 */}
-      <div className="flex flex-col gap-1">
-        <label htmlFor="inquiry-message" className="text-[15px] font-medium text-heading-dark">
-          요청사항 <span className="text-error" aria-hidden="true">*</span>
-        </label>
-        <textarea
-          id="inquiry-message"
-          rows={6}
-          placeholder="문의하실 내용을 10자 이상 입력해 주세요."
-          {...register('message')}
-          aria-invalid={!!errors.message}
-          aria-describedby={errors.message ? 'inquiry-message-error' : undefined}
-          className="w-full bg-surface-light rounded-md px-4 py-3 text-[17px] text-heading-dark placeholder:text-secondary-dark focus:outline-none focus:ring-2 focus:ring-aircok-blue border-none resize-y"
-        />
-        <div className="h-5 mt-1">
-          {errors.message && (
-            <p id="inquiry-message-error" role="alert" className="text-[13px] text-error leading-none">
-              {errors.message.message}
-            </p>
-          )}
-        </div>
-      </div>
+            {/* h-5(20px): 에러 텍스트 예약 공간 — spacing 토큰 없음(16px/24px 사이 1회성 레이아웃 수치) */}
+            {/* text-[13px]: 폼 에러 전용 크기 — Micro(12px)보다 크고 Caption(14px)보다 작은 1회성 수치 */}
+            <div className="h-5 mt-1">
+              {fieldError && (
+                <p
+                  id={errorId}
+                  role="alert"
+                  className="text-[13px] text-error leading-none"
+                >
+                  {fieldError.message as string}
+                </p>
+              )}
+            </div>
+          </div>
+        )
+      })}
 
       {/* 제출 버튼 */}
       <button

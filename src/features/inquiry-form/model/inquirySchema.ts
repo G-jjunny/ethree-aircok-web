@@ -1,35 +1,46 @@
 import { z } from 'zod'
+import type { InquiryField } from '@/entities/inquiry-field'
+
+/** tel 허용 문자: 숫자/공백/+ - ( ) — 백엔드 계약과 동일 */
+const TEL_PATTERN = /^[0-9+\-() ]+$/
 
 /**
- * 문의 폼 검증 스키마.
- * 백엔드 DTO와 길이 제약을 1:1로 맞추되,
- * company는 화면상 필수 표기 요구에 따라 프론트에서 min(1)로 필수 검증한다.
- * (백엔드 DTO상 company는 optional이므로 더 엄격한 프론트 검증은 안전하다.)
- * phone은 길이 검증만 — 대표번호/유선번호 입력이 가능해야 하므로
- * 한국 휴대폰 정규식을 강제하지 않는다.
+ * 동적 문의 폼 검증 스키마 빌더.
+ * 필드 정의(key 기반)로부터 z.object를 생성한다.
+ * - required면 빈 값을 거부, 아니면 빈 문자열 허용.
+ * - type email은 값이 있을 때 이메일 형식 검증.
+ * - type tel은 값이 있을 때 허용 문자 검증.
+ * 폼 values는 Record<string, string>(key 기반).
  */
-export const inquirySchema = z.object({
-  company: z
-    .string()
-    .min(1, '회사/기관명을 입력해주세요.')
-    .max(100, '회사/기관명은 100자 이내로 입력해주세요.'),
-  name: z
-    .string()
-    .min(1, '담당자명을 입력해주세요.')
-    .max(50, '담당자명은 50자 이내로 입력해주세요.'),
-  phone: z
-    .string()
-    .min(9, '전화번호를 올바르게 입력해주세요.')
-    .max(20, '전화번호는 20자 이내로 입력해주세요.'),
-  email: z
-    .string()
-    .min(1, '이메일을 입력해주세요.')
-    .email('이메일 형식이 올바르지 않습니다.')
-    .max(254, '이메일은 254자 이내로 입력해주세요.'),
-  message: z
-    .string()
-    .min(10, '요청사항을 10자 이상 입력해주세요.')
-    .max(2000, '요청사항은 2000자 이내로 입력해주세요.'),
-})
+export function buildInquirySchema(fields: InquiryField[]) {
+  const shape: Record<string, z.ZodTypeAny> = {}
 
-export type InquiryFormValues = z.infer<typeof inquirySchema>
+  for (const field of fields) {
+    const label = field.label
+    let schema = z.string()
+
+    if (field.type === 'email') {
+      // 값이 있을 때만 이메일 형식 검증 (빈 값은 required 규칙이 처리)
+      schema = schema.refine(
+        (v) => v === '' || z.string().email().safeParse(v).success,
+        { message: `${label} 형식이 올바르지 않습니다.` },
+      )
+    } else if (field.type === 'tel') {
+      schema = schema.refine((v) => v === '' || TEL_PATTERN.test(v), {
+        message: `${label}을(를) 올바르게 입력해주세요.`,
+      })
+    }
+
+    if (field.required) {
+      schema = schema.refine((v) => v.trim().length > 0, {
+        message: `${label}을(를) 입력해주세요.`,
+      })
+    }
+
+    shape[field.key] = schema
+  }
+
+  return z.object(shape)
+}
+
+export type InquiryFormValues = Record<string, string>

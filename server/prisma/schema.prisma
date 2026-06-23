@@ -27,16 +27,59 @@ model NewsPost {
   updatedAt   DateTime @updatedAt
 }
 
+/// 문의하기(Inquiry) 접수 레코드.
+///
+/// 동적 폼 빌더 도입 정책 (#33):
+/// - 폼 필드 구성은 InquiryField 모델로 관리되며, 실제 제출 답안은 answers(Json)에
+///   필드 key → 값(string) 매핑으로 저장된다. 예: { "company": "...", "name": "...", ... }
+/// - answers 는 NOT NULL DEFAULT '{}' 이며, 값은 항상 문자열로 정규화되어 저장된다
+///   (서비스가 동적 검증 후 String 으로 강제). 정의(InquiryField)에 없는 key 는 저장하지 않는다.
+///
+/// 기존 고정 컬럼(company/name/phone/email/message) 호환 정책:
+/// - 동적 폼 도입 전 데이터 보존을 위해 고정 컬럼은 nullable 로 유지한다(삭제하지 않음).
+/// - 신규 접수는 고정 컬럼을 채우지 않고 answers 에만 저장한다(서비스 구현 기준).
+///   읽기 측(어드민 목록/메일)은 answers 를 단일 소스로 사용한다.
+/// - 마이그레이션 시점에 기존 행의 고정 컬럼 값을 answers JSONB 로 백필했다.
+/// - 고정 컬럼은 차후 별도 마이그레이션에서 제거될 수 있다(현재는 호환 목적 잔존).
 model Inquiry {
   id        String   @id @default(cuid())
-  company   String
-  name      String
-  phone     String
-  email     String
-  message   String   @db.Text
+  /// 동적 폼 답안. 필드 key → 문자열 값 매핑. NOT NULL, 기본 {}.
+  answers   Json     @default("{}")
+  company   String?
+  name      String?
+  phone     String?
+  email     String?
+  message   String?  @db.Text
   status    String   @default("NEW")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+/// 문의하기 동적 폼 필드 정의 (#33).
+///
+/// 어드민이 문의하기 폼의 필드 구성을 CRUD 로 관리한다. 공개 폼은
+/// GET /api/inquiry/fields 로 이 정의를 받아 동적으로 렌더링하고, 제출 시
+/// Inquiry.answers 에 key → 값 매핑으로 저장한다.
+///
+/// 컬럼 정책:
+/// - key: 폼 제출 answers 의 키이자 메일 템플릿 치환 변수(slug). 영소문자/숫자/언더스코어,
+///   첫 글자는 영소문자. 유니크. 생성 후 변경 불가(메일 템플릿/기존 answers 와의 정합성 보장).
+/// - type: 'text' | 'textarea' | 'email' | 'tel' (옵션형 미지원).
+/// - required: 필수 입력 여부. 서비스가 제출 시 동적 검증한다.
+/// - order: 폼 내 표시 순서(오름차순). 동률 시 createdAt 보조 정렬 권장.
+///
+/// 기본 5필드(company/name/phone/email/message)는 마이그레이션 INSERT 로 시드된다.
+/// 이들 key 는 메일 템플릿 치환 변수({{company}} 등)와 1:1 일치한다.
+model InquiryField {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  label       String
+  type        String
+  required    Boolean  @default(true)
+  placeholder String?
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 /// 문의 접수 알림 메일 설정 (싱글톤).
