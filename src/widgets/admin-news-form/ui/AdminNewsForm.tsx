@@ -7,14 +7,12 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useRef } from 'react';
 import { toast } from 'sonner';
-import { uploadNewsImage } from '@/features/news-editor';
+import { uploadNewsImage, useCreateNewsMutation, useUpdateNewsMutation } from '@/features/news-editor';
 
 const NewsEditor = dynamic(
   () => import('@/features/news-editor').then((m) => m.NewsEditor),
   { ssr: false },
 );
-
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
 
 const schema = z.object({
   title: z.string().min(1, '제목을 입력하세요'),
@@ -44,13 +42,15 @@ interface Props {
 
 export function AdminNewsForm({ initialData, onSuccess }: Props) {
   const coverImageInputRef = useRef<HTMLInputElement>(null);
+  const createMutation = useCreateNewsMutation();
+  const updateMutation = useUpdateNewsMutation();
 
   const {
     register,
     control,
     handleSubmit,
     setValue,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<FormValues>({
     resolver: zodResolver(schema) as import('react-hook-form').Resolver<FormValues>,
     defaultValues: {
@@ -67,11 +67,7 @@ export function AdminNewsForm({ initialData, onSuccess }: Props) {
   });
 
   const coverImageValue = useWatch({ control, name: 'coverImage' });
-  const coverImageSrc = coverImageValue
-    ? coverImageValue.startsWith('http')
-      ? coverImageValue
-      : `${API_BASE}${coverImageValue}`
-    : '';
+  const coverImageSrc = coverImageValue ?? '';
 
   const handleCoverImageChange = async (
     e: React.ChangeEvent<HTMLInputElement>,
@@ -90,48 +86,40 @@ export function AdminNewsForm({ initialData, onSuccess }: Props) {
 
   const onSubmit = async (values: FormValues) => {
     const payload: {
-      title: string;
-      description: string;
-      content: string;
-      date: string;
-      published: boolean;
-      location?: string;
-      coverImage?: string;
+      title: string
+      description: string
+      content: string
+      date: string
+      published: boolean
+      location?: string
+      coverImage?: string
     } = {
       title: values.title,
       description: values.description,
       content: values.content,
       date: values.date,
       published: values.published,
-    };
-    if (values.location) payload.location = values.location;
-    if (values.coverImage) payload.coverImage = values.coverImage;
+    }
+    if (values.location) payload.location = values.location
+    if (values.coverImage) payload.coverImage = values.coverImage
 
-    const url = initialData
-      ? `${API_BASE}/api/news/${initialData.id}`
-      : `${API_BASE}/api/news`;
-    const method = initialData ? 'PATCH' : 'POST';
-
-    const res = await fetch(url, {
-      method,
-      credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
-
-    if (!res.ok) {
+    try {
+      if (initialData) {
+        await updateMutation.mutateAsync({ id: initialData.id, ...payload })
+      } else {
+        await createMutation.mutateAsync(payload)
+      }
+      toast.success(
+        initialData ? '뉴스가 수정되었습니다' : '뉴스가 등록되었습니다',
+      )
+      onSuccess?.()
+    } catch {
       toast.error(
         initialData
           ? '뉴스 수정에 실패했습니다. 다시 시도해 주세요.'
           : '뉴스 등록에 실패했습니다. 다시 시도해 주세요.',
-      );
-      return;
+      )
     }
-
-    toast.success(
-      initialData ? '뉴스가 수정되었습니다' : '뉴스가 등록되었습니다',
-    );
-    onSuccess?.();
   };
 
   return (
@@ -265,10 +253,10 @@ export function AdminNewsForm({ initialData, onSuccess }: Props) {
       <div className="flex gap-3">
         <button
           type="submit"
-          disabled={isSubmitting}
+          disabled={createMutation.isPending || updateMutation.isPending}
           className="px-6 py-2 bg-aircok-blue text-heading-light text-sm font-body rounded-md hover:bg-aircok-blue-dark transition-colors disabled:opacity-50"
         >
-          {isSubmitting ? '저장 중...' : initialData ? '수정 저장' : '작성 완료'}
+          {createMutation.isPending || updateMutation.isPending ? '저장 중...' : initialData ? '수정 저장' : '작성 완료'}
         </button>
         <Link
           href="/console/news"

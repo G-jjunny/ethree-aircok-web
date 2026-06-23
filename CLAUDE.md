@@ -109,6 +109,59 @@ src/
 
 모든 디자인 결정은 오직 `docs/design.md` 토큰과 Aircok 디자인 시스템을 기준으로 한다. XML의 시각적 표현은 무시한다.
 
+## API 통신 규칙 (axios + TanStack Query)
+
+모든 서버 상태 통신은 **axios 인스턴스 + TanStack Query** 조합만 허용합니다. `fetch()` 직접 호출, `useEffect`+`useState` 데이터패칭 패턴은 금지입니다.
+
+### axios 인스턴스
+
+`src/shared/api/axiosInstance.ts` — 모든 API 호출의 단일 진입점.
+- baseURL `/api`, timeout 10s, withCredentials (쿠키 자동 전송)
+- 응답 401 → `/console/login` 자동 리다이렉트
+
+```ts
+// ❌ 금지
+const res = await fetch('/api/news', { credentials: 'include' })
+
+// ✅ 필수
+import { axiosInstance } from '@/shared/api'
+const { data } = await axiosInstance.get('/news')
+```
+
+### 레이어별 역할 분리
+
+| 레이어 | 위치 | 역할 |
+|--------|------|------|
+| **entities/\*/api/** | `queryOptions` + raw API 함수 | GET 데이터 정의. `useQuery`는 직접 사용하지 않음 |
+| **features/\*/api/** | `useMutation` hooks | POST/PATCH/DELETE mutation hooks. `useQuery`가 필요하면 entities의 queryOptions 재사용 |
+| **widgets/views** | `useQuery(options)` 호출 | 데이터 소비만. API 함수/fetch 직접 호출 금지 |
+
+```ts
+// entities/news/api/newsApi.ts — queryOptions 정의
+export const newsListQueryOptions = () =>
+  queryOptions({
+    queryKey: ['news'],
+    queryFn: async () => {
+      const { data } = await axiosInstance.get('/news')
+      return data
+    },
+    staleTime: 1000 * 60 * 5,
+  })
+
+// features/news-editor/api/useDeleteNewsMutation.ts — mutation hook
+export function useDeleteNewsMutation() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (id: number) => axiosInstance.delete(`/news/${id}`),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['news'] }),
+  })
+}
+
+// views/admin-news/ui/NewsList.tsx — 소비만
+const { data } = useQuery(newsListQueryOptions())
+const deleteMutation = useDeleteNewsMutation()
+```
+
 ## 상수 관리 규칙 (하드코딩 금지)
 
 회사명·전화번호·주소·슬로건·SNS 링크 등 반복 사용되는 사이트 메타 정보는 **반드시** `src/shared/config/site.ts`에서 import해 사용한다.

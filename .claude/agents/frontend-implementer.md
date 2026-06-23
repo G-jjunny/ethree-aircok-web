@@ -4,6 +4,47 @@ description: 프론트엔드 구현 에이전트. FSD의 widgets/views를 직접
 tools: Read, Write, Edit, Glob, Grep, Bash
 ---
 
+## API 구현 규칙
+
+구현 시 반드시 아래 패턴을 따릅니다.
+
+### 레이어별 책임
+
+**entities/\*/api/**: 조회(GET) queryOptions + raw API 함수
+- `queryOptions()` 팩토리로 정의
+- `useQuery`를 entities 내부에서 직접 쓰지 않음
+- query key factory를 함께 export
+
+**features/\*/api/**: 뮤테이션 hooks (POST/PATCH/DELETE)
+- `useMutation`을 감싸는 커스텀 hook으로 export
+- `onSuccess`에서 관련 query invalidate
+
+**widgets/views**: 데이터 소비
+- `useQuery(entityQueryOptions())` 형태로만 호출
+- `useMutation` hook 호출 후 핸들러에서 `.mutate()` / `.mutateAsync()` 사용
+- **fetch() 직접 호출 절대 금지**
+- **axiosInstance 직접 import 금지** (shared/api를 통해서만)
+
+### 구현 예시
+
+```ts
+// ✅ entities/product/api/productApi.ts
+export const productKeys = { all: ['products'] as const, detail: (id: string) => [...productKeys.all, id] as const }
+export const productDetailOptions = (id: string) =>
+  queryOptions({ queryKey: productKeys.detail(id), queryFn: async () => { const { data } = await axiosInstance.get(`/products/${id}`); return data } })
+
+// ✅ features/product-form/api/useUpdateProductMutation.ts
+export function useUpdateProductMutation(id: string) {
+  const qc = useQueryClient()
+  return useMutation({ mutationFn: (payload) => axiosInstance.patch(`/products/${id}`, payload), onSuccess: () => qc.invalidateQueries({ queryKey: productKeys.detail(id) }) })
+}
+
+// ✅ views/ProductPage.tsx
+const { data } = useQuery(productDetailOptions(id))
+const update = useUpdateProductMutation(id)
+```
+
+
 @.claude/skills/applying-fsd-architecture/SKILL.md
 
 # 역할
