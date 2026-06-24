@@ -109,6 +109,10 @@ Tailwind v4 프로젝트이므로 모든 토큰은 `@theme` 블록 안에 정의
   --color-border-subtle: rgba(0, 0, 0, 0.04);
   --color-border-dark:   rgba(255, 255, 255, 0.08);
 
+  /* ── Typography Scale (Tailwind 기본에 없는 값만) ──── */
+  --font-size-nav:        15px;  /* Nav 링크·Category Tab·FAQ 입력·관리자 UI 중간 텍스트 */
+  --font-size-subheading: 21px;  /* Sub-heading / Card Title — Feature Strip·Stat Card·모달 제목 */
+
   /* ── Aspect Ratios (매거진 레이아웃) ────── */
   --aspect-featured:  16 / 7;  /* News Featured Hero / Detail overlay hero 와이드 비율 */
   --aspect-row-thumb: 4 / 3;   /* News Horizontal Row 썸네일 비율 */
@@ -169,6 +173,11 @@ Tailwind v4 프로젝트이므로 모든 토큰은 `@theme` 블록 안에 정의
 | 라이트 구분선 | `border-border-light` | `--color-border-light` |
 | 미세 구분선 | `border-border-subtle` | `--color-border-subtle` |
 | 다크 구분선 | `border-border-dark` | `--color-border-dark` |
+| **타이포그래피** | | |
+| Nav·UI 중간 텍스트 (15px) | `text-nav` | `--font-size-nav` |
+| Sub-heading · Card Title (21px) | `text-subheading` | `--font-size-subheading` |
+| Caption · Link (14px) | `text-sm` | Tailwind 기본 |
+| Micro (12px) | `text-xs` | Tailwind 기본 |
 | **폰트** | | |
 | 디스플레이 헤딩 | `font-display` | `--font-display` |
 | 본문 | `font-body` | `--font-body` |
@@ -259,15 +268,16 @@ Apple 스타일의 '제품 우선 프레젠테이션'을 Aircok 브랜드에 적
 | Section Heading | 40px (2.50rem) | 600 | 1.10 | -0.3px | 섹션 타이틀 |
 | Tile Heading | 28px (1.75rem) | 500 | 1.14 | -0.1px | 제품 타일 헤드라인 |
 | Article Sub-heading | 22px (1.375rem) | 600 | 1.14 | 0px | 아티클 본문 내 H3 |
-| Card Title | 21px (1.31rem) | 700 | 1.19 | 0px | 카드 강조 헤딩 |
+| Card Title | 21px (1.31rem) | 700 | 1.19 | 0px | 카드 강조 헤딩 — `text-subheading` |
 | Card News Title | 18px (1.125rem) | 600 | 1.35 | 0px | 뉴스 카드 제목 |
-| Sub-heading | 21px (1.31rem) | 400 | 1.19 | 0px | 일반 카드 헤딩 |
+| Sub-heading | 21px (1.31rem) | 400 | 1.19 | 0px | 일반 카드 헤딩 — `text-subheading` |
+| Nav / UI | 15px | 400–500 | 1.43 | 0px | Nav 링크·FAQ Search Input·Category Tab·관리자 UI 중간 텍스트 — `text-nav` |
 | Body | 17px (1.06rem) | 400 | 1.65 | -0.2px | 한글 가독성을 위해 line-height 1.47→1.65 |
 | Body Emphasis | 17px (1.06rem) | 600 | 1.47 | -0.2px | 강조 본문, 레이블 |
 | Button | 17px (1.06rem) | 500 | 1.00 | 0px | 버튼 텍스트 |
-| Link / Caption | 14px (0.88rem) | 400 | 1.43 | -0.1px | "자세히 보기", 설명 |
-| Caption Bold | 14px (0.88rem) | 600 | 1.43 | -0.1px | 강조 캡션 |
-| Micro | 12px (0.75rem) | 400 | 1.33 | 0px | 주석, 소인쇄 |
+| Link / Caption | 14px (0.88rem) | 400 | 1.43 | -0.1px | "자세히 보기", 설명 — `text-sm` |
+| Caption Bold | 14px (0.88rem) | 600 | 1.43 | -0.1px | 강조 캡션 — `text-sm` |
+| Micro | 12px (0.75rem) | 400 | 1.33 | 0px | 주석, 소인쇄 — `text-xs` |
 
 ### 한글 특이사항
 - **line-height**: 한글은 자소 높이가 커서 Body 기준 1.65 사용 (영문 1.47보다 여유 있게)
@@ -1852,6 +1862,62 @@ CSS `grid-template-rows` 트릭을 사용한 부드러운 열림/닫힘 애니�
 ```
 
 > **모바일 동작 전제**: `drawerOpen` 상태는 `ConsoleLayout` 내부 `useState`로 관리한다. (1) 햄버거 클릭 → `true`, (2) 오버레이 클릭 / 메뉴 항목 클릭 / 라우트 변경 시 → `false`. `lg` 이상에서는 사이드바가 항상 `lg:translate-x-0`로 노출되므로 `drawerOpen` 값과 무관하게 보인다(오버레이·모바일 상단 바는 `lg:hidden`으로 숨김). 라우트 변경 시 자동 닫힘(`useEffect`로 `pathname` 변화 감지)은 implementer가 붙인다.
+
+### Admin Selectable List Row (선택 가능한 목록 행)
+
+카테고리·항목 목록에서 행을 클릭하면 "선택됨" 상태로 고정 하이라이트하는 리스트 패턴. 뉴스 관리 테이블(`hover`만 있음)과 달리, 클릭 후 상태가 유지되어 우측 패널·폼과 연동된다.
+
+**행 컨테이너 (`<div>` 또는 `<button>`):**
+- 기본: `flex items-center justify-between w-full rounded-md px-3 py-2.5 min-h-[44px] text-sm font-body text-heading-dark cursor-pointer transition-colors hover:bg-surface-light`
+- **선택됨**: `flex items-center justify-between w-full rounded-md px-3 py-2.5 min-h-[44px] text-sm font-body font-semibold bg-aircok-blue/10 text-aircok-blue cursor-pointer transition-colors` — 사이드바 활성 메뉴 강조(`bg-aircok-blue/10 text-aircok-blue font-semibold`)와 동일 톤으로 통일.
+
+**행 내부 액션 (수정·삭제 아이콘 버튼):**
+- 인라인 아이콘 버튼: `inline-flex items-center justify-center w-7 h-7 rounded text-secondary-dark hover:text-heading-dark hover:bg-surface-light transition-colors shrink-0`
+- 삭제 아이콘(위험): `inline-flex items-center justify-center w-7 h-7 rounded text-secondary-dark hover:text-error hover:bg-surface-light transition-colors shrink-0`
+- 버튼들 래퍼: `flex items-center gap-1 shrink-0 ml-auto`
+- 선택된 행의 아이콘 버튼은 `hover:bg-aircok-blue/10`으로 배경 틴트를 유지: `inline-flex items-center justify-center w-7 h-7 rounded text-aircok-blue/60 hover:text-aircok-blue hover:bg-aircok-blue/10 transition-colors shrink-0`
+
+**질문 텍스트 truncate (FAQ 항목 행):**
+- `flex-1 min-w-0 truncate text-left` — 한 줄 truncate. 전체 텍스트는 수정 폼에서 확인.
+
+```tsx
+// Admin Selectable List Row 예시 (비선택 / 선택 상태 분기)
+<button
+  type="button"
+  onClick={() => onSelect(item.id)}
+  aria-pressed={isSelected}
+  className={
+    isSelected
+      ? 'flex items-center justify-between w-full rounded-md px-3 py-2.5 min-h-[44px] text-sm font-body font-semibold bg-aircok-blue/10 text-aircok-blue cursor-pointer transition-colors'
+      : 'flex items-center justify-between w-full rounded-md px-3 py-2.5 min-h-[44px] text-sm font-body text-heading-dark cursor-pointer transition-colors hover:bg-surface-light'
+  }
+>
+  <span className="flex-1 min-w-0 truncate text-left">{item.name}</span>
+  <span className="flex items-center gap-1 shrink-0 ml-2">
+    {/* 수정 아이콘 */}
+    <span
+      role="button"
+      onClick={(e) => { e.stopPropagation(); onEdit(item.id); }}
+      className={isSelected
+        ? 'inline-flex items-center justify-center w-7 h-7 rounded text-aircok-blue/60 hover:text-aircok-blue hover:bg-aircok-blue/10 transition-colors'
+        : 'inline-flex items-center justify-center w-7 h-7 rounded text-secondary-dark hover:text-heading-dark hover:bg-surface-light transition-colors'}
+    >
+      {/* 연필 SVG 등 */}
+    </span>
+    {/* 삭제 아이콘 */}
+    <span
+      role="button"
+      onClick={(e) => { e.stopPropagation(); onDelete(item.id); }}
+      className="inline-flex items-center justify-center w-7 h-7 rounded text-secondary-dark hover:text-error hover:bg-surface-light transition-colors"
+    >
+      {/* 쓰레기통 SVG 등 */}
+    </span>
+  </span>
+</button>
+```
+
+**목록 래퍼:**
+- `flex flex-col gap-1` — 행 사이 gap-1. §8 FAQ Sidebar와 동일 간격.
 
 ### Admin Subtab Navigation (어드민 서브탭 내비게이션)
 

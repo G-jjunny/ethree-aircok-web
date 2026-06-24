@@ -1,30 +1,57 @@
 'use client'
 
 import { useState, useMemo } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { SectionHeader } from '@/shared/ui'
-import { FAQ_CATEGORIES, FAQ_ITEMS } from '../model/faqData'
+import { faqCategoryQueryOptions, faqItemQueryOptions } from '@/entities/faq'
+import type { FaqItem } from '@/entities/faq'
 import { FaqSidebar } from './FaqSidebar'
 import { FaqAccordion } from './FaqAccordion'
 
 // 카테고리별 원래 순번 인덱스를 계산하는 헬퍼.
 // 각 item이 자신의 카테고리 내에서 몇 번째인지 반환한다.
-function buildCategoryIndexMap(): Map<string, number> {
+function buildCategoryIndexMap(items: FaqItem[]): Map<string, number> {
   const counters: Record<string, number> = {}
   const result = new Map<string, number>()
-  for (const item of FAQ_ITEMS) {
-    const count = counters[item.category] ?? 0
+  for (const item of items) {
+    const categoryName = item.categoryName
+    const count = counters[categoryName] ?? 0
     result.set(item.id, count)
-    counters[item.category] = count + 1
+    counters[categoryName] = count + 1
   }
   return result
 }
-
-const CATEGORY_INDEX_MAP = buildCategoryIndexMap()
 
 export function FaqSection() {
   const [activeCategory, setActiveCategory] = useState<string>('전체')
   const [searchQuery, setSearchQuery] = useState<string>('')
   const [openItemId, setOpenItemId] = useState<string | null>(null)
+
+  const { data: faqCategories = [], isLoading: isCategoriesLoading } = useQuery(faqCategoryQueryOptions())
+  const { data: allItems = [], isLoading: isItemsLoading } = useQuery(faqItemQueryOptions())
+
+  const isLoading = isCategoriesLoading || isItemsLoading
+
+  // categories 문자열 목록: ['전체', ...카테고리명들]
+  const categoryNames = useMemo(
+    () => ['전체', ...faqCategories.map((c) => c.name)],
+    [faqCategories]
+  )
+
+  // 카테고리별 항목 수 (사이드바용)
+  const itemCounts = useMemo(() => {
+    const counts: Record<string, number> = { '전체': allItems.length }
+    for (const cat of faqCategories) {
+      counts[cat.name] = allItems.filter((item) => item.categoryId === cat.id).length
+    }
+    return counts
+  }, [faqCategories, allItems])
+
+  // 카테고리 인덱스 맵 (배지 번호용)
+  const categoryIndexMap = useMemo(
+    () => buildCategoryIndexMap(allItems),
+    [allItems]
+  )
 
   const handleCategoryChange = (category: string) => {
     setActiveCategory(category)
@@ -39,8 +66,8 @@ export function FaqSection() {
   const filteredItems = useMemo(() => {
     let items =
       activeCategory === '전체'
-        ? FAQ_ITEMS
-        : FAQ_ITEMS.filter((item) => item.category === activeCategory)
+        ? allItems
+        : allItems.filter((item) => item.categoryName === activeCategory)
 
     const query = searchQuery.trim().toLowerCase()
     if (query.length > 0) {
@@ -52,12 +79,14 @@ export function FaqSection() {
     }
 
     return items
-  }, [activeCategory, searchQuery])
+  }, [activeCategory, searchQuery, allItems])
 
   // 필터된 항목의 카테고리 내 원래 순번 목록
   const categoryIndexes = filteredItems.map(
-    (item) => CATEGORY_INDEX_MAP.get(item.id) ?? 0
+    (item) => categoryIndexMap.get(item.id) ?? 0
   )
+
+  if (isLoading) return null
 
   return (
     <section className="bg-surface-white py-20 md:py-28">
@@ -95,7 +124,7 @@ export function FaqSection() {
               setSearchQuery(e.target.value)
               setOpenItemId(null)
             }}
-            className="w-full bg-surface-light rounded-lg px-4 py-3 pl-10 text-[15px] text-heading-dark placeholder:text-secondary-dark focus:outline-none focus:ring-2 focus:ring-aircok-blue border-none"
+            className="w-full bg-surface-light rounded-md px-4 py-3 pl-10 text-[15px] text-heading-dark placeholder:text-secondary-dark focus:outline-none focus:ring-2 focus:ring-aircok-blue border-none"
           />
         </div>
 
@@ -104,6 +133,8 @@ export function FaqSection() {
         <div className="grid grid-cols-1 sm:grid-cols-[200px_1fr] gap-10 mt-8">
           {/* 사이드바 (sm 이상에서만 노출) */}
           <FaqSidebar
+            categories={categoryNames}
+            itemCounts={itemCounts}
             activeCategory={activeCategory}
             onCategoryChange={handleCategoryChange}
           />
@@ -116,7 +147,7 @@ export function FaqSection() {
               role="tablist"
               aria-label="FAQ 카테고리"
             >
-              {FAQ_CATEGORIES.map((category) => {
+              {categoryNames.map((category) => {
                 const isActive = activeCategory === category
                 return (
                   <button
