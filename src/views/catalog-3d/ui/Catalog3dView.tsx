@@ -1,23 +1,28 @@
 'use client'
 
 import Link from 'next/link'
+import dynamic from 'next/dynamic'
 import { useQuery } from '@tanstack/react-query'
 import { SITE } from '@/shared/config'
 import { catalogImageListQueryOptions } from '@/entities/catalog'
-import { FlipBookViewer } from './FlipBookViewer'
 
 /**
- * 방식 A — react-pageflip 기반 2D 플립북 카탈로그 뷰어.
- * react-pageflip 의존은 이 슬라이스(FlipBookViewer)에만 격리되어 있다.
+ * 방식 B — three / @react-three/fiber / @react-three/drei 기반 3D 카탈로그 뷰어.
+ * WebGL Canvas는 SSR이 불가하므로 3D 씬은 ssr:false 동적 import로 로드한다.
+ * three 관련 의존은 Catalog3dScene(이 슬라이스)에만 격리되어 있다.
  */
-export function CatalogView() {
+const Catalog3dScene = dynamic(() => import('./Catalog3dScene'), {
+  ssr: false,
+  loading: () => (
+    // token 없음: max-w-[900px] aspect-[16/10] — 3D 카탈로그 캔버스 고정 폭·비율(WebGL 뷰포트 전용 1회성 수치)
+    <div className="w-full max-w-[900px] aspect-[16/10] rounded-xl bg-surface-light animate-pulse" />
+  ),
+})
+
+export function Catalog3dView() {
   const { data: images = [], isLoading, isError } = useQuery(
     catalogImageListQueryOptions(),
   )
-
-  // PDF 다운로드 URL은 현재 카탈로그 데이터 모델에 없다.
-  // TODO(contract): 카탈로그 PDF 다운로드 URL이 계약에 추가되면 버튼 href 연결.
-  const downloadUrl: string | null = null
 
   return (
     <main className="min-h-screen bg-surface-white">
@@ -25,14 +30,14 @@ export function CatalogView() {
         <header className="flex flex-col gap-4 mb-10">
           <div className="flex items-center justify-between gap-4 flex-wrap">
             <h1 className="text-heading-dark font-display text-[40px] font-semibold">
-              {SITE.pages.catalog.title}
+              {SITE.pages.catalog.title} (3D)
             </h1>
-            {/* 타 뷰어 제거 시(3D 슬라이스/라우트 삭제 시) 이 링크 삭제 */}
+            {/* 타 뷰어 제거 시(2D catalog 슬라이스/라우트 삭제 시) 이 링크 삭제 */}
             <Link
-              href="/catalog/3d"
+              href="/catalog"
               className="inline-flex items-center justify-center rounded-md border border-border-light bg-surface-white px-4 py-2 min-h-[44px] text-sm font-medium text-heading-dark hover:bg-surface-light transition-colors"
             >
-              3D 뷰어로 보기
+              2D 책자로 보기
             </Link>
           </div>
           <p className="text-body-dark">{SITE.pages.catalog.description}</p>
@@ -40,8 +45,8 @@ export function CatalogView() {
 
         {isLoading ? (
           <div className="flex justify-center py-20">
-            {/* token 없음: 480x640 — 플립북 단일 페이지 기본 비율 자리표시자 */}
-            <div className="w-[480px] max-w-full h-[640px] rounded-md bg-surface-light animate-pulse" />
+            {/* token 없음: max-w-[900px] aspect-[16/10] — 3D 카탈로그 캔버스 고정 폭·비율(WebGL 뷰포트 전용 1회성 수치) */}
+            <div className="w-full max-w-[900px] aspect-[16/10] rounded-xl bg-surface-light animate-pulse" />
           </div>
         ) : isError ? (
           <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-border-light bg-surface-white px-6 py-20 text-center">
@@ -57,25 +62,11 @@ export function CatalogView() {
             <p className="text-nav text-heading-dark">
               등록된 카탈로그가 없습니다.
             </p>
-            <p className="text-sm text-secondary-dark">
-              콘텐츠 준비 중입니다.
-            </p>
+            <p className="text-sm text-secondary-dark">콘텐츠 준비 중입니다.</p>
           </div>
         ) : (
-          <div className="flex flex-col items-center gap-8">
-            <FlipBookViewer images={images} />
-
-            <a
-              href={downloadUrl ?? undefined}
-              aria-disabled={downloadUrl === null}
-              className={
-                downloadUrl === null
-                  ? 'inline-flex items-center justify-center rounded-md bg-surface-light px-6 py-3 min-h-[44px] text-sm font-medium text-secondary-dark pointer-events-none cursor-not-allowed'
-                  : 'inline-flex items-center justify-center rounded-md bg-aircok-blue px-6 py-3 min-h-[44px] text-sm font-medium text-heading-light hover:bg-aircok-blue-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:ring-offset-2'
-              }
-            >
-              {SITE.cta.catalog}
-            </a>
+          <div className="flex justify-center">
+            <Catalog3dScene images={images} />
           </div>
         )}
       </div>
