@@ -6,4 +6,7 @@ export {
   adminNewsQueryOptions,
   adminNewsKeys,
   AdminNewsApiError,
+  NewsApiError,
+  newsListQueryOptions,
+  newsKeys,
 } from './api/newsApi';
