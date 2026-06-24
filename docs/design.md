@@ -587,6 +587,18 @@ Apple 스타일의 '제품 우선 프레젠테이션'을 Aircok 브랜드에 적
 </div>
 ```
 
+### Catalog Thumbnail · File-Type Badge (카탈로그 썸네일·파일유형 배지) — 공통
+
+카탈로그 관리(`admin-catalog`)에서 이미지·PDF 항목을 동일한 카드 썸네일로 표현한다. PDF 항목은 첫 페이지 렌더 썸네일 위에 **파일유형 배지**를 얹고, 렌더 전/실패 시에는 **파일유형 플레이스홀더**로 폴백한다. 모든 색·간격·radius는 기존 토큰을 재활용하며 신규 색상 토큰은 없다(파일 종류가 늘어나면 동일 톤으로 재사용).
+
+- **썸네일 컨테이너**: `relative w-full aspect-[3/4] overflow-hidden rounded-md bg-surface-light` (`aspect-[3/4]` {/* token 없음: 책자 페이지 세로 비율, 카탈로그 전용 1회성 수치 */})
+- **썸네일 이미지**: `absolute inset-0 w-full h-full object-contain` (책자 페이지는 잘림 없이 `object-contain`)
+- **파일유형 배지** (썸네일 위 좌상단, §Tag/Badge `rounded-sm` 규칙 + 다크 오버레이 토큰 재활용): `absolute left-1.5 top-1.5 rounded-sm bg-overlay-dark-60 px-1.5 py-0.5 text-xs font-semibold text-heading-light`
+- **파일유형 플레이스홀더** (렌더 전/실패): Image Placeholder 라이트 변형과 동일 톤 — 컨테이너 `absolute inset-0 flex flex-col items-center justify-center gap-2 text-secondary-dark`, 아이콘 `w-8 h-8`(현재 색 상속), 라벨 `text-xs font-semibold tracking-wide`
+- **교체/처리 중 오버레이**: `absolute inset-0 flex items-center justify-center bg-overlay-dark-60` + 안내 `text-xs text-heading-light` (다크 모달 오버레이 톤 재활용)
+
+> 비동기 렌더 대기·전체 뷰어 로딩 자리표시자는 별도 패턴 없이 `bg-surface-light animate-pulse`(컨테이너 radius는 사용처를 따름 — 플립북 `rounded-md`, 3D 캔버스 `rounded-xl`)로 통일한다.
+
 ### News Card (뉴스 카드)
 
 뉴스 목록 페이지에서 3열 그리드로 배치되는 카드. 커버 이미지 + 텍스트 구조. 매거진형 레이아웃에서는 **보조 2열 그리드**의 기본 단위로도 사용한다.

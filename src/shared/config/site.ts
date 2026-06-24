@@ -566,6 +566,7 @@ export const SITE = {
       { label: '뉴스 관리', href: '/console/news' },
       { label: '문의 관리', href: '/console/inquiries' },
       { label: 'FAQ 관리', href: '/console/faq' },
+      { label: '카탈로그 관리', href: '/console/catalog' },
     ],
     inquiryTabs: [
       { key: 'list', label: '문의 내역' },

@@ -1,0 +1,10 @@
+-- CreateTable
+CREATE TABLE "CatalogImage" (
+    "id" TEXT NOT NULL,
+    "imageUrl" TEXT NOT NULL,
+    "order" INTEGER NOT NULL DEFAULT 0,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "CatalogImage_pkey" PRIMARY KEY ("id")
+);

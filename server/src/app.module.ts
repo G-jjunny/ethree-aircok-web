@@ -5,6 +5,7 @@ import { AuthModule } from './auth/auth.module';
 import { NewsModule } from './news/news.module';
 import { InquiryModule } from './inquiry/inquiry.module';
 import { FaqModule } from './faq/faq.module';
+import { CatalogModule } from './catalog/catalog.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { FaqModule } from './faq/faq.module';
     NewsModule,
     InquiryModule,
     FaqModule,
+    CatalogModule,
   ],
 })
 export class AppModule {}
