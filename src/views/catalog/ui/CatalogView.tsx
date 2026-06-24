@@ -1,6 +1,5 @@
 'use client'
 
-import Link from 'next/link'
 import { useQuery } from '@tanstack/react-query'
 import { SITE } from '@/shared/config'
 import { catalogImageListQueryOptions } from '@/entities/catalog'
@@ -29,13 +28,15 @@ export function CatalogView() {
             <h1 className="text-heading-dark font-display text-[40px] font-semibold">
               {SITE.pages.catalog.title}
             </h1>
-            {/* 타 뷰어 제거 시(3D 슬라이스/라우트 삭제 시) 이 링크 삭제 */}
-            <Link
-              href="/catalog/3d"
-              className="inline-flex items-center justify-center rounded-md border border-border-light bg-surface-white px-4 py-2 min-h-[44px] text-sm font-medium text-heading-dark hover:bg-surface-light transition-colors"
-            >
-              3D 뷰어로 보기
-            </Link>
+            {/*
+              타 뷰어 제거 시(3D 슬라이스/라우트 삭제 시) 이 링크 삭제
+              <Link
+                href="/catalog/3d"
+                className="inline-flex items-center justify-center rounded-md border border-border-light bg-surface-white px-4 py-2 min-h-[44px] text-sm font-medium text-heading-dark hover:bg-surface-light transition-colors"
+              >
+                3D 뷰어로 보기
+              </Link>
+            */}
           </div>
           <p className="text-body-dark">{SITE.pages.catalog.description}</p>
         </header>
