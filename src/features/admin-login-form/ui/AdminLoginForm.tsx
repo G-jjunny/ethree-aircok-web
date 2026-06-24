@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useMutation } from '@tanstack/react-query';
 import { adminLogin, useAdminAuthStore } from '@/entities/admin-auth';
 import { SITE } from '@/shared/config/site';
-import axios from 'axios';
+import { isAxiosError } from 'axios';
 
 const schema = z.object({
   username: z.string().min(1, '아이디를 입력해주세요'),
@@ -35,7 +35,7 @@ export function AdminLoginForm() {
       setUser(result.user);
       router.push(SITE.admin.basePath);
     } catch (err) {
-      if (axios.isAxiosError(err)) {
+      if (isAxiosError(err)) {
         const status = err.response?.status;
         if (status === 429) {
           setError('root', { message: '잠시 후 다시 시도해주세요' });

@@ -15,7 +15,7 @@ axiosInstance.interceptors.response.use(
         window.location.href = '/console/login';
       }
     }
-    return Promise.reject(error instanceof Error ? error : new Error(String(error)));
+    return Promise.reject(error);
   },
 );
 
