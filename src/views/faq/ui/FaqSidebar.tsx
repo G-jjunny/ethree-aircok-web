@@ -1,19 +1,18 @@
 'use client'
 
-import { FAQ_CATEGORIES, FAQ_ITEMS } from '../model/faqData'
-
 interface FaqSidebarProps {
+  categories: readonly string[]
+  itemCounts: Record<string, number>
   activeCategory: string
   onCategoryChange: (category: string) => void
 }
 
-// 카테고리별 항목 수를 계산하는 헬퍼
-function getCategoryCount(category: string): number {
-  if (category === '전체') return FAQ_ITEMS.length
-  return FAQ_ITEMS.filter((item) => item.category === category).length
-}
-
-export function FaqSidebar({ activeCategory, onCategoryChange }: FaqSidebarProps) {
+export function FaqSidebar({
+  categories,
+  itemCounts,
+  activeCategory,
+  onCategoryChange,
+}: FaqSidebarProps) {
   return (
     <div className="hidden sm:block">
       <div className="sticky top-20">
@@ -21,9 +20,9 @@ export function FaqSidebar({ activeCategory, onCategoryChange }: FaqSidebarProps
           카테고리
         </p>
         <div className="flex flex-col gap-1">
-          {FAQ_CATEGORIES.map((category) => {
+          {categories.map((category) => {
             const isActive = activeCategory === category
-            const count = getCategoryCount(category)
+            const count = itemCounts[category] ?? 0
 
             return (
               <button

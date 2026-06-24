@@ -1,15 +1,9 @@
 "use client";
 
-import { type FaqItem } from "../model/faqData";
+import type { FaqItem } from "@/entities/faq";
 
 // 카테고리별 질문 번호 접두어 및 순번을 계산하는 헬퍼
 function getQuestionBadge(item: FaqItem, categoryIndex: number): string {
-  if (item.category === "제품 관련") {
-    return `P${String(categoryIndex + 1).padStart(2, "0")}`;
-  }
-  if (item.category === "실내공기질") {
-    return `A${String(categoryIndex + 1).padStart(2, "0")}`;
-  }
   return String(categoryIndex + 1).padStart(2, "0");
 }
 
