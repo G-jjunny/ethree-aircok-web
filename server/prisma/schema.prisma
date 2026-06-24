@@ -165,3 +165,24 @@ model FaqItem {
   createdAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt
 }
+
+/// 스마트에어콕 카탈로그 이미지 (#44).
+///
+/// 운용 방식:
+/// - 카탈로그 페이지에 노출되는 제품 카탈로그 이미지를 어드민이 CRUD 로 관리한다.
+/// - 공개 목록(GET /api/catalog)은 order 오름차순으로 노출한다. 동률 시 createdAt 보조 정렬 권장.
+/// - 어드민은 드래그앤드롭으로 순서를 일괄 변경한다(PATCH /api/catalog/reorder).
+///
+/// 컬럼 정책:
+/// - imageUrl: POST /api/catalog/images (multipart, 필드명 `image`) 응답으로 받은
+///   URL 문자열(예: "/uploads/1781859080294-foo.png")을 보관한다. 파일 바이너리 아님.
+/// - order: 표시 순서(오름차순). 기본값 0.
+model CatalogImage {
+  id        String   @id @default(cuid())
+  /// 업로드된 카탈로그 이미지 URL (예: "/uploads/xxx.png"). POST /api/catalog/images 응답값.
+  imageUrl  String
+  /// 표시 순서(오름차순). 기본값 0.
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
