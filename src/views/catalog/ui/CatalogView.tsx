@@ -42,8 +42,8 @@ export function CatalogView() {
 
         {isLoading || (isRendering && pages.length === 0) ? (
           <div className="flex justify-center py-20">
-            {/* token 없음: 480x640 — 플립북 단일 페이지 기본 비율 자리표시자 */}
-            <div className="w-[480px] max-w-full h-[640px] rounded-md bg-surface-light animate-pulse" />
+            {/* token 없음: 960x640 — 플립북 양면(2페이지) 스프레드 비율 자리표시자 */}
+            <div className="w-[960px] max-w-full h-[640px] rounded-md bg-surface-light animate-pulse" />
           </div>
         ) : isError ? (
           <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-border-light bg-surface-white px-6 py-20 text-center">
