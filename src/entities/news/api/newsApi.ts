@@ -5,14 +5,19 @@ import type { NewsListResponse, NewsPost } from '../model/types';
 
 /**
  * 서버/클라이언트 환경에 따라 API baseURL을 반환한다.
- * 서버 컴포넌트에서는 상대 URL을 사용할 수 없으므로 절대 URL이 필요하다.
+ *
+ * Next.js rewrites는 브라우저 → Next.js 인바운드 요청에만 적용된다.
+ * 서버 컴포넌트가 Next.js 자신(localhost:3000)으로 요청을 보내면
+ * rewrites가 무시되고 app/api/* 라우트를 탐색하다 404가 발생한다.
+ * 따라서 서버 사이드에서는 NestJS를 직접 가리키는 절대 URL을 사용한다.
  */
 function getApiBaseUrl(): string {
   if (typeof window === 'undefined') {
-    // 서버 사이드: 절대 URL 필요
-    return process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3000/api';
+    // 서버 사이드: NestJS 직접 호출 (rewrites 우회)
+    // API_URL은 NEXT_PUBLIC_ 접두사 없이 서버에서만 읽힌다.
+    return process.env.API_URL ?? 'http://localhost:3001/api';
   }
-  // 클라이언트 사이드: 상대 URL 가능
+  // 클라이언트 사이드: next.config.ts rewrites가 /api/* → NestJS로 프록시
   return '/api';
 }
 
