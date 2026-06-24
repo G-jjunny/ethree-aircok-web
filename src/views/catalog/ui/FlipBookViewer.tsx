@@ -55,8 +55,8 @@ const Page = forwardRef<
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src={resolveSrc(image.url)}
-        alt={image.alt ?? `카탈로그 ${pageNumber}/${total} 페이지`}
+        src={resolveSrc(image.imageUrl)}
+        alt={`카탈로그 ${pageNumber}/${total} 페이지`}
         className="w-full h-full object-contain"
       />
     </div>

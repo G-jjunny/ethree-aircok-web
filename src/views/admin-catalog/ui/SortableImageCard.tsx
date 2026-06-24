@@ -79,8 +79,8 @@ export function SortableImageCard({
       <div className="relative w-full aspect-[3/4] overflow-hidden rounded-md bg-surface-light">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src={resolveSrc(image.url)}
-          alt={image.alt ?? `카탈로그 ${index + 1} 페이지`}
+          src={resolveSrc(image.imageUrl)}
+          alt={`카탈로그 ${index + 1} 페이지`}
           className="absolute inset-0 w-full h-full object-contain"
         />
         {isReplacing && (

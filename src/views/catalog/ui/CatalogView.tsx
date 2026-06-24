@@ -15,8 +15,7 @@ export function CatalogView() {
     catalogImageListQueryOptions(),
   )
 
-  // PDF 다운로드 URL은 현재 카탈로그 데이터 모델에 없다.
-  // TODO(contract): 카탈로그 PDF 다운로드 URL이 계약에 추가되면 버튼 href 연결.
+  // PDF 다운로드 URL은 향후 계약 확장 시 연결(현재 계약에 없음).
   const downloadUrl: string | null = null
 
   return (

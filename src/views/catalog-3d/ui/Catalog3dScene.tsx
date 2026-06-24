@@ -28,7 +28,7 @@ function CatalogPlane({
   position: [number, number, number]
   rotationY: number
 }) {
-  const texture = useTexture(resolveSrc(image.url))
+  const texture = useTexture(resolveSrc(image.imageUrl))
   // 이미지 비율을 유지하기 위해 텍스처 종횡비로 평면 크기 산출
   const { width, height } = useMemo(() => {
     const img = texture.image as { width?: number; height?: number } | undefined

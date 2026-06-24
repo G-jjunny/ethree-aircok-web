@@ -1,7 +1,7 @@
 'use client'
 
 import { useQuery } from '@tanstack/react-query'
-import { adminCatalogImageListQueryOptions } from '@/entities/catalog'
+import { catalogImageListQueryOptions } from '@/entities/catalog'
 import { CatalogUploadSection } from './CatalogUploadSection'
 import { CatalogImageGridSection } from './CatalogImageGridSection'
 
@@ -12,7 +12,7 @@ import { CatalogImageGridSection } from './CatalogImageGridSection'
  */
 export function AdminCatalogView() {
   const { data: images = [], isLoading } = useQuery(
-    adminCatalogImageListQueryOptions(),
+    catalogImageListQueryOptions(),
   )
 
   return (
