@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Script from 'next/script';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
@@ -36,7 +36,7 @@ export function MapSettingForm({ initialData }: Props) {
     register,
     handleSubmit,
     reset,
-    watch,
+    control,
     setValue,
     formState: { errors, isSubmitting },
   } = useForm<MapSettingFormValues>({
@@ -67,7 +67,7 @@ export function MapSettingForm({ initialData }: Props) {
   };
 
   // 입력 중 주소를 실시간 구독해 미리보기 지도를 갱신
-  const watchedAddress = watch('address');
+  const watchedAddress = useWatch({ control, name: 'address' });
   const previewSrc = watchedAddress
     ? `https://maps.google.com/maps?q=${encodeURIComponent(
         watchedAddress,

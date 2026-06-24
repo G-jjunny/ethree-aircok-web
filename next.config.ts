@@ -1,5 +1,7 @@
 import type { NextConfig } from "next";
 
+const API_ORIGIN = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
+
 const nextConfig: NextConfig = {
   // Enables 'use cache' directive, cacheLife/cacheTag, and Partial Prerendering (PPR) by default.
   cacheComponents: true,
@@ -29,6 +31,15 @@ const nextConfig: NextConfig = {
       revalidate: 86400,
       expire: 604800,
     },
+  },
+
+  async rewrites() {
+    return [
+      {
+        source: '/api/:path*',
+        destination: `${API_ORIGIN}/api/:path*`,
+      },
+    ];
   },
 };
 
