@@ -1,4 +1,4 @@
-import apiClient from '@/shared/lib/axios';
+import { axiosInstance } from '@/shared/api';
 
 export interface AdminUser {
   id: string;
@@ -11,10 +11,10 @@ export interface LoginBody {
 }
 
 export const adminLogin = (body: LoginBody) =>
-  apiClient.post<{ user: AdminUser }>('/api/auth/login', body).then((r) => r.data);
+  axiosInstance.post<{ user: AdminUser }>('/auth/login', body).then((r) => r.data);
 
 export const adminLogout = () =>
-  apiClient.post<void>('/api/auth/logout').then((r) => r.data);
+  axiosInstance.post<void>('/auth/logout').then((r) => r.data);
 
 export const adminMe = () =>
-  apiClient.get<{ user: AdminUser }>('/api/auth/me').then((r) => r.data);
+  axiosInstance.get<{ user: AdminUser }>('/auth/me').then((r) => r.data);

@@ -1,7 +1,12 @@
+import axios from 'axios';
 import { queryOptions } from '@tanstack/react-query';
+import {
+  axiosInstance,
+  ApiError,
+  authAwareRetry,
+  parseAxiosMessages,
+} from '@/shared/api';
 import type { MailSetting, UpdateMailSettingBody } from '../model/types';
-
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
 
 /**
  * 이메일 설정 TanStack Query 키의 단일 출처(팩토리).
@@ -13,77 +18,32 @@ export const mailSettingKeys = {
 
 /**
  * 이메일 설정 API 호출 실패를 나타내는 에러.
- * `status`로 인증 실패(401/403)와 검증 실패(400), 일반 실패를 구분한다.
+ * 공통 판별(`isAuthError`/`isValidationError` 등)은 베이스 {@link ApiError}에서 제공한다.
  */
-export class MailSettingApiError extends Error {
-  readonly status: number;
-  /** 검증 실패(400) 시 백엔드가 내려준 메시지 배열 */
-  readonly messages?: string[];
-
-  constructor(status: number, message: string, messages?: string[]) {
-    super(message);
-    this.name = 'MailSettingApiError';
-    this.status = status;
-    this.messages = messages;
-  }
-
-  /** 인증/인가 실패 여부 (로그인 필요) */
-  get isAuthError(): boolean {
-    return this.status === 401 || this.status === 403;
-  }
-
-  /** 검증 실패 여부 */
-  get isValidationError(): boolean {
-    return this.status === 400;
-  }
-}
-
-/** 응답 본문에서 백엔드 검증 메시지 배열을 안전하게 추출한다. */
-async function parseMessages(res: Response): Promise<string[] | undefined> {
-  try {
-    const data: unknown = await res.json();
-    if (
-      data &&
-      typeof data === 'object' &&
-      'message' in data &&
-      Array.isArray((data as { message: unknown }).message)
-    ) {
-      return (data as { message: string[] }).message;
-    }
-  } catch {
-    // 본문 파싱 실패는 무시 — 상태코드 기반으로 처리
-  }
-  return undefined;
-}
+export class MailSettingApiError extends ApiError {}
 
 /**
- * 이메일 설정 조회. 인증 필요(access_token 쿠키).
+ * 이메일 설정 조회. 인증 필요(access_token 쿠키 — withCredentials: true).
  * 응답은 비래핑 단일 객체이며 백엔드가 행이 없으면 lazy 생성하므로 null이 오지 않는다.
  * (클라이언트 컴포넌트 전용 — 서버에서 호출하지 않는다.)
  */
 export async function getMailSetting(): Promise<MailSetting> {
-  let res: Response;
   try {
-    res = await fetch(`${API_BASE}/api/inquiry/mail-setting`, {
-      cache: 'no-store',
-      credentials: 'include',
-    });
-  } catch {
-    throw new MailSettingApiError(
-      0,
-      '네트워크 오류로 이메일 설정을 불러오지 못했습니다.',
-    );
+    const { data } = await axiosInstance.get<MailSetting>('/inquiry/mail-setting');
+    return data;
+  } catch (err) {
+    if (axios.isAxiosError(err)) {
+      const status = err.response?.status ?? 0;
+      const message =
+        status === 401 || status === 403
+          ? '로그인이 필요합니다.'
+          : status === 0
+            ? '네트워크 오류로 이메일 설정을 불러오지 못했습니다.'
+            : '이메일 설정을 불러오는 데 실패했습니다.';
+      throw new MailSettingApiError(status, message);
+    }
+    throw new MailSettingApiError(0, '네트워크 오류로 이메일 설정을 불러오지 못했습니다.');
   }
-
-  if (!res.ok) {
-    const message =
-      res.status === 401 || res.status === 403
-        ? '로그인이 필요합니다.'
-        : '이메일 설정을 불러오는 데 실패했습니다.';
-    throw new MailSettingApiError(res.status, message);
-  }
-
-  return res.json() as Promise<MailSetting>;
 }
 
 /**
@@ -95,11 +55,7 @@ export function mailSettingQueryOptions() {
     queryKey: mailSettingKeys.all,
     queryFn: getMailSetting,
     staleTime: 0,
-    retry: (failureCount, error) => {
-      if (error instanceof MailSettingApiError && error.isAuthError)
-        return false;
-      return failureCount < 1;
-    },
+    retry: authAwareRetry,
   });
 }
 
@@ -112,35 +68,27 @@ export function mailSettingQueryOptions() {
 export async function updateMailSetting(
   body: UpdateMailSettingBody,
 ): Promise<MailSetting> {
-  let res: Response;
   try {
-    res = await fetch(`${API_BASE}/api/inquiry/mail-setting`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({
-        recipientEmail: body.recipientEmail,
-        subjectTemplate: body.subjectTemplate,
-        bodyTemplate: body.bodyTemplate,
-      }),
+    const { data } = await axiosInstance.put<MailSetting>('/inquiry/mail-setting', {
+      recipientEmail: body.recipientEmail,
+      subjectTemplate: body.subjectTemplate,
+      bodyTemplate: body.bodyTemplate,
     });
-  } catch {
-    throw new MailSettingApiError(
-      0,
-      '네트워크 오류로 이메일 설정을 저장하지 못했습니다.',
-    );
+    return data;
+  } catch (err) {
+    if (axios.isAxiosError(err)) {
+      const status = err.response?.status ?? 0;
+      const messages = parseAxiosMessages(err.response?.data);
+      const message =
+        status === 401 || status === 403
+          ? '로그인이 필요합니다.'
+          : status === 400
+            ? '입력값을 다시 확인해 주세요.'
+            : status === 0
+              ? '네트워크 오류로 이메일 설정을 저장하지 못했습니다.'
+              : '이메일 설정 저장에 실패했습니다.';
+      throw new MailSettingApiError(status, message, messages);
+    }
+    throw new MailSettingApiError(0, '네트워크 오류로 이메일 설정을 저장하지 못했습니다.');
   }
-
-  if (!res.ok) {
-    const messages = await parseMessages(res);
-    const message =
-      res.status === 401 || res.status === 403
-        ? '로그인이 필요합니다.'
-        : res.status === 400
-          ? '입력값을 다시 확인해 주세요.'
-          : '이메일 설정 저장에 실패했습니다.';
-    throw new MailSettingApiError(res.status, message, messages);
-  }
-
-  return res.json() as Promise<MailSetting>;
 }

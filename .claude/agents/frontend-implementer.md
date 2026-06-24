@@ -4,6 +4,66 @@ description: 프론트엔드 구현 에이전트. FSD의 widgets/views를 직접
 tools: Read, Write, Edit, Glob, Grep, Bash
 ---
 
+## API 구현 규칙
+
+구현 시 반드시 아래 패턴을 따릅니다.
+
+### 레이어별 책임
+
+**entities/\*/api/**: 조회(GET) queryOptions + raw API 함수
+- `queryOptions()` 팩토리로 정의
+- `useQuery`를 entities 내부에서 직접 쓰지 않음
+- query key factory를 함께 export
+
+**features/\*/api/**: 뮤테이션 hooks (POST/PATCH/DELETE)
+- `useMutation`을 감싸는 커스텀 hook으로 export
+- `onSuccess`에서 관련 query invalidate
+
+**widgets/views**: 데이터 소비
+- `useQuery(entityQueryOptions())` 형태로만 호출
+- `useMutation` hook 호출 후 핸들러에서 `.mutate()` / `.mutateAsync()` 사용
+- **fetch() 직접 호출 절대 금지**
+- **axiosInstance 직접 import 금지** (shared/api를 통해서만)
+
+### 구현 예시
+
+```ts
+// ✅ entities/product/api/productApi.ts
+export const productKeys = { all: ['products'] as const, detail: (id: string) => [...productKeys.all, id] as const }
+export const productDetailOptions = (id: string) =>
+  queryOptions({ queryKey: productKeys.detail(id), queryFn: async () => { const { data } = await axiosInstance.get(`/products/${id}`); return data } })
+
+// ✅ features/product-form/api/useUpdateProductMutation.ts
+export function useUpdateProductMutation(id: string) {
+  const qc = useQueryClient()
+  return useMutation({ mutationFn: (payload) => axiosInstance.patch(`/products/${id}`, payload), onSuccess: () => qc.invalidateQueries({ queryKey: productKeys.detail(id) }) })
+}
+
+// ✅ views/ProductPage.tsx
+const { data } = useQuery(productDetailOptions(id))
+const update = useUpdateProductMutation(id)
+```
+
+### 에러 처리: 메커니즘은 shared, 도메인 지식은 slice
+
+API 에러의 **공통 메커니즘**은 `src/shared/api`(`apiError.ts`)에 단 한 번 정의돼 있다. 새 도메인 API를 만들 때 `status` 필드·`isAuthError`·`parseAxiosMessages`·retry 로직을 **다시 작성하지 말고 import**한다.
+
+- 도메인 에러 클래스는 베이스 `ApiError`를 **상속만** 한다. 공통 판별 getter(`isAuthError`/`isValidationError`/`isConflict`/`isRateLimited`/`isNotFound`)는 베이스가 제공하므로, 도메인 특화 분기가 없으면 빈 클래스로 둔다.
+- queryOptions의 `retry`에는 `authAwareRetry`를 그대로 전달한다.
+- 검증 메시지 추출은 `parseAxiosMessages(err.response?.data)`를 쓴다.
+- 슬라이스에는 **도메인 한글 메시지와 `instanceof` 분기**만 남긴다. 쿼리키·queryOptions·도메인 메시지를 shared로 끌어올리는 것은 의존성 역전이므로 **금지**.
+
+```ts
+// ✅ entities/inquiry/api/inquiryApi.ts
+import { axiosInstance, ApiError, authAwareRetry, parseAxiosMessages } from '@/shared/api'
+export class InquiryApiError extends ApiError {}              // 상속만
+export function adminInquiryQueryOptions() {
+  return queryOptions({ /* ... */ retry: authAwareRetry })    // 공용 정책 재사용
+}
+
+// ❌ 금지: 슬라이스마다 status/isAuthError/parseAxiosMessages/retry 복붙 재정의
+```
+
 @.claude/skills/applying-fsd-architecture/SKILL.md
 
 # 역할
