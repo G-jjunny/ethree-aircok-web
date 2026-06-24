@@ -3,16 +3,6 @@
 import { forwardRef, useRef } from 'react'
 import type { ComponentType, CSSProperties, ReactNode } from 'react'
 import HTMLFlipBookDefault from 'react-pageflip'
-import type { CatalogImage } from '@/entities/catalog'
-
-/**
- * 상대 경로 이미지 URL을 백엔드 절대 URL로 보정한다.
- * (shared/ui NewsImage와 동일 패턴 — 동적 호스트라 next/image 대신 <img> 사용)
- */
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001'
-function resolveSrc(src: string): string {
-  return src.startsWith('http') ? src : `${API_BASE}${src}`
-}
 
 /**
  * react-pageflip의 HTMLFlipBook IProps는 모든 설정 필드를 required로 선언하지만
@@ -46,8 +36,8 @@ const FlipBook = HTMLFlipBookDefault as unknown as ComponentType<FlipBookProps>
  */
 const Page = forwardRef<
   HTMLDivElement,
-  { image: CatalogImage; pageNumber: number; total: number }
->(function Page({ image, pageNumber, total }, ref) {
+  { src: string; pageNumber: number; total: number }
+>(function Page({ src, pageNumber, total }, ref) {
   return (
     <div
       ref={ref}
@@ -55,7 +45,7 @@ const Page = forwardRef<
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src={resolveSrc(image.imageUrl)}
+        src={src}
         alt={`카탈로그 ${pageNumber}/${total} 페이지`}
         className="w-full h-full object-contain"
       />
@@ -64,10 +54,11 @@ const Page = forwardRef<
 })
 
 interface FlipBookViewerProps {
-  images: CatalogImage[]
+  /** 평탄화된 페이지 이미지 src 배열(이미지 항목 + PDF 분해 페이지). */
+  pages: string[]
 }
 
-export function FlipBookViewer({ images }: FlipBookViewerProps) {
+export function FlipBookViewer({ pages }: FlipBookViewerProps) {
   // HTMLFlipBook 인스턴스 ref — 외부 페이지 이동 버튼에서 사용
   const bookRef = useRef<{
     pageFlip: () => { flipNext: () => void; flipPrev: () => void }
@@ -92,12 +83,12 @@ export function FlipBookViewer({ images }: FlipBookViewerProps) {
         maxShadowOpacity={0.5}
         className="catalog-flipbook"
       >
-        {images.map((image, index) => (
+        {pages.map((src, index) => (
           <Page
-            key={image.id}
-            image={image}
+            key={`${index}-${src.slice(0, 32)}`}
+            src={src}
             pageNumber={index + 1}
-            total={images.length}
+            total={pages.length}
           />
         ))}
       </FlipBook>

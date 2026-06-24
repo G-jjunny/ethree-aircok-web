@@ -5,6 +5,7 @@ import { useQuery } from '@tanstack/react-query'
 import { SITE } from '@/shared/config'
 import { catalogImageListQueryOptions } from '@/entities/catalog'
 import { FlipBookViewer } from './FlipBookViewer'
+import { useCatalogPages } from './useCatalogPages'
 
 /**
  * 방식 A — react-pageflip 기반 2D 플립북 카탈로그 뷰어.
@@ -14,6 +15,8 @@ export function CatalogView() {
   const { data: images = [], isLoading, isError } = useQuery(
     catalogImageListQueryOptions(),
   )
+  // 이미지/PDF 항목을 페이지 src 배열로 평탄화(PDF는 클라이언트에서 비동기 렌더).
+  const { pages, isRendering } = useCatalogPages(images)
 
   // PDF 다운로드 URL은 향후 계약 확장 시 연결(현재 계약에 없음).
   const downloadUrl: string | null = null
@@ -37,7 +40,7 @@ export function CatalogView() {
           <p className="text-body-dark">{SITE.pages.catalog.description}</p>
         </header>
 
-        {isLoading ? (
+        {isLoading || (isRendering && pages.length === 0) ? (
           <div className="flex justify-center py-20">
             {/* token 없음: 480x640 — 플립북 단일 페이지 기본 비율 자리표시자 */}
             <div className="w-[480px] max-w-full h-[640px] rounded-md bg-surface-light animate-pulse" />
@@ -62,7 +65,7 @@ export function CatalogView() {
           </div>
         ) : (
           <div className="flex flex-col items-center gap-8">
-            <FlipBookViewer images={images} />
+            <FlipBookViewer pages={pages} />
 
             <a
               href={downloadUrl ?? undefined}

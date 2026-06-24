@@ -39,6 +39,12 @@ const nextConfig: NextConfig = {
         source: '/api/:path*',
         destination: `${API_ORIGIN}/api/:path*`,
       },
+      // 정적 업로드(이미지·PDF)를 동일 출처로 프록시한다.
+      // pdf.js가 동일 출처 `/uploads/xxx.pdf`로 fetch하면 CORS가 불필요하다.
+      {
+        source: '/uploads/:path*',
+        destination: `${API_ORIGIN}/uploads/:path*`,
+      },
     ];
   },
 };

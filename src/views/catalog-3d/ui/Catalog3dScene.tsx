@@ -4,31 +4,26 @@ import { Suspense, useMemo, useRef, useState } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { Environment, OrbitControls, useTexture } from '@react-three/drei'
 import * as THREE from 'three'
-import type { CatalogImage } from '@/entities/catalog'
-
-/** 상대 경로 이미지 URL을 백엔드 절대 URL로 보정한다(NewsImage 패턴). */
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001'
-function resolveSrc(src: string): string {
-  return src.startsWith('http') ? src : `${API_BASE}${src}`
-}
 
 /**
  * three / @react-three/fiber / @react-three/drei 의존을 catalog-3d 슬라이스 내부에
  * 완전히 격리하는 3D 씬 컴포넌트.
  * WebGL Canvas는 SSR이 불가하므로 이 파일은 next/dynamic(ssr:false)로만 로드된다.
+ *
+ * 입력은 이미 평탄화된 "페이지 src 배열"(이미지 절대 URL 또는 PDF 분해 dataURL)이다.
  */
 
-/** 한 장의 카탈로그 이미지를 텍스처로 입힌 평면 메시(한 페이지). */
+/** 한 페이지 src(이미지/PDF 페이지)를 텍스처로 입힌 평면 메시. */
 function CatalogPlane({
-  image,
+  src,
   position,
   rotationY,
 }: {
-  image: CatalogImage
+  src: string
   position: [number, number, number]
   rotationY: number
 }) {
-  const texture = useTexture(resolveSrc(image.imageUrl))
+  const texture = useTexture(src)
   // 이미지 비율을 유지하기 위해 텍스처 종횡비로 평면 크기 산출
   const { width, height } = useMemo(() => {
     const img = texture.image as { width?: number; height?: number } | undefined
@@ -55,8 +50,8 @@ function BookSpread({
   left,
   right,
 }: {
-  left?: CatalogImage
-  right?: CatalogImage
+  left?: string
+  right?: string
 }) {
   const groupRef = useRef<THREE.Group>(null)
 
@@ -75,12 +70,12 @@ function BookSpread({
     <group ref={groupRef}>
       {left && (
         <Suspense fallback={null}>
-          <CatalogPlane image={left} position={[-1.6, 0, 0]} rotationY={0.12} />
+          <CatalogPlane src={left} position={[-1.6, 0, 0]} rotationY={0.12} />
         </Suspense>
       )}
       {right && (
         <Suspense fallback={null}>
-          <CatalogPlane image={right} position={[1.6, 0, 0]} rotationY={-0.12} />
+          <CatalogPlane src={right} position={[1.6, 0, 0]} rotationY={-0.12} />
         </Suspense>
       )}
     </group>
@@ -88,16 +83,17 @@ function BookSpread({
 }
 
 interface Catalog3dSceneProps {
-  images: CatalogImage[]
+  /** 평탄화된 페이지 src 배열(이미지 절대 URL 또는 PDF 분해 dataURL). */
+  pages: string[]
 }
 
-export default function Catalog3dScene({ images }: Catalog3dSceneProps) {
+export default function Catalog3dScene({ pages }: Catalog3dSceneProps) {
   // 두 페이지씩 스프레드 단위로 묶어 넘긴다.
   const [spreadIndex, setSpreadIndex] = useState(0)
-  const spreadCount = Math.ceil(images.length / 2)
+  const spreadCount = Math.ceil(pages.length / 2)
 
-  const left = images[spreadIndex * 2]
-  const right = images[spreadIndex * 2 + 1]
+  const left = pages[spreadIndex * 2]
+  const right = pages[spreadIndex * 2 + 1]
 
   const goPrev = () => setSpreadIndex((i) => Math.max(0, i - 1))
   const goNext = () => setSpreadIndex((i) => Math.min(spreadCount - 1, i + 1))

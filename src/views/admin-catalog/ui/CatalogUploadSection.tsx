@@ -4,9 +4,18 @@ import { useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { useUploadCatalogImageMutation } from '@/features/catalog-editor'
 
+/** 업로드 가능한 파일인지 판별한다(이미지 또는 PDF). */
+function isAllowedFile(file: File): boolean {
+  return (
+    file.type.startsWith('image/') ||
+    file.type === 'application/pdf' ||
+    file.name.toLowerCase().endsWith('.pdf')
+  )
+}
+
 /**
- * 카탈로그 이미지 업로드 영역.
- * 파일 선택/드롭으로 여러 이미지를 순차 업로드한다.
+ * 카탈로그 파일 업로드 영역.
+ * 파일 선택/드롭으로 여러 이미지·PDF를 순차 업로드한다.
  */
 export function CatalogUploadSection() {
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -14,10 +23,10 @@ export function CatalogUploadSection() {
   const uploadMutation = useUploadCatalogImageMutation()
 
   const uploadFiles = async (files: File[]) => {
-    const images = files.filter((f) => f.type.startsWith('image/'))
-    if (images.length === 0) return
+    const allowed = files.filter(isAllowedFile)
+    if (allowed.length === 0) return
     let success = 0
-    for (const file of images) {
+    for (const file of allowed) {
       try {
         await uploadMutation.mutateAsync(file)
         success += 1
@@ -25,7 +34,7 @@ export function CatalogUploadSection() {
         toast.error(`"${file.name}" 업로드에 실패했습니다`)
       }
     }
-    if (success > 0) toast.success(`${success}개 이미지가 업로드되었습니다`)
+    if (success > 0) toast.success(`${success}개 파일이 업로드되었습니다`)
   }
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -42,7 +51,9 @@ export function CatalogUploadSection() {
 
   return (
     <section className="flex flex-col gap-3">
-      <h2 className="text-nav font-semibold text-heading-dark">이미지 업로드</h2>
+      <h2 className="text-nav font-semibold text-heading-dark">
+        이미지·PDF 업로드
+      </h2>
       <div
         onDragOver={(e) => {
           e.preventDefault()
@@ -71,7 +82,7 @@ export function CatalogUploadSection() {
           />
         </svg>
         <p className="text-sm text-secondary-dark [word-break:keep-all]">
-          이미지를 끌어다 놓거나 아래 버튼으로 선택하세요.
+          이미지나 PDF를 끌어다 놓거나 아래 버튼으로 선택하세요.
         </p>
         <button
           type="button"
@@ -79,12 +90,12 @@ export function CatalogUploadSection() {
           disabled={uploadMutation.isPending}
           className="inline-flex items-center justify-center rounded-md bg-aircok-blue px-5 py-2 min-h-[44px] text-sm font-medium text-heading-light hover:bg-aircok-blue-dark transition-colors disabled:opacity-40 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:ring-offset-2"
         >
-          {uploadMutation.isPending ? '업로드 중...' : '이미지 선택'}
+          {uploadMutation.isPending ? '업로드 중...' : '파일 선택'}
         </button>
         <input
           ref={fileInputRef}
           type="file"
-          accept="image/*"
+          accept="image/*,application/pdf,.pdf"
           multiple
           onChange={handleFileChange}
           className="hidden"

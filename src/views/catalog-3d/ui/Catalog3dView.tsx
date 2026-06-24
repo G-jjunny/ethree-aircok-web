@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic'
 import { useQuery } from '@tanstack/react-query'
 import { SITE } from '@/shared/config'
 import { catalogImageListQueryOptions } from '@/entities/catalog'
+import { useCatalogPages } from './useCatalogPages'
 
 /**
  * 방식 B — three / @react-three/fiber / @react-three/drei 기반 3D 카탈로그 뷰어.
@@ -23,6 +24,7 @@ export function Catalog3dView() {
   const { data: images = [], isLoading, isError } = useQuery(
     catalogImageListQueryOptions(),
   )
+  const { pages, isRendering } = useCatalogPages(images)
 
   return (
     <main className="min-h-screen bg-surface-white">
@@ -43,7 +45,7 @@ export function Catalog3dView() {
           <p className="text-body-dark">{SITE.pages.catalog.description}</p>
         </header>
 
-        {isLoading ? (
+        {isLoading || (isRendering && pages.length === 0) ? (
           <div className="flex justify-center py-20">
             {/* token 없음: max-w-[900px] aspect-[16/10] — 3D 카탈로그 캔버스 고정 폭·비율(WebGL 뷰포트 전용 1회성 수치) */}
             <div className="w-full max-w-[900px] aspect-[16/10] rounded-xl bg-surface-light animate-pulse" />
@@ -66,7 +68,7 @@ export function Catalog3dView() {
           </div>
         ) : (
           <div className="flex justify-center">
-            <Catalog3dScene images={images} />
+            <Catalog3dScene pages={pages} />
           </div>
         )}
       </div>

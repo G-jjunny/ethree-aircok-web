@@ -1,4 +1,4 @@
-export type { CatalogImage } from './model/types'
+export type { CatalogImage, CatalogImageResponse } from './model/types'
 export {
   catalogKeys,
   CatalogApiError,

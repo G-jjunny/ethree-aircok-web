@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { queryOptions } from '@tanstack/react-query';
 import { ApiError, authAwareRetry } from '@/shared/api';
-import type { CatalogImage } from '../model/types';
+import type { CatalogImage, CatalogImageResponse } from '../model/types';
 
 /**
  * 서버/클라이언트 환경에 따라 API baseURL을 반환한다.
@@ -40,14 +40,29 @@ export const catalogKeys = {
  */
 export async function getCatalogImageList(): Promise<CatalogImage[]> {
   try {
-    const { data } = await axios.get<CatalogImage[]>(
+    const { data } = await axios.get<CatalogImageResponse[]>(
       `${getApiBaseUrl()}/catalog`,
       { timeout: 10000 },
     );
-    return [...data].sort(
-      (a, b) =>
-        a.order - b.order || (a.createdAt ?? '').localeCompare(b.createdAt ?? ''),
-    );
+    // legacy 항목(fileUrl null)은 렌더 불가하므로 안전하게 걸러내고,
+    // fileUrl 보장된 항목만 도메인 모델 CatalogImage로 정규화한다.
+    return data
+      .filter((item): item is CatalogImageResponse & { fileUrl: string } =>
+        typeof item.fileUrl === 'string' && item.fileUrl.length > 0,
+      )
+      .map<CatalogImage>((item) => ({
+        id: item.id,
+        fileUrl: item.fileUrl,
+        fileType: item.fileType,
+        order: item.order,
+        createdAt: item.createdAt,
+        updatedAt: item.updatedAt,
+      }))
+      .sort(
+        (a, b) =>
+          a.order - b.order ||
+          (a.createdAt ?? '').localeCompare(b.createdAt ?? ''),
+      );
   } catch (err) {
     if (axios.isAxiosError(err)) {
       throw new CatalogApiError(

@@ -1,14 +1,51 @@
 'use client'
 
-import { useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
+import { renderPdfToImages } from '@/shared/lib'
 import type { CatalogImage } from '@/entities/catalog'
 
-/** 상대 경로 이미지 URL을 백엔드 절대 URL로 보정한다(NewsImage 패턴). */
+/** 이미지 항목은 백엔드 절대 URL로 보정한다(NewsImage 패턴). */
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001'
 function resolveSrc(src: string): string {
   return src.startsWith('http') ? src : `${API_BASE}${src}`
+}
+
+/** PDF는 동일 출처(`/uploads/...`)로 fetch해 CORS를 회피한다. */
+function resolveSameOriginPdfSrc(src: string): string {
+  if (!src.startsWith('http')) return src
+  try {
+    return new URL(src).pathname
+  } catch {
+    return src
+  }
+}
+
+/**
+ * PDF 항목의 첫 페이지 썸네일 dataURL을 비동기로 렌더한다.
+ * 실패 시 null을 반환해 호출부가 플레이스홀더로 폴백하게 한다.
+ */
+function usePdfThumbnail(enabled: boolean, fileUrl: string): string | null {
+  const [thumb, setThumb] = useState<string | null>(null)
+  useEffect(() => {
+    if (!enabled) return
+    let cancelled = false
+    void renderPdfToImages(resolveSameOriginPdfSrc(fileUrl), { maxPages: 1 })
+      .then((pages) => {
+        if (!cancelled) setThumb(pages[0] ?? null)
+      })
+      .catch(() => {
+        if (!cancelled) setThumb(null)
+      })
+    return () => {
+      cancelled = true
+      // enabled/fileUrl 변경 또는 언마운트 시 이전 썸네일을 비워 stale 표시를 방지한다.
+      setThumb(null)
+    }
+  }, [enabled, fileUrl])
+  // PDF가 아닌 경우 썸네일은 사용되지 않으므로 항상 null을 반환한다.
+  return enabled ? thumb : null
 }
 
 interface SortableImageCardProps {
@@ -31,6 +68,8 @@ export function SortableImageCard({
   isReplacing,
 }: SortableImageCardProps) {
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const isPdf = image.fileType === 'pdf'
+  const pdfThumb = usePdfThumbnail(isPdf, image.fileUrl)
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
     useSortable({ id: image.id })
 
@@ -77,12 +116,45 @@ export function SortableImageCard({
 
       {/* token 없음: aspect-[3/4] — 카탈로그 책자 페이지(세로형) 비율, 카탈로그 전용 1회성 수치 */}
       <div className="relative w-full aspect-[3/4] overflow-hidden rounded-md bg-surface-light">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={resolveSrc(image.imageUrl)}
-          alt={`카탈로그 ${index + 1} 페이지`}
-          className="absolute inset-0 w-full h-full object-contain"
-        />
+        {isPdf && !pdfThumb ? (
+          // PDF 첫 페이지 렌더 전/실패 시 PDF 표시 플레이스홀더
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-secondary-dark">
+            <svg
+              className="w-8 h-8"
+              viewBox="0 0 24 24"
+              fill="none"
+              aria-hidden="true"
+            >
+              <path
+                d="M7 3h7l4 4v14a1 1 0 01-1 1H7a1 1 0 01-1-1V4a1 1 0 011-1z"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M13 3v5h5"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinejoin="round"
+              />
+            </svg>
+            <span className="text-xs font-semibold tracking-wide">PDF</span>
+          </div>
+        ) : (
+          <>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={isPdf ? (pdfThumb ?? '') : resolveSrc(image.fileUrl)}
+              alt={`카탈로그 ${index + 1} 페이지`}
+              className="absolute inset-0 w-full h-full object-contain"
+            />
+            {isPdf && (
+              <span className="absolute left-1.5 top-1.5 rounded-sm bg-overlay-dark-60 px-1.5 py-0.5 text-xs font-semibold text-heading-light">
+                PDF
+              </span>
+            )}
+          </>
+        )}
         {isReplacing && (
           <div className="absolute inset-0 flex items-center justify-center bg-overlay-dark-60">
             <span className="text-xs text-heading-light">교체 중...</span>
@@ -109,7 +181,7 @@ export function SortableImageCard({
         <input
           ref={fileInputRef}
           type="file"
-          accept="image/*"
+          accept="image/*,application/pdf,.pdf"
           onChange={handleFileChange}
           className="hidden"
         />
