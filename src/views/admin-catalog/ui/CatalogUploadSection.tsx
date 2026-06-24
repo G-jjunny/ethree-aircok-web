@@ -50,7 +50,7 @@ export function CatalogUploadSection() {
   }
 
   return (
-    <section className="flex flex-col gap-3">
+    <section className="bg-surface-white rounded-xl border border-border-light p-6 flex flex-col gap-4">
       <h2 className="text-nav font-semibold text-heading-dark">
         이미지·PDF 업로드
       </h2>
@@ -88,7 +88,7 @@ export function CatalogUploadSection() {
           type="button"
           onClick={() => fileInputRef.current?.click()}
           disabled={uploadMutation.isPending}
-          className="inline-flex items-center justify-center rounded-md bg-aircok-blue px-5 py-2 min-h-[44px] text-sm font-medium text-heading-light hover:bg-aircok-blue-dark transition-colors disabled:opacity-40 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:ring-offset-2"
+          className="inline-flex items-center justify-center bg-aircok-blue text-heading-light text-sm font-medium rounded-md px-4 py-2 min-h-[44px] hover:bg-aircok-blue-dark active:scale-[0.97] transition-colors disabled:opacity-40 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:ring-offset-2"
         >
           {uploadMutation.isPending ? '업로드 중...' : '파일 선택'}
         </button>

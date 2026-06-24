@@ -117,21 +117,47 @@ export function CatalogImageGridSection({
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-        {[1, 2, 3, 4].map((i) => (
-          // token 없음: aspect-[3/4] — 카탈로그 책자 페이지(세로형) 비율, 카탈로그 전용 1회성 수치
-          <div
-            key={i}
-            className="aspect-[3/4] rounded-lg bg-surface-light animate-pulse"
-          />
-        ))}
+      <div className="bg-surface-white rounded-xl border border-border-light p-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+          {[1, 2, 3, 4].map((i) => (
+            // token 없음: aspect-[3/4] — 카탈로그 책자 페이지(세로형) 비율, 카탈로그 전용 1회성 수치
+            <div
+              key={i}
+              className="aspect-[3/4] rounded-lg bg-surface-light animate-pulse"
+            />
+          ))}
+        </div>
       </div>
     )
   }
 
   if (items.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center text-center gap-3 rounded-xl border border-border-light bg-surface-white px-6 py-16">
+      <div className="bg-surface-white rounded-xl border border-border-light px-6 py-16 flex flex-col items-center justify-center text-center gap-3">
+        <svg
+          className="w-10 h-10 text-secondary-dark"
+          viewBox="0 0 24 24"
+          fill="none"
+          aria-hidden="true"
+        >
+          <rect
+            x="3"
+            y="3"
+            width="18"
+            height="18"
+            rx="2"
+            stroke="currentColor"
+            strokeWidth="1.5"
+          />
+          <path
+            d="M3 9l4-4 4 4 4-4 4 4"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          <circle cx="8.5" cy="14.5" r="1.5" fill="currentColor" />
+        </svg>
         <p className="text-nav text-secondary-dark [word-break:keep-all]">
           등록된 카탈로그 이미지가 없습니다.
         </p>
@@ -143,8 +169,8 @@ export function CatalogImageGridSection({
   }
 
   return (
-    <section className="flex flex-col gap-3">
-      <div className="flex items-center justify-between">
+    <section className="bg-surface-white rounded-xl border border-border-light p-6 flex flex-col gap-4">
+      <div className="flex items-center justify-between border-b border-border-light pb-4">
         <h2 className="text-nav font-semibold text-heading-dark">
           카탈로그 이미지 ({items.length})
         </h2>
