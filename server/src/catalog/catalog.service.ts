@@ -34,7 +34,8 @@ export class CatalogService {
 
     return this.prisma.catalogImage.create({
       data: {
-        imageUrl: dto.imageUrl,
+        fileUrl: dto.fileUrl,
+        fileType: dto.fileType,
         order,
       },
     });
@@ -44,7 +45,8 @@ export class CatalogService {
     await this.findOne(id);
 
     const data: Record<string, unknown> = {};
-    if (dto.imageUrl !== undefined) data.imageUrl = dto.imageUrl;
+    if (dto.fileUrl !== undefined) data.fileUrl = dto.fileUrl;
+    if (dto.fileType !== undefined) data.fileType = dto.fileType;
     if (dto.order !== undefined) data.order = dto.order;
 
     return this.prisma.catalogImage.update({ where: { id }, data });

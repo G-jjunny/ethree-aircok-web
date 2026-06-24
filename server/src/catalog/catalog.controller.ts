@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Controller,
   Get,
   Post,
@@ -21,6 +22,15 @@ import { CreateCatalogImageDto } from './dto/create-catalog-image.dto';
 import { UpdateCatalogImageDto } from './dto/update-catalog-image.dto';
 import { ReorderCatalogDto } from './dto/reorder-catalog.dto';
 
+// 카탈로그 업로드 허용 MIME 타입 화이트리스트 (#44). 이미지 + PDF.
+const ALLOWED_UPLOAD_MIMETYPES = [
+  'application/pdf',
+  'image/png',
+  'image/jpeg',
+  'image/webp',
+  'image/gif',
+];
+
 const multerOptions = {
   storage: diskStorage({
     destination: join(__dirname, '..', '..', '..', 'public', 'uploads'),
@@ -28,6 +38,22 @@ const multerOptions = {
       cb(null, `${Date.now()}-${file.originalname}`);
     },
   }),
+  // 허용 목록 외 mimetype 은 거부한다.
+  fileFilter: (
+    _req: Express.Request,
+    file: Express.Multer.File,
+    cb: (error: Error | null, acceptFile: boolean) => void,
+  ) => {
+    if (ALLOWED_UPLOAD_MIMETYPES.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new BadRequestException('허용되지 않은 파일 형식입니다.'), false);
+    }
+  },
+  // 최대 파일 크기 20MB. 초과 시 거부.
+  limits: {
+    fileSize: 20 * 1024 * 1024,
+  },
 };
 
 @Controller('catalog')
@@ -40,10 +66,12 @@ export class CatalogController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post('images')
-  @UseInterceptors(FileInterceptor('image', multerOptions))
-  uploadImage(@UploadedFile() file: Express.Multer.File) {
-    return { url: `/uploads/${file.filename}` };
+  @Post('uploads')
+  @UseInterceptors(FileInterceptor('file', multerOptions))
+  uploadFile(@UploadedFile() file: Express.Multer.File) {
+    // PDF 는 'pdf', 그 외 허용 이미지 타입은 'image' 로 분류해 응답한다.
+    const fileType = file.mimetype === 'application/pdf' ? 'pdf' : 'image';
+    return { url: `/uploads/${file.filename}`, fileType };
   }
 
   @UseGuards(JwtAuthGuard)

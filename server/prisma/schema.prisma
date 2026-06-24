@@ -6,6 +6,14 @@ datasource db {
   provider = "postgresql"
 }
 
+/// 카탈로그 파일 종류 (#44). 이미지/PDF 업로드를 구분한다.
+/// - image: png/jpeg/webp/gif 등 이미지 파일
+/// - pdf: application/pdf 파일
+enum CatalogFileType {
+  image
+  pdf
+}
+
 model AdminUser {
   id             String   @id @default(cuid())
   username       String   @unique
@@ -166,23 +174,30 @@ model FaqItem {
   updatedAt  DateTime    @updatedAt
 }
 
-/// 스마트에어콕 카탈로그 이미지 (#44).
+/// 스마트에어콕 카탈로그 파일 (이미지/PDF) (#44).
 ///
 /// 운용 방식:
-/// - 카탈로그 페이지에 노출되는 제품 카탈로그 이미지를 어드민이 CRUD 로 관리한다.
+/// - 카탈로그 페이지에 노출되는 제품 카탈로그 이미지/PDF 를 어드민이 CRUD 로 관리한다.
 /// - 공개 목록(GET /api/catalog)은 order 오름차순으로 노출한다. 동률 시 createdAt 보조 정렬 권장.
 /// - 어드민은 드래그앤드롭으로 순서를 일괄 변경한다(PATCH /api/catalog/reorder).
 ///
 /// 컬럼 정책:
-/// - imageUrl: POST /api/catalog/images (multipart, 필드명 `image`) 응답으로 받은
-///   URL 문자열(예: "/uploads/1781859080294-foo.png")을 보관한다. 파일 바이너리 아님.
+/// - fileUrl: POST /api/catalog/uploads (multipart, 필드명 `file`) 응답으로 받은
+///   URL 문자열(예: "/uploads/1781859080294-foo.pdf")을 보관한다. 파일 바이너리 아님.
+///   이미지/PDF 공통 URL 컬럼이며, 신규 레코드는 이 컬럼을 사용한다.
+/// - fileType: image | pdf. 업로드 응답의 fileType 을 그대로 저장. 기본값 image.
+/// - imageUrl: 하위호환/백필 잔재용 nullable 컬럼. 신규 레코드는 null 로 둔다(fileUrl 사용).
 /// - order: 표시 순서(오름차순). 기본값 0.
 model CatalogImage {
-  id        String   @id @default(cuid())
-  /// 업로드된 카탈로그 이미지 URL (예: "/uploads/xxx.png"). POST /api/catalog/images 응답값.
-  imageUrl  String
+  id        String          @id @default(cuid())
+  /// (하위호환) 구버전 이미지 URL. 신규 레코드는 null. 기존 데이터 보존용으로만 유지.
+  imageUrl  String?
+  /// 업로드된 카탈로그 파일 URL (예: "/uploads/xxx.pdf"). POST /api/catalog/uploads 응답값.
+  fileUrl   String?
+  /// 파일 종류(image | pdf). 업로드 응답 fileType 값을 저장. 기본값 image.
+  fileType  CatalogFileType @default(image)
   /// 표시 순서(오름차순). 기본값 0.
-  order     Int      @default(0)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  order     Int             @default(0)
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
 }
