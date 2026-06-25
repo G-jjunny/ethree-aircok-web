@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import { SITE } from '@/shared/config';
 
@@ -33,10 +34,16 @@ export function HeroSection() {
             </div>
           </div>
 
-          {/* 우측 placeholder */}
-          <div className="lg:w-2/5 w-full">
-            <div className="bg-surface-dark-1 rounded-xl aspect-square w-full flex items-center justify-center">
-              <span className="text-body-light text-sm">제품 이미지 영역</span>
+          {/* 우측 이미지 */}
+          <div className="lg:w-2/5 w-full flex items-center justify-center">
+            <div className="relative w-full aspect-square">
+              <Image
+                src="/images/home/aircok_product.png"
+                alt="스마트 에어콕 제품"
+                fill
+                className="object-contain"
+                priority
+              />
             </div>
           </div>
         </div>
