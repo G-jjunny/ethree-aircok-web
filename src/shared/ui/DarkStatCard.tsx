@@ -60,7 +60,7 @@ export function DarkStatCard({
   const icon = CATEGORY_ICONS[category]
 
   return (
-    <div className="group relative flex h-full flex-col gap-4 overflow-hidden rounded-xl bg-surface-dark-1 p-8 transition-all duration-200 hover:-translate-y-1 hover:bg-surface-dark-2">
+    <div className="group relative flex h-full flex-col gap-4 overflow-hidden rounded-xl bg-surface-dark-1 px-5 py-6 transition-all duration-200 hover:-translate-y-1 hover:bg-surface-dark-2">
       {icon && (
         <span className="flex size-11 items-center justify-center rounded-lg bg-overlay-white-10 text-aircok-blue-light">
           {icon}
@@ -72,7 +72,8 @@ export function DarkStatCard({
       <span className="text-6xl font-bold leading-none text-heading-light">
         {stat}
       </span>
-      <h3 className="mt-2 text-2xl font-bold leading-[1.19] text-heading-light [word-break:keep-all]">
+      {/* lg:min-h-[2.4em]: 4열 좁은 폭에서 1줄/2줄 제목 모두 동일 영역 점유 → description 시작점 통일 (design.md "title 정렬 규칙") */}
+      <h3 className="mt-2 text-2xl font-bold leading-[1.19] text-heading-light [word-break:keep-all] lg:min-h-[2.4em]">
         {title}
       </h3>
       <p className="flex-1 text-sm leading-[1.65] text-body-light [word-break:keep-all]">

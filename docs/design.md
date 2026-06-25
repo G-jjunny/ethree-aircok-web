@@ -1002,16 +1002,22 @@ TipTap 등 rich text 에디터의 HTML 출력을 렌더링하는 스타일 가�
 
 **공통 (4개 카드 균등)**
 - 섹션 배경: `bg-surface-dark`, 그리드 `grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch`
-- Radius: `rounded-xl` (16px), 패딩: `p-8`, 래퍼: `group flex flex-col gap-4 h-full overflow-hidden`
+- Radius: `rounded-xl` (16px), 패딩: **비대칭 `py-6 px-5`** (세로 32px=`--spacing-6` / 가로 24px=`--spacing-5`), 래퍼: `group flex flex-col gap-4 h-full overflow-hidden`
+  - 비대칭 패딩 근거: 좁은 1열 폭(lg 4열)에서 좌우 패딩이 과하면 한글 제목·설명이 가운데로 몰려 줄바꿈이 잦아진다. 세로는 카드 호흡 유지, 가로는 텍스트가 카드 폭을 더 활용하도록 한 단계 축소한다. 두 값 모두 커스텀 스페이싱 스케일 내 토큰(`py-6`=32px / `px-5`=24px)이며 신규 토큰 없음.
 - 카드 높이는 `h-full` + 그리드 `items-stretch`로 통일
 - 호버 인터랙션: `transition-all duration-200 hover:-translate-y-1`
 - 카드 배경: `bg-surface-dark-1`, 호버 시 `hover:bg-surface-dark-2` (배경색 대비로 depth, 그림자 없음)
 - **category 아이콘**: 카드 상단(category 레이블 위)에 카테고리 의미를 나타내는 라인 아이콘 1개 배치 — 아래 **Stat Category Icon** 규칙 참조
 - category 레이블: `text-aircok-blue-light text-xs font-semibold uppercase tracking-widest`
 - 핵심 수치: `text-6xl font-bold text-heading-light leading-none`
-- **title**: `text-2xl font-bold text-heading-light leading-[1.19] [word-break:keep-all]` (제목 위계 강화)
+- **title**: `text-2xl font-bold text-heading-light leading-[1.19] [word-break:keep-all]` (제목 위계 강화) + **2줄 높이 확보(`lg:min-h-[2.4em]`)** — 아래 *title 정렬 규칙* 참조
 - 설명: `text-body-light text-sm leading-[1.65] [word-break:keep-all]`
 - 출처: `text-body-light opacity-50 text-xs italic`
+
+**title 정렬 규칙 (description 시작점 통일)**
+- 제목 줄 수(1줄/2줄)가 카드마다 달라 설명(description) 시작점이 들쭉날쭉해지는 것을 막기 위해, title에 **2줄 기준 최소 높이**를 부여해 모든 카드가 동일한 제목 영역을 점유하게 한다.
+- 값: `lg:min-h-[2.4em]` — `em` 단위로 title 자체 font-size(`text-2xl`)·`leading-[1.19]`에 종속시켜, 2줄(`1.19 × 2 ≈ 2.38em`)을 안정적으로 담는 최소 높이. 픽셀 하드코딩 대신 폰트 스케일에 연동되므로 토큰 체계와 충돌하지 않는다.
+- **반응형 분기**: 1열(`< sm`)·2열(`sm`)에서는 카드 폭이 넓어 제목이 대부분 1줄로 들어가므로 min-height를 적용하면 불필요한 빈 공간이 생긴다. 따라서 카드가 좁은 1열 폭이 되는 **`lg`(4열) 이상에서만** min-height를 적용(`lg:min-h-[...]`)한다.
 
 **Stat Category Icon (통계 카테고리 라인 아이콘)**
 
@@ -1025,14 +1031,15 @@ TipTap 등 rich text 에디터의 HTML 출력을 렌더링하는 스타일 가�
 
 ```tsx
 // Dark Stat Card — 4개 카드 균등 (아이콘 칩 + 제목 위계 강화)
-<div className="group flex h-full flex-col gap-4 overflow-hidden rounded-xl p-8 bg-surface-dark-1 transition-all duration-200 hover:-translate-y-1 hover:bg-surface-dark-2">
+<div className="group flex h-full flex-col gap-4 overflow-hidden rounded-xl py-6 px-5 bg-surface-dark-1 transition-all duration-200 hover:-translate-y-1 hover:bg-surface-dark-2">
   <span className="flex size-11 items-center justify-center rounded-lg bg-overlay-white-10 text-aircok-blue-light">
     {/* 카테고리 라인 아이콘: size-6, currentColor stroke */}
     <svg className="size-6" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">...</svg>
   </span>
   <span className="text-aircok-blue-light text-xs font-semibold uppercase tracking-widest">category</span>
   <span className="text-6xl font-bold text-heading-light leading-none">50%</span>
-  <h3 className="mt-2 text-2xl font-bold text-heading-light leading-[1.19] [word-break:keep-all]">핵심 수치 제목</h3>
+  {/* lg:min-h-[2.4em] — 4열에서 1줄/2줄 제목 모두 동일 영역 점유 → description 시작점 통일 */}
+  <h3 className="mt-2 text-2xl font-bold text-heading-light leading-[1.19] [word-break:keep-all] lg:min-h-[2.4em]">핵심 수치 제목</h3>
   <p className="flex-1 text-body-light text-sm leading-[1.65] [word-break:keep-all]">설명 텍스트</p>
   <p className="mt-auto text-body-light opacity-50 text-xs italic">출처</p>
 </div>
