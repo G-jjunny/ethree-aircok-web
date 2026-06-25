@@ -175,6 +175,7 @@ Tailwind v4 프로젝트이므로 모든 토큰은 `@theme` 블록 안에 정의
 | 다크 구분선 | `border-border-dark` | `--color-border-dark` |
 | **타이포그래피** | | |
 | Nav·UI 중간 텍스트 (15px) | `text-nav` | `--font-size-nav` |
+| Stat Card Title (24px) | `text-2xl` | Tailwind 기본 |
 | Sub-heading · Card Title (21px) | `text-subheading` | `--font-size-subheading` |
 | Caption · Link (14px) | `text-sm` | Tailwind 기본 |
 | Micro (12px) | `text-xs` | Tailwind 기본 |
@@ -267,6 +268,7 @@ Apple 스타일의 '제품 우선 프레젠테이션'을 Aircok 브랜드에 적
 | Article Hero Mobile | 36px (2.25rem) | 700 | 1.14 | -0.2px | 뉴스/아티클 상세 페이지 H1 (모바일) |
 | Section Heading | 40px (2.50rem) | 600 | 1.10 | -0.3px | 섹션 타이틀 |
 | Tile Heading | 28px (1.75rem) | 500 | 1.14 | -0.1px | 제품 타일 헤드라인 |
+| Stat Card Title | 24px (1.50rem) | 700 | 1.19 | 0px | Dark Stat Card 결과 제목 — 수치 다음 위계, `text-2xl` (Tailwind 기본) |
 | Article Sub-heading | 22px (1.375rem) | 600 | 1.14 | 0px | 아티클 본문 내 H3 |
 | Card Title | 21px (1.31rem) | 700 | 1.19 | 0px | 카드 강조 헤딩 — `text-subheading` |
 | Card News Title | 18px (1.125rem) | 600 | 1.35 | 0px | 뉴스 카드 제목 |
@@ -990,52 +992,49 @@ TipTap 등 rich text 에디터의 HTML 출력을 렌더링하는 스타일 가�
 
 ### Dark Stat Card (다크 섹션 통계 카드)
 
-라이트 Stat Card의 다크 배경 변형. `StatSection`이 `bg-surface-dark` 배경에 배치될 때 사용. 기본(default) 변형과 핵심 지표 강조용 **highlight 변형** 두 가지를 제공하며, 동일 그리드 안에서 색·수치 크기로 위계를 만든다. 4개 카드는 균일 그리드(완전 타일링)를 유지하고, 강조는 **레이아웃 span이 아니라 highlight 카드의 색/크기/elevation**으로 표현한다(단조로운 동일 색 나열 방지).
+라이트 Stat Card의 다크 배경 변형. `StatSection`이 `bg-surface-dark` 배경에 배치될 때 사용. **4개 카드를 단일 default 스타일로 균등하게** 처리한다(개별 카드 색/크기 강조 없음). 강조는 카드 부각이 아니라 **각 카드의 결과 제목(title) 텍스트 위계 강화**로 표현한다 — 수치 다음으로 강한 시각 무게를 제목에 부여한다.
 
 **위계 규칙 (수치 > 제목 > 설명 > 출처)**
-- 핵심 수치: default `text-6xl` / highlight `text-7xl` (가장 강한 시각 무게)
-- 제목: `text-subheading`(21px) weight 700
+- 핵심 수치: `text-6xl` weight 700 (가장 강한 시각 무게)
+- 제목: `text-2xl`(24px) weight 700 — 수치 다음 위계로 끌어올림(기존 `text-subheading` 21px → 24px)
 - 설명: `text-sm`
 - 출처: `text-xs` italic
 
-**공통**
+**공통 (4개 카드 균등)**
 - 섹션 배경: `bg-surface-dark`, 그리드 `grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch`
 - Radius: `rounded-xl` (16px), 패딩: `p-8`, 래퍼: `group flex flex-col gap-4 h-full overflow-hidden`
 - 카드 높이는 `h-full` + 그리드 `items-stretch`로 통일
-- 호버 인터랙션: `transition-all duration-200 hover:-translate-y-1` (모든 카드 공통)
-- **title**: `text-subheading font-bold text-heading-light leading-[1.19] [word-break:keep-all]`
-
-**default 변형** (보조 지표)
+- 호버 인터랙션: `transition-all duration-200 hover:-translate-y-1`
 - 카드 배경: `bg-surface-dark-1`, 호버 시 `hover:bg-surface-dark-2` (배경색 대비로 depth, 그림자 없음)
+- **category 아이콘**: 카드 상단(category 레이블 위)에 카테고리 의미를 나타내는 라인 아이콘 1개 배치 — 아래 **Stat Category Icon** 규칙 참조
 - category 레이블: `text-aircok-blue-light text-xs font-semibold uppercase tracking-widest`
 - 핵심 수치: `text-6xl font-bold text-heading-light leading-none`
+- **title**: `text-2xl font-bold text-heading-light leading-[1.19] [word-break:keep-all]` (제목 위계 강화)
 - 설명: `text-body-light text-sm leading-[1.65] [word-break:keep-all]`
 - 출처: `text-body-light opacity-50 text-xs italic`
 
-**highlight 변형** (핵심/임팩트 지표 — 그리드 내 1개 권장)
-- 카드 배경: `bg-aircok-blue` + `shadow-product`, 호버 시 `hover:bg-aircok-blue-dark` (블루 면적으로 강조)
-- category 레이블: `text-heading-light opacity-80 text-xs font-semibold uppercase tracking-widest`
-- 핵심 수치: `text-7xl font-bold text-heading-light leading-none` (default보다 한 단계 큼)
-- 설명: `text-heading-light opacity-90 text-sm leading-[1.65] [word-break:keep-all]`
-- 출처: `text-heading-light opacity-70 text-xs italic`
+**Stat Category Icon (통계 카테고리 라인 아이콘)**
+
+각 카드 상단에 카테고리 의미를 절제 있게 시각화하는 인라인 SVG 라인 아이콘. **알록달록한 유니코드 이모지 사용 금지** — Location Pin Icon과 동일하게 `currentColor` 기반 외곽선(stroke) SVG로 통일한다. 4개 카드 모두 동일한 크기·색·배치로 처리하며(개별 강조 금지), 아이콘 모양만 카테고리별로 다르다.
+
+- **컨테이너(아이콘 칩)**: `flex size-11 items-center justify-center rounded-lg bg-overlay-white-10 text-aircok-blue-light` (다크 배경 위 미세 chip, 신규 색상 토큰 없이 `bg-overlay-white-10` + `text-aircok-blue-light` 재활용)
+- **아이콘**: `size-6`, `fill="none"`, `stroke="currentColor"`, `strokeWidth="1.5"`, `aria-hidden="true"` (색은 칩의 `text-aircok-blue-light` 상속)
+- 호버 시 별도 색 변화 없음(카드 호버는 배경/translate로만 표현)
+- 카테고리별 매핑은 데이터(`SITE.stats`)가 아니라 **컴포넌트 레이어(`DarkStatCard`)에서 `category` 키 기반 매핑**으로 둔다. 매핑에 없는 category는 아이콘 생략(graceful fallback)
+- 권장 아이콘 의미: Concentration=집중(과녁/타깃), Value=가치상승(우상향 추세), Cost=에너지/절감(번개), Air Quality=공기 흐름(바람결)
 
 ```tsx
-// Dark Stat Card — default 변형
+// Dark Stat Card — 4개 카드 균등 (아이콘 칩 + 제목 위계 강화)
 <div className="group flex h-full flex-col gap-4 overflow-hidden rounded-xl p-8 bg-surface-dark-1 transition-all duration-200 hover:-translate-y-1 hover:bg-surface-dark-2">
+  <span className="flex size-11 items-center justify-center rounded-lg bg-overlay-white-10 text-aircok-blue-light">
+    {/* 카테고리 라인 아이콘: size-6, currentColor stroke */}
+    <svg className="size-6" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">...</svg>
+  </span>
   <span className="text-aircok-blue-light text-xs font-semibold uppercase tracking-widest">category</span>
   <span className="text-6xl font-bold text-heading-light leading-none">50%</span>
-  <h3 className="mt-2 text-subheading font-bold text-heading-light leading-[1.19] [word-break:keep-all]">핵심 수치 제목</h3>
+  <h3 className="mt-2 text-2xl font-bold text-heading-light leading-[1.19] [word-break:keep-all]">핵심 수치 제목</h3>
   <p className="flex-1 text-body-light text-sm leading-[1.65] [word-break:keep-all]">설명 텍스트</p>
   <p className="mt-auto text-body-light opacity-50 text-xs italic">출처</p>
-</div>
-
-// Dark Stat Card — highlight 변형 (핵심 지표 1개)
-<div className="group flex h-full flex-col gap-4 overflow-hidden rounded-xl p-8 bg-aircok-blue shadow-product transition-all duration-200 hover:-translate-y-1 hover:bg-aircok-blue-dark">
-  <span className="text-heading-light opacity-80 text-xs font-semibold uppercase tracking-widest">category</span>
-  <span className="text-7xl font-bold text-heading-light leading-none">79%</span>
-  <h3 className="mt-2 text-subheading font-bold text-heading-light leading-[1.19] [word-break:keep-all]">핵심 수치 제목</h3>
-  <p className="flex-1 text-heading-light opacity-90 text-sm leading-[1.65] [word-break:keep-all]">설명 텍스트</p>
-  <p className="mt-auto text-heading-light opacity-70 text-xs italic">출처</p>
 </div>
 ```
 

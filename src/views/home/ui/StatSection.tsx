@@ -10,9 +10,6 @@ const STAT_NUMBERS: Record<string, string> = {
   'Air Quality': '46%',
 };
 
-// Cost(79%) — 가장 임팩트 있는 수치를 시각적으로 부각하는 강조 카드
-const HIGHLIGHT_CATEGORY = 'Cost';
-
 export function StatSection() {
   return (
     <section className="bg-surface-dark">
@@ -26,7 +23,6 @@ export function StatSection() {
               title={stat.title}
               description={stat.description}
               source={stat.source}
-              highlight={stat.category === HIGHLIGHT_CATEGORY}
             />
           ))}
         </div>
