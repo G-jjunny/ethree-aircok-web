@@ -1094,6 +1094,72 @@ TipTap 등 rich text 에디터의 HTML 출력을 렌더링하는 스타일 가�
 </div>
 ```
 
+### Process Timeline Flow (프로세스 타임라인 플로우)
+
+순서가 있는 다단계 프로세스를 카드 그리드 대신 **방향성 있는 타임라인**으로 표현하는 패턴. `MethodologySection`(공기질 안전진단 4단계)에서 사용. 균일 카드 그리드보다 단계 간 "흐름"을 시각적으로 전달한다. 신규 색상 토큰 없음 — 노드/도트는 `bg-aircok-blue`, 커넥터 라인은 `bg-border-light` 재활용.
+
+- 컨테이너: `<ol>` 시맨틱 리스트, 데스크탑 가로(`md:flex-row`, 좌→우) / 모바일 세로(`flex-col`, 위→아래) 반응형 전환. 각 단계는 `<li>`, 데스크탑에서 `md:flex-1`로 균등 분할
+- **노드(번호 배지)**: `h-10 w-10 rounded-full bg-aircok-blue text-[17px] font-bold text-heading-light shadow-card` 중앙 정렬. 단계 번호를 강조해 진행 순서를 명확히 함 (`relative z-10`으로 커넥터 위에 표시)
+- **커넥터 라인**:
+  - 데스크탑: 노드 우측 → 다음 노드 직전까지 가로선 `absolute top-5 h-px bg-border-light`. 노드 지름(`left-12`)에서 시작해 다음 단계 직전(`right-2`)에서 끝남
+  - 모바일: 노드 아래 세로선 `absolute left-5 w-px bg-border-light`
+  - **마지막 단계에는 커넥터를 그리지 않는다**
+- **진행 방향 도트**: 데스크탑 커넥터 끝점에 `h-1.5 w-1.5 rounded-full bg-aircok-blue`(`-translate-y-1/2`로 라인 중앙 정렬) 작은 점을 찍어 다음 단계로 향하는 방향성을 표현. `aria-hidden="true"`
+- **STEP 레이블**: `text-aircok-blue text-xs font-bold uppercase tracking-widest` (예: `STEP 01`)
+- **단계 제목**: `text-heading-dark text-xl font-semibold leading-[1.14] [word-break:keep-all]`
+- 텍스트 블록 배치: 모바일은 노드 우측(`ml-4`), 데스크탑은 노드 아래(`md:mt-5 md:ml-0 md:pr-8`)
+- 모든 장식 요소(`span`)는 `aria-hidden="true"`
+
+```tsx
+// Process Timeline Flow 예시 (마지막 단계 커넥터 생략)
+<ol className="flex flex-col md:flex-row md:items-start">
+  {steps.map((item, index) => {
+    const isLast = index === steps.length - 1;
+    return (
+      <li key={item.step} className="relative flex md:flex-1 md:flex-col">
+        {!isLast && (
+          <>
+            <span aria-hidden="true" className="absolute left-5 top-11 -bottom-1 w-px bg-border-light md:hidden" />
+            <span aria-hidden="true" className="absolute left-12 right-2 top-5 hidden h-px bg-border-light md:block" />
+            <span aria-hidden="true" className="absolute right-2 top-5 hidden h-1.5 w-1.5 -translate-y-1/2 rounded-full bg-aircok-blue md:block" />
+          </>
+        )}
+        <div className="relative z-10 flex shrink-0 items-center md:w-full md:flex-col md:items-start">
+          <span className="flex h-10 w-10 items-center justify-center rounded-full bg-aircok-blue text-[17px] font-bold text-heading-light shadow-card">
+            {item.step}
+          </span>
+        </div>
+        <div className="ml-4 pb-10 md:ml-0 md:mt-5 md:pb-0 md:pr-8">
+          <span className="text-aircok-blue text-xs font-bold uppercase tracking-widest">STEP {String(item.step).padStart(2, "0")}</span>
+          <h3 className="mt-1.5 text-heading-dark text-xl font-semibold leading-[1.14] [word-break:keep-all]">{item.title}</h3>
+        </div>
+      </li>
+    );
+  })}
+</ol>
+```
+
+> **Watermark Step Card 와의 구분**: 균일한 4열 카드 그리드가 적합한 경우(병렬적 특징 나열)는 Watermark Step Card를, 순서·진행 방향이 핵심인 경우는 Process Timeline Flow를 사용한다.
+
+### Accent Bar Stat Card (액센트 바 수치 카드)
+
+수치(통계) 하이라이트를 좌측 액센트 바 + 큰 타이포로 위계화한 흰 배경 카드. `WhatYouGetSection` 우측 통계 스택에서 사용. 라이트 섹션(`bg-surface-light`) 위 흰 카드. 신규 토큰 없음.
+
+- 카드 래퍼: `relative overflow-hidden bg-surface-white rounded-xl shadow-card pl-7 pr-6 py-6 flex items-baseline gap-4 hover:shadow-product hover:-translate-y-1 transition-all duration-200` (News Card 와 동일한 hover 상승 톤 재활용)
+- **좌측 액센트 바**: `absolute left-0 top-0 bottom-0 w-1 bg-aircok-blue` (`aria-hidden="true"`) — 카드마다 브랜드 컬러 강조 띠
+- **수치**: `text-4xl font-bold text-aircok-blue leading-none tracking-[-0.3px] shrink-0` (36px, 강한 위계)
+- **레이블**: `text-heading-dark text-[17px] font-medium leading-[1.4] [word-break:keep-all]`
+- 수치와 레이블은 `items-baseline`으로 베이스라인 정렬
+
+```tsx
+// Accent Bar Stat Card 예시
+<div className="group relative overflow-hidden bg-surface-white rounded-xl shadow-card pl-7 pr-6 py-6 flex items-baseline gap-4 hover:shadow-product hover:-translate-y-1 transition-all duration-200">
+  <span aria-hidden="true" className="absolute left-0 top-0 bottom-0 w-1 bg-aircok-blue" />
+  <p className="text-4xl font-bold text-aircok-blue leading-none tracking-[-0.3px] shrink-0">50%</p>
+  <p className="text-heading-dark text-[17px] font-medium leading-[1.4] [word-break:keep-all]">집중력 향상</p>
+</div>
+```
+
 ### Check List Item (체크리스트 아이템)
 
 혜택·포함 항목을 나열하는 체크리스트. `WhatYouGetSection`에서 사용.
