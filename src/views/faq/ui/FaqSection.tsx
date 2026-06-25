@@ -99,36 +99,7 @@ export function FaqSection() {
           titleAs="h2"
         />
 
-        {/* 검색 입력창 */}
-        <div className="relative mt-8">
-          <svg
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-secondary-dark w-5 h-5 pointer-events-none"
-            aria-hidden="true"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth="1.5"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607z"
-            />
-          </svg>
-          <input
-            type="search"
-            aria-label="FAQ 검색"
-            placeholder="질문을 검색하세요"
-            value={searchQuery}
-            onChange={(e) => {
-              setSearchQuery(e.target.value)
-              setOpenItemId(null)
-            }}
-            className="w-full bg-surface-light rounded-md px-4 py-3 pl-10 text-[15px] text-heading-dark placeholder:text-secondary-dark focus:outline-none focus:ring-2 focus:ring-aircok-blue border-none"
-          />
-        </div>
-
-        {/* 2컬럼 그리드: 사이드바(데스크탑) + 아코디언 */}
+        {/* 2컬럼 그리드: 사이드바(데스크탑) + (검색 + 아코디언) */}
         {/* token 없음: sm:grid-cols-[200px_1fr] — 사이드바 고정 너비 200px */}
         <div className="grid grid-cols-1 sm:grid-cols-[200px_1fr] gap-10 mt-8">
           {/* 사이드바 (sm 이상에서만 노출) */}
@@ -139,8 +110,37 @@ export function FaqSection() {
             onCategoryChange={handleCategoryChange}
           />
 
-          {/* 우측 콘텐츠 */}
+          {/* 우측 콘텐츠: 검색 입력창 + (모바일 탭) + 아코디언 */}
           <div>
+            {/* 검색 입력창 */}
+            <div className="relative mb-8">
+              <svg
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-secondary-dark w-5 h-5 pointer-events-none"
+                aria-hidden="true"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth="1.5"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607z"
+                />
+              </svg>
+              <input
+                type="search"
+                aria-label="FAQ 검색"
+                placeholder="질문을 검색하세요"
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value)
+                  setOpenItemId(null)
+                }}
+                className="w-full bg-surface-light rounded-md px-4 py-3 pl-10 text-[15px] text-heading-dark placeholder:text-secondary-dark focus:outline-none focus:ring-2 focus:ring-aircok-blue border-none"
+              />
+            </div>
+
             {/* 모바일 탭 (sm 미만에서만 노출) */}
             <div
               className="sm:hidden mb-6 flex flex-row gap-2 overflow-x-auto pb-1 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
