@@ -1265,33 +1265,32 @@ FAQ 페이지(`/faq`)에서 사용하는 전용 컴포넌트 패턴. 전체 섹�
 
 ### FAQ Section Layout (데스크탑 2컬럼 사이드바 레이아웃)
 
-데스크탑에서는 좌측 sticky 사이드바 + 우측 아코디언의 2컬럼 구조를 사용한다. 모바일에서는 사이드바를 숨기고 상단 탭으로 폴백한다.
+데스크탑에서는 좌측 sticky 사이드바 + 우측(검색 → 아코디언) 2컬럼 구조를 사용한다. 검색 입력창은 그리드 우측 콘텐츠 컬럼 최상단에 두어 아코디언과 같은 폭으로 정렬한다(사이드바 폭만큼 좁아지지 않음). 모바일에서는 사이드바를 숨기고 상단 탭으로 폴백한다.
 
 - 섹션 배경: `bg-surface-white`
 - 섹션 패딩: `py-20 md:py-28`
 - 전체 컨테이너 최대 너비: `max-w-[1000px] mx-auto px-5` {/* token 없음: FAQ 전용 중간 너비, 1200px 보다 좁고 768px 보다 넓은 2컬럼용 */}
-- 검색 입력창과 2컬럼 그리드 사이 간격: `mt-8`
+- SectionHeader와 2컬럼 그리드 사이 간격: `mt-8` (32px)
 - 2컬럼 그리드: `grid grid-cols-1 sm:grid-cols-[200px_1fr] gap-10` {/* token 없음: 사이드바 고정 너비 200px */}
-- 사이드바 영역: `hidden sm:block` (모바일 숨김)
-- 사이드바 sticky: `sticky top-20`
-- 모바일 탭 영역: `sm:hidden` (데스크탑 숨김)
+- 사이드바 영역: `hidden sm:block` (모바일 숨김), `sticky top-20`
+- 우측 콘텐츠 컬럼 세로 리듬(스페이싱 토큰 스케일 준수): 검색 입력창 `mb-8`(32px) → 모바일 탭 `mb-6`(24px, `sm:hidden`) → 아코디언
 - 전체 구조:
 
 ```tsx
-// FAQ Section Layout 예시 (데스크탑 2컬럼)
+// FAQ Section Layout 예시 (데스크탑 2컬럼, 검색은 우측 컬럼 최상단)
 <section className="bg-surface-white py-20 md:py-28">
   <div className="max-w-[1000px] mx-auto px-5"> {/* token 없음: FAQ 2컬럼 전용 너비 */}
     <SectionHeader label="자주 묻는 질문" title="FAQ" theme="light" titleAs="h2" />
-    {/* 검색 input */}
-    <div className="mt-8">
-      <FaqSearchInput ... />
-    </div>
     {/* 2컬럼 그리드 */}
     <div className="grid grid-cols-1 sm:grid-cols-[200px_1fr] gap-10 mt-8"> {/* token 없음: 사이드바 고정 너비 */}
       {/* 사이드바 (데스크탑만) */}
       <FaqSidebar ... />
-      {/* 우측 콘텐츠 */}
+      {/* 우측 콘텐츠: 검색 → 모바일 탭 → 아코디언 세로 스택 */}
       <div>
+        {/* 검색 input (우측 컬럼 최상단, 아코디언과 동일 폭) */}
+        <div className="relative mb-8">
+          <FaqSearchInput ... />
+        </div>
         {/* 모바일 탭 (모바일만) */}
         <div className="sm:hidden mb-6">
           <CategoryTabList ... />
@@ -1308,8 +1307,8 @@ FAQ 페이지(`/faq`)에서 사용하는 전용 컴포넌트 패턴. 전체 섹�
 
 섹션 상단에 배치되는 키워드 필터링 입력창. 입력 즉시 아코디언 목록을 필터링한다.
 
-- 컨테이너: `relative`
-- input: `w-full bg-surface-light rounded-lg px-4 py-3 pl-10 text-[15px] text-heading-dark placeholder:text-secondary-dark focus:outline-none focus:ring-2 focus:ring-aircok-blue border-none`
+- 컨테이너: `relative` (우측 콘텐츠 컬럼 최상단에 배치 시 `relative mb-8`로 아래 요소와 32px 간격 확보)
+- input: `w-full bg-surface-light rounded-md px-4 py-3 pl-10 text-[15px] text-heading-dark placeholder:text-secondary-dark focus:outline-none focus:ring-2 focus:ring-aircok-blue border-none` (radius는 §4 인풋 규칙 `rounded-md`와 통일)
 - 검색 아이콘: `absolute left-3 top-1/2 -translate-y-1/2 text-secondary-dark w-5 h-5`
 - 아이콘: SVG 돋보기, `pointer-events-none aria-hidden="true"`
 
@@ -1326,7 +1325,7 @@ FAQ 페이지(`/faq`)에서 사용하는 전용 컴포넌트 패턴. 전체 섹�
   <input
     type="search"
     placeholder="질문을 검색하세요"
-    className="w-full bg-surface-light rounded-lg px-4 py-3 pl-10 text-[15px] text-heading-dark placeholder:text-secondary-dark focus:outline-none focus:ring-2 focus:ring-aircok-blue border-none"
+    className="w-full bg-surface-light rounded-md px-4 py-3 pl-10 text-[15px] text-heading-dark placeholder:text-secondary-dark focus:outline-none focus:ring-2 focus:ring-aircok-blue border-none"
   />
 </div>
 ```
