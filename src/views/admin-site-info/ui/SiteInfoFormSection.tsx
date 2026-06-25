@@ -103,12 +103,14 @@ export function SiteInfoFormSection() {
     })
   }
 
-  const fields: Array<{
+  type Field = {
     name: keyof FormValues
     label: string
     type?: string
     required?: boolean
-  }> = [
+  }
+
+  const baseFields: Field[] = [
     { name: 'companyName', label: '회사명', required: true },
     { name: 'legalName', label: '법인명 (선택)' },
     { name: 'ceo', label: '대표자', required: true },
@@ -118,6 +120,9 @@ export function SiteInfoFormSection() {
     { name: 'phone', label: '전화', required: true },
     { name: 'fax', label: '팩스 (선택)' },
     { name: 'email', label: '이메일', type: 'email', required: true },
+  ]
+
+  const snsFields: Field[] = [
     { name: 'instagram', label: 'Instagram URL (선택)', type: 'url' },
     { name: 'youtube', label: 'YouTube URL (선택)', type: 'url' },
     { name: 'linkedin', label: 'LinkedIn URL (선택)', type: 'url' },
@@ -125,33 +130,40 @@ export function SiteInfoFormSection() {
     { name: 'kakaoUrl', label: 'KakaoTalk URL (선택)', type: 'url' },
   ]
 
+  const renderField = ({ name, label, type }: Field) => (
+    <div key={name} className="flex flex-col gap-1">
+      <label htmlFor={name} className="text-sm font-medium text-heading-dark">
+        {label}
+      </label>
+      <input
+        id={name}
+        type={type ?? 'text'}
+        {...register(name)}
+        className={
+          errors[name]
+            ? 'w-full bg-surface-light border border-error rounded-md px-4 py-3 text-nav text-heading-dark placeholder:text-secondary-dark focus:outline-none focus:ring-2 focus:ring-error focus:border-transparent transition-shadow min-h-[44px]'
+            : 'w-full bg-surface-light border border-border-light rounded-md px-4 py-3 text-nav text-heading-dark placeholder:text-secondary-dark focus:outline-none focus:ring-2 focus:ring-aircok-blue focus:border-transparent transition-shadow min-h-[44px]'
+        }
+        placeholder={label}
+      />
+      {errors[name] && (
+        <p className="text-xs text-error leading-[1.33] mt-1">{errors[name]?.message}</p>
+      )}
+    </div>
+  )
+
   return (
     <section className="bg-surface-white rounded-xl border border-border-light p-6">
       <h2 className="text-nav font-display font-semibold text-heading-dark mb-6">기본 정보</h2>
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {fields.map(({ name, label, type }) => (
-            <div key={name} className="flex flex-col gap-1">
-              <label htmlFor={name} className="text-sm font-medium text-heading-dark">
-                {label}
-              </label>
-              <input
-                id={name}
-                type={type ?? 'text'}
-                {...register(name)}
-                className={
-                  errors[name]
-                    ? 'w-full bg-surface-light border border-error rounded-md px-4 py-3 text-nav text-heading-dark placeholder:text-secondary-dark focus:outline-none focus:ring-2 focus:ring-error focus:border-transparent transition-shadow min-h-[44px]'
-                    : 'w-full bg-surface-light border border-border-light rounded-md px-4 py-3 text-nav text-heading-dark placeholder:text-secondary-dark focus:outline-none focus:ring-2 focus:ring-aircok-blue focus:border-transparent transition-shadow min-h-[44px]'
-                }
-                placeholder={label}
-              />
-              {errors[name] && (
-                <p className="text-xs text-error leading-[1.33] mt-1">{errors[name]?.message}</p>
-              )}
-            </div>
-          ))}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">{baseFields.map(renderField)}</div>
+        <div className="flex flex-col gap-1.5 mt-2">
+          <h3 className="text-nav font-semibold text-heading-dark">SNS 링크</h3>
+          <p className="text-sm text-secondary-dark leading-[1.43] [word-break:keep-all]">
+            링크를 비워두면 공개 사이트 푸터에 해당 SNS 링크가 표시되지 않습니다.
+          </p>
         </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">{snsFields.map(renderField)}</div>
         <div className="flex justify-end mt-2">
           <button
             type="submit"
