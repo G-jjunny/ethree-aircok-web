@@ -26,6 +26,8 @@ async function main() {
 
   console.log('Admin user created/verified:', admin.username);
 
+  await seedSiteInfo();
+  await seedPartners();
   await seedFaq();
 }
 
@@ -215,6 +217,74 @@ async function seedFaq() {
       productItemsCreated + airQualityItemsCreated
     })`,
   );
+}
+
+const PARTNERS: { name: string; order: number }[] = [
+  { name: '삼성 S1', order: 0 },
+  { name: '환경산업기술원', order: 1 },
+  { name: '대한민국무공수훈자회', order: 2 },
+  { name: '한국환경연구원(KEI)', order: 3 },
+  { name: '고려대학교', order: 4 },
+  { name: '건국대학교', order: 5 },
+  { name: '한국화학융합시험연구원', order: 6 },
+  { name: '평택대학교', order: 7 },
+  { name: 'LG화학 오창공장', order: 8 },
+  { name: '한국표준협회', order: 9 },
+  { name: '인하대학교병원', order: 10 },
+  { name: '현대아산병원', order: 11 },
+  { name: '동대문역사문화공원역', order: 12 },
+  { name: '수유역', order: 13 },
+  { name: '광주광역시', order: 14 },
+  { name: '농촌진흥청', order: 15 },
+  { name: '산림청', order: 16 },
+];
+
+async function seedSiteInfo() {
+  const siteInfo = await prisma.siteInfo.upsert({
+    where: { id: 'singleton' },
+    update: {},
+    create: {
+      id: 'singleton',
+      companyName: '스마트 에어콕',
+      legalName: '(주)에어콕',
+      address: '서울특별시 성동구 아차산로17길 49 성수 생각공장 데시앙플렉스 815호',
+      phone: '02-6952-1947',
+      email: 'contact@aircok.com',
+      bizNo: '689-87-00920',
+      ceo: '조흔우',
+      fax: '02-552-1948',
+      mailOrderNo: '2020-서울성동-02120',
+      instagram: 'https://www.instagram.com/smartaircok',
+      youtube: 'https://youtube.com/@aircok',
+      linkedin: 'https://linkedin.com/company/aircok',
+      facebook: null,
+      kakaoUrl: null,
+    },
+  });
+
+  console.log('SiteInfo created/verified:', siteInfo.companyName);
+}
+
+async function seedPartners() {
+  const existingCount = await prisma.partner.count();
+
+  if (existingCount >= PARTNERS.length) {
+    console.log(
+      `Partners already seeded (${existingCount} records), skipping.`,
+    );
+    return;
+  }
+
+  const result = await prisma.partner.createMany({
+    data: PARTNERS.map((p) => ({
+      name: p.name,
+      logoUrl: null,
+      type: 'partner' as const,
+      order: p.order,
+    })),
+  });
+
+  console.log(`Partners created: ${result.count}`);
 }
 
 main()
