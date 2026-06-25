@@ -990,29 +990,56 @@ TipTap 등 rich text 에디터의 HTML 출력을 렌더링하는 스타일 가�
 
 ### Dark Stat Card (다크 섹션 통계 카드)
 
-라이트 Stat Card의 다크 배경 변형. `StatSection`이 `bg-surface-dark` 배경에 배치될 때 사용.
+라이트 Stat Card의 다크 배경 변형. `StatSection`이 `bg-surface-dark` 배경에 배치될 때 사용. 기본(default) 변형과 핵심 지표 강조용 **highlight 변형** 두 가지를 제공하며, 동일 그리드 안에서 색·수치 크기로 위계를 만든다. 4개 카드는 균일 그리드(완전 타일링)를 유지하고, 강조는 **레이아웃 span이 아니라 highlight 카드의 색/크기/elevation**으로 표현한다(단조로운 동일 색 나열 방지).
 
-- 섹션 배경: `bg-surface-dark`
-- 카드 배경: `bg-surface-dark-1`
-- Radius: `rounded-xl` (16px)
-- 패딩: `p-8`
-- 테두리: 없음 (다크 섹션에서 배경색 대비로 depth 표현)
-- **category 레이블**: 12px, weight 600, `text-aircok-blue-light` (다크 배경에서 가독성), `uppercase tracking-widest`
-- **핵심 수치**: `text-5xl font-bold text-heading-light leading-none` (카드 상단에 대형 강조 수치 표시)
-- **title**: 21px, weight 700, `text-heading-light`
-- **description**: `text-body-light text-sm leading-[1.65] [word-break:keep-all]`
-- **source (출처)**: `text-body-light opacity-50 text-xs italic` (다크 배경에서 secondary 대체)
+**위계 규칙 (수치 > 제목 > 설명 > 출처)**
+- 핵심 수치: default `text-6xl` / highlight `text-7xl` (가장 강한 시각 무게)
+- 제목: `text-subheading`(21px) weight 700
+- 설명: `text-sm`
+- 출처: `text-xs` italic
+
+**공통**
+- 섹션 배경: `bg-surface-dark`, 그리드 `grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch`
+- Radius: `rounded-xl` (16px), 패딩: `p-8`, 래퍼: `group flex flex-col gap-4 h-full overflow-hidden`
+- 카드 높이는 `h-full` + 그리드 `items-stretch`로 통일
+- 호버 인터랙션: `transition-all duration-200 hover:-translate-y-1` (모든 카드 공통)
+- **title**: `text-subheading font-bold text-heading-light leading-[1.19] [word-break:keep-all]`
+
+**default 변형** (보조 지표)
+- 카드 배경: `bg-surface-dark-1`, 호버 시 `hover:bg-surface-dark-2` (배경색 대비로 depth, 그림자 없음)
+- category 레이블: `text-aircok-blue-light text-xs font-semibold uppercase tracking-widest`
+- 핵심 수치: `text-6xl font-bold text-heading-light leading-none`
+- 설명: `text-body-light text-sm leading-[1.65] [word-break:keep-all]`
+- 출처: `text-body-light opacity-50 text-xs italic`
+
+**highlight 변형** (핵심/임팩트 지표 — 그리드 내 1개 권장)
+- 카드 배경: `bg-aircok-blue` + `shadow-product`, 호버 시 `hover:bg-aircok-blue-dark` (블루 면적으로 강조)
+- category 레이블: `text-heading-light opacity-80 text-xs font-semibold uppercase tracking-widest`
+- 핵심 수치: `text-7xl font-bold text-heading-light leading-none` (default보다 한 단계 큼)
+- 설명: `text-heading-light opacity-90 text-sm leading-[1.65] [word-break:keep-all]`
+- 출처: `text-heading-light opacity-70 text-xs italic`
 
 ```tsx
-// Dark Stat Card 예시
-<div className="bg-surface-dark-1 rounded-xl p-8 flex flex-col gap-4">
+// Dark Stat Card — default 변형
+<div className="group flex h-full flex-col gap-4 overflow-hidden rounded-xl p-8 bg-surface-dark-1 transition-all duration-200 hover:-translate-y-1 hover:bg-surface-dark-2">
   <span className="text-aircok-blue-light text-xs font-semibold uppercase tracking-widest">category</span>
-  <span className="text-5xl font-bold text-heading-light leading-none">50%</span>
-  <h3 className="text-heading-light text-[21px] font-bold leading-[1.19] mt-2">핵심 수치 제목</h3>
-  <p className="text-body-light text-sm leading-[1.65] [word-break:keep-all] flex-1">설명 텍스트</p>
-  <p className="text-body-light opacity-50 text-xs italic mt-auto">출처</p>
+  <span className="text-6xl font-bold text-heading-light leading-none">50%</span>
+  <h3 className="mt-2 text-subheading font-bold text-heading-light leading-[1.19] [word-break:keep-all]">핵심 수치 제목</h3>
+  <p className="flex-1 text-body-light text-sm leading-[1.65] [word-break:keep-all]">설명 텍스트</p>
+  <p className="mt-auto text-body-light opacity-50 text-xs italic">출처</p>
+</div>
+
+// Dark Stat Card — highlight 변형 (핵심 지표 1개)
+<div className="group flex h-full flex-col gap-4 overflow-hidden rounded-xl p-8 bg-aircok-blue shadow-product transition-all duration-200 hover:-translate-y-1 hover:bg-aircok-blue-dark">
+  <span className="text-heading-light opacity-80 text-xs font-semibold uppercase tracking-widest">category</span>
+  <span className="text-7xl font-bold text-heading-light leading-none">79%</span>
+  <h3 className="mt-2 text-subheading font-bold text-heading-light leading-[1.19] [word-break:keep-all]">핵심 수치 제목</h3>
+  <p className="flex-1 text-heading-light opacity-90 text-sm leading-[1.65] [word-break:keep-all]">설명 텍스트</p>
+  <p className="mt-auto text-heading-light opacity-70 text-xs italic">출처</p>
 </div>
 ```
+
+> `StatSection` 하단에는 `SITE.statsCta`(모든 서비스 보기)로 이동하는 Pill 링크를 둔다: `rounded-pill border border-border-dark px-8 min-h-[44px] text-nav font-medium text-aircok-blue-light hover:bg-overlay-white-10` (다크 배경 Pill Link 토큰 재활용, 신규 토큰 없음).
 
 ### Step Badge (스텝 원형 배지)
 
