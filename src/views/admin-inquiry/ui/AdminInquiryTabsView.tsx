@@ -56,86 +56,88 @@ export function AdminInquiryTabsView() {
   };
 
   return (
-    <div className="p-6 lg:p-8">
-      <div className="mb-6">
-        <h1 className="text-heading-dark font-display font-semibold text-2xl">
-          문의 관리
-        </h1>
+    <div>
+      {/* 페이지 헤더 + 탭 바 — §15.2 + §15 탭 연결 구조 */}
+      <div className="bg-surface-white px-6 lg:px-8">
+        {/* 상단 row: 제목 */}
+        <div className="pt-5 flex items-center justify-between">
+          <h1 className="text-[22px] font-display font-semibold text-heading-dark">
+            문의 관리
+          </h1>
+        </div>
+
+        {/* 탭 바 — 헤더 하단에 자연스럽게 연결 */}
+        <div
+          role="tablist"
+          aria-label="문의 관리 탭"
+          className="flex items-center gap-1 mt-4 border-b border-border-light overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+        >
+          {TABS.map((tab, index) => {
+            const active = tab.key === activeTab;
+            return (
+              <button
+                key={tab.key}
+                ref={(el) => {
+                  tabRefs.current[tab.key] = el;
+                }}
+                type="button"
+                role="tab"
+                id={`tab-${tab.key}`}
+                aria-selected={active}
+                aria-controls={`panel-${tab.key}`}
+                tabIndex={active ? 0 : -1}
+                onClick={() => setActiveTab(tab.key)}
+                onKeyDown={(e) => handleKeyDown(e, index)}
+                className={
+                  active
+                    ? 'shrink-0 -mb-px border-b-2 border-aircok-blue px-4 py-3 min-h-[44px] text-sm font-body font-semibold text-aircok-blue transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:ring-offset-2 rounded-t-md'
+                    : 'shrink-0 -mb-px border-b-2 border-transparent px-4 py-3 min-h-[44px] text-sm font-body text-secondary-dark hover:text-heading-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:ring-offset-2 rounded-t-md'
+                }
+              >
+                {tab.label}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
-      {/* 탭 바 */}
-      <div
-        role="tablist"
-        aria-label="문의 관리 탭"
-        className="flex items-center gap-1 border-b border-border-light overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
-      >
-        {TABS.map((tab, index) => {
-          const active = tab.key === activeTab;
-          return (
-            <button
-              key={tab.key}
-              ref={(el) => {
-                tabRefs.current[tab.key] = el;
-              }}
-              type="button"
-              role="tab"
-              id={`tab-${tab.key}`}
-              aria-selected={active}
-              aria-controls={`panel-${tab.key}`}
-              tabIndex={active ? 0 : -1}
-              onClick={() => setActiveTab(tab.key)}
-              onKeyDown={(e) => handleKeyDown(e, index)}
-              className={
-                active
-                  ? 'shrink-0 -mb-px border-b-2 border-aircok-blue px-4 py-3 min-h-[44px] text-sm font-body font-semibold text-aircok-blue transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:ring-offset-2 rounded-t-md'
-                  : 'shrink-0 -mb-px border-b-2 border-transparent px-4 py-3 min-h-[44px] text-sm font-body text-secondary-dark hover:text-heading-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:ring-offset-2 rounded-t-md'
-              }
-            >
-              {tab.label}
-            </button>
-          );
-        })}
-      </div>
+      {/* 탭 콘텐츠 영역 */}
+      <div className="p-6 lg:p-8">
+        <div
+          role="tabpanel"
+          id="panel-list"
+          aria-labelledby="tab-list"
+          hidden={activeTab !== 'list'}
+        >
+          {activeTab === 'list' && <AdminInquiryListView />}
+        </div>
 
-      {/* 패널들 (비활성은 hidden) */}
-      <div
-        role="tabpanel"
-        id="panel-list"
-        aria-labelledby="tab-list"
-        hidden={activeTab !== 'list'}
-        className="pt-6"
-      >
-        {activeTab === 'list' && <AdminInquiryListView />}
-      </div>
+        <div
+          role="tabpanel"
+          id="panel-form"
+          aria-labelledby="tab-form"
+          hidden={activeTab !== 'form'}
+        >
+          {activeTab === 'form' && <AdminInquiryFormBuilderView />}
+        </div>
 
-      <div
-        role="tabpanel"
-        id="panel-form"
-        aria-labelledby="tab-form"
-        hidden={activeTab !== 'form'}
-        className="pt-6"
-      >
-        {activeTab === 'form' && <AdminInquiryFormBuilderView />}
-      </div>
+        <div
+          role="tabpanel"
+          id="panel-mail"
+          aria-labelledby="tab-mail"
+          hidden={activeTab !== 'mail'}
+        >
+          {activeTab === 'mail' && <AdminMailSettingView />}
+        </div>
 
-      <div
-        role="tabpanel"
-        id="panel-mail"
-        aria-labelledby="tab-mail"
-        hidden={activeTab !== 'mail'}
-        className="pt-6"
-      >
-        {activeTab === 'mail' && <AdminMailSettingView />}
-      </div>
-
-      <div
-        role="tabpanel"
-        id="panel-map"
-        aria-labelledby="tab-map"
-        hidden={activeTab !== 'map'}
-        className="pt-6"
-      >
-        {activeTab === 'map' && <AdminMapSettingView />}
+        <div
+          role="tabpanel"
+          id="panel-map"
+          aria-labelledby="tab-map"
+          hidden={activeTab !== 'map'}
+        >
+          {activeTab === 'map' && <AdminMapSettingView />}
+        </div>
       </div>
     </div>
   );

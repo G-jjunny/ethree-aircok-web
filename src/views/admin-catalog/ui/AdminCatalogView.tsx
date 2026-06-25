@@ -16,12 +16,19 @@ export function AdminCatalogView() {
   )
 
   return (
-    <div className="p-6 lg:p-8 flex flex-col gap-8">
-      <h1 className="text-heading-dark font-display font-semibold text-2xl">
-        카탈로그 관리
-      </h1>
-      <CatalogUploadSection />
-      <CatalogImageGridSection images={images} isLoading={isLoading} />
+    <div>
+      {/* 페이지 헤더 — §15.2 */}
+      <div className="bg-surface-white border-b border-border-light px-6 lg:px-8 py-5">
+        <h1 className="text-[22px] font-display font-semibold text-heading-dark leading-tight [word-break:keep-all]">
+          카탈로그 관리
+        </h1>
+      </div>
+
+      {/* 콘텐츠 영역 */}
+      <div className="p-6 lg:p-8 flex flex-col gap-8">
+        <CatalogUploadSection />
+        <CatalogImageGridSection images={images} isLoading={isLoading} />
+      </div>
     </div>
   )
 }

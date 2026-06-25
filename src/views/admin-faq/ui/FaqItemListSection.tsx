@@ -65,7 +65,7 @@ export function FaqItemListSection({
 
   return (
     <div className="bg-surface-white rounded-xl border border-border-light p-4 flex flex-col gap-3">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between border-b border-border-light pb-3 mb-3">
         <h2 className="text-nav font-semibold text-heading-dark truncate">
           {selectedCategoryName ?? '항목 목록'}
         </h2>
@@ -122,7 +122,7 @@ export function FaqItemListSection({
                   type="button"
                   aria-label="FAQ 항목 수정"
                   onClick={() => setEditingItem(item)}
-                  className="inline-flex items-center justify-center w-7 h-7 rounded-sm text-secondary-dark hover:text-heading-dark hover:bg-surface-light transition-colors shrink-0"
+                  className="inline-flex items-center justify-center w-7 h-7 rounded text-secondary-dark hover:text-heading-dark hover:bg-surface-light transition-colors shrink-0"
                 >
                   {/* pencil icon */}
                   <svg
@@ -144,7 +144,7 @@ export function FaqItemListSection({
                   type="button"
                   aria-label="FAQ 항목 삭제"
                   onClick={() => setDeletingItemId(item.id)}
-                  className="inline-flex items-center justify-center w-7 h-7 rounded-sm text-secondary-dark hover:text-error hover:bg-surface-light transition-colors shrink-0"
+                  className="inline-flex items-center justify-center w-7 h-7 rounded text-secondary-dark hover:text-error hover:bg-surface-light transition-colors shrink-0"
                 >
                   {/* trash2 icon */}
                   <svg

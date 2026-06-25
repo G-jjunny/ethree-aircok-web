@@ -1768,11 +1768,11 @@ CSS `grid-template-rows` 트릭을 사용한 부드러운 열림/닫힘 애니�
 콘솔 전역 셸 레이아웃. 기존 상단 가로 nav 헤더(§ConsoleLayout)를 **좌측 고정 사이드바 + 우측 메인 콘텐츠** 2단 구조로 대체한다. 마케팅 페이지와 달리 `content-container`를 사용하지 않고 풀폭 셸을 쓰며, 사이드바는 데스크탑에서 고정·모바일에서 드로어로 접힌다.
 
 **신규 레이아웃 수치 (토큰 없음 — 콘솔 셸 전용 1회성 수치)**
-- 사이드바 폭: `w-60` (240px). Tailwind 기본 스페이싱 스케일(`w-60`)을 사용하므로 임의 하드코딩이 아니며, 콘솔 셸의 단일 출처로 고정한다. 메인 콘텐츠의 좌측 여백(`lg:pl-60`)도 동일 값을 참조한다.
+- 사이드바 폭: `w-64` (256px). Tailwind 기본 스페이싱 스케일(`w-64`)을 사용하므로 임의 하드코딩이 아니며, 콘솔 셸의 단일 출처로 고정한다. 메인 콘텐츠의 좌측 여백(`lg:pl-64`)도 동일 값을 참조한다. *(구 w-60에서 §15.1에서 w-64로 확정)*
 - 데스크탑 분기점: `lg`(1024px). `lg` 이상은 고정 사이드바 + 메인 좌측 패딩, `lg` 미만은 사이드바를 화면 밖으로 숨기고(`-translate-x-full`) 상단 모바일 바 + 드로어로 전환한다. 콘솔은 업무용 화면이라 풀 사이드바 노출 기준을 마케팅(834px)보다 높은 1024px로 둔다.
 
 **활성 메뉴 강조 (신규 색상 토큰 없음)**
-- 활성 항목 배경은 Aircok Blue의 저채도 틴트를 Tailwind 불투명도 모디파이어로 표현: `bg-aircok-blue/10` (신규 CSS 변수 없이 기존 `--color-aircok-blue`에서 파생). 텍스트·아이콘은 `text-aircok-blue font-semibold`.
+- 활성 항목 배경은 진한 파란색 채움으로 강조: `bg-aircok-blue` (기존 `bg-aircok-blue/10` 틴트에서 §15.1에서 진한 강조로 확정). 텍스트·아이콘은 `text-heading-light font-semibold`.
 - 비활성 항목: `text-secondary-dark`, hover 시 `hover:bg-surface-light hover:text-heading-dark`.
 
 **전체 구조 (전제 마크업)**
@@ -1783,10 +1783,10 @@ CSS `grid-template-rows` 트릭을 사용한 부드러운 열림/닫힘 애니�
 - **사이드바(`<aside>`)**: 
   `fixed inset-y-0 left-0 z-50 w-60 bg-surface-white border-r border-border-light flex flex-col transition-transform duration-200 lg:translate-x-0`
   + 모바일 토글: 닫힘일 때 `-translate-x-full`, 열림일 때 `translate-x-0` (둘 다 `lg:translate-x-0`로 데스크탑에서는 항상 노출). `aria-label="콘솔 메뉴"` 권장.
-- **사이드바 타이틀/로고 영역**: `flex items-center h-14 px-5 border-b border-border-light shrink-0` 내부에 `text-heading-dark font-body font-semibold text-sm` 로 "어드민 콘솔".
+- **사이드바 타이틀/로고 영역**: `flex items-center h-16 px-5 border-b border-border-light shrink-0` 내부에 `text-heading-dark font-body font-semibold text-sm` 로 "어드민 콘솔".
 - **메뉴 목록(`<nav>`)**: `flex flex-col gap-1 p-3 flex-1 overflow-y-auto` (`SITE.admin.nav` 순회). `aria-label="콘솔 내비게이션"`.
-- **메뉴 아이템 — 활성**: `flex items-center gap-3 rounded-md px-3 py-2.5 min-h-[44px] text-sm font-body font-semibold bg-aircok-blue/10 text-aircok-blue transition-colors`
-- **메뉴 아이템 — 비활성**: `flex items-center gap-3 rounded-md px-3 py-2.5 min-h-[44px] text-sm font-body text-secondary-dark hover:bg-surface-light hover:text-heading-dark transition-colors`
+- **메뉴 아이템 — 활성**: `flex items-center gap-3 rounded-lg px-3 py-2.5 min-h-[44px] text-[15px] font-body font-semibold bg-aircok-blue text-heading-light transition-colors`
+- **메뉴 아이템 — 비활성**: `flex items-center gap-3 rounded-lg px-3 py-2.5 min-h-[44px] text-[15px] font-body text-secondary-dark hover:bg-surface-light hover:text-heading-dark transition-colors`
 - **사이드바 하단 사용자 영역**: `mt-auto border-t border-border-light p-3 flex flex-col gap-2 shrink-0`
   - username: `text-secondary-dark text-sm px-3 truncate`
   - 로그아웃 버튼: `flex items-center gap-2 rounded-md px-3 py-2.5 min-h-[44px] text-sm font-body text-error hover:bg-surface-light transition-colors text-left`
@@ -1794,9 +1794,9 @@ CSS `grid-template-rows` 트릭을 사용한 부드러운 열림/닫힘 애니�
   - 햄버거 버튼: `inline-flex items-center justify-center w-11 h-11 -ml-2 rounded-md text-heading-dark hover:bg-surface-light transition-colors` (`aria-label="메뉴 열기"`, `aria-expanded={drawerOpen}`, `aria-controls="console-sidebar"`)
   - 타이틀: `text-heading-dark font-body font-semibold text-sm`
 - **모바일 드로어 오버레이**: `fixed inset-0 z-40 bg-overlay-dark-60 lg:hidden` — `drawerOpen`일 때만 렌더, 클릭 시 닫힘. 사이드바 `<aside>`에는 `id="console-sidebar"` 부여.
-- **메인 콘텐츠(`<main>`)**: `lg:pl-60` (사이드바 폭만큼 좌측 패딩)만 부여한다. **콘텐츠 내부 패딩은 셸이 갖지 않는다.**
+- **메인 콘텐츠(`<main>`)**: `lg:pl-64` (사이드바 폭만큼 좌측 패딩)만 부여한다. **콘텐츠 내부 패딩은 셸이 갖지 않는다.**
 
-> **⚠️ 콘솔 콘텐츠 패딩 단일 출처 정책 (정책 (b) — 뷰 자체 패딩)**: 셸(`<main>`)은 좌측 사이드바 오프셋(`lg:pl-60`)만 책임지고 콘텐츠 패딩을 갖지 않는다. **각 콘솔 뷰(views/widgets)가 자신의 최상위 래퍼에 `p-6 lg:p-8` 패딩을 직접 갖는다.** 이는 기존 콘솔 뷰들(뉴스 관리·로그인 등)이 이미 자체 패딩을 갖는 현실과 일치시키고, 셸과 뷰가 패딩을 이중으로 거는 충돌을 방지하기 위함이다. 콘솔 뷰 신규 작성 시 최상위 래퍼는 `p-6 lg:p-8`(반응형)을 표준으로 한다(과거 일부 뷰의 고정 `p-8`은 점진적으로 `p-6 lg:p-8`로 수렴).
+> **⚠️ 콘솔 콘텐츠 패딩 단일 출처 정책 (정책 (b) — 뷰 자체 패딩)**: 셸(`<main>`)은 좌측 사이드바 오프셋(`lg:pl-64`)만 책임지고 콘텐츠 패딩을 갖지 않는다. **각 콘솔 뷰(views/widgets)가 자신의 최상위 래퍼에 `p-6 lg:p-8` 패딩을 직접 갖는다.** 이는 기존 콘솔 뷰들(뉴스 관리·로그인 등)이 이미 자체 패딩을 갖는 현실과 일치시키고, 셸과 뷰가 패딩을 이중으로 거는 충돌을 방지하기 위함이다. 콘솔 뷰 신규 작성 시 최상위 래퍼는 `p-6 lg:p-8`(반응형)을 표준으로 한다(과거 일부 뷰의 고정 `p-8`은 점진적으로 `p-6 lg:p-8`로 수렴).
 
 ```tsx
 // Admin Console Sidebar Layout 골격 ('use client', 상태/인증 로직은 implementer)
@@ -1832,11 +1832,11 @@ CSS `grid-template-rows` 트릭을 사용한 부드러운 열림/닫힘 애니�
   <aside
     id="console-sidebar"
     aria-label="콘솔 메뉴"
-    className={`fixed inset-y-0 left-0 z-50 w-60 bg-surface-white border-r border-border-light flex flex-col transition-transform duration-200 lg:translate-x-0 ${
+    className={`fixed inset-y-0 left-0 z-50 w-64 bg-surface-white border-r border-border-light flex flex-col transition-transform duration-200 lg:translate-x-0 ${
       drawerOpen ? 'translate-x-0' : '-translate-x-full'
     }`}
   >
-    <div className="flex items-center h-14 px-5 border-b border-border-light shrink-0">
+    <div className="flex items-center h-16 px-5 border-b border-border-light shrink-0">
       <span className="text-heading-dark font-body font-semibold text-sm">어드민 콘솔</span>
     </div>
     <nav aria-label="콘솔 내비게이션" className="flex flex-col gap-1 p-3 flex-1 overflow-y-auto">
@@ -1848,8 +1848,8 @@ CSS `grid-template-rows` 트릭을 사용한 부드러운 열림/닫힘 애니�
           onClick={() => setDrawerOpen(false)}
           className={
             isNavActive(item.href)
-              ? 'flex items-center gap-3 rounded-md px-3 py-2.5 min-h-[44px] text-sm font-body font-semibold bg-aircok-blue/10 text-aircok-blue transition-colors'
-              : 'flex items-center gap-3 rounded-md px-3 py-2.5 min-h-[44px] text-sm font-body text-secondary-dark hover:bg-surface-light hover:text-heading-dark transition-colors'
+              ? 'flex items-center gap-3 rounded-lg px-3 py-2.5 min-h-[44px] text-[15px] font-body font-semibold bg-aircok-blue text-heading-light transition-colors'
+              : 'flex items-center gap-3 rounded-lg px-3 py-2.5 min-h-[44px] text-[15px] font-body text-secondary-dark hover:bg-surface-light hover:text-heading-dark transition-colors'
           }
         >
           {item.label}
@@ -1869,11 +1869,11 @@ CSS `grid-template-rows` 트릭을 사용한 부드러운 열림/닫힘 애니�
   </aside>
 
   {/* 메인 콘텐츠 — 셸은 사이드바 오프셋만, 콘텐츠 패딩은 각 뷰가 자체 보유 (정책 (b)) */}
-  <main className="lg:pl-60">{children}</main>
+  <main className="lg:pl-64">{children}</main>
 </div>
 ```
 
-> **모바일 동작 전제**: `drawerOpen` 상태는 `ConsoleLayout` 내부 `useState`로 관리한다. (1) 햄버거 클릭 → `true`, (2) 오버레이 클릭 / 메뉴 항목 클릭 / 라우트 변경 시 → `false`. `lg` 이상에서는 사이드바가 항상 `lg:translate-x-0`로 노출되므로 `drawerOpen` 값과 무관하게 보인다(오버레이·모바일 상단 바는 `lg:hidden`으로 숨김). 라우트 변경 시 자동 닫힘(`useEffect`로 `pathname` 변화 감지)은 implementer가 붙인다.
+> **모바일 동작 전제**: `drawerOpen` 상태는 `ConsoleLayout` 내부 `useState`로 관리한다. (1) 햄버거 클릭 → `true`, (2) 오버레이 클릭 / 메뉴 항목 클릭 / 라우트 변경 시 → `false`. `lg` 이상에서는 사이드바가 항상 `lg:translate-x-0`로 노출되므로 `drawerOpen` 값과 무관하게 보인다(오버레이·모바일 상단 바는 `lg:hidden`으로 숨김). 라우트 변경 시 자동 닫힘(`useEffect`로 `pathname` 변화 감지)은 implementer가 붙인다. 사이드바 폭: `w-64`(256px), 메인 오프셋: `lg:pl-64`.
 
 ### Admin Selectable List Row (선택 가능한 목록 행)
 
@@ -2311,3 +2311,301 @@ toast.error('뉴스 등록에 실패했습니다. 다시 시도해 주세요')
 ```
 
 > **역할 분리 요약**: 비가역 행동 직전 확인 → §14.1 `ConfirmDialog`(딤드 모달). 행동 결과 알림 → §14.2 Toaster(`toast.success`/`toast.error`). native `confirm`/`alert`은 두 경우 모두에서 대체한다.
+
+---
+
+## 15. 관리자 콘솔 UI 패턴 — 리디자인 확정본
+
+> §9 Admin / Console UI 패턴의 **확장·갱신판**이다. §9에서 미정의였던 페이지 헤더·테이블·대시보드 카드·섹션 패널 패턴을 추가하고, §9의 사이드바 수치를 이 섹션 기준으로 확정한다. 신규 색상 CSS 변수는 없으며 기존 토큰만 재활용한다.
+
+### 15.1 Admin Console Layout (관리자 콘솔 레이아웃) — §9 확정
+
+§9 `Admin Console Sidebar Layout`의 수치를 이 섹션에서 확정한다. **§9의 구 정의(w-60, bg-aircok-blue/10)보다 이 섹션이 우선한다.**
+
+- **사이드바 폭**: `w-64` (256px). 메인 콘텐츠 오프셋: `lg:pl-64`
+- **사이드바 헤더 높이**: `h-16` (64px) — 모바일 상단 바와 동일 높이로 정렬
+- **nav 항목 (비활성)**: `flex items-center gap-3 rounded-lg px-3 py-2.5 min-h-[44px] text-[15px] font-body text-secondary-dark hover:bg-surface-light hover:text-heading-dark transition-colors`
+- **nav 항목 (활성)**: `flex items-center gap-3 rounded-lg px-3 py-2.5 min-h-[44px] text-[15px] font-body font-semibold bg-aircok-blue text-heading-light transition-colors`
+  - radius를 `rounded-md`(8px)에서 `rounded-lg`(12px)로, 활성 색을 틴트(`bg-aircok-blue/10 text-aircok-blue`)에서 진한 채움(`bg-aircok-blue text-heading-light`)으로 교체
+- **사이드바 헤더 영역**: `flex items-center h-16 px-5 border-b border-border-light shrink-0`
+- **사이드바 푸터 (사용자명 + 로그아웃)**: `mt-auto border-t border-border-light p-3 flex flex-col gap-2 shrink-0`
+  - 사용자명: `text-secondary-dark text-sm px-3 truncate`
+  - 로그아웃 버튼: `flex items-center gap-2 rounded-md px-3 py-2.5 min-h-[44px] text-sm font-body text-error hover:bg-surface-light transition-colors text-left`
+- **모바일 상단 바**: `sticky top-0 z-30 flex items-center justify-between h-16 px-4 bg-surface-white border-b border-border-light lg:hidden`
+- **메인 콘텐츠 영역**: `lg:pl-64 min-h-screen bg-surface-light`
+
+```tsx
+// ConsoleLayout 골격 요약 — w-64 / h-16 / bg-aircok-blue 활성 강조
+<div className="min-h-screen bg-surface-light">
+  {/* 모바일 상단 바 */}
+  <div className="sticky top-0 z-30 flex items-center justify-between h-16 px-4 bg-surface-white border-b border-border-light lg:hidden">
+    {/* 햄버거 버튼 */}
+    <button type="button" aria-label="메뉴 열기" className="inline-flex items-center justify-center w-11 h-11 -ml-2 rounded-md text-heading-dark hover:bg-surface-light transition-colors">
+      {/* 햄버거 SVG */}
+    </button>
+    <span className="text-heading-dark font-body font-semibold text-sm">어드민 콘솔</span>
+    <span className="w-11" aria-hidden="true" />
+  </div>
+
+  {/* 사이드바 */}
+  <aside
+    id="console-sidebar"
+    aria-label="콘솔 메뉴"
+    className="fixed inset-y-0 left-0 z-50 w-64 bg-surface-white border-r border-border-light flex flex-col transition-transform duration-200 lg:translate-x-0 -translate-x-full"
+  >
+    <div className="flex items-center h-16 px-5 border-b border-border-light shrink-0">
+      <span className="text-heading-dark font-body font-semibold text-sm">어드민 콘솔</span>
+    </div>
+    <nav aria-label="콘솔 내비게이션" className="flex flex-col gap-1 p-3 flex-1 overflow-y-auto">
+      {/* 활성 항목 */}
+      <a className="flex items-center gap-3 rounded-lg px-3 py-2.5 min-h-[44px] text-[15px] font-body font-semibold bg-aircok-blue text-heading-light transition-colors">
+        뉴스 관리
+      </a>
+      {/* 비활성 항목 */}
+      <a className="flex items-center gap-3 rounded-lg px-3 py-2.5 min-h-[44px] text-[15px] font-body text-secondary-dark hover:bg-surface-light hover:text-heading-dark transition-colors">
+        문의 관리
+      </a>
+    </nav>
+    <div className="mt-auto border-t border-border-light p-3 flex flex-col gap-2 shrink-0">
+      <span className="text-secondary-dark text-sm px-3 truncate">admin</span>
+      <button type="button" className="flex items-center gap-2 rounded-md px-3 py-2.5 min-h-[44px] text-sm font-body text-error hover:bg-surface-light transition-colors text-left">
+        로그아웃
+      </button>
+    </div>
+  </aside>
+
+  <main className="lg:pl-64">{/* 각 뷰가 자체 p-6 lg:p-8 패딩 보유 */}</main>
+</div>
+```
+
+---
+
+### 15.2 Admin Page Header (관리자 페이지 헤더)
+
+각 관리 페이지 상단에 위치하는 헤더 영역. 페이지 제목 + 주요 액션 버튼을 가로 배치한다. 흰 배경에 하단 구분선으로 콘텐츠 영역과 분리한다.
+
+- **헤더 컨테이너**: `bg-surface-white border-b border-border-light px-6 lg:px-8 py-5 flex items-center justify-between gap-4`
+- **좌측 텍스트 스택**: `flex flex-col gap-0.5 min-w-0`
+- **페이지 제목 (`<h1>`)**: `text-[22px] font-display font-semibold text-heading-dark leading-tight [word-break:keep-all]`
+  - 22px — Tailwind `text-2xl`(24px)보다 한 단계 절제된 사이즈. 관리 도구 헤딩에 적합.
+- **페이지 부제목 (`<p>`, 선택)**: `text-[15px] text-secondary-dark leading-[1.43] mt-0.5 [word-break:keep-all]`
+- **헤더 액션 영역**: `flex items-center gap-3 shrink-0` + §9 Admin Primary 버튼 (파란 채움)
+- **헤더 아래 콘텐츠 영역 패딩**: `p-6 lg:p-8` (§9 콘솔 콘텐츠 패딩 정책 (b)와 동일)
+
+```tsx
+// Admin Page Header 예시 (제목 + 부제목 + 버튼)
+<div className="bg-surface-white border-b border-border-light px-6 lg:px-8 py-5 flex items-center justify-between gap-4">
+  <div className="flex flex-col gap-0.5 min-w-0">
+    <h1 className="text-[22px] font-display font-semibold text-heading-dark leading-tight [word-break:keep-all]">
+      뉴스 관리
+    </h1>
+    <p className="text-[15px] text-secondary-dark leading-[1.43] mt-0.5 [word-break:keep-all]">
+      뉴스를 등록·수정·삭제합니다.
+    </p>
+  </div>
+  <div className="flex items-center gap-3 shrink-0">
+    <button
+      type="button"
+      className="inline-flex items-center justify-center bg-aircok-blue text-heading-light text-sm font-medium rounded-md px-4 py-2 min-h-[44px] hover:bg-aircok-blue-dark active:scale-[0.97] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:ring-offset-2"
+    >
+      새 뉴스 작성
+    </button>
+  </div>
+</div>
+
+{/* 헤더 아래 콘텐츠 */}
+<div className="p-6 lg:p-8">
+  {/* 본문 콘텐츠 */}
+</div>
+```
+
+> **전체 페이지 래퍼**: 각 뷰의 최상위 래퍼는 `min-h-screen` 없이 단순 `<div>`로 두되, 뷰 전체 배경이 필요하면 `bg-surface-light`를 추가한다. 헤더의 `bg-surface-white`와 콘텐츠 영역의 `bg-surface-light`가 자연스럽게 대비를 이룬다.
+
+---
+
+### 15.3 Admin Table (관리 테이블)
+
+뉴스 목록·문의 목록 등 행-열 데이터를 표시하는 표 컴포넌트.
+
+- **테이블 컨테이너**: `bg-surface-white rounded-xl border border-border-light overflow-hidden`
+- **`<table>`**: `w-full border-collapse`
+- **`<thead>`**: `bg-surface-light border-b border-border-light`
+- **`<th>`**: `px-4 py-3 text-left text-[13px] font-semibold text-secondary-dark uppercase tracking-wide whitespace-nowrap`
+- **`<tbody>`**: 행 사이 구분선 `divide-y divide-border-light`
+- **`<tr>` hover**: `hover:bg-surface-light transition-colors`
+- **`<td>`**: `px-4 py-4 text-[15px] text-body-dark font-body`
+- **상태 배지 — 발행됨**: `inline-flex items-center gap-1.5 rounded-pill px-2.5 py-1 text-xs font-semibold bg-success/10 text-success`
+- **상태 배지 — 미발행**: `inline-flex items-center gap-1.5 rounded-pill px-2.5 py-1 text-xs font-semibold bg-surface-light text-secondary-dark`
+  - `bg-success/10` — Tailwind 불투명도 모디파이어로 기존 `--color-success` 토큰에서 파생. 신규 CSS 변수 없음.
+- **행 액션 버튼 — 수정**: `text-[13px] text-aircok-blue hover:underline font-medium`
+- **행 액션 버튼 — 삭제**: `text-[13px] text-error hover:underline font-medium`
+- **빈 상태 / 로딩 / 에러 행**: `<td colSpan={N}>`에 §9 Admin List State 블록 삽입
+
+```tsx
+// Admin Table 예시 (뉴스 목록)
+<div className="bg-surface-white rounded-xl border border-border-light overflow-hidden">
+  <table className="w-full border-collapse">
+    <thead className="bg-surface-light border-b border-border-light">
+      <tr>
+        <th className="px-4 py-3 text-left text-[13px] font-semibold text-secondary-dark uppercase tracking-wide whitespace-nowrap">제목</th>
+        <th className="px-4 py-3 text-left text-[13px] font-semibold text-secondary-dark uppercase tracking-wide whitespace-nowrap">날짜</th>
+        <th className="px-4 py-3 text-left text-[13px] font-semibold text-secondary-dark uppercase tracking-wide whitespace-nowrap">상태</th>
+        <th className="px-4 py-3 text-left text-[13px] font-semibold text-secondary-dark uppercase tracking-wide whitespace-nowrap">액션</th>
+      </tr>
+    </thead>
+    <tbody className="divide-y divide-border-light">
+      {/* 데이터 행 */}
+      <tr className="hover:bg-surface-light transition-colors">
+        <td className="px-4 py-4 text-[15px] text-body-dark font-body">뉴스 제목</td>
+        <td className="px-4 py-4 text-[15px] text-body-dark font-body whitespace-nowrap">2026.06.24</td>
+        <td className="px-4 py-4">
+          {/* 발행됨 배지 */}
+          <span className="inline-flex items-center gap-1.5 rounded-pill px-2.5 py-1 text-xs font-semibold bg-success/10 text-success">
+            발행됨
+          </span>
+          {/* 미발행 배지 (조건 분기) */}
+          {/* <span className="inline-flex items-center gap-1.5 rounded-pill px-2.5 py-1 text-xs font-semibold bg-surface-light text-secondary-dark">미발행</span> */}
+        </td>
+        <td className="px-4 py-4">
+          <div className="flex items-center gap-3">
+            <button type="button" className="text-[13px] text-aircok-blue hover:underline font-medium">수정</button>
+            <button type="button" className="text-[13px] text-error hover:underline font-medium">삭제</button>
+          </div>
+        </td>
+      </tr>
+      {/* 빈 상태 */}
+      {/* <tr><td colSpan={4} className="px-4 py-20 text-center text-[15px] text-secondary-dark">등록된 뉴스가 없습니다.</td></tr> */}
+    </tbody>
+  </table>
+</div>
+```
+
+---
+
+### 15.4 Admin Login Page — Blue Header 변형
+
+§9 `Admin Login Layout`의 강조 변형. 카드 상단 헤더 영역을 Aircok Blue 배경으로 채워 브랜드 인지도를 높이고 로그인 페이지임을 즉시 전달한다. 신규 색상 토큰 없음 — 기존 `bg-aircok-blue`, `text-heading-light` 재활용.
+
+**§9 기본 변형과 다른 점**
+- 카드 최대 너비: `max-w-[420px]` (§9의 `400px`에서 20px 확장 — 아이디/비밀번호 입력 폼이 더 여유롭게)
+- 카드 구조: 패딩을 `px-8 py-10` 단일 블록 대신 **상단 헤더 영역 + 하단 폼 영역**으로 분리
+- 카드 내부 패딩 제거 후 오버플로우 클리핑: `overflow-hidden` 추가
+
+**페이지 래퍼**
+- `min-h-screen bg-surface-light flex items-center justify-center px-5 py-12`
+
+**로그인 카드**
+- `bg-surface-white rounded-xl shadow-card w-full max-w-[420px] overflow-hidden` {/* token 없음: 로그인 카드 너비 420px, 폼 입력 여유폭 전용 1회성 수치 */}
+
+**카드 상단 헤더 영역 (Blue)**
+- `bg-aircok-blue px-8 py-8 flex flex-col items-center gap-2`
+- 브랜드명: `text-heading-light text-[22px] font-display font-semibold leading-tight`
+- 서브텍스트: `text-heading-light/70 text-[15px] leading-[1.43]`
+  - `text-heading-light/70` — `--color-heading-light`(#ffffff)에 불투명도 70%. 신규 토큰 없음.
+
+**카드 하단 폼 영역**
+- `px-8 py-8`
+
+```tsx
+// Admin Login Page — Blue Header 변형
+<main className="min-h-screen bg-surface-light flex items-center justify-center px-5 py-12">
+  <div className="bg-surface-white rounded-xl shadow-card w-full max-w-[420px] overflow-hidden"> {/* token 없음: 로그인 카드 420px */}
+    {/* 상단 블루 헤더 */}
+    <div className="bg-aircok-blue px-8 py-8 flex flex-col items-center gap-2">
+      <p className="text-heading-light text-[22px] font-display font-semibold leading-tight">
+        스마트에어콕
+      </p>
+      <p className="text-heading-light/70 text-[15px] leading-[1.43]">
+        관리자 로그인
+      </p>
+    </div>
+    {/* 폼 영역 */}
+    <div className="px-8 py-8">
+      {/* AdminLoginForm 컴포넌트 — 폼 마크업은 §9 Admin Form Input 규칙 준수 */}
+    </div>
+  </div>
+</main>
+```
+
+> **§9 기본 변형과 선택 기준**: 블루 헤더 변형이 디폴트 권장이다. §9의 `max-w-[400px]` 카드(텍스트 헤더)는 간소한 내부 툴에 적합하며, 외부 노출 어드민 로그인(`/console/login`)에는 블루 헤더 변형을 사용한다.
+
+---
+
+### 15.5 Admin Dashboard Card (대시보드 통계/바로가기 카드)
+
+`app/console/` 대시보드 페이지에서 통계 수치 또는 관리 섹션 바로가기를 표현하는 카드. 4열 그리드로 배치한다.
+
+- **카드 컨테이너**: `bg-surface-white rounded-xl border border-border-light p-6 flex flex-col gap-3 hover:shadow-card transition-shadow`
+- **아이콘 영역**: `w-10 h-10 rounded-lg bg-aircok-blue/10 flex items-center justify-center text-aircok-blue shrink-0`
+  - `bg-aircok-blue/10` — 불투명도 모디파이어. 신규 CSS 변수 없음.
+  - 아이콘: SVG 또는 lucide-react, `w-5 h-5 text-aircok-blue`
+- **카드 제목**: `text-[17px] font-semibold text-heading-dark leading-[1.47] [word-break:keep-all]`
+- **카드 설명**: `text-[15px] text-secondary-dark leading-[1.43] [word-break:keep-all]`
+- **바로가기 링크 ("관리하기 →")**: `text-aircok-blue text-sm font-medium mt-auto inline-flex items-center gap-1`
+- **그리드 컨테이너**: `grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4`
+
+```tsx
+// Admin Dashboard Card 그리드 예시
+<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+  <div className="bg-surface-white rounded-xl border border-border-light p-6 flex flex-col gap-3 hover:shadow-card transition-shadow">
+    {/* 아이콘 */}
+    <div className="w-10 h-10 rounded-lg bg-aircok-blue/10 flex items-center justify-center shrink-0">
+      <svg className="w-5 h-5 text-aircok-blue" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
+        {/* 아이콘 path */}
+      </svg>
+    </div>
+    {/* 텍스트 */}
+    <h2 className="text-[17px] font-semibold text-heading-dark leading-[1.47] [word-break:keep-all]">
+      뉴스 관리
+    </h2>
+    <p className="text-[15px] text-secondary-dark leading-[1.43] [word-break:keep-all]">
+      뉴스를 등록·수정·삭제합니다.
+    </p>
+    {/* 바로가기 */}
+    <a href="/console/news" className="text-aircok-blue text-sm font-medium mt-auto inline-flex items-center gap-1">
+      관리하기 →
+    </a>
+  </div>
+  {/* 반복 */}
+</div>
+```
+
+> **대시보드 페이지 래퍼**: `p-6 lg:p-8` (§9 콘솔 콘텐츠 패딩 정책 (b)). 페이지 상단에 §15.2 Admin Page Header를 사용해 "대시보드" 제목을 표시한다.
+
+---
+
+### 15.6 Admin Section Panel (관리 섹션 패널)
+
+FAQ 카테고리 패널, 카탈로그 업로드 섹션 등 관리 페이지 내 개별 카드형 패널. 데이터 목록이 아니라 폼·설정·미리보기 등 독립적인 기능 단위를 카드로 묶을 때 사용한다.
+
+- **패널 컨테이너**: `bg-surface-white rounded-xl border border-border-light`
+- **패널 헤더** (선택적): `flex items-center justify-between px-4 py-3 border-b border-border-light`
+  - **패널 제목 (`<h2>` 또는 `<h3>`)**: `text-[15px] font-semibold text-heading-dark`
+  - **헤더 액션** (버튼 등): 우측 정렬, §9 Admin Primary/Secondary 버튼 규칙 준수
+- **패널 본문**: `p-4` (패딩은 콘텐츠 유형에 따라 `p-4` 또는 `p-6`)
+
+```tsx
+// Admin Section Panel 예시 (헤더 + 본문)
+<div className="bg-surface-white rounded-xl border border-border-light">
+  {/* 패널 헤더 */}
+  <div className="flex items-center justify-between px-4 py-3 border-b border-border-light">
+    <h2 className="text-[15px] font-semibold text-heading-dark">카테고리 목록</h2>
+    <button
+      type="button"
+      className="inline-flex items-center justify-center bg-aircok-blue text-heading-light text-sm font-medium rounded-md px-3 py-1.5 min-h-[36px] hover:bg-aircok-blue-dark active:scale-[0.97] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:ring-offset-2"
+    >
+      추가
+    </button>
+  </div>
+  {/* 패널 본문 */}
+  <div className="p-4">
+    {/* 패널 콘텐츠 */}
+  </div>
+</div>
+```
+
+> **패널 vs. 테이블 컨테이너 선택**: 행-열 구조 데이터는 §15.3 Admin Table(`overflow-hidden`), 그 외 기능 단위 묶음은 §15.6 Admin Section Panel. 하나의 페이지에서 두 패턴을 함께 쓸 수 있다(예: 카탈로그 페이지 = 업로드 패널 + 이미지 그리드 테이블 컨테이너).
+
+---
+
+> **§15 신규 CSS 변수 요약**: 없음. 모든 패턴이 기존 `--color-*`, `--radius-*`, `--shadow-*` 토큰과 Tailwind 불투명도 모디파이어(`/10`, `/70`)만 사용한다.

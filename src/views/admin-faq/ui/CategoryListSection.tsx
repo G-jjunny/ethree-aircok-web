@@ -35,7 +35,7 @@ export function CategoryListSection({
 
   return (
     <div className="bg-surface-white rounded-xl border border-border-light p-4 flex flex-col gap-3 h-fit">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between border-b border-border-light pb-3 mb-3">
         <h2 className="text-nav font-semibold text-heading-dark">카테고리</h2>
         <button
           type="button"
@@ -108,7 +108,11 @@ export function CategoryListSection({
                       e.stopPropagation()
                       setEditingCategory(category)
                     }}
-                    className="inline-flex items-center justify-center w-7 h-7 rounded-sm text-secondary-dark hover:text-heading-dark hover:bg-surface-light transition-colors shrink-0"
+                    className={
+                      isSelected
+                        ? 'inline-flex items-center justify-center w-7 h-7 rounded text-aircok-blue/60 hover:text-aircok-blue hover:bg-aircok-blue/10 transition-colors shrink-0'
+                        : 'inline-flex items-center justify-center w-7 h-7 rounded text-secondary-dark hover:text-heading-dark hover:bg-surface-light transition-colors shrink-0'
+                    }
                   >
                     {/* pencil icon */}
                     <svg
@@ -133,7 +137,7 @@ export function CategoryListSection({
                       e.stopPropagation()
                       setDeletingCategoryId(category.id)
                     }}
-                    className="inline-flex items-center justify-center w-7 h-7 rounded-sm text-secondary-dark hover:text-error hover:bg-surface-light transition-colors shrink-0"
+                    className="inline-flex items-center justify-center w-7 h-7 rounded text-secondary-dark hover:text-error hover:bg-surface-light transition-colors shrink-0"
                   >
                     {/* trash2 icon */}
                     <svg

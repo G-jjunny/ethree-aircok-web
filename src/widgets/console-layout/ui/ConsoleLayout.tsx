@@ -73,7 +73,7 @@ export function ConsoleLayout({ children }: Props) {
   return (
     <div className="min-h-screen bg-surface-light">
       {/* 모바일 상단 바 */}
-      <div className="sticky top-0 z-30 flex items-center justify-between h-14 px-4 bg-surface-white border-b border-border-light lg:hidden">
+      <div className="sticky top-0 z-30 flex items-center justify-between h-16 px-4 bg-surface-white border-b border-border-light lg:hidden">
         <button
           type="button"
           onClick={() => setDrawerOpen(true)}
@@ -97,7 +97,7 @@ export function ConsoleLayout({ children }: Props) {
             />
           </svg>
         </button>
-        <span className="text-heading-dark font-body font-semibold text-sm">
+        <span className="text-heading-dark font-display font-semibold text-[15px]">
           어드민 콘솔
         </span>
         <span className="w-11" aria-hidden="true" />
@@ -116,12 +116,12 @@ export function ConsoleLayout({ children }: Props) {
       <aside
         id="console-sidebar"
         aria-label="콘솔 메뉴"
-        className={`fixed inset-y-0 left-0 z-50 w-60 bg-surface-white border-r border-border-light flex flex-col transition-transform duration-200 lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 w-64 bg-surface-white border-r border-border-light flex flex-col transition-transform duration-200 lg:translate-x-0 ${
           drawerOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
-        <div className="flex items-center h-14 px-5 border-b border-border-light shrink-0">
-          <span className="text-heading-dark font-body font-semibold text-sm">
+        <div className="flex items-center h-16 px-5 border-b border-aircok-blue/20 shrink-0">
+          <span className="text-heading-dark font-display font-semibold text-[15px]">
             어드민 콘솔
           </span>
         </div>
@@ -137,7 +137,7 @@ export function ConsoleLayout({ children }: Props) {
               onClick={() => setDrawerOpen(false)}
               className={
                 isNavActive(item.href)
-                  ? 'flex items-center gap-3 rounded-md px-3 py-2.5 min-h-[44px] text-sm font-body font-semibold bg-aircok-blue/10 text-aircok-blue transition-colors'
+                  ? 'flex items-center gap-3 rounded-md px-3 py-2.5 min-h-[44px] text-sm font-body font-semibold bg-aircok-blue text-heading-light transition-colors'
                   : 'flex items-center gap-3 rounded-md px-3 py-2.5 min-h-[44px] text-sm font-body text-secondary-dark hover:bg-surface-light hover:text-heading-dark transition-colors'
               }
             >
@@ -162,7 +162,7 @@ export function ConsoleLayout({ children }: Props) {
       </aside>
 
       {/* 메인 콘텐츠 */}
-      <main className="lg:pl-60">{children}</main>
+      <main className="lg:pl-64">{children}</main>
 
       <ConfirmDialog
         open={logoutOpen}

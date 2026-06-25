@@ -99,7 +99,7 @@ export function SortableImageCard({
         <button
           type="button"
           aria-label="순서 변경 드래그"
-          className="inline-flex items-center justify-center w-7 h-7 rounded-sm text-secondary-dark hover:text-heading-dark hover:bg-surface-light transition-colors cursor-grab active:cursor-grabbing touch-none"
+          className="inline-flex items-center justify-center w-7 h-7 rounded-md text-secondary-dark hover:text-heading-dark hover:bg-surface-light transition-colors cursor-grab active:cursor-grabbing touch-none"
           {...attributes}
           {...listeners}
         >
@@ -167,14 +167,14 @@ export function SortableImageCard({
           type="button"
           onClick={() => fileInputRef.current?.click()}
           disabled={isReplacing}
-          className="flex-1 inline-flex items-center justify-center rounded-md border border-border-light bg-surface-white px-3 py-2 min-h-[44px] text-xs font-medium text-heading-dark hover:bg-surface-light transition-colors disabled:opacity-40"
+          className="flex-1 inline-flex items-center justify-center rounded-md border border-border-light bg-transparent px-3 py-2 min-h-[44px] text-xs font-medium text-heading-dark hover:bg-surface-light active:scale-[0.97] transition-colors disabled:opacity-40 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:ring-offset-2"
         >
           교체
         </button>
         <button
           type="button"
           onClick={() => onDelete(image.id)}
-          className="flex-1 inline-flex items-center justify-center rounded-md border border-border-light bg-surface-white px-3 py-2 min-h-[44px] text-xs font-medium text-error hover:bg-surface-light transition-colors"
+          className="flex-1 inline-flex items-center justify-center rounded-md border border-error/30 bg-transparent px-3 py-2 min-h-[44px] text-xs font-medium text-error hover:bg-surface-light active:scale-[0.97] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-error focus-visible:ring-offset-2"
         >
           삭제
         </button>
