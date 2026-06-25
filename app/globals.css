@@ -102,4 +102,30 @@ body {
     margin-inline: auto;
     padding-inline: 1.25rem; /* px-5 */
   }
+
+  /*
+   * .numeral-stroke — Numeral Spine Process Timeline 대형 아웃라인 넘버럴 전용.
+   * 기본: 브랜드 블루 stroke로 속 빈(outline) 숫자.
+   * @supports 폴백: -webkit-text-stroke 미지원 렌더러에서는 stroke 없이
+   *   브랜드 블루로 채워(fill) 숫자가 사라지지 않게 한다(순서 정보 보존).
+   * hover(.group:hover): outline → 브랜드 블루 fill 전환.
+   */
+  .numeral-stroke {
+    color: transparent;
+    -webkit-text-stroke: 1.5px var(--color-aircok-blue);
+    transition:
+      color 200ms ease,
+      -webkit-text-stroke-color 200ms ease;
+  }
+
+  .group:hover .numeral-stroke {
+    color: var(--color-aircok-blue);
+    -webkit-text-stroke-width: 0;
+  }
+
+  @supports not (-webkit-text-stroke: 1px black) {
+    .numeral-stroke {
+      color: var(--color-aircok-blue);
+    }
+  }
 }

@@ -1094,44 +1094,44 @@ TipTap 등 rich text 에디터의 HTML 출력을 렌더링하는 스타일 가�
 </div>
 ```
 
-### Process Timeline Flow (프로세스 타임라인 플로우)
+### Numeral Spine Process Timeline (대형 넘버럴 스파인 프로세스)
 
-순서가 있는 다단계 프로세스를 카드 그리드 대신 **방향성 있는 타임라인**으로 표현하는 패턴. `MethodologySection`(공기질 안전진단 4단계)에서 사용. 균일 카드 그리드보다 단계 간 "흐름"을 시각적으로 전달한다. 신규 색상 토큰 없음 — 노드/도트는 `bg-aircok-blue`, 커넥터 라인은 `bg-border-light` 재활용.
+순서가 있는 다단계 프로세스를, 작은 도트 타임라인 대신 **대형 아웃라인 넘버럴(01–04)을 구조적 스파인(spine)으로** 삼아 표현하는 패턴. `MethodologySection`(공기질 안전진단 4단계)에서 사용. 번호 자체가 진행 순서를 인코딩하므로(콘텐츠가 진짜 순차일 때만 정당) signature 요소로 키운다. 균일 dot-timeline의 "AI 템플릿 기본값" 인상을 피하고, 타이포그래피가 개성을 전달하게 한다. 신규 색상 토큰 없음 — 넘버럴/액티브 노드/레일 progress는 `aircok-blue` 계열, 비활성 레일·구분선은 `bg-border-light` 재활용.
 
-- 컨테이너: `<ol>` 시맨틱 리스트, 데스크탑 가로(`md:flex-row`, 좌→우) / 모바일 세로(`flex-col`, 위→아래) 반응형 전환. 각 단계는 `<li>`, 데스크탑에서 `md:flex-1`로 균등 분할
-- **노드(번호 배지)**: `h-10 w-10 rounded-full bg-aircok-blue text-[17px] font-bold text-heading-light shadow-card` 중앙 정렬. 단계 번호를 강조해 진행 순서를 명확히 함 (`relative z-10`으로 커넥터 위에 표시)
-- **커넥터 라인**:
-  - 데스크탑: 노드 우측 → 다음 노드 직전까지 가로선 `absolute top-5 h-px bg-border-light`. 노드 지름(`left-12`)에서 시작해 다음 단계 직전(`right-2`)에서 끝남
-  - 모바일: 노드 아래 세로선 `absolute left-5 w-px bg-border-light`
-  - **마지막 단계에는 커넥터를 그리지 않는다**
-- **진행 방향 도트**: 데스크탑 커넥터 끝점에 `h-1.5 w-1.5 rounded-full bg-aircok-blue`(`-translate-y-1/2`로 라인 중앙 정렬) 작은 점을 찍어 다음 단계로 향하는 방향성을 표현. `aria-hidden="true"`
-- **STEP 레이블**: `text-aircok-blue text-xs font-bold uppercase tracking-widest` (예: `STEP 01`)
+**구조 원칙**
+- 컨테이너: `<ol>` 시맨틱 리스트. 데스크탑 4열 그리드(`md:grid-cols-4`), 모바일 세로 스택(`flex-col`).
+- **signature = 대형 아웃라인 넘버럴**: 각 단계 상단에 `text-[64px] sm:text-[88px] font-display font-bold leading-none tracking-[-0.3px]`로 `01`–`04`를 크게 노출. **outline 효과는 전용 유틸리티 `.numeral-stroke`로 적용한다**(globals.css `@layer utilities`). 이 유틸리티가 브랜드 컬러 stroke로 속 빈 숫자를 렌더하고, hover 전환과 stroke 미지원 폴백까지 캡슐화한다. 임의값 인라인(`text-transparent`, `[-webkit-text-stroke:...]`, `group-hover:[-webkit-text-stroke:0]`)을 컴포넌트에 직접 쓰지 않는다. 이 대형 넘버럴이 순서를 인코딩하는 유일한 구조 장식이다(추가 도트/번호 배지를 중복으로 두지 않는다). `aria-hidden`은 하지 않음 — 숫자가 의미 정보(순서)다.
+- **`.numeral-stroke` 유틸리티 정의 (globals.css)**:
+  - 기본: `color: transparent` + `-webkit-text-stroke: 1.5px var(--color-aircok-blue)` → 브랜드 블루 stroke 속 빈 숫자.
+  - **stroke 미지원 폴백 (필수)**: `@supports not (-webkit-text-stroke: 1px black)` 분기에서 `color: var(--color-aircok-blue)`로 **채움형(fill)** 폴백. `-webkit-text-stroke`를 지원하지 않는 렌더러에서 `transparent`만 남아 숫자가 사라지면 순서 정보까지 소실되므로, 이 폴백으로 숫자를 가시 상태로 보존한다.
+  - hover: `.group:hover .numeral-stroke`에서 stroke→fill(`color: var(--color-aircok-blue)` + `-webkit-text-stroke-width: 0`). 컴포넌트의 상위 `<li>`에 `group` 클래스가 있어야 동작한다.
+  - 색·두께는 모두 `--color-aircok-blue` 변수 기준(하드코딩 없음). stroke 두께 `1.5px`는 outline 시각 두께를 위한 유틸리티 내부 상수다.
+- **진행 레일(progress rail)**: 넘버럴 baseline 아래 얇은 가로 레일 1줄. 비활성 구간은 `bg-border-light h-px`, 현재 단계까지의 채워진 구간은 `bg-aircok-blue h-px`(또는 단계 노드를 `bg-aircok-blue` 도트로). 마지막 단계 우측에는 레일을 그리지 않는다. 레일/도트는 `aria-hidden="true"`.
+- **STEP 레이블**: `text-aircok-blue text-xs font-bold uppercase tracking-widest`
 - **단계 제목**: `text-heading-dark text-xl font-semibold leading-[1.14] [word-break:keep-all]`
-- 텍스트 블록 배치: 모바일은 노드 우측(`ml-4`), 데스크탑은 노드 아래(`md:mt-5 md:ml-0 md:pr-8`)
-- 모든 장식 요소(`span`)는 `aria-hidden="true"`
+- **단계 메타(선택)**: 단계에 실제 기간/수치가 있을 때만 `text-secondary-dark text-sm`로 노출(예: "10일"). **정보가 없는 단계에는 장식용 메타를 넣지 않는다** — 구조 장식은 정보 위계를 인코딩할 때만.
+- 모션 절제: hover 시 넘버럴 stroke→fill 전환(`.numeral-stroke` 유틸리티가 `.group:hover`로 처리) 정도만, 과한 애니메이션 금지.
+- 순수 장식 요소(레일·도트)만 `aria-hidden="true"`.
 
 ```tsx
-// Process Timeline Flow 예시 (마지막 단계 커넥터 생략)
-<ol className="flex flex-col md:flex-row md:items-start">
+// Numeral Spine Process Timeline 예시 (마지막 단계 레일 생략)
+<ol className="grid grid-cols-1 gap-10 md:grid-cols-4 md:gap-6">
   {steps.map((item, index) => {
     const isLast = index === steps.length - 1;
     return (
-      <li key={item.step} className="relative flex md:flex-1 md:flex-col">
+      <li key={item.step} className="group relative flex flex-col gap-4">
+        {/* 대형 아웃라인 넘버럴 (signature, 순서 인코딩) — outline/hover/폴백은 .numeral-stroke가 캡슐화 */}
+        <span className="numeral-stroke font-display text-[64px] sm:text-[88px] font-bold leading-none tracking-[-0.3px]">
+          {String(item.step).padStart(2, "0")}
+        </span>
+        {/* 진행 레일 — 데스크탑 가로, 마지막 단계 제외 */}
         {!isLast && (
-          <>
-            <span aria-hidden="true" className="absolute left-5 top-11 -bottom-1 w-px bg-border-light md:hidden" />
-            <span aria-hidden="true" className="absolute left-12 right-2 top-5 hidden h-px bg-border-light md:block" />
-            <span aria-hidden="true" className="absolute right-2 top-5 hidden h-1.5 w-1.5 -translate-y-1/2 rounded-full bg-aircok-blue md:block" />
-          </>
+          <span aria-hidden="true" className="absolute right-0 top-10 hidden h-px w-1/2 bg-border-light md:block" />
         )}
-        <div className="relative z-10 flex shrink-0 items-center md:w-full md:flex-col md:items-start">
-          <span className="flex h-10 w-10 items-center justify-center rounded-full bg-aircok-blue text-[17px] font-bold text-heading-light shadow-card">
-            {item.step}
-          </span>
-        </div>
-        <div className="ml-4 pb-10 md:ml-0 md:mt-5 md:pb-0 md:pr-8">
+        <div className="flex flex-col gap-1.5">
           <span className="text-aircok-blue text-xs font-bold uppercase tracking-widest">STEP {String(item.step).padStart(2, "0")}</span>
-          <h3 className="mt-1.5 text-heading-dark text-xl font-semibold leading-[1.14] [word-break:keep-all]">{item.title}</h3>
+          <h3 className="text-heading-dark text-xl font-semibold leading-[1.14] [word-break:keep-all]">{item.title}</h3>
+          {item.meta && <span className="text-secondary-dark text-sm">{item.meta}</span>}
         </div>
       </li>
     );
@@ -1139,7 +1139,7 @@ TipTap 등 rich text 에디터의 HTML 출력을 렌더링하는 스타일 가�
 </ol>
 ```
 
-> **Watermark Step Card 와의 구분**: 균일한 4열 카드 그리드가 적합한 경우(병렬적 특징 나열)는 Watermark Step Card를, 순서·진행 방향이 핵심인 경우는 Process Timeline Flow를 사용한다.
+> **패턴 선택 기준**: 균일한 4열 카드 그리드가 적합한 경우(병렬적 특징 나열)는 Watermark Step Card를, 순서·진행 방향이 핵심이고 타이포로 개성을 주고 싶은 경우는 Numeral Spine Process Timeline을 사용한다.
 
 ### Accent Bar Stat Card (액센트 바 수치 카드)
 
@@ -1157,6 +1157,35 @@ TipTap 등 rich text 에디터의 HTML 출력을 렌더링하는 스타일 가�
   <span aria-hidden="true" className="absolute left-0 top-0 bottom-0 w-1 bg-aircok-blue" />
   <p className="text-4xl font-bold text-aircok-blue leading-none tracking-[-0.3px] shrink-0">50%</p>
   <p className="text-heading-dark text-[17px] font-medium leading-[1.4] [word-break:keep-all]">집중력 향상</p>
+</div>
+```
+
+### Navy Signature Stat Panel (네이비 시그니처 수치 패널)
+
+라이트 섹션 안에서 **단 하나의 수치에 대담함을 집중**시키는 패널. `WhatYouGetSection`의 우측 시그니처로 사용. StatSection의 딥 네이비 톤(`surface-stat`/`surface-stat-card`)을 라이트 섹션 위로 가져와, 메인페이지 전체 톤과 일관성을 유지하면서 한 요소만 강하게 띄운다(나머지 좌측 콘텐츠는 절제). 신규 색상 토큰 없음 — StatSection 전용 네이비 토큰 재활용.
+
+- 패널 래퍼: `relative overflow-hidden rounded-2xl bg-surface-stat px-8 py-10 sm:px-10 sm:py-12 flex flex-col gap-4` (`rounded-2xl` {/* token 없음: 대형 signature 패널 라운드, 1회성 — radius-xl(16px)보다 큰 시각적 무게 */})
+- **소형 레이블**: `text-aircok-blue-light text-xs font-semibold uppercase tracking-widest`
+- **signature 대형 수치**: `text-aircok-blue-light text-7xl sm:text-8xl font-display font-bold leading-none tracking-[-0.3px]` — 패널에서 단 하나의 지배적 수치(예: `40+`). 추가 수치를 나란히 두어 위계를 분산시키지 않는다.
+- **수치 설명**: `text-heading-light text-[21px] font-semibold leading-[1.19] [word-break:keep-all]`
+- **보조 캡션**: `text-body-light opacity-70 text-sm leading-[1.65] [word-break:keep-all]`
+- 보조 수치(선택, 절제): 패널 하단에 `border-t border-border-dark pt-5` 후 2–3개의 작은 수치를 `text-body-light` 인라인으로만. signature 수치보다 항상 작게(`text-2xl` 이하), 강조 분산 금지.
+- 모션 절제: 패널 자체는 hover 상승/scale 없음(signature는 정적 무게로 승부).
+
+```tsx
+// Navy Signature Stat Panel 예시
+<div className="relative overflow-hidden rounded-2xl bg-surface-stat px-8 py-10 sm:px-10 sm:py-12 flex flex-col gap-4"> {/* token 없음: rounded-2xl signature 무게 */}
+  <span className="text-aircok-blue-light text-xs font-semibold uppercase tracking-widest">Validated</span>
+  <span className="text-aircok-blue-light text-7xl sm:text-8xl font-display font-bold leading-none tracking-[-0.3px]">40+</span>
+  <p className="text-heading-light text-[21px] font-semibold leading-[1.19] [word-break:keep-all]">대기업 사옥에서 검증 중</p>
+  <p className="text-body-light opacity-70 text-sm leading-[1.65] [word-break:keep-all]">건강경영 도입 레퍼런스</p>
+  <div className="mt-2 grid grid-cols-3 gap-4 border-t border-border-dark pt-5">
+    <div className="flex flex-col gap-1">
+      <span className="text-heading-light text-2xl font-bold leading-none">50%</span>
+      <span className="text-body-light opacity-60 text-xs [word-break:keep-all]">집중력 향상</span>
+    </div>
+    {/* 79% 에너지 절감, 46% 공기질 개선 동일 패턴 */}
+  </div>
 </div>
 ```
 
