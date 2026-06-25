@@ -60,7 +60,7 @@ export function DarkStatCard({
   const icon = CATEGORY_ICONS[category]
 
   return (
-    <div className="group relative flex h-full flex-col gap-4 overflow-hidden rounded-xl bg-surface-dark-1 px-5 py-6 transition-all duration-200 hover:-translate-y-1 hover:bg-surface-dark-2">
+    <div className="group relative flex h-full flex-col gap-4 overflow-hidden rounded-xl bg-surface-stat-card px-5 py-6 transition-all duration-200 hover:-translate-y-1 hover:bg-surface-stat-card-hover">
       {icon && (
         <span className="flex size-11 items-center justify-center rounded-lg bg-overlay-white-10 text-aircok-blue-light">
           {icon}

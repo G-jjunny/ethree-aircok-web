@@ -68,7 +68,9 @@ Tailwind v4 프로젝트이므로 모든 토큰은 `@theme` 블록 안에 정의
   --color-surface-dark:  #0a0a0a;
   --color-surface-dark-1: #1a1a1a;
   --color-surface-dark-2: #242424;
-  --color-surface-stat:  #0b1730;  /* StatSection 전용 딥 네이비 배경 — 브랜드 블루 계열 톤, surface-dark-1 카드와 색상·명도 대비 확보 */
+  --color-surface-stat:  #0b1730;  /* StatSection 전용 딥 네이비 배경 — 브랜드 블루 계열 톤 */
+  --color-surface-stat-card:       #13213f;  /* StatSection 카드 배경 — 배경(#0b1730)보다 한 단계 밝은 동일 색온도 네이비 (떠 보임) */
+  --color-surface-stat-card-hover: #1b2c4f;  /* StatSection 카드 호버 — 카드보다 한 단계 더 밝은 네이비 (depth 대비 유지) */
 
   /* ── Text Colors ────────────────────────── */
   --color-heading-dark:    #1d1d1f;
@@ -149,6 +151,8 @@ Tailwind v4 프로젝트이므로 모든 토큰은 `@theme` 블록 안에 정의
 | 라이트 섹션 배경 | `bg-surface-light` | `--color-surface-light` |
 | 다크 섹션 배경 | `bg-surface-dark` | `--color-surface-dark` |
 | StatSection 배경 | `bg-surface-stat` | `--color-surface-stat` (딥 네이비, StatSection 전용) |
+| StatSection 카드 배경 | `bg-surface-stat-card` | `--color-surface-stat-card` (배경보다 밝은 네이비, StatSection 카드 전용) |
+| StatSection 카드 호버 | `bg-surface-stat-card-hover` | `--color-surface-stat-card-hover` (카드보다 밝은 네이비, StatSection 카드 전용) |
 | 다크 카드 배경 | `bg-surface-dark-1` | `--color-surface-dark-1` |
 | **텍스트** | | |
 | 라이트 BG 헤딩 | `text-heading-dark` | `--color-heading-dark` |
@@ -1003,12 +1007,12 @@ TipTap 등 rich text 에디터의 HTML 출력을 렌더링하는 스타일 가�
 - 출처: `text-xs` italic
 
 **공통 (4개 카드 균등)**
-- 섹션 배경: `bg-surface-stat` (StatSection 전용 딥 네이비 `#0b1730` — 순흑(`surface-dark`)을 쓰는 다른 다크 섹션과 구분되는 브랜드 블루 계열 톤). 카드 배경 `surface-dark-1`(`#1a1a1a`)이 배경보다 명도가 높아 카드가 배경 위로 떠 보이고, 호버 `surface-dark-2`(`#242424`)도 한 단계 더 밝아 depth 대비가 유지된다. 그리드 `grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch`
+- 섹션 배경: `bg-surface-stat` (StatSection 전용 딥 네이비 `#0b1730` — 순흑(`surface-dark`)을 쓰는 다른 다크 섹션과 구분되는 브랜드 블루 계열 톤). 카드는 **배경과 동일한 색온도(blue hue)의 네이비 계열**로 통일해 이질감을 없앤다: 카드 배경 `surface-stat-card`(`#13213f`)가 배경(`#0b1730`)보다 명도가 높아 카드가 배경 위로 떠 보이고, 호버 `surface-stat-card-hover`(`#1b2c4f`)도 한 단계 더 밝아 depth 대비가 유지된다(명도 위계 `#0b1730` < `#13213f` < `#1b2c4f`). 그리드 `grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch`
 - Radius: `rounded-xl` (16px), 패딩: **비대칭 `py-6 px-5`** (세로 32px=`--spacing-6` / 가로 24px=`--spacing-5`), 래퍼: `group flex flex-col gap-4 h-full overflow-hidden`
   - 비대칭 패딩 근거: 좁은 1열 폭(lg 4열)에서 좌우 패딩이 과하면 한글 제목·설명이 가운데로 몰려 줄바꿈이 잦아진다. 세로는 카드 호흡 유지, 가로는 텍스트가 카드 폭을 더 활용하도록 한 단계 축소한다. 두 값 모두 커스텀 스페이싱 스케일 내 토큰(`py-6`=32px / `px-5`=24px)이며 신규 토큰 없음.
 - 카드 높이는 `h-full` + 그리드 `items-stretch`로 통일
 - 호버 인터랙션: `transition-all duration-200 hover:-translate-y-1`
-- 카드 배경: `bg-surface-dark-1`, 호버 시 `hover:bg-surface-dark-2` (배경색 대비로 depth, 그림자 없음)
+- 카드 배경: `bg-surface-stat-card`, 호버 시 `hover:bg-surface-stat-card-hover` (섹션 배경과 같은 네이비 색온도 + 단계적 명도 차로 depth, 그림자 없음)
 - **category 아이콘**: 카드 상단(category 레이블 위)에 카테고리 의미를 나타내는 라인 아이콘 1개 배치 — 아래 **Stat Category Icon** 규칙 참조
 - category 레이블: `text-aircok-blue-light text-xs font-semibold uppercase tracking-widest`
 - 핵심 수치: `text-6xl font-bold text-heading-light leading-none`
@@ -1033,7 +1037,7 @@ TipTap 등 rich text 에디터의 HTML 출력을 렌더링하는 스타일 가�
 
 ```tsx
 // Dark Stat Card — 4개 카드 균등 (아이콘 칩 + 제목 위계 강화)
-<div className="group flex h-full flex-col gap-4 overflow-hidden rounded-xl py-6 px-5 bg-surface-dark-1 transition-all duration-200 hover:-translate-y-1 hover:bg-surface-dark-2">
+<div className="group flex h-full flex-col gap-4 overflow-hidden rounded-xl py-6 px-5 bg-surface-stat-card transition-all duration-200 hover:-translate-y-1 hover:bg-surface-stat-card-hover">
   <span className="flex size-11 items-center justify-center rounded-lg bg-overlay-white-10 text-aircok-blue-light">
     {/* 카테고리 라인 아이콘: size-6, currentColor stroke */}
     <svg className="size-6" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">...</svg>

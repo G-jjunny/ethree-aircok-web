@@ -22,6 +22,8 @@
   --color-surface-dark-1: #1a1a1a;
   --color-surface-dark-2: #242424;
   --color-surface-stat:   #0b1730;
+  --color-surface-stat-card:       #13213f;
+  --color-surface-stat-card-hover: #1b2c4f;
 
   /* ── Text ───────────────────────────────── */
   --color-heading-dark:   #1d1d1f;
