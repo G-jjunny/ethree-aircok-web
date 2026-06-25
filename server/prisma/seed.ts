@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Prisma } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import pg from 'pg';
 import * as bcrypt from 'bcrypt';
@@ -239,27 +239,28 @@ const PARTNERS: { name: string; order: number }[] = [
   { name: '산림청', order: 16 },
 ];
 
+const SITE_INFO_SEED = {
+  companyName: '스마트 에어콕',
+  legalName: '(주)에어콕',
+  address: '서울특별시 성동구 아차산로17길 49 성수 생각공장 데시앙플렉스 815호',
+  phone: '02-6952-1947',
+  email: 'contact@aircok.com',
+  bizNo: '689-87-00920',
+  ceo: '조흔우',
+  fax: '02-552-1948',
+  mailOrderNo: '2020-서울성동-02120',
+  instagram: 'https://www.instagram.com/smartaircok',
+  youtube: 'https://youtube.com/@aircok',
+  linkedin: 'https://linkedin.com/company/aircok',
+  facebook: null,
+  kakaoUrl: null,
+} satisfies Prisma.SiteInfoUpdateInput;
+
 async function seedSiteInfo() {
   const siteInfo = await prisma.siteInfo.upsert({
     where: { id: 'singleton' },
-    update: {},
-    create: {
-      id: 'singleton',
-      companyName: '스마트 에어콕',
-      legalName: '(주)에어콕',
-      address: '서울특별시 성동구 아차산로17길 49 성수 생각공장 데시앙플렉스 815호',
-      phone: '02-6952-1947',
-      email: 'contact@aircok.com',
-      bizNo: '689-87-00920',
-      ceo: '조흔우',
-      fax: '02-552-1948',
-      mailOrderNo: '2020-서울성동-02120',
-      instagram: 'https://www.instagram.com/smartaircok',
-      youtube: 'https://youtube.com/@aircok',
-      linkedin: 'https://linkedin.com/company/aircok',
-      facebook: null,
-      kakaoUrl: null,
-    },
+    update: SITE_INFO_SEED,
+    create: { id: 'singleton', ...SITE_INFO_SEED },
   });
 
   console.log('SiteInfo created/verified:', siteInfo.companyName);
