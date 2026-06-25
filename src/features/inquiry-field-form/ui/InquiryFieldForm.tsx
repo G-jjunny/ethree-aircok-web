@@ -16,6 +16,7 @@ import {
   INQUIRY_FIELD_TYPES,
   type InquiryFieldFormValues,
 } from '../model/inquiryFieldSchema'
+import { SITE } from '@/shared/config/site'
 
 const TYPE_LABELS: Record<(typeof INQUIRY_FIELD_TYPES)[number], string> = {
   text: '한 줄 텍스트',
@@ -167,7 +168,7 @@ export function InquiryFieldForm({ field, onSuccess, onCancel }: Props) {
           <input
             type="text"
             {...register('placeholder')}
-            placeholder="(주)에어콕"
+            placeholder={SITE.legalName}
             className="border border-border-light rounded-md px-3 py-2 text-body-dark text-sm font-body focus:outline-none focus:ring-1 focus:ring-aircok-blue"
           />
           {errors.placeholder && (
