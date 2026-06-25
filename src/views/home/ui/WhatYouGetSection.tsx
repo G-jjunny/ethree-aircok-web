@@ -46,12 +46,24 @@ export function WhatYouGetSection() {
             </Link>
           </div>
 
-          {/* 우측 수치 카드 스택 */}
-          <div className="lg:w-[40%] flex flex-col gap-4">
+          {/* 우측 수치 카드 스택 — 강조 수치를 좌측 액센트 바 + 큰 타이포로 위계화 */}
+          <div className="lg:w-[40%] flex flex-col gap-5">
             {STAT_HIGHLIGHTS.map((stat) => (
-              <div key={stat.value} className="bg-surface-white rounded-xl shadow-card p-6">
-                <p className="text-3xl font-bold text-aircok-blue leading-none">{stat.value}</p>
-                <p className="text-heading-dark font-medium mt-1">{stat.label}</p>
+              <div
+                key={stat.value}
+                className="group relative overflow-hidden bg-surface-white rounded-xl shadow-card pl-7 pr-6 py-6 flex items-baseline gap-4 hover:shadow-product hover:-translate-y-1 transition-all duration-200"
+              >
+                {/* 좌측 액센트 바 */}
+                <span
+                  aria-hidden="true"
+                  className="absolute left-0 top-0 bottom-0 w-1 bg-aircok-blue"
+                />
+                <p className="text-4xl font-bold text-aircok-blue leading-none tracking-[-0.3px] shrink-0">
+                  {stat.value}
+                </p>
+                <p className="text-heading-dark text-[17px] font-medium leading-[1.4] [word-break:keep-all]">
+                  {stat.label}
+                </p>
               </div>
             ))}
           </div>
