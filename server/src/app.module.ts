@@ -6,6 +6,8 @@ import { NewsModule } from './news/news.module';
 import { InquiryModule } from './inquiry/inquiry.module';
 import { FaqModule } from './faq/faq.module';
 import { CatalogModule } from './catalog/catalog.module';
+import { SiteInfoModule } from './site-info/site-info.module';
+import { PartnersModule } from './partners/partners.module';
 
 @Module({
   imports: [
@@ -21,6 +23,8 @@ import { CatalogModule } from './catalog/catalog.module';
     InquiryModule,
     FaqModule,
     CatalogModule,
+    SiteInfoModule,
+    PartnersModule,
   ],
 })
 export class AppModule {}
