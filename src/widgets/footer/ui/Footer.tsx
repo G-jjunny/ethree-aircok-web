@@ -4,21 +4,25 @@ import { useQuery } from '@tanstack/react-query'
 import { SITE } from '@/shared/config'
 import { siteInfoQueryOptions } from '@/entities/site-info'
 
+function pick(apiValue: string | null | undefined, fallback: string): string {
+  return apiValue?.trim() ? apiValue : fallback
+}
+
 export function Footer() {
   const { data: siteInfo } = useQuery(siteInfoQueryOptions())
 
-  const companyName = siteInfo?.legalName ?? siteInfo?.companyName ?? SITE.legalName
-  const ceo = siteInfo?.ceo ?? SITE.footer.ceo
-  const bizNo = siteInfo?.bizNo ?? SITE.footer.bizNo
-  const mailOrderNo = siteInfo?.mailOrderNo ?? SITE.footer.mailOrderNo
-  const address = siteInfo?.address ?? SITE.contact.address
-  const phone = siteInfo?.phone ?? SITE.contact.phone
-  const fax = siteInfo?.fax ?? SITE.footer.fax
-  const email = siteInfo?.email ?? SITE.footer.email2
+  const companyName = pick(siteInfo?.legalName, pick(siteInfo?.companyName, SITE.legalName))
+  const ceo = pick(siteInfo?.ceo, SITE.footer.ceo)
+  const bizNo = pick(siteInfo?.bizNo, SITE.footer.bizNo)
+  const mailOrderNo = pick(siteInfo?.mailOrderNo, SITE.footer.mailOrderNo)
+  const address = pick(siteInfo?.address, SITE.contact.address)
+  const phone = pick(siteInfo?.phone, SITE.contact.phone)
+  const fax = pick(siteInfo?.fax, SITE.footer.fax)
+  const email = pick(siteInfo?.email, SITE.footer.email2)
 
-  const instagram = siteInfo?.instagram ?? SITE.social.instagram
-  const youtube = siteInfo?.youtube ?? SITE.social.youtube
-  const linkedin = siteInfo?.linkedin ?? SITE.social.linkedin
+  const instagram = siteInfo?.instagram?.trim() || undefined
+  const youtube = siteInfo?.youtube?.trim() || undefined
+  const linkedin = siteInfo?.linkedin?.trim() || undefined
 
   return (
     <footer>
