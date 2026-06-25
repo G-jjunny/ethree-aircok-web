@@ -1,5 +1,6 @@
 'use client'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useQuery } from '@tanstack/react-query'
 import { SITE } from '@/shared/config'
 import { siteInfoQueryOptions } from '@/entities/site-info'
@@ -31,9 +32,13 @@ export function Footer() {
         <div className="content-container py-10">
           {/* 상단 행: 법인명 + 소셜 링크 */}
           <div className="flex flex-col sm:flex-row justify-between gap-4 mb-6">
-            <p className="text-heading-light font-display font-semibold text-base">
-              {companyName}
-            </p>
+            <Image
+              src="/images/logos/logo-white.png"
+              alt={companyName}
+              height={28}
+              width={100}
+              style={{ width: 'auto' }}
+            />
             <div className="flex items-center gap-4">
               {instagram && (
                 <Link

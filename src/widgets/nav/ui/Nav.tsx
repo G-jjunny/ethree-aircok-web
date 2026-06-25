@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { SITE } from '@/shared/config';
 
 export function Nav() {
@@ -11,8 +12,15 @@ export function Nav() {
     <header className="sticky top-0 z-50 bg-nav-bg backdrop-blur-xl backdrop-saturate-180 border-b border-border-light">
       <div className="max-w-[1200px] mx-auto px-5 h-[52px] flex items-center justify-between">
         {/* 로고 */}
-        <Link href="/" className="font-display font-semibold text-heading-dark text-base">
-          {SITE.name}
+        <Link href="/" aria-label={SITE.name}>
+          <Image
+            src="/images/logos/logo.png"
+            alt={SITE.name}
+            height={32}
+            width={120}
+            style={{ width: 'auto' }}
+            priority
+          />
         </Link>
 
         {/* 데스크탑 네비게이션 (834px 이상) */}
