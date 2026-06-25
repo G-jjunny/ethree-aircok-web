@@ -68,6 +68,7 @@ Tailwind v4 프로젝트이므로 모든 토큰은 `@theme` 블록 안에 정의
   --color-surface-dark:  #0a0a0a;
   --color-surface-dark-1: #1a1a1a;
   --color-surface-dark-2: #242424;
+  --color-surface-stat:  #0b1730;  /* StatSection 전용 딥 네이비 배경 — 브랜드 블루 계열 톤, surface-dark-1 카드와 색상·명도 대비 확보 */
 
   /* ── Text Colors ────────────────────────── */
   --color-heading-dark:    #1d1d1f;
@@ -147,6 +148,7 @@ Tailwind v4 프로젝트이므로 모든 토큰은 `@theme` 블록 안에 정의
 | **서피스** | | |
 | 라이트 섹션 배경 | `bg-surface-light` | `--color-surface-light` |
 | 다크 섹션 배경 | `bg-surface-dark` | `--color-surface-dark` |
+| StatSection 배경 | `bg-surface-stat` | `--color-surface-stat` (딥 네이비, StatSection 전용) |
 | 다크 카드 배경 | `bg-surface-dark-1` | `--color-surface-dark-1` |
 | **텍스트** | | |
 | 라이트 BG 헤딩 | `text-heading-dark` | `--color-heading-dark` |
@@ -992,7 +994,7 @@ TipTap 등 rich text 에디터의 HTML 출력을 렌더링하는 스타일 가�
 
 ### Dark Stat Card (다크 섹션 통계 카드)
 
-라이트 Stat Card의 다크 배경 변형. `StatSection`이 `bg-surface-dark` 배경에 배치될 때 사용. **4개 카드를 단일 default 스타일로 균등하게** 처리한다(개별 카드 색/크기 강조 없음). 강조는 카드 부각이 아니라 **각 카드의 결과 제목(title) 텍스트 위계 강화**로 표현한다 — 수치 다음으로 강한 시각 무게를 제목에 부여한다.
+라이트 Stat Card의 다크 배경 변형. `StatSection`이 딥 네이비 배경(`bg-surface-stat`)에 배치될 때 사용. **4개 카드를 단일 default 스타일로 균등하게** 처리한다(개별 카드 색/크기 강조 없음). 강조는 카드 부각이 아니라 **각 카드의 결과 제목(title) 텍스트 위계 강화**로 표현한다 — 수치 다음으로 강한 시각 무게를 제목에 부여한다.
 
 **위계 규칙 (수치 > 제목 > 설명 > 출처)**
 - 핵심 수치: `text-6xl` weight 700 (가장 강한 시각 무게)
@@ -1001,7 +1003,7 @@ TipTap 등 rich text 에디터의 HTML 출력을 렌더링하는 스타일 가�
 - 출처: `text-xs` italic
 
 **공통 (4개 카드 균등)**
-- 섹션 배경: `bg-surface-dark`, 그리드 `grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch`
+- 섹션 배경: `bg-surface-stat` (StatSection 전용 딥 네이비 `#0b1730` — 순흑(`surface-dark`)을 쓰는 다른 다크 섹션과 구분되는 브랜드 블루 계열 톤). 카드 배경 `surface-dark-1`(`#1a1a1a`)이 배경보다 명도가 높아 카드가 배경 위로 떠 보이고, 호버 `surface-dark-2`(`#242424`)도 한 단계 더 밝아 depth 대비가 유지된다. 그리드 `grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch`
 - Radius: `rounded-xl` (16px), 패딩: **비대칭 `py-6 px-5`** (세로 32px=`--spacing-6` / 가로 24px=`--spacing-5`), 래퍼: `group flex flex-col gap-4 h-full overflow-hidden`
   - 비대칭 패딩 근거: 좁은 1열 폭(lg 4열)에서 좌우 패딩이 과하면 한글 제목·설명이 가운데로 몰려 줄바꿈이 잦아진다. 세로는 카드 호흡 유지, 가로는 텍스트가 카드 폭을 더 활용하도록 한 단계 축소한다. 두 값 모두 커스텀 스페이싱 스케일 내 토큰(`py-6`=32px / `px-5`=24px)이며 신규 토큰 없음.
 - 카드 높이는 `h-full` + 그리드 `items-stretch`로 통일

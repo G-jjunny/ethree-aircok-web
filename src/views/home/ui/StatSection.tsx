@@ -12,7 +12,7 @@ const STAT_NUMBERS: Record<string, string> = {
 
 export function StatSection() {
   return (
-    <section className="bg-surface-dark">
+    <section className="bg-surface-stat">
       <div className="content-container py-20">
         <div className="grid grid-cols-1 items-stretch gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {SITE.stats.map((stat) => (
