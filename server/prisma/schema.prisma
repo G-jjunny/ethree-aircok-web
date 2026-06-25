@@ -201,3 +201,66 @@ model CatalogImage {
   createdAt DateTime        @default(now())
   updatedAt DateTime        @updatedAt
 }
+
+/// 파트너/고객사 구분 enum (#48).
+/// - partner: 파트너사
+/// - client: 고객사
+enum PartnerType {
+  partner
+  client
+}
+
+/// 사이트 기본 정보 싱글톤 (#48).
+///
+/// 운용 방식 (고정 PK 싱글톤):
+/// - 이 테이블에는 항상 id = 'singleton' 인 행 1개만 존재한다.
+/// - GET /api/site-info: service 는 findUnique({ where: { id: 'singleton' } }) 로 조회한다.
+///   행이 없으면 기본값으로 lazy 생성 후 반환한다.
+/// - PUT /api/site-info: upsert 로 id 'singleton' 행을 갱신(없으면 생성)한다. 관리자 인증 필요.
+///
+/// 컬럼 정책:
+/// - companyName, address, phone, email, bizNo, ceo 는 필수(NOT NULL).
+/// - fax, mailOrderNo, legalName, instagram, youtube, linkedin, facebook, kakaoUrl 은 선택(nullable).
+/// - legalName: 법인명(상호명과 다를 경우 사용). nullable.
+model SiteInfo {
+  id           String   @id @default("singleton")
+  companyName  String
+  legalName    String?
+  address      String
+  phone        String
+  email        String
+  bizNo        String
+  ceo          String
+  fax          String?
+  mailOrderNo  String?
+  instagram    String?
+  youtube      String?
+  linkedin     String?
+  facebook     String?
+  kakaoUrl     String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+/// 파트너사/고객사 목록 (#48).
+///
+/// 운용 방식:
+/// - type(PartnerType enum)으로 파트너사(partner)와 고객사(client)를 구분한다.
+/// - 공개 목록(GET /api/partners)은 order 오름차순, 동률 시 createdAt 보조 정렬.
+/// - 어드민은 드래그앤드롭으로 순서를 일괄 변경한다(PATCH /api/partners/reorder).
+/// - 로고 이미지는 POST /api/partners/:id/logo (multipart, 필드명 file) 로 업로드하며,
+///   업로드 후 해당 Partner 레코드의 logoUrl 을 갱신한다.
+///
+/// 컬럼 정책:
+/// - id: cuid (String). 기존 모델 패턴 통일.
+/// - logoUrl: nullable. 로고 이미지 미설정 파트너 허용.
+/// - order: 표시 순서(오름차순). 기본값 0.
+model Partner {
+  id        String      @id @default(cuid())
+  name      String
+  logoUrl   String?
+  type      PartnerType @default(partner)
+  order     Int         @default(0)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+}

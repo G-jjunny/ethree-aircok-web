@@ -1,21 +1,39 @@
-import Link from 'next/link';
-import { SITE } from '@/shared/config';
+'use client'
+import Link from 'next/link'
+import { useQuery } from '@tanstack/react-query'
+import { SITE } from '@/shared/config'
+import { siteInfoQueryOptions } from '@/entities/site-info'
 
 export function Footer() {
+  const { data: siteInfo } = useQuery(siteInfoQueryOptions())
+
+  const companyName = siteInfo?.legalName ?? siteInfo?.companyName ?? SITE.legalName
+  const ceo = siteInfo?.ceo ?? SITE.footer.ceo
+  const bizNo = siteInfo?.bizNo ?? SITE.footer.bizNo
+  const mailOrderNo = siteInfo?.mailOrderNo ?? SITE.footer.mailOrderNo
+  const address = siteInfo?.address ?? SITE.contact.address
+  const phone = siteInfo?.phone ?? SITE.contact.phone
+  const fax = siteInfo?.fax ?? SITE.footer.fax
+  const email = siteInfo?.email ?? SITE.footer.email2
+
+  const instagram = siteInfo?.instagram ?? SITE.social.instagram
+  const youtube = siteInfo?.youtube ?? SITE.social.youtube
+  const linkedin = siteInfo?.linkedin ?? SITE.social.linkedin
+
   return (
     <footer>
       {/* 파트 B: 법인 정보 블록 */}
       <div className="bg-surface-dark">
-        <div className="max-w-[1200px] mx-auto px-5 py-10">
+        <div className="content-container py-10">
           {/* 상단 행: 법인명 + 소셜 링크 */}
           <div className="flex flex-col sm:flex-row justify-between gap-4 mb-6">
             <p className="text-heading-light font-display font-semibold text-base">
-              {SITE.legalName}
+              {companyName}
             </p>
             <div className="flex items-center gap-4">
-              {SITE.social.instagram && (
+              {instagram && (
                 <Link
-                  href={SITE.social.instagram}
+                  href={instagram}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-body-light text-sm hover:text-heading-light transition-colors"
@@ -23,9 +41,9 @@ export function Footer() {
                   Instagram
                 </Link>
               )}
-              {SITE.social.youtube && (
+              {youtube && (
                 <Link
-                  href={SITE.social.youtube}
+                  href={youtube}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-body-light text-sm hover:text-heading-light transition-colors"
@@ -33,9 +51,9 @@ export function Footer() {
                   YouTube
                 </Link>
               )}
-              {SITE.social.linkedin && (
+              {linkedin && (
                 <Link
-                  href={SITE.social.linkedin}
+                  href={linkedin}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-body-light text-sm hover:text-heading-light transition-colors"
@@ -52,34 +70,34 @@ export function Footer() {
             <div className="flex flex-col gap-1.5">
               <p className="text-body-light text-xs">
                 <span className="opacity-40 mr-2">대표</span>
-                {SITE.footer.ceo}
+                {ceo}
               </p>
               <p className="text-body-light text-xs">
                 <span className="opacity-40 mr-2">사업자등록번호</span>
-                {SITE.footer.bizNo}
+                {bizNo}
               </p>
               <p className="text-body-light text-xs">
                 <span className="opacity-40 mr-2">통신판매업신고번호</span>
-                {SITE.footer.mailOrderNo}
+                {mailOrderNo}
               </p>
               <p className="text-body-light text-xs">
                 <span className="opacity-40 mr-2">주소</span>
-                {SITE.contact.address}
+                {address}
               </p>
             </div>
             {/* 우열: 전화·팩스·이메일 */}
             <div className="flex flex-col gap-1.5">
               <p className="text-body-light text-xs">
                 <span className="opacity-40 mr-2">전화</span>
-                {SITE.contact.phone}
+                {phone}
               </p>
               <p className="text-body-light text-xs">
                 <span className="opacity-40 mr-2">팩스</span>
-                {SITE.footer.fax}
+                {fax}
               </p>
               <p className="text-body-light text-xs">
                 <span className="opacity-40 mr-2">이메일</span>
-                {SITE.footer.email2}
+                {email}
               </p>
             </div>
           </div>
@@ -93,5 +111,5 @@ export function Footer() {
         </div>
       </div>
     </footer>
-  );
+  )
 }
