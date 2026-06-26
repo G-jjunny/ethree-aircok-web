@@ -612,6 +612,30 @@ Apple 스타일의 '제품 우선 프레젠테이션'을 Aircok 브랜드에 적
 </div>
 ```
 
+### Team Member Placeholder Card (팀원 자리표시 카드) — About
+
+팀원 사진/프로필이 아직 없을 때(데이터 연동 전) 표시하는 정사각 카드. "준비 중"이 미완성이 아니라 의도된 상태로 읽히도록, 중앙 아바타 실루엣 + 이름/역할 자리표시 라인으로 구성한다. 신규 색 토큰 없이 라이트 표면·보조 텍스트 토큰만 재활용한다.
+
+- 카드 래퍼: `group bg-surface-white rounded-xl aspect-square flex flex-col items-center justify-center gap-4 p-8 text-center`
+- **아바타 실루엣**: `flex h-16 w-16 items-center justify-center rounded-pill bg-surface-light`(원형 배경) + user 외곽선 SVG 아이콘 `h-8 w-8 text-secondary-dark`
+- **자리표시 라벨**: 이름 자리 `text-heading-dark text-subheading font-semibold`(예: "팀원 합류 예정"), 역할 자리 `text-secondary-dark text-sm`(예: "프로필 준비 중")
+- 호버(선택): `hover:bg-surface-light transition-colors duration-200` (사진 카드로 교체될 자리임을 미세하게 암시)
+
+```tsx
+// Team Member Placeholder Card 예시
+<div className="group bg-surface-white rounded-xl aspect-square flex flex-col items-center justify-center gap-4 p-8 text-center transition-colors duration-200 hover:bg-surface-light">
+  <span className="flex h-16 w-16 items-center justify-center rounded-pill bg-surface-light">
+    <svg className="h-8 w-8 text-secondary-dark" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+    </svg>
+  </span>
+  <div className="flex flex-col gap-1">
+    <p className="text-heading-dark text-subheading font-semibold [word-break:keep-all]">팀원 합류 예정</p>
+    <p className="text-secondary-dark text-sm">프로필 준비 중</p>
+  </div>
+</div>
+```
+
 ### Catalog Thumbnail · File-Type Badge (카탈로그 썸네일·파일유형 배지) — 공통
 
 카탈로그 관리(`admin-catalog`)에서 이미지·PDF 항목을 동일한 카드 썸네일로 표현한다. PDF 항목은 첫 페이지 렌더 썸네일 위에 **파일유형 배지**를 얹고, 렌더 전/실패 시에는 **파일유형 플레이스홀더**로 폴백한다. 모든 색·간격·radius는 기존 토큰을 재활용하며 신규 색상 토큰은 없다(파일 종류가 늘어나면 동일 톤으로 재사용).
@@ -1283,34 +1307,47 @@ About·Services 등 서브 페이지 상단의 텍스트 전용 히어로.
 </section>
 ```
 
-### History Timeline (연혁 타임라인)
+### History Timeline (연혁 타임라인 — Spine 변형)
 
-연도별 이벤트를 나열하는 2컬럼 타임라인 레이아웃.
+연도별 이벤트를 나열하는 타임라인. About 연혁처럼 항목 수가 많고 "시간 위에서 측정된 회사"라는 서사를 강조할 때는, 좌측 연도 컬럼과 이벤트 컬럼 사이에 **연속 수직 레일(spine)** 과 연도 **노드 마커**를 두어 진짜 연대기임을 인코딩한다. 레일·노드는 기존 `bg-border-light`(레일) + `bg-aircok-blue`(노드) 토큰만 재활용하며 신규 색 토큰을 추가하지 않는다.
 
 - 배경: `bg-surface-white`
-- 연도 블록 구분: `border-t border-border-light`
-- 레이아웃: `grid grid-cols-[120px_1fr] gap-8 md:grid-cols-[160px_1fr]`
-- **연도 숫자**: 40px, weight 700, `text-aircok-blue`, `leading-none`
-- **월 레이블**: 14px, weight 500, `text-secondary-dark`, `shrink-0 w-10`
+- 레이아웃: 행마다 `grid grid-cols-[88px_1fr] gap-6 md:grid-cols-[120px_1fr] md:gap-10`
+- **연도 숫자**: Section Heading 크기(40px), weight 700, `text-aircok-blue`, `leading-none`, `text-[28px] sm:text-[40px]`(모바일 28px). 연도 컬럼은 `md:sticky md:top-24 self-start`로 스크롤 시 이벤트 옆에 머문다(선택, 권장).
+- **연도 카운트(선택)**: 연도 숫자 아래 `text-secondary-dark text-xs font-medium` 으로 해당 연도 이벤트 수(`{n}건`)를 표기해 타임라인 밀도를 전달.
+- **수직 레일**: 이벤트 컬럼 좌측에 `relative` 컨테이너 + `before:` 가상요소 또는 `absolute` span 으로 `w-px bg-border-light`. 노드: `bg-aircok-blue`(연도 시작점) / `bg-border-light`(이벤트 점). 마지막 연도 그룹은 레일을 끝까지 그리지 않아도 된다(과한 장식 금지).
+- **노드 마커**: 연도 노드 `h-2.5 w-2.5 rounded-pill bg-aircok-blue ring-4 ring-surface-white`(흰 배경에서 레일과 분리), 이벤트 노드 `h-1.5 w-1.5 rounded-pill bg-border-light`(작게).
+- **월 레이블**: 14px, weight 600, `text-secondary-dark`, `shrink-0 w-12 tabular-nums`(`tabular-nums`로 월 숫자 정렬).
 - **이벤트 텍스트**: Body (17px, weight 400), `text-body-dark`, `leading-[1.65]`, `[word-break:keep-all]`
+- 연도 그룹 간 구분은 `border-t border-border-light` 대신 레일이 담당하므로, 그룹 상단 구분선은 생략하고 `py-10`(첫 그룹은 `pt-0`)로 리듬을 만든다.
 
 ```tsx
-// History Timeline 예시
-<div className="flex flex-col gap-0">
-  {yearGroups.map((block) => (
-    <div key={block.year} className="border-t border-border-light py-8 grid grid-cols-[120px_1fr] gap-8 md:grid-cols-[160px_1fr]">
-      <div className="text-[40px] font-bold text-aircok-blue leading-none pt-1">{block.year}</div>
-      <ul className="flex flex-col gap-4">
-        {block.events.map((event) => (
-          <li key={event.month + event.text} className="flex gap-3">
-            <span className="text-secondary-dark text-sm font-medium shrink-0 w-10">{event.month}</span>
-            <span className="text-[17px] text-body-dark leading-[1.65] [word-break:keep-all]">{event.text}</span>
-          </li>
-        ))}
-      </ul>
-    </div>
+// History Timeline (Spine 변형) 예시 — 연도 컬럼 + 레일 + 노드
+<ol className="flex flex-col">
+  {yearGroups.map((block, gi) => (
+    <li key={block.year} className="grid grid-cols-[88px_1fr] gap-6 md:grid-cols-[120px_1fr] md:gap-10">
+      {/* 연도 컬럼 (sticky) */}
+      <div className="md:sticky md:top-24 self-start pb-10">
+        <p className="text-[28px] sm:text-[40px] font-bold text-aircok-blue leading-none">{block.year}</p>
+        <p className="text-secondary-dark text-xs font-medium mt-1.5">{block.events.length}건</p>
+      </div>
+      {/* 이벤트 컬럼 + 레일 */}
+      <div className="relative pb-10">
+        <span aria-hidden="true" className="absolute left-1 top-1.5 bottom-0 w-px bg-border-light" />
+        <span aria-hidden="true" className="absolute left-0 top-1 h-2.5 w-2.5 rounded-pill bg-aircok-blue ring-4 ring-surface-white" />
+        <ul className="flex flex-col gap-5 pl-8">
+          {block.events.map((event) => (
+            <li key={event.month + event.text} className="relative flex gap-4 [word-break:keep-all]">
+              <span aria-hidden="true" className="absolute -left-[27px] top-2 h-1.5 w-1.5 rounded-pill bg-border-light" />
+              <span className="text-secondary-dark text-sm font-semibold shrink-0 w-12 tabular-nums pt-0.5">{event.month}</span>
+              <span className="text-[17px] text-body-dark leading-[1.65]">{event.text}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </li>
   ))}
-</div>
+</ol>
 ```
 
 ---
