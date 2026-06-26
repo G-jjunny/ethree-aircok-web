@@ -364,11 +364,24 @@ Apple 스타일의 '제품 우선 프레젠테이션'을 Aircok 브랜드에 적
 
 ### Hero Section
 
-- Full-viewport-width, 배경 `#f5f5f7` 또는 `#0a0a0a`
-- 헤드라인: 56px, weight 600, line-height 1.07
-- 서브 카피: 21px, weight 400, line-height 1.19
-- CTA 2개 나란히: "도입 문의" (Filled Blue) + "제품 보기" (Pill Outline)
-- 제품 이미지: 하단 또는 우측, 솔리드 배경 위
+메인 페이지 최상단 히어로. **수치/통계/metric 카드를 두지 않는다** — 수치 근거는 바로 아래 StatSection 등에서 다루므로 Hero에서 중복 금지. Hero는 타이포그래피·여백·CTA·제품 비주얼만으로 첫인상을 만든다.
+
+- Full-viewport-width, 높이 `min-h-[calc(100vh-52px)]` (Nav 52px 제외 — 1회성 레이아웃 수치, 주석 명시)
+- 헤드라인: Display Hero (56px, weight 600, line-height 1.07), `text-heading-light`, `[word-break:keep-all]`
+- 서브 카피: 21px, weight 400, `text-body-light`, `leading-[1.65]`(한글), `[word-break:keep-all]`
+- CTA 2개 나란히: "도입 문의" (Filled Blue, `rounded-md`) + "제품 보기" (Pill Outline, `rounded-pill`), 둘 다 `min-h-[44px]`
+- 제품 이미지: 우측, `next/image` `fill` + `priority`(LCP) + `sizes`, `object-contain`
+
+**배경 — 다크 연속 캔버스(권장)**: Hero는 바로 아래 `StatSection`(`bg-surface-stat` 딥 네이비)과 하나의 "측정된 공기" 흐름으로 읽히도록 **`bg-surface-stat`를 공유**한다. 검정(`#0a0a0a`)→네이비 전환의 미세한 색온도 점프를 없애고, 리듬 전환(다크→라이트)은 그 아래 `MethodologySection`에서 한다.
+
+**Signature — Air Spine(브랜드 수직 룰)**: 좌측 콘텐츠 헤드라인 옆/위에 짧은 수직 Aircok Blue 룰 하나로 브랜드의 "공기 밸브(cock)" 은유를 인코딩한다. 단 하나의 액센트로 절제하며, 장식적 반복(여러 룰·아이콘)은 금지. 헤드라인 내 핵심 어구 한 곳에만 `text-aircok-blue-light` 강조를 줄 수 있다(다크 배경 가독성). 모션은 절제 — 페이지 로드 시 1회성 reveal 외 hover 상승·scale 없음.
+
+```tsx
+// Air Spine signature 마크업 (좌측 콘텐츠 상단)
+<span aria-hidden="true" className="block h-12 w-0.5 bg-aircok-blue" />
+```
+
+**제품 비주얼 — 다크 캔버스 위 제품 배치**: 제품은 헤일로·도형·배경 패널 없이 `bg-surface-stat` 다크 캔버스 위에 그대로 놓는다(`object-contain`). 헤드라인과 제품이 1:1 폭(`lg:w-1/2`)으로 나뉘어 제품이 충분히 크게 보이도록 한다. 그라디언트·텍스처·원형 헤일로 등 배경 장식은 금지(§Visual Theme), 신규 색 토큰도 추가하지 않는다. (투명 PNG에는 box-shadow `shadow-product`가 실루엣이 아닌 박스에 적용되므로 사용하지 않는다 — depth는 다크 캔버스 대비만으로 표현.)
 
 ### Product Grid Tile
 
