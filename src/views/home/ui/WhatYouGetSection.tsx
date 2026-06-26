@@ -2,19 +2,13 @@ import Link from 'next/link';
 import { SITE } from '@/shared/config';
 import { SectionHeader } from '@/shared/ui';
 
-const STAT_HIGHLIGHTS = [
-  { value: '50%', label: '집중력 향상' },
-  { value: '79%', label: '에너지 비용 최대 절감' },
-  { value: '46%', label: '공기질 최대 개선' },
-] as const;
-
 export function WhatYouGetSection() {
   return (
     <section className="bg-surface-light">
       <div className="content-container py-20">
         <div className="flex flex-col lg:flex-row gap-16 items-start">
-          {/* 좌측 콘텐츠 */}
-          <div className="lg:w-[60%] flex flex-col">
+          {/* 좌측 콘텐츠 — 절제 (signature는 우측 패널에 집중) */}
+          <div className="lg:w-[55%] flex flex-col">
             <SectionHeader
               label={SITE.whatYouGet.label}
               title={SITE.whatYouGet.title}
@@ -46,14 +40,37 @@ export function WhatYouGetSection() {
             </Link>
           </div>
 
-          {/* 우측 수치 카드 스택 */}
-          <div className="lg:w-[40%] flex flex-col gap-4">
-            {STAT_HIGHLIGHTS.map((stat) => (
-              <div key={stat.value} className="bg-surface-white rounded-xl shadow-card p-6">
-                <p className="text-3xl font-bold text-aircok-blue leading-none">{stat.value}</p>
-                <p className="text-heading-dark font-medium mt-1">{stat.label}</p>
+          {/* 우측 signature — Navy Signature Stat Panel (단 하나의 지배적 수치 40+에 대담함 집중) */}
+          <div className="lg:w-[45%] w-full">
+            {/* token 없음: rounded-2xl signature 패널 시각적 무게 (radius-xl 16px보다 큼) */}
+            <div className="relative overflow-hidden rounded-2xl bg-surface-stat px-8 py-10 sm:px-10 sm:py-12 flex flex-col gap-4">
+              <span className="text-aircok-blue-light text-xs font-semibold uppercase tracking-widest">
+                {SITE.whatYouGet.signature.label}
+              </span>
+              <span className="text-aircok-blue-light text-7xl sm:text-8xl font-display font-bold leading-none tracking-[-0.3px]">
+                {SITE.whatYouGet.signature.value}
+              </span>
+              <p className="text-heading-light text-[21px] font-semibold leading-[1.19] [word-break:keep-all]">
+                {SITE.whatYouGet.signature.title}
+              </p>
+              <p className="text-body-light opacity-70 text-sm leading-[1.65] [word-break:keep-all]">
+                {SITE.whatYouGet.signature.caption}
+              </p>
+
+              {/* 보조 수치 — 절제, signature보다 작게 */}
+              <div className="mt-2 grid grid-cols-3 gap-4 border-t border-border-dark pt-5">
+                {SITE.whatYouGet.supportingStats.map((stat) => (
+                  <div key={stat.value} className="flex flex-col gap-1">
+                    <span className="text-heading-light text-2xl font-bold leading-none tracking-[-0.3px]">
+                      {stat.value}
+                    </span>
+                    <span className="text-body-light opacity-60 text-xs leading-[1.4] [word-break:keep-all]">
+                      {stat.label}
+                    </span>
+                  </div>
+                ))}
               </div>
-            ))}
+            </div>
           </div>
         </div>
       </div>

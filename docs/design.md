@@ -68,6 +68,9 @@ Tailwind v4 프로젝트이므로 모든 토큰은 `@theme` 블록 안에 정의
   --color-surface-dark:  #0a0a0a;
   --color-surface-dark-1: #1a1a1a;
   --color-surface-dark-2: #242424;
+  --color-surface-stat:  #0b1730;  /* StatSection 전용 딥 네이비 배경 — 브랜드 블루 계열 톤 */
+  --color-surface-stat-card:       #13213f;  /* StatSection 카드 배경 — 배경(#0b1730)보다 한 단계 밝은 동일 색온도 네이비 (떠 보임) */
+  --color-surface-stat-card-hover: #1b2c4f;  /* StatSection 카드 호버 — 카드보다 한 단계 더 밝은 네이비 (depth 대비 유지) */
 
   /* ── Text Colors ────────────────────────── */
   --color-heading-dark:    #1d1d1f;
@@ -147,6 +150,9 @@ Tailwind v4 프로젝트이므로 모든 토큰은 `@theme` 블록 안에 정의
 | **서피스** | | |
 | 라이트 섹션 배경 | `bg-surface-light` | `--color-surface-light` |
 | 다크 섹션 배경 | `bg-surface-dark` | `--color-surface-dark` |
+| StatSection 배경 | `bg-surface-stat` | `--color-surface-stat` (딥 네이비, StatSection 전용) |
+| StatSection 카드 배경 | `bg-surface-stat-card` | `--color-surface-stat-card` (배경보다 밝은 네이비, StatSection 카드 전용) |
+| StatSection 카드 호버 | `bg-surface-stat-card-hover` | `--color-surface-stat-card-hover` (카드보다 밝은 네이비, StatSection 카드 전용) |
 | 다크 카드 배경 | `bg-surface-dark-1` | `--color-surface-dark-1` |
 | **텍스트** | | |
 | 라이트 BG 헤딩 | `text-heading-dark` | `--color-heading-dark` |
@@ -175,6 +181,7 @@ Tailwind v4 프로젝트이므로 모든 토큰은 `@theme` 블록 안에 정의
 | 다크 구분선 | `border-border-dark` | `--color-border-dark` |
 | **타이포그래피** | | |
 | Nav·UI 중간 텍스트 (15px) | `text-nav` | `--font-size-nav` |
+| Stat Card Title (24px) | `text-2xl` | Tailwind 기본 |
 | Sub-heading · Card Title (21px) | `text-subheading` | `--font-size-subheading` |
 | Caption · Link (14px) | `text-sm` | Tailwind 기본 |
 | Micro (12px) | `text-xs` | Tailwind 기본 |
@@ -267,6 +274,7 @@ Apple 스타일의 '제품 우선 프레젠테이션'을 Aircok 브랜드에 적
 | Article Hero Mobile | 36px (2.25rem) | 700 | 1.14 | -0.2px | 뉴스/아티클 상세 페이지 H1 (모바일) |
 | Section Heading | 40px (2.50rem) | 600 | 1.10 | -0.3px | 섹션 타이틀 |
 | Tile Heading | 28px (1.75rem) | 500 | 1.14 | -0.1px | 제품 타일 헤드라인 |
+| Stat Card Title | 24px (1.50rem) | 700 | 1.19 | 0px | Dark Stat Card 결과 제목 — 수치 다음 위계, `text-2xl` (Tailwind 기본) |
 | Article Sub-heading | 22px (1.375rem) | 600 | 1.14 | 0px | 아티클 본문 내 H3 |
 | Card Title | 21px (1.31rem) | 700 | 1.19 | 0px | 카드 강조 헤딩 — `text-subheading` |
 | Card News Title | 18px (1.125rem) | 600 | 1.35 | 0px | 뉴스 카드 제목 |
@@ -356,11 +364,24 @@ Apple 스타일의 '제품 우선 프레젠테이션'을 Aircok 브랜드에 적
 
 ### Hero Section
 
-- Full-viewport-width, 배경 `#f5f5f7` 또는 `#0a0a0a`
-- 헤드라인: 56px, weight 600, line-height 1.07
-- 서브 카피: 21px, weight 400, line-height 1.19
-- CTA 2개 나란히: "도입 문의" (Filled Blue) + "제품 보기" (Pill Outline)
-- 제품 이미지: 하단 또는 우측, 솔리드 배경 위
+메인 페이지 최상단 히어로. **수치/통계/metric 카드를 두지 않는다** — 수치 근거는 바로 아래 StatSection 등에서 다루므로 Hero에서 중복 금지. Hero는 타이포그래피·여백·CTA·제품 비주얼만으로 첫인상을 만든다.
+
+- Full-viewport-width, 높이 `min-h-[calc(100vh-52px)]` (Nav 52px 제외 — 1회성 레이아웃 수치, 주석 명시)
+- 헤드라인: Display Hero (56px, weight 600, line-height 1.07), `text-heading-light`, `[word-break:keep-all]`
+- 서브 카피: 21px, weight 400, `text-body-light`, `leading-[1.65]`(한글), `[word-break:keep-all]`
+- CTA 2개 나란히: "도입 문의" (Filled Blue, `rounded-md`) + "제품 보기" (Pill Outline, `rounded-pill`), 둘 다 `min-h-[44px]`
+- 제품 이미지: 우측, `next/image` `fill` + `priority`(LCP) + `sizes`, `object-contain`
+
+**배경 — 다크 연속 캔버스(권장)**: Hero는 바로 아래 `StatSection`(`bg-surface-stat` 딥 네이비)과 하나의 "측정된 공기" 흐름으로 읽히도록 **`bg-surface-stat`를 공유**한다. 검정(`#0a0a0a`)→네이비 전환의 미세한 색온도 점프를 없애고, 리듬 전환(다크→라이트)은 그 아래 `MethodologySection`에서 한다.
+
+**Signature — Air Spine(브랜드 수직 룰)**: 좌측 콘텐츠 헤드라인 옆/위에 짧은 수직 Aircok Blue 룰 하나로 브랜드의 "공기 밸브(cock)" 은유를 인코딩한다. 단 하나의 액센트로 절제하며, 장식적 반복(여러 룰·아이콘)은 금지. 헤드라인 내 핵심 어구 한 곳에만 `text-aircok-blue-light` 강조를 줄 수 있다(다크 배경 가독성). 모션은 절제 — 페이지 로드 시 1회성 reveal 외 hover 상승·scale 없음.
+
+```tsx
+// Air Spine signature 마크업 (좌측 콘텐츠 상단)
+<span aria-hidden="true" className="block h-12 w-0.5 bg-aircok-blue" />
+```
+
+**제품 비주얼 — 다크 캔버스 위 제품 배치**: 제품은 헤일로·도형·배경 패널 없이 `bg-surface-stat` 다크 캔버스 위에 그대로 놓는다(`object-contain`). 헤드라인과 제품이 1:1 폭(`lg:w-1/2`)으로 나뉘어 제품이 충분히 크게 보이도록 한다. 그라디언트·텍스처·원형 헤일로 등 배경 장식은 금지(§Visual Theme), 신규 색 토큰도 추가하지 않는다. (투명 PNG에는 box-shadow `shadow-product`가 실루엣이 아닌 박스에 적용되므로 사용하지 않는다 — depth는 다크 캔버스 대비만으로 표현.)
 
 ### Product Grid Tile
 
@@ -383,18 +404,22 @@ Apple 스타일의 '제품 우선 프레젠테이션'을 Aircok 브랜드에 적
 
 - 섹션 배경: `bg-surface-dark`
 - 카드 배경: `bg-surface-dark-1` (radius: `rounded-xl`, 패딩: `p-6`)
-- **제목**: Card Title (21px, weight 700), `text-heading-light`
+- **상단 액센트 룰(선택)**: 카드 상단에 `block h-0.5 w-10 bg-aircok-blue` (`aria-hidden="true"`). 병렬 특징을 브랜드 컬러로 묶되, 순서를 암시하지 않는다(번호 마커는 진짜 순차 콘텐츠에만 — §Numeral Spine 참조).
+- **제목**: Card Title (21px, weight 700), `text-heading-light` — `text-subheading` 토큰 사용
 - **설명**: Body (17px, weight 400), `text-body-light`, `leading-[1.65]`, `[word-break:keep-all]`
 - 그리드: 4열(데스크탑, `lg:grid-cols-4`) → 2열(태블릿, `sm:grid-cols-2`) → 1열(모바일)
-- 카드 간 그림자 없음 (다크 섹션 내부 elevation은 배경색 차이로만 표현)
+- 호버(선택): `hover:bg-surface-dark-2 transition-colors duration-200` (다크 섹션 내부 elevation은 배경색 차이로만 — 그림자 금지)
 
 ```tsx
-// Feature Strip 다크 카드 예시
-<div className="bg-surface-dark-1 rounded-xl p-6 flex flex-col gap-3">
-  <h3 className="text-[21px] font-bold text-heading-light leading-[1.19]">카드 제목</h3>
+// Feature Strip 다크 카드 예시 (액센트 룰 + 호버 변형)
+<li className="group flex flex-col gap-4 rounded-xl bg-surface-dark-1 p-6 transition-colors duration-200 hover:bg-surface-dark-2">
+  <span aria-hidden="true" className="block h-0.5 w-10 bg-aircok-blue" />
+  <h4 className="text-subheading font-bold font-display text-heading-light leading-[1.19]">카드 제목</h4>
   <p className="text-[17px] text-body-light leading-[1.65] [word-break:keep-all]">카드 설명 텍스트</p>
-</div>
+</li>
 ```
+
+> **WhyChoose 연속 다크 흐름**: `WhyChooseUsSection`(시그니처 인용 + 보조 포인트 hairline 그리드)과 `WhyChooseUsFeatureSection`(위 Feature Strip 다크 카드)은 동일 `bg-surface-dark`를 공유하는 하나의 흐름이다. 두 섹션은 `border-t border-border-dark pt-16` 구분선으로 연결하고, 보조 포인트 그리드는 `gap-px ... bg-border-dark` 헤어라인으로 셀을 구분한다(신규 토큰 없음). 시그니처(중앙 대형 인용)에만 대담함을 집중하고 포인트/카드는 절제한다.
 
 **Bottom CTA Section**
 
@@ -990,29 +1015,60 @@ TipTap 등 rich text 에디터의 HTML 출력을 렌더링하는 스타일 가�
 
 ### Dark Stat Card (다크 섹션 통계 카드)
 
-라이트 Stat Card의 다크 배경 변형. `StatSection`이 `bg-surface-dark` 배경에 배치될 때 사용.
+라이트 Stat Card의 다크 배경 변형. `StatSection`이 딥 네이비 배경(`bg-surface-stat`)에 배치될 때 사용. **4개 카드를 단일 default 스타일로 균등하게** 처리한다(개별 카드 색/크기 강조 없음). 강조는 카드 부각이 아니라 **각 카드의 결과 제목(title) 텍스트 위계 강화**로 표현한다 — 수치 다음으로 강한 시각 무게를 제목에 부여한다.
 
-- 섹션 배경: `bg-surface-dark`
-- 카드 배경: `bg-surface-dark-1`
-- Radius: `rounded-xl` (16px)
-- 패딩: `p-8`
-- 테두리: 없음 (다크 섹션에서 배경색 대비로 depth 표현)
-- **category 레이블**: 12px, weight 600, `text-aircok-blue-light` (다크 배경에서 가독성), `uppercase tracking-widest`
-- **핵심 수치**: `text-5xl font-bold text-heading-light leading-none` (카드 상단에 대형 강조 수치 표시)
-- **title**: 21px, weight 700, `text-heading-light`
-- **description**: `text-body-light text-sm leading-[1.65] [word-break:keep-all]`
-- **source (출처)**: `text-body-light opacity-50 text-xs italic` (다크 배경에서 secondary 대체)
+**위계 규칙 (수치 > 제목 > 설명 > 출처)**
+- 핵심 수치: `text-6xl` weight 700 (가장 강한 시각 무게)
+- 제목: `text-2xl`(24px) weight 700 — 수치 다음 위계로 끌어올림(기존 `text-subheading` 21px → 24px)
+- 설명: `text-sm`
+- 출처: `text-xs` italic
+
+**공통 (4개 카드 균등)**
+- 섹션 배경: `bg-surface-stat` (StatSection 전용 딥 네이비 `#0b1730` — 순흑(`surface-dark`)을 쓰는 다른 다크 섹션과 구분되는 브랜드 블루 계열 톤). 카드는 **배경과 동일한 색온도(blue hue)의 네이비 계열**로 통일해 이질감을 없앤다: 카드 배경 `surface-stat-card`(`#13213f`)가 배경(`#0b1730`)보다 명도가 높아 카드가 배경 위로 떠 보이고, 호버 `surface-stat-card-hover`(`#1b2c4f`)도 한 단계 더 밝아 depth 대비가 유지된다(명도 위계 `#0b1730` < `#13213f` < `#1b2c4f`). 그리드 `grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch`
+- Radius: `rounded-xl` (16px), 패딩: **비대칭 `py-6 px-5`** (세로 32px=`--spacing-6` / 가로 24px=`--spacing-5`), 래퍼: `group flex flex-col gap-4 h-full overflow-hidden`
+  - 비대칭 패딩 근거: 좁은 1열 폭(lg 4열)에서 좌우 패딩이 과하면 한글 제목·설명이 가운데로 몰려 줄바꿈이 잦아진다. 세로는 카드 호흡 유지, 가로는 텍스트가 카드 폭을 더 활용하도록 한 단계 축소한다. 두 값 모두 커스텀 스페이싱 스케일 내 토큰(`py-6`=32px / `px-5`=24px)이며 신규 토큰 없음.
+- 카드 높이는 `h-full` + 그리드 `items-stretch`로 통일
+- 호버 인터랙션: `transition-all duration-200 hover:-translate-y-1`
+- 카드 배경: `bg-surface-stat-card`, 호버 시 `hover:bg-surface-stat-card-hover` (섹션 배경과 같은 네이비 색온도 + 단계적 명도 차로 depth, 그림자 없음)
+- **category 아이콘**: 카드 상단(category 레이블 위)에 카테고리 의미를 나타내는 라인 아이콘 1개 배치 — 아래 **Stat Category Icon** 규칙 참조
+- category 레이블: `text-aircok-blue-light text-xs font-semibold uppercase tracking-widest`
+- 핵심 수치: `text-6xl font-bold text-heading-light leading-none`
+- **title**: `text-2xl font-bold text-heading-light leading-[1.19] [word-break:keep-all]` (제목 위계 강화) + **2줄 높이 확보(`lg:min-h-[2.4em]`)** — 아래 *title 정렬 규칙* 참조
+- 설명: `text-body-light text-sm leading-[1.65] [word-break:keep-all]`
+- 출처: `text-body-light opacity-50 text-xs italic`
+
+**title 정렬 규칙 (description 시작점 통일)**
+- 제목 줄 수(1줄/2줄)가 카드마다 달라 설명(description) 시작점이 들쭉날쭉해지는 것을 막기 위해, title에 **2줄 기준 최소 높이**를 부여해 모든 카드가 동일한 제목 영역을 점유하게 한다.
+- 값: `lg:min-h-[2.4em]` — `em` 단위로 title 자체 font-size(`text-2xl`)·`leading-[1.19]`에 종속시켜, 2줄(`1.19 × 2 ≈ 2.38em`)을 안정적으로 담는 최소 높이. 픽셀 하드코딩 대신 폰트 스케일에 연동되므로 토큰 체계와 충돌하지 않는다.
+- **반응형 분기**: 1열(`< sm`)·2열(`sm`)에서는 카드 폭이 넓어 제목이 대부분 1줄로 들어가므로 min-height를 적용하면 불필요한 빈 공간이 생긴다. 따라서 카드가 좁은 1열 폭이 되는 **`lg`(4열) 이상에서만** min-height를 적용(`lg:min-h-[...]`)한다.
+
+**Stat Category Icon (통계 카테고리 라인 아이콘)**
+
+각 카드 상단에 카테고리 의미를 절제 있게 시각화하는 인라인 SVG 라인 아이콘. **알록달록한 유니코드 이모지 사용 금지** — Location Pin Icon과 동일하게 `currentColor` 기반 외곽선(stroke) SVG로 통일한다. 4개 카드 모두 동일한 크기·색·배치로 처리하며(개별 강조 금지), 아이콘 모양만 카테고리별로 다르다.
+
+- **컨테이너(아이콘 칩)**: `flex size-11 items-center justify-center rounded-lg bg-overlay-white-10 text-aircok-blue-light` (다크 배경 위 미세 chip, 신규 색상 토큰 없이 `bg-overlay-white-10` + `text-aircok-blue-light` 재활용)
+- **아이콘**: `size-6`, `fill="none"`, `stroke="currentColor"`, `strokeWidth="1.5"`, `aria-hidden="true"` (색은 칩의 `text-aircok-blue-light` 상속)
+- 호버 시 별도 색 변화 없음(카드 호버는 배경/translate로만 표현)
+- 카테고리별 매핑은 데이터(`SITE.stats`)가 아니라 **컴포넌트 레이어(`DarkStatCard`)에서 `category` 키 기반 매핑**으로 둔다. 매핑에 없는 category는 아이콘 생략(graceful fallback)
+- 권장 아이콘 의미: Concentration=집중(과녁/타깃), Value=가치상승(우상향 추세), Cost=에너지/절감(번개), Air Quality=공기 흐름(바람결)
 
 ```tsx
-// Dark Stat Card 예시
-<div className="bg-surface-dark-1 rounded-xl p-8 flex flex-col gap-4">
+// Dark Stat Card — 4개 카드 균등 (아이콘 칩 + 제목 위계 강화)
+<div className="group flex h-full flex-col gap-4 overflow-hidden rounded-xl py-6 px-5 bg-surface-stat-card transition-all duration-200 hover:-translate-y-1 hover:bg-surface-stat-card-hover">
+  <span className="flex size-11 items-center justify-center rounded-lg bg-overlay-white-10 text-aircok-blue-light">
+    {/* 카테고리 라인 아이콘: size-6, currentColor stroke */}
+    <svg className="size-6" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">...</svg>
+  </span>
   <span className="text-aircok-blue-light text-xs font-semibold uppercase tracking-widest">category</span>
-  <span className="text-5xl font-bold text-heading-light leading-none">50%</span>
-  <h3 className="text-heading-light text-[21px] font-bold leading-[1.19] mt-2">핵심 수치 제목</h3>
-  <p className="text-body-light text-sm leading-[1.65] [word-break:keep-all] flex-1">설명 텍스트</p>
-  <p className="text-body-light opacity-50 text-xs italic mt-auto">출처</p>
+  <span className="text-6xl font-bold text-heading-light leading-none">50%</span>
+  {/* lg:min-h-[2.4em] — 4열에서 1줄/2줄 제목 모두 동일 영역 점유 → description 시작점 통일 */}
+  <h3 className="mt-2 text-2xl font-bold text-heading-light leading-[1.19] [word-break:keep-all] lg:min-h-[2.4em]">핵심 수치 제목</h3>
+  <p className="flex-1 text-body-light text-sm leading-[1.65] [word-break:keep-all]">설명 텍스트</p>
+  <p className="mt-auto text-body-light opacity-50 text-xs italic">출처</p>
 </div>
 ```
+
+> `StatSection` 하단에는 `SITE.statsCta`(모든 서비스 보기)로 이동하는 Pill 링크를 둔다: `rounded-pill border border-border-dark px-8 min-h-[44px] text-nav font-medium text-aircok-blue-light hover:bg-overlay-white-10` (다크 배경 Pill Link 토큰 재활용, 신규 토큰 없음).
 
 ### Step Badge (스텝 원형 배지)
 
@@ -1052,6 +1108,97 @@ TipTap 등 rich text 에디터의 HTML 출력을 렌더링하는 스타일 가�
   </span>
   <span className="text-aircok-blue text-xs font-bold uppercase tracking-widest">STEP 01</span>
   <h3 className="text-heading-dark text-xl font-semibold leading-[1.14] mt-2 [word-break:keep-all]">스텝 제목</h3>
+</div>
+```
+
+### Numeral Spine Process Timeline (대형 넘버럴 스파인 프로세스)
+
+순서가 있는 다단계 프로세스를, 작은 도트 타임라인 대신 **대형 솔리드 넘버럴(01–04)을 구조적 스파인(spine)으로** 삼아 표현하는 패턴. `MethodologySection`(공기질 안전진단 4단계)에서 사용. 번호 자체가 진행 순서를 인코딩하므로(콘텐츠가 진짜 순차일 때만 정당) signature 요소로 키운다. 균일 dot-timeline의 "AI 템플릿 기본값" 인상을 피하고, 타이포그래피가 개성을 전달하게 한다. 신규 색상 토큰 없음 — 넘버럴/액티브 노드/레일 progress는 `aircok-blue` 계열, 비활성 레일·구분선은 `bg-border-light` 재활용.
+
+**구조 원칙**
+- 컨테이너: `<ol>` 시맨틱 리스트. 데스크탑 4열 그리드(`md:grid-cols-4`), 모바일 세로 스택(`flex-col`).
+- **signature = 대형 솔리드 넘버럴**: 각 단계 상단에 `text-7xl sm:text-8xl font-display font-bold leading-none tracking-[-0.3px]`로 `01`–`04`를 크게 노출. 색은 `text-aircok-blue-light`(브랜드 라이트 블루) 솔리드 채움 — stroke/outline 효과나 hover 색 전환 없이 정적으로 채워진 숫자다. 이 대형 넘버럴이 순서를 인코딩하는 유일한 구조 장식이다(추가 도트/번호 배지를 중복으로 두지 않는다). `aria-hidden`은 하지 않음 — 숫자가 의미 정보(순서)다.
+- **진행 레일(progress rail)**: 넘버럴 baseline 아래 얇은 가로 레일 1줄. 비활성 구간은 `bg-border-light h-px`, 현재 단계까지의 채워진 구간은 `bg-aircok-blue h-px`(또는 단계 노드를 `bg-aircok-blue` 도트로). 마지막 단계 우측에는 레일을 그리지 않는다. 레일/도트는 `aria-hidden="true"`. **레일 폭/위치**: 콘텐츠가 셀 중앙 정렬(`md:items-center`)이므로 레일은 **현재 넘버럴 중심 → 다음 넘버럴 중심**까지 연결해야 한다 — `left-1/2`에서 시작해 셀 폭 + 셀 간 gap만큼 뻗는다. gap이 `md:gap-6`이면 폭은 `w-[calc(100%+var(--spacing-6))]`로, gap 토큰(`--spacing-6`)을 직접 참조해 동기를 유지한다(`2rem` 같은 매직넘버 금지). `right-0`(셀 오른쪽 절반만 덮음)은 콘텐츠 왼쪽/빈 오른쪽 리듬을 만들어 좌측 쏠림 착시를 유발하므로 사용하지 않는다.
+- **STEP 레이블**: `text-aircok-blue-light text-xs font-bold uppercase tracking-widest`
+- **단계 제목**: `text-heading-dark text-xl font-semibold leading-[1.14] [word-break:keep-all]`
+- **단계 메타(선택)**: 단계에 실제 기간/수치가 있을 때만 `text-secondary-dark text-sm`로 노출(예: "10일"). **정보가 없는 단계에는 장식용 메타를 넣지 않는다** — 구조 장식은 정보 위계를 인코딩할 때만.
+- 모션 절제: 넘버럴은 정적 솔리드 채움으로 hover 색 전환이 없다. 과한 애니메이션 금지.
+- 순수 장식 요소(레일·도트)만 `aria-hidden="true"`.
+
+```tsx
+// Numeral Spine Process Timeline 예시 (마지막 단계 레일 생략)
+<ol className="grid grid-cols-1 gap-10 md:grid-cols-4 md:gap-6">
+  {steps.map((item, index) => {
+    const isLast = index === steps.length - 1;
+    return (
+      <li key={item.step} className="group relative flex flex-col gap-4 md:items-center md:text-center">
+        {/* 진행 레일 — 데스크탑 가로(현재 넘버럴 중심 → 다음 넘버럴 중심), 마지막 단계 제외.
+            폭 = 셀폭 + gap, gap 토큰(--spacing-6)을 직접 참조해 md:gap-6 과 동기 유지 */}
+        {!isLast && (
+          <span aria-hidden="true" className="absolute left-1/2 top-11 hidden h-px w-[calc(100%+var(--spacing-6))] bg-border-light md:block" />
+        )}
+        {/* 대형 솔리드 넘버럴 (signature, 순서 인코딩) — aircok-blue-light 솔리드 채움 */}
+        <span className="text-aircok-blue-light text-7xl sm:text-8xl font-display font-bold leading-none tracking-[-0.3px]">
+          {String(item.step).padStart(2, "0")}
+        </span>
+        <div className="flex flex-col gap-1.5 md:items-center">
+          <span className="text-aircok-blue-light text-xs font-bold uppercase tracking-widest">STEP {String(item.step).padStart(2, "0")}</span>
+          <h3 className="text-heading-dark text-xl font-semibold leading-[1.14] [word-break:keep-all]">{item.title}</h3>
+          {item.meta && <span className="text-secondary-dark text-sm">{item.meta}</span>}
+        </div>
+      </li>
+    );
+  })}
+</ol>
+```
+
+> **패턴 선택 기준**: 균일한 4열 카드 그리드가 적합한 경우(병렬적 특징 나열)는 Watermark Step Card를, 순서·진행 방향이 핵심이고 타이포로 개성을 주고 싶은 경우는 Numeral Spine Process Timeline을 사용한다.
+
+### Accent Bar Stat Card (액센트 바 수치 카드)
+
+수치(통계) 하이라이트를 좌측 액센트 바 + 큰 타이포로 위계화한 흰 배경 카드. `WhatYouGetSection` 우측 통계 스택에서 사용. 라이트 섹션(`bg-surface-light`) 위 흰 카드. 신규 토큰 없음.
+
+- 카드 래퍼: `relative overflow-hidden bg-surface-white rounded-xl shadow-card pl-7 pr-6 py-6 flex items-baseline gap-4 hover:shadow-product hover:-translate-y-1 transition-all duration-200` (News Card 와 동일한 hover 상승 톤 재활용)
+- **좌측 액센트 바**: `absolute left-0 top-0 bottom-0 w-1 bg-aircok-blue` (`aria-hidden="true"`) — 카드마다 브랜드 컬러 강조 띠
+- **수치**: `text-4xl font-bold text-aircok-blue leading-none tracking-[-0.3px] shrink-0` (36px, 강한 위계)
+- **레이블**: `text-heading-dark text-[17px] font-medium leading-[1.4] [word-break:keep-all]`
+- 수치와 레이블은 `items-baseline`으로 베이스라인 정렬
+
+```tsx
+// Accent Bar Stat Card 예시
+<div className="group relative overflow-hidden bg-surface-white rounded-xl shadow-card pl-7 pr-6 py-6 flex items-baseline gap-4 hover:shadow-product hover:-translate-y-1 transition-all duration-200">
+  <span aria-hidden="true" className="absolute left-0 top-0 bottom-0 w-1 bg-aircok-blue" />
+  <p className="text-4xl font-bold text-aircok-blue leading-none tracking-[-0.3px] shrink-0">50%</p>
+  <p className="text-heading-dark text-[17px] font-medium leading-[1.4] [word-break:keep-all]">집중력 향상</p>
+</div>
+```
+
+### Navy Signature Stat Panel (네이비 시그니처 수치 패널)
+
+라이트 섹션 안에서 **단 하나의 수치에 대담함을 집중**시키는 패널. `WhatYouGetSection`의 우측 시그니처로 사용. StatSection의 딥 네이비 톤(`surface-stat`/`surface-stat-card`)을 라이트 섹션 위로 가져와, 메인페이지 전체 톤과 일관성을 유지하면서 한 요소만 강하게 띄운다(나머지 좌측 콘텐츠는 절제). 신규 색상 토큰 없음 — StatSection 전용 네이비 토큰 재활용.
+
+- 패널 래퍼: `relative overflow-hidden rounded-2xl bg-surface-stat px-8 py-10 sm:px-10 sm:py-12 flex flex-col gap-4` (`rounded-2xl` {/* token 없음: 대형 signature 패널 라운드, 1회성 — radius-xl(16px)보다 큰 시각적 무게 */})
+- **소형 레이블**: `text-aircok-blue-light text-xs font-semibold uppercase tracking-widest`
+- **signature 대형 수치**: `text-aircok-blue-light text-7xl sm:text-8xl font-display font-bold leading-none tracking-[-0.3px]` — 패널에서 단 하나의 지배적 수치(예: `40+`). 추가 수치를 나란히 두어 위계를 분산시키지 않는다.
+- **수치 설명**: `text-heading-light text-[21px] font-semibold leading-[1.19] [word-break:keep-all]`
+- **보조 캡션**: `text-body-light opacity-70 text-sm leading-[1.65] [word-break:keep-all]`
+- 보조 수치(선택, 절제): 패널 하단에 `border-t border-border-dark pt-5` 후 2–3개의 작은 수치를 `text-body-light` 인라인으로만. signature 수치보다 항상 작게(`text-2xl` 이하), 강조 분산 금지.
+- 모션 절제: 패널 자체는 hover 상승/scale 없음(signature는 정적 무게로 승부).
+
+```tsx
+// Navy Signature Stat Panel 예시
+<div className="relative overflow-hidden rounded-2xl bg-surface-stat px-8 py-10 sm:px-10 sm:py-12 flex flex-col gap-4"> {/* token 없음: rounded-2xl signature 무게 */}
+  <span className="text-aircok-blue-light text-xs font-semibold uppercase tracking-widest">Validated</span>
+  <span className="text-aircok-blue-light text-7xl sm:text-8xl font-display font-bold leading-none tracking-[-0.3px]">40+</span>
+  <p className="text-heading-light text-[21px] font-semibold leading-[1.19] [word-break:keep-all]">대기업 사옥에서 검증 중</p>
+  <p className="text-body-light opacity-70 text-sm leading-[1.65] [word-break:keep-all]">건강경영 도입 레퍼런스</p>
+  <div className="mt-2 grid grid-cols-3 gap-4 border-t border-border-dark pt-5">
+    <div className="flex flex-col gap-1">
+      <span className="text-heading-light text-2xl font-bold leading-none">50%</span>
+      <span className="text-body-light opacity-60 text-xs [word-break:keep-all]">집중력 향상</span>
+    </div>
+    {/* 79% 에너지 절감, 46% 공기질 개선 동일 패턴 */}
+  </div>
 </div>
 ```
 

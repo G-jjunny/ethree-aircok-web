@@ -106,6 +106,8 @@ export const SITE = {
       "잘 관리된 공기질은 거주자 건강을 향상시켜주며, 기업의 성공과 건물 가치를 향상시켜줄 수 있다는 건강경영의 핵심 키워드입니다.",
     ],
     emphasis: "공기는 경쟁력 그 자체입니다.",
+    featuresLabel: "What Makes Us Different",
+    featuresTitle: "스마트 에어콕을 선택하는 네 가지 이유",
     features: [
       {
         title: "정확성",
@@ -140,6 +142,17 @@ export const SITE = {
     ],
     body: '공기질 측정기가 "회사의 경쟁력" 이라는 그 사실을… 알고 싶으시다면, 세계적인 글로벌 기업이 어떻게 해서 건강경영으로 근무자의 생산성 향상과 기업 가치를 향상시킬수 있었는가에 대한 내용을 알고 싶다면 이하에서 무료 Report를 신청해 주세요.',
     cta: "건강경영 레포트 신청",
+    signature: {
+      label: "Validated",
+      value: "40+",
+      title: "대기업 사옥에서 검증 중인 스마트 에어콕",
+      caption: "건강경영을 도입한 글로벌 기업이 선택한 공기질 측정 레퍼런스",
+    },
+    supportingStats: [
+      { value: "50%", label: "집중력 향상" },
+      { value: "79%", label: "에너지 비용 절감" },
+      { value: "46%", label: "공기질 개선" },
+    ],
   },
 
   partners: {

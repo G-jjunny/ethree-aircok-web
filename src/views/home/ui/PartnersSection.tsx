@@ -1,6 +1,7 @@
 'use client'
 import { useQuery } from '@tanstack/react-query'
 import { SITE } from '@/shared/config'
+import { SectionHeader } from '@/shared/ui'
 import { partnerListQueryOptions } from '@/entities/partner'
 
 export function PartnersSection() {
@@ -13,17 +14,24 @@ export function PartnersSection() {
 
   return (
     <section className="bg-surface-light">
-      <div className="content-container py-20">
-        <h2 className="text-heading-dark font-display text-[28px] font-semibold text-center mb-10 [word-break:keep-all]">
-          {SITE.partners.heading}
-        </h2>
-        <div className="flex flex-wrap gap-3 justify-center">
+      <div className="content-container flex flex-col items-center gap-10 py-20">
+        <SectionHeader
+          label={SITE.partners.label}
+          title={SITE.partners.heading}
+          body={SITE.partners.body}
+          align="center"
+        />
+
+        <ul className="flex flex-wrap justify-center gap-3">
           {partnerNames.map((name) => (
-            <div key={name} className="bg-surface-white rounded-lg px-4 py-3 text-sm font-medium text-body-dark shadow-card">
+            <li
+              key={name}
+              className="rounded-pill border border-border-light bg-surface-white px-5 py-2.5 text-sm font-medium text-body-dark transition-colors hover:border-aircok-blue hover:text-aircok-blue [word-break:keep-all]"
+            >
               {name}
-            </div>
+            </li>
           ))}
-        </div>
+        </ul>
       </div>
     </section>
   )
