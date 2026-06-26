@@ -1096,21 +1096,16 @@ TipTap 등 rich text 에디터의 HTML 출력을 렌더링하는 스타일 가�
 
 ### Numeral Spine Process Timeline (대형 넘버럴 스파인 프로세스)
 
-순서가 있는 다단계 프로세스를, 작은 도트 타임라인 대신 **대형 아웃라인 넘버럴(01–04)을 구조적 스파인(spine)으로** 삼아 표현하는 패턴. `MethodologySection`(공기질 안전진단 4단계)에서 사용. 번호 자체가 진행 순서를 인코딩하므로(콘텐츠가 진짜 순차일 때만 정당) signature 요소로 키운다. 균일 dot-timeline의 "AI 템플릿 기본값" 인상을 피하고, 타이포그래피가 개성을 전달하게 한다. 신규 색상 토큰 없음 — 넘버럴/액티브 노드/레일 progress는 `aircok-blue` 계열, 비활성 레일·구분선은 `bg-border-light` 재활용.
+순서가 있는 다단계 프로세스를, 작은 도트 타임라인 대신 **대형 솔리드 넘버럴(01–04)을 구조적 스파인(spine)으로** 삼아 표현하는 패턴. `MethodologySection`(공기질 안전진단 4단계)에서 사용. 번호 자체가 진행 순서를 인코딩하므로(콘텐츠가 진짜 순차일 때만 정당) signature 요소로 키운다. 균일 dot-timeline의 "AI 템플릿 기본값" 인상을 피하고, 타이포그래피가 개성을 전달하게 한다. 신규 색상 토큰 없음 — 넘버럴/액티브 노드/레일 progress는 `aircok-blue` 계열, 비활성 레일·구분선은 `bg-border-light` 재활용.
 
 **구조 원칙**
 - 컨테이너: `<ol>` 시맨틱 리스트. 데스크탑 4열 그리드(`md:grid-cols-4`), 모바일 세로 스택(`flex-col`).
-- **signature = 대형 아웃라인 넘버럴**: 각 단계 상단에 `text-[64px] sm:text-[88px] font-display font-bold leading-none tracking-[-0.3px]`로 `01`–`04`를 크게 노출. **outline 효과는 전용 유틸리티 `.numeral-stroke`로 적용한다**(globals.css `@layer utilities`). 이 유틸리티가 브랜드 컬러 stroke로 속 빈 숫자를 렌더하고, hover 전환과 stroke 미지원 폴백까지 캡슐화한다. 임의값 인라인(`text-transparent`, `[-webkit-text-stroke:...]`, `group-hover:[-webkit-text-stroke:0]`)을 컴포넌트에 직접 쓰지 않는다. 이 대형 넘버럴이 순서를 인코딩하는 유일한 구조 장식이다(추가 도트/번호 배지를 중복으로 두지 않는다). `aria-hidden`은 하지 않음 — 숫자가 의미 정보(순서)다.
-- **`.numeral-stroke` 유틸리티 정의 (globals.css)**:
-  - 기본: `color: transparent` + `-webkit-text-stroke: 1.5px var(--color-aircok-blue)` → 브랜드 블루 stroke 속 빈 숫자.
-  - **stroke 미지원 폴백 (필수)**: `@supports not (-webkit-text-stroke: 1px black)` 분기에서 `color: var(--color-aircok-blue)`로 **채움형(fill)** 폴백. `-webkit-text-stroke`를 지원하지 않는 렌더러에서 `transparent`만 남아 숫자가 사라지면 순서 정보까지 소실되므로, 이 폴백으로 숫자를 가시 상태로 보존한다.
-  - hover: `.group:hover .numeral-stroke`에서 stroke→fill(`color: var(--color-aircok-blue)` + `-webkit-text-stroke-width: 0`). 컴포넌트의 상위 `<li>`에 `group` 클래스가 있어야 동작한다.
-  - 색·두께는 모두 `--color-aircok-blue` 변수 기준(하드코딩 없음). stroke 두께 `1.5px`는 outline 시각 두께를 위한 유틸리티 내부 상수다.
+- **signature = 대형 솔리드 넘버럴**: 각 단계 상단에 `text-7xl sm:text-8xl font-display font-bold leading-none tracking-[-0.3px]`로 `01`–`04`를 크게 노출. 색은 `text-aircok-blue-light`(브랜드 라이트 블루) 솔리드 채움 — stroke/outline 효과나 hover 색 전환 없이 정적으로 채워진 숫자다. 이 대형 넘버럴이 순서를 인코딩하는 유일한 구조 장식이다(추가 도트/번호 배지를 중복으로 두지 않는다). `aria-hidden`은 하지 않음 — 숫자가 의미 정보(순서)다.
 - **진행 레일(progress rail)**: 넘버럴 baseline 아래 얇은 가로 레일 1줄. 비활성 구간은 `bg-border-light h-px`, 현재 단계까지의 채워진 구간은 `bg-aircok-blue h-px`(또는 단계 노드를 `bg-aircok-blue` 도트로). 마지막 단계 우측에는 레일을 그리지 않는다. 레일/도트는 `aria-hidden="true"`.
-- **STEP 레이블**: `text-aircok-blue text-xs font-bold uppercase tracking-widest`
+- **STEP 레이블**: `text-aircok-blue-light text-xs font-bold uppercase tracking-widest`
 - **단계 제목**: `text-heading-dark text-xl font-semibold leading-[1.14] [word-break:keep-all]`
 - **단계 메타(선택)**: 단계에 실제 기간/수치가 있을 때만 `text-secondary-dark text-sm`로 노출(예: "10일"). **정보가 없는 단계에는 장식용 메타를 넣지 않는다** — 구조 장식은 정보 위계를 인코딩할 때만.
-- 모션 절제: hover 시 넘버럴 stroke→fill 전환(`.numeral-stroke` 유틸리티가 `.group:hover`로 처리) 정도만, 과한 애니메이션 금지.
+- 모션 절제: 넘버럴은 정적 솔리드 채움으로 hover 색 전환이 없다. 과한 애니메이션 금지.
 - 순수 장식 요소(레일·도트)만 `aria-hidden="true"`.
 
 ```tsx
@@ -1120,16 +1115,16 @@ TipTap 등 rich text 에디터의 HTML 출력을 렌더링하는 스타일 가�
     const isLast = index === steps.length - 1;
     return (
       <li key={item.step} className="group relative flex flex-col gap-4">
-        {/* 대형 아웃라인 넘버럴 (signature, 순서 인코딩) — outline/hover/폴백은 .numeral-stroke가 캡슐화 */}
-        <span className="numeral-stroke font-display text-[64px] sm:text-[88px] font-bold leading-none tracking-[-0.3px]">
+        {/* 대형 솔리드 넘버럴 (signature, 순서 인코딩) — aircok-blue-light 솔리드 채움 */}
+        <span className="text-aircok-blue-light text-7xl sm:text-8xl font-display font-bold leading-none tracking-[-0.3px]">
           {String(item.step).padStart(2, "0")}
         </span>
         {/* 진행 레일 — 데스크탑 가로, 마지막 단계 제외 */}
         {!isLast && (
-          <span aria-hidden="true" className="absolute right-0 top-10 hidden h-px w-1/2 bg-border-light md:block" />
+          <span aria-hidden="true" className="absolute left-1/2 right-0 top-11 hidden h-px bg-border-light md:block" />
         )}
         <div className="flex flex-col gap-1.5">
-          <span className="text-aircok-blue text-xs font-bold uppercase tracking-widest">STEP {String(item.step).padStart(2, "0")}</span>
+          <span className="text-aircok-blue-light text-xs font-bold uppercase tracking-widest">STEP {String(item.step).padStart(2, "0")}</span>
           <h3 className="text-heading-dark text-xl font-semibold leading-[1.14] [word-break:keep-all]">{item.title}</h3>
           {item.meta && <span className="text-secondary-dark text-sm">{item.meta}</span>}
         </div>

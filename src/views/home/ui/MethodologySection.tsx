@@ -16,7 +16,7 @@ export function MethodologySection() {
           align="center"
         />
 
-        {/* Numeral Spine Process Timeline — 대형 아웃라인 넘버럴이 순서를 인코딩하는 signature 스파인 */}
+        {/* Numeral Spine Process Timeline — 대형 솔리드 넘버럴이 순서를 인코딩하는 signature 스파인 */}
         <ol className="mt-16 grid grid-cols-1 gap-10 sm:grid-cols-2 md:grid-cols-4 md:gap-6">
           {steps.map((item, index) => {
             const isLast = index === lastIndex;
@@ -31,13 +31,13 @@ export function MethodologySection() {
                   />
                 )}
 
-                {/* signature: 대형 아웃라인 넘버럴 (속 빈 숫자, 브랜드 stroke + 미지원 fallback) */}
-                <span className="numeral-stroke font-display text-[64px] sm:text-[88px] font-bold leading-none tracking-[-0.3px]">
+                {/* signature: 대형 솔리드 넘버럴 (브랜드 라이트 블루 채움) */}
+                <span className="text-aircok-blue-light text-7xl sm:text-8xl font-display font-bold leading-none tracking-[-0.3px]">
                   {numeral}
                 </span>
 
                 <div className="flex flex-col gap-1.5">
-                  <span className="text-aircok-blue text-xs font-bold uppercase tracking-widest">
+                  <span className="text-aircok-blue-light text-xs font-bold uppercase tracking-widest">
                     STEP {numeral}
                   </span>
                   <h3 className="text-heading-dark text-xl font-semibold leading-[1.14] [word-break:keep-all]">
