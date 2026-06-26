@@ -2791,4 +2791,46 @@ FAQ 카테고리 패널, 카탈로그 업로드 섹션 등 관리 페이지 내 
 
 ---
 
+### 15.7 Admin Timeline Manager (연혁 연도 그룹 관리)
+
+`admin-about`의 연혁/타임라인 관리 UI. 단일 평면 리스트 대신 **연도별 그룹 아코디언 + 검색·연도 필터 + 행 액션**으로 구성한다. 공개 `HistorySection`(§4.5 History Timeline)의 "연도 컬럼 + N건" 시각 언어를 관리 맥락으로 옮기되, sticky 스파인 대신 접기/펼치기 아코디언을 사용한다. 연/월 순으로 정렬된 항목을 그룹 단위로 접는 다른 관리 화면에도 재사용 가능한 패턴이며, 모든 색·간격·radius는 기존 토큰만 재활용한다(신규 CSS 변수 없음).
+
+**전체 구조 (§15.6 Admin Section Panel 안에 배치)**
+1. 패널 헤더: 제목 + 설명 + "연혁 추가"(Admin Primary 버튼)
+2. 도구 모음(toolbar): 검색 입력(§8 FAQ Search Input 재활용) + 총 건수 요약 + 연도 필터 칩(§4 News Year Filter Tab 재활용, "전체" + 연도 칩)
+3. 연도 그룹 아코디언 목록
+4. 상태: 로딩 스켈레톤 / 데이터 없음 / 검색 결과 없음(§8 검색 결과 없음 상태)
+
+**Toolbar (검색 + 요약 + 필터)**
+- 래퍼: `flex flex-col gap-4`
+- 검색·요약 행: `flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between`
+  - 검색 입력: §8 FAQ Search Input 그대로(컨테이너 `relative w-full sm:max-w-xs`), `type="search"`, placeholder `"연혁 내용 검색"`
+  - 총 건수 요약: `text-sm text-secondary-dark tabular-nums shrink-0` — 기본 `총 {total}건`, 검색·필터 적용 시 `{filtered}건 / 총 {total}건`
+- 연도 필터 칩: §4 News Year Filter Tab 마크업 그대로("전체" 칩 + 내림차순 연도 칩 + 선택형 카운트 배지). `aria-label="연도별 필터"`.
+
+**연도 그룹 (아코디언) — 시그니처**
+- 그룹 래퍼: `rounded-lg border border-border-light overflow-hidden`
+- **그룹 헤더 버튼**: `w-full flex items-center gap-3 px-4 py-3.5 text-left hover:bg-surface-light transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:ring-inset`
+  - `aria-expanded={isOpen}`, `aria-controls={그룹 본문 id}`
+  - **토글 chevron**: `shrink-0 w-5 h-5 text-secondary-dark transition-transform duration-200` + 상태 회전 — 펼침 `rotate-0`(아래 방향), 접힘 `-rotate-90`(우측 방향). 아래 방향 chevron SVG 하나만 회전시켜 두 상태를 표현(`aria-hidden="true"`).
+  - **연도 numeral(시그니처)**: `text-[21px] font-display font-bold text-aircok-blue tabular-nums leading-none` — 공개 History 연도 컬럼의 블루 numeral을 관리용 위계(21px)로 절제 적용. 화면에서 단 하나의 대담한 요소로 두고 주변은 조용히 유지한다.
+  - **N건 배지**: `text-[12px] text-secondary-dark bg-surface-light rounded-pill px-2 py-0.5 ml-auto tabular-nums`(§8 FAQ Sidebar 카운트 배지 톤) — `{count}건`
+- **그룹 본문(행 목록)**: §8 아코디언 grid-rows 트랜지션으로 접기/펼치기
+  - 래퍼: `grid transition-all duration-300 ease-in-out ${isOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}` → `<div className="overflow-hidden">` → 행 목록 `flex flex-col divide-y divide-border-light border-t border-border-light`
+  - 접힘 상태는 `grid-rows-[0fr]`로 높이 0(시각적 hidden), DOM 유지(애니메이션). 항목 수가 매우 많으면 implementer가 `isOpen && (...)` 조건부 렌더로 대체 가능.
+
+**행(Row) — 항목 단위**
+- 래퍼: `flex items-start gap-3 px-4 py-3 bg-surface-white`
+- 날짜 라벨: `w-[68px] shrink-0 pt-0.5 text-sm font-semibold tabular-nums text-heading-dark` — `{year}.{MM}`(2자리 패딩). `w-[68px]` {/* token 없음: YYYY.MM 라벨 고정폭, 관리 행 정렬 전용 1회성 수치 */}
+- 내용: `flex-1 min-w-0 text-sm text-body-dark leading-[1.47] [word-break:keep-all]`(관리 가독성을 위해 truncate 대신 줄바꿈 허용)
+- 액션: `flex items-center gap-1.5 shrink-0`
+  - 수정: `px-2.5 py-1 rounded-md text-xs font-medium text-body-dark bg-surface-white border border-border-light hover:bg-surface-light transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:ring-inset` — 행은 아코디언 `overflow-hidden` 안에 있으므로 `ring-offset` 대신 `ring-inset`로 클리핑을 방지한다(그룹 헤더 포커스 링과 동일 정책).
+  - 삭제: 위와 동일하되 텍스트 `text-error`
+
+> **기본 펼침 정책**: 최신 연도(목록 첫 그룹)만 펼치고 나머지는 접는다. 검색/필터로 결과가 좁혀지면 매칭된 그룹을 모두 펼친다(implementer 구현). 상태(`openYears`)·검색·필터·그룹화/정렬 로직은 frontend-implementer 담당이며, 본 가이드는 마크업·상태 클래스만 정의한다.
+
+> **재사용 메모**: 그룹 헤더(회전 chevron + 블루 numeral + N건 배지)와 행은 view-local 컴포넌트(`TimelineYearGroup`, `TimelineRow`)로 분리한다. 연/월 그룹 관리 화면이 2곳 이상 등장하면 `shared/ui`로 추출을 검토한다.
+
+---
+
 > **§15 신규 CSS 변수 요약**: 없음. 모든 패턴이 기존 `--color-*`, `--radius-*`, `--shadow-*` 토큰과 Tailwind 불투명도 모디파이어(`/10`, `/70`)만 사용한다.
