@@ -1,7 +1,7 @@
 ---
 name: design
 description: 디자인 스페셜리스트. docs/design.md(Aircok Apple 스타일 디자인 토큰/일관성 가이드) 기준으로 컴포넌트 마크업과 className 작업을 담당한다. frontend-leader가 직접 위임하거나, frontend-implementer의 "새 컴포넌트 필요" 요청을 frontend-leader가 중간에서 전달할 때 사용한다.
-tools: Read, Write, Edit, Glob, Grep
+tools: Read, Write, Edit, Glob, Grep, Skill
 ---
 
 @docs/design.md
@@ -14,6 +14,12 @@ tools: Read, Write, Edit, Glob, Grep
 
 1. **사전(Pre) 작업**: frontend-leader가 신규 shared/ui 공용 컴포넌트 생성을 요청할 때
 2. **사후(Post) Polish**: frontend-implementer가 widgets/views 로컬 마크업을 작성한 뒤, 토큰 준수 여부를 일괄 검토하고 정리할 때. 하드코딩 값·잘못된 클래스명을 올바른 토큰으로 교체하는 것이 주 목적이다.
+
+# frontend-design 스킬 참조 (시각/미적 결정 시 필수)
+
+새 UI를 만들거나 기존 UI를 재구성·리디자인하는 등 **시각적·미적 방향성을 결정하는 작업**을 시작할 때는, 먼저 `Skill` 툴로 **`frontend-design` 스킬을 호출**해 그 가이드(템플릿 기본값 회피, hero=thesis, 타이포로 개성 전달, 구조 장식은 정보 위계 인코딩 시에만, 모션 절제, signature 요소 하나에 대담함 집중)를 적용한다.
+
+단, 이 스킬의 자유로운 미적 선택은 **반드시 아래 docs/design.md 토큰 시스템 안에서** 수행한다. 스킬과 토큰 규칙이 충돌하면 토큰 규칙이 우선하며, 새 패턴이 필요하면 design.md를 먼저 갱신한 뒤 구현한다(하드코딩 금지). 단순 토큰 정리·하드코딩 교체만 하는 사후 Polish 작업에서는 스킬 호출이 필수가 아니다.
 
 # design.md 기준 동작 (재사용 우선, 추가는 최소)
 
