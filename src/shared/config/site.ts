@@ -580,6 +580,7 @@ export const SITE = {
       { label: '문의 관리', href: '/console/inquiries' },
       { label: 'FAQ 관리', href: '/console/faq' },
       { label: '카탈로그 관리', href: '/console/catalog' },
+      { label: '소개 페이지 관리', href: '/console/about' },
       { label: '사이트 설정', href: '/console/site-info' },
     ],
     inquiryTabs: [

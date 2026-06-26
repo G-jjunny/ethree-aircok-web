@@ -8,6 +8,7 @@ import { FaqModule } from './faq/faq.module';
 import { CatalogModule } from './catalog/catalog.module';
 import { SiteInfoModule } from './site-info/site-info.module';
 import { PartnersModule } from './partners/partners.module';
+import { TeamModule } from './team/team.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { PartnersModule } from './partners/partners.module';
     CatalogModule,
     SiteInfoModule,
     PartnersModule,
+    TeamModule,
   ],
 })
 export class AppModule {}

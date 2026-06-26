@@ -264,3 +264,24 @@ model Partner {
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
 }
+
+/// 에어콕 소개 페이지 OUR Team 섹션 이미지 (#57).
+///
+/// 운용 방식:
+/// - 팀 항목은 이미지만 보관한다(캡션/이름 없음). 이미지 URL + 표시 순서.
+/// - 공개 목록(GET /api/team-images)은 order 오름차순, 동률 시 createdAt 보조 정렬.
+/// - 어드민은 드래그앤드롭으로 순서를 일괄 변경한다(PATCH /api/team-images/reorder).
+/// - 이미지는 POST /api/team-images/uploads (multipart, 필드명 file) 로 업로드 후 URL을 받아 레코드 생성.
+/// - 최대 3개 제한: 서비스 레이어에서 강제(이미 3개면 생성 거부, 400).
+///
+/// 컬럼 정책:
+/// - id: cuid (String). 기존 모델 패턴 통일.
+/// - imageUrl: 업로드된 이미지 URL (예: "/uploads/xxx.png"). NOT NULL.
+/// - order: 표시 순서(오름차순). 기본값 0.
+model TeamImage {
+  id        String   @id @default(cuid())
+  imageUrl  String
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
