@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query'
 import { teamImageListQueryOptions } from '@/entities/team-image'
 import { TeamImageUploadSection } from './TeamImageUploadSection'
 import { TeamImageGridSection } from './TeamImageGridSection'
+import { TimelineManageSection } from './TimelineManageSection'
 
 /**
  * 소개 페이지(OUR Team) 관리 어드민 뷰.
@@ -30,6 +31,7 @@ export function AdminAboutView() {
       <div className="p-6 lg:p-8 flex flex-col gap-8">
         <TeamImageUploadSection count={images.length} />
         <TeamImageGridSection images={images} isLoading={isLoading} />
+        <TimelineManageSection />
       </div>
     </div>
   )

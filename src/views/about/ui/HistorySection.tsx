@@ -1,22 +1,83 @@
+'use client'
+
+import { useQuery } from '@tanstack/react-query'
 import { SITE } from '@/shared/config'
 import { SectionHeader } from '@/shared/ui'
+import { timelineListQueryOptions } from '@/entities/timeline'
+import type { TimelineItem } from '@/entities/timeline'
 
-type HistoryItem = (typeof SITE.about.history.items)[number]
+/**
+ * 화면 표시용 정규화 이벤트.
+ * API(month: number)와 SITE 폴백(month: "01월" 문자열)을 동일 형태로 일원화한다.
+ */
+interface NormalizedEvent {
+  /** 정렬용 월 숫자 (1~12) */
+  monthNum: number
+  /** 표시용 월 라벨 ("1월" 등) */
+  monthLabel: string
+  content: string
+}
 
-function groupByYear(items: readonly HistoryItem[]): { year: number; events: HistoryItem[] }[] {
-  const map = new Map<number, HistoryItem[]>()
+type FallbackItem = (typeof SITE.about.history.items)[number]
+
+/** SITE 폴백 month 문자열("01월")에서 숫자를 추출한다. */
+function parseFallbackMonth(month: string): number {
+  const n = parseInt(month, 10)
+  return Number.isNaN(n) ? 0 : n
+}
+
+function normalizeFromApi(items: TimelineItem[]): (NormalizedEvent & { year: number })[] {
+  return items.map((item) => ({
+    year: item.year,
+    monthNum: item.month,
+    monthLabel: `${item.month}월`,
+    content: item.content,
+  }))
+}
+
+function normalizeFromFallback(items: readonly FallbackItem[]): (NormalizedEvent & { year: number })[] {
+  return items.map((item) => {
+    const monthNum = parseFallbackMonth(item.month)
+    return {
+      year: item.year,
+      monthNum,
+      monthLabel: `${monthNum}월`,
+      content: item.event,
+    }
+  })
+}
+
+/**
+ * 연도 내림차순, 연 그룹 내 월 내림차순으로 묶는다.
+ */
+function groupByYear(
+  items: { year: number; monthNum: number; monthLabel: string; content: string }[],
+): { year: number; events: NormalizedEvent[] }[] {
+  const map = new Map<number, NormalizedEvent[]>()
   for (const item of items) {
     if (!map.has(item.year)) map.set(item.year, [])
-    map.get(item.year)!.push(item)
+    map.get(item.year)!.push({
+      monthNum: item.monthNum,
+      monthLabel: item.monthLabel,
+      content: item.content,
+    })
   }
-  // 최신 연도 먼저 (내림차순)
   return Array.from(map.entries())
     .sort(([a], [b]) => b - a)
-    .map(([year, events]) => ({ year, events }))
+    .map(([year, events]) => ({
+      year,
+      events: events.sort((a, b) => b.monthNum - a.monthNum),
+    }))
 }
 
 export function HistorySection() {
-  const historyGroups = groupByYear(SITE.about.history.items)
+  const { data, isError } = useQuery(timelineListQueryOptions())
+
+  const useApiData = !isError && Array.isArray(data) && data.length > 0
+
+  const historyGroups = useApiData
+    ? groupByYear(normalizeFromApi(data))
+    : groupByYear(normalizeFromFallback(SITE.about.history.items))
 
   return (
     <section className="bg-surface-white py-24">
@@ -55,7 +116,7 @@ export function HistorySection() {
                 <ul className="flex flex-col gap-5 pl-8">
                   {group.events.map((event, idx) => (
                     <li
-                      key={`${event.month}-${idx}`}
+                      key={`${event.monthLabel}-${idx}`}
                       className="relative flex gap-4 [word-break:keep-all]"
                     >
                       {/* token 없음: 이벤트 노드를 레일 중심(pl-8 기준 -27px)에 맞추는 1회성 정렬 오프셋 */}
@@ -64,10 +125,10 @@ export function HistorySection() {
                         className="absolute -left-[27px] top-2 h-1.5 w-1.5 rounded-pill bg-border-light"
                       />
                       <span className="w-12 shrink-0 pt-0.5 text-sm font-semibold tabular-nums text-secondary-dark">
-                        {event.month}
+                        {event.monthLabel}
                       </span>
                       <span className="text-[17px] leading-[1.65] text-body-dark">
-                        {event.event}
+                        {event.content}
                       </span>
                     </li>
                   ))}

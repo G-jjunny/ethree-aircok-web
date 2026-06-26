@@ -285,3 +285,24 @@ model TeamImage {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+/// 에어콕 소개 페이지 연혁(타임라인) 항목 (#57).
+///
+/// 운용 방식:
+/// - 연혁 항목은 연도(year) + 월(month) + 이벤트 설명(content)으로 구성된다.
+/// - 공개 목록(GET /api/timelines)은 최신순으로 노출한다:
+///   year 내림차순 → month 내림차순 → 동률 시 createdAt 내림차순(보조).
+///
+/// 컬럼 정책:
+/// - id: cuid (String).
+/// - year: 연도(정수). 검증 범위 2000~2100 (DTO 레벨).
+/// - month: 월(정수). 검증 범위 1~12 (DTO 레벨).
+/// - content: 연혁 이벤트 설명. 비어있지 않은 문자열. NOT NULL.
+model TimelineItem {
+  id        String   @id @default(cuid())
+  year      Int
+  month     Int
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
