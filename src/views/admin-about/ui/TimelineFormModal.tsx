@@ -15,11 +15,13 @@ interface TimelineFormModalProps {
   open: boolean
   onClose: () => void
   item?: TimelineItem
+  /** 추가 모드에서 현재 선택된 연도를 폼 기본값으로 사용(수정 모드에서는 무시) */
+  defaultYear?: number
 }
 
 const MONTHS = Array.from({ length: 12 }, (_, i) => i + 1)
 
-export function TimelineFormModal({ open, onClose, item }: TimelineFormModalProps) {
+export function TimelineFormModal({ open, onClose, item, defaultYear }: TimelineFormModalProps) {
   const createMutation = useCreateTimelineMutation()
   const updateMutation = useUpdateTimelineMutation()
   const isPending = createMutation.isPending || updateMutation.isPending
@@ -41,12 +43,12 @@ export function TimelineFormModal({ open, onClose, item }: TimelineFormModalProp
   useEffect(() => {
     if (open) {
       reset({
-        year: item?.year ?? new Date().getFullYear(),
+        year: item?.year ?? defaultYear ?? new Date().getFullYear(),
         month: item?.month ?? 1,
         content: item?.content ?? '',
       })
     }
-  }, [open, item, reset])
+  }, [open, item, defaultYear, reset])
 
   const onSubmit = (values: TimelineFormValues) => {
     if (item) {
