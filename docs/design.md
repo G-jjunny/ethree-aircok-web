@@ -1101,7 +1101,7 @@ TipTap 등 rich text 에디터의 HTML 출력을 렌더링하는 스타일 가�
 **구조 원칙**
 - 컨테이너: `<ol>` 시맨틱 리스트. 데스크탑 4열 그리드(`md:grid-cols-4`), 모바일 세로 스택(`flex-col`).
 - **signature = 대형 솔리드 넘버럴**: 각 단계 상단에 `text-7xl sm:text-8xl font-display font-bold leading-none tracking-[-0.3px]`로 `01`–`04`를 크게 노출. 색은 `text-aircok-blue-light`(브랜드 라이트 블루) 솔리드 채움 — stroke/outline 효과나 hover 색 전환 없이 정적으로 채워진 숫자다. 이 대형 넘버럴이 순서를 인코딩하는 유일한 구조 장식이다(추가 도트/번호 배지를 중복으로 두지 않는다). `aria-hidden`은 하지 않음 — 숫자가 의미 정보(순서)다.
-- **진행 레일(progress rail)**: 넘버럴 baseline 아래 얇은 가로 레일 1줄. 비활성 구간은 `bg-border-light h-px`, 현재 단계까지의 채워진 구간은 `bg-aircok-blue h-px`(또는 단계 노드를 `bg-aircok-blue` 도트로). 마지막 단계 우측에는 레일을 그리지 않는다. 레일/도트는 `aria-hidden="true"`.
+- **진행 레일(progress rail)**: 넘버럴 baseline 아래 얇은 가로 레일 1줄. 비활성 구간은 `bg-border-light h-px`, 현재 단계까지의 채워진 구간은 `bg-aircok-blue h-px`(또는 단계 노드를 `bg-aircok-blue` 도트로). 마지막 단계 우측에는 레일을 그리지 않는다. 레일/도트는 `aria-hidden="true"`. **레일 폭/위치**: 콘텐츠가 셀 중앙 정렬(`md:items-center`)이므로 레일은 **현재 넘버럴 중심 → 다음 넘버럴 중심**까지 연결해야 한다 — `left-1/2`에서 시작해 셀 폭 + 셀 간 gap만큼 뻗는다. gap이 `md:gap-6`이면 폭은 `w-[calc(100%+var(--spacing-6))]`로, gap 토큰(`--spacing-6`)을 직접 참조해 동기를 유지한다(`2rem` 같은 매직넘버 금지). `right-0`(셀 오른쪽 절반만 덮음)은 콘텐츠 왼쪽/빈 오른쪽 리듬을 만들어 좌측 쏠림 착시를 유발하므로 사용하지 않는다.
 - **STEP 레이블**: `text-aircok-blue-light text-xs font-bold uppercase tracking-widest`
 - **단계 제목**: `text-heading-dark text-xl font-semibold leading-[1.14] [word-break:keep-all]`
 - **단계 메타(선택)**: 단계에 실제 기간/수치가 있을 때만 `text-secondary-dark text-sm`로 노출(예: "10일"). **정보가 없는 단계에는 장식용 메타를 넣지 않는다** — 구조 장식은 정보 위계를 인코딩할 때만.
@@ -1114,16 +1114,17 @@ TipTap 등 rich text 에디터의 HTML 출력을 렌더링하는 스타일 가�
   {steps.map((item, index) => {
     const isLast = index === steps.length - 1;
     return (
-      <li key={item.step} className="group relative flex flex-col gap-4">
+      <li key={item.step} className="group relative flex flex-col gap-4 md:items-center md:text-center">
+        {/* 진행 레일 — 데스크탑 가로(현재 넘버럴 중심 → 다음 넘버럴 중심), 마지막 단계 제외.
+            폭 = 셀폭 + gap, gap 토큰(--spacing-6)을 직접 참조해 md:gap-6 과 동기 유지 */}
+        {!isLast && (
+          <span aria-hidden="true" className="absolute left-1/2 top-11 hidden h-px w-[calc(100%+var(--spacing-6))] bg-border-light md:block" />
+        )}
         {/* 대형 솔리드 넘버럴 (signature, 순서 인코딩) — aircok-blue-light 솔리드 채움 */}
         <span className="text-aircok-blue-light text-7xl sm:text-8xl font-display font-bold leading-none tracking-[-0.3px]">
           {String(item.step).padStart(2, "0")}
         </span>
-        {/* 진행 레일 — 데스크탑 가로, 마지막 단계 제외 */}
-        {!isLast && (
-          <span aria-hidden="true" className="absolute left-1/2 right-0 top-11 hidden h-px bg-border-light md:block" />
-        )}
-        <div className="flex flex-col gap-1.5">
+        <div className="flex flex-col gap-1.5 md:items-center">
           <span className="text-aircok-blue-light text-xs font-bold uppercase tracking-widest">STEP {String(item.step).padStart(2, "0")}</span>
           <h3 className="text-heading-dark text-xl font-semibold leading-[1.14] [word-break:keep-all]">{item.title}</h3>
           {item.meta && <span className="text-secondary-dark text-sm">{item.meta}</span>}

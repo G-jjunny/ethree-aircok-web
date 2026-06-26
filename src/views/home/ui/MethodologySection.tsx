@@ -22,12 +22,17 @@ export function MethodologySection() {
             const isLast = index === lastIndex;
             const numeral = String(item.step).padStart(2, "0");
             return (
-              <li key={item.step} className="group relative flex flex-col gap-4">
-                {/* 진행 레일 — 데스크탑 가로(다음 단계로 향함), 마지막 단계 제외 */}
+              <li
+                key={item.step}
+                className="group relative flex flex-col gap-4 md:items-center md:text-center"
+              >
+                {/* 진행 레일 — 데스크탑 가로(현재 넘버럴 중심 → 다음 넘버럴 중심), 마지막 단계 제외.
+                    셀 간 gap(md:gap-6)을 포함해 4단계가 끊김 없이 연결되도록 폭 = 셀폭 + gap.
+                    gap 값은 --spacing-6 토큰을 직접 참조해 md:gap-6 과 동기 유지(매직넘버 회피) */}
                 {!isLast && (
                   <span
                     aria-hidden="true"
-                    className="absolute left-1/2 right-0 top-11 hidden h-px bg-border-light md:block"
+                    className="absolute left-1/2 top-11 hidden h-px w-[calc(100%+var(--spacing-6))] bg-border-light md:block"
                   />
                 )}
 
@@ -36,7 +41,7 @@ export function MethodologySection() {
                   {numeral}
                 </span>
 
-                <div className="flex flex-col gap-1.5">
+                <div className="flex flex-col gap-1.5 md:items-center">
                   <span className="text-aircok-blue-light text-xs font-bold uppercase tracking-widest">
                     STEP {numeral}
                   </span>
