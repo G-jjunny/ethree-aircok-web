@@ -106,6 +106,8 @@ export const SITE = {
       "잘 관리된 공기질은 거주자 건강을 향상시켜주며, 기업의 성공과 건물 가치를 향상시켜줄 수 있다는 건강경영의 핵심 키워드입니다.",
     ],
     emphasis: "공기는 경쟁력 그 자체입니다.",
+    featuresLabel: "What Makes Us Different",
+    featuresTitle: "스마트 에어콕을 선택하는 네 가지 이유",
     features: [
       {
         title: "정확성",

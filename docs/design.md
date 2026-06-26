@@ -391,18 +391,22 @@ Apple 스타일의 '제품 우선 프레젠테이션'을 Aircok 브랜드에 적
 
 - 섹션 배경: `bg-surface-dark`
 - 카드 배경: `bg-surface-dark-1` (radius: `rounded-xl`, 패딩: `p-6`)
-- **제목**: Card Title (21px, weight 700), `text-heading-light`
+- **상단 액센트 룰(선택)**: 카드 상단에 `block h-0.5 w-10 bg-aircok-blue` (`aria-hidden="true"`). 병렬 특징을 브랜드 컬러로 묶되, 순서를 암시하지 않는다(번호 마커는 진짜 순차 콘텐츠에만 — §Numeral Spine 참조).
+- **제목**: Card Title (21px, weight 700), `text-heading-light` — `text-subheading` 토큰 사용
 - **설명**: Body (17px, weight 400), `text-body-light`, `leading-[1.65]`, `[word-break:keep-all]`
 - 그리드: 4열(데스크탑, `lg:grid-cols-4`) → 2열(태블릿, `sm:grid-cols-2`) → 1열(모바일)
-- 카드 간 그림자 없음 (다크 섹션 내부 elevation은 배경색 차이로만 표현)
+- 호버(선택): `hover:bg-surface-dark-2 transition-colors duration-200` (다크 섹션 내부 elevation은 배경색 차이로만 — 그림자 금지)
 
 ```tsx
-// Feature Strip 다크 카드 예시
-<div className="bg-surface-dark-1 rounded-xl p-6 flex flex-col gap-3">
-  <h3 className="text-[21px] font-bold text-heading-light leading-[1.19]">카드 제목</h3>
+// Feature Strip 다크 카드 예시 (액센트 룰 + 호버 변형)
+<li className="group flex flex-col gap-4 rounded-xl bg-surface-dark-1 p-6 transition-colors duration-200 hover:bg-surface-dark-2">
+  <span aria-hidden="true" className="block h-0.5 w-10 bg-aircok-blue" />
+  <h4 className="text-subheading font-bold font-display text-heading-light leading-[1.19]">카드 제목</h4>
   <p className="text-[17px] text-body-light leading-[1.65] [word-break:keep-all]">카드 설명 텍스트</p>
-</div>
+</li>
 ```
+
+> **WhyChoose 연속 다크 흐름**: `WhyChooseUsSection`(시그니처 인용 + 보조 포인트 hairline 그리드)과 `WhyChooseUsFeatureSection`(위 Feature Strip 다크 카드)은 동일 `bg-surface-dark`를 공유하는 하나의 흐름이다. 두 섹션은 `border-t border-border-dark pt-16` 구분선으로 연결하고, 보조 포인트 그리드는 `gap-px ... bg-border-dark` 헤어라인으로 셀을 구분한다(신규 토큰 없음). 시그니처(중앙 대형 인용)에만 대담함을 집중하고 포인트/카드는 절제한다.
 
 **Bottom CTA Section**
 

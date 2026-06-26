@@ -41,6 +41,7 @@ export function HeroSection() {
                 src="/images/home/aircok_product.png"
                 alt="스마트 에어콕 제품"
                 fill
+                sizes="(min-width: 1200px) 464px, (min-width: 1024px) 40vw, 100vw"
                 className="object-contain"
                 priority
               />
