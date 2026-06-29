@@ -1,3 +1,5 @@
+export type NewsType = 'BLOG' | 'LINK';
+
 export interface NewsSummary {
   id: string;
   title: string;
@@ -8,6 +10,8 @@ export interface NewsSummary {
   coverImage: string | null;
   createdAt: string;
   updatedAt: string;
+  type: NewsType;
+  externalUrl: string | null;
 }
 
 export interface NewsListResponse {
@@ -18,5 +22,5 @@ export interface NewsListResponse {
 }
 
 export interface NewsPost extends NewsSummary {
-  content: string; // HTML 문자열
+  content: string | null; // HTML 문자열 (LINK 타입은 null일 수 있음)
 }

@@ -24,11 +24,13 @@ export function AdminNewsFormWrapper({ initialData }: Props) {
               id: initialData.id,
               title: initialData.title,
               description: initialData.description,
-              content: initialData.content,
+              content: initialData.content ?? '',
               date: initialData.date,
               location: initialData.location,
               published: initialData.published,
               coverImage: initialData.coverImage,
+              type: initialData.type,
+              externalUrl: initialData.externalUrl,
             }
           : undefined
       }

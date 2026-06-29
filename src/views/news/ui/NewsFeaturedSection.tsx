@@ -11,6 +11,7 @@ interface Props {
  * 대표 기사 1건(News Featured Hero)을 렌더한다.
  * 페이지 헤더는 PageHero(shared/ui)로 분리됨.
  * coverImage 있으면 Overlay 변형, 없으면 텍스트 분리형 폴백.
+ * LINK 타입은 외부 URL로 새 탭 열기, BLOG 타입은 내부 라우트.
  */
 export function NewsFeaturedSection({ item }: Props) {
   return (
@@ -26,10 +27,39 @@ export function NewsFeaturedSection({ item }: Props) {
   );
 }
 
+/** 공통 래퍼: LINK면 외부 a, BLOG면 내부 Link */
+function NewsItemWrapper({
+  item,
+  className,
+  children,
+}: {
+  item: NewsSummary;
+  className?: string;
+  children: React.ReactNode;
+}) {
+  if (item.type === 'LINK' && item.externalUrl) {
+    return (
+      <a
+        href={item.externalUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={className}
+      >
+        {children}
+      </a>
+    );
+  }
+  return (
+    <Link href={`/news/${item.id}`} className={className}>
+      {children}
+    </Link>
+  );
+}
+
 /** Overlay 변형 — 커버 이미지 위 텍스트 오버레이 */
 function FeaturedOverlay({ item }: Props) {
   return (
-    <Link href={`/news/${item.id}`} className="block">
+    <NewsItemWrapper item={item} className="block">
       <article className="relative rounded-xl overflow-hidden group">
         <NewsImage
           src={item.coverImage}
@@ -55,14 +85,14 @@ function FeaturedOverlay({ item }: Props) {
           )}
         </div>
       </article>
-    </Link>
+    </NewsItemWrapper>
   );
 }
 
 /** 텍스트 분리형 — coverImage 없을 때 폴백 (좌우 split, 이미지 칼럼은 placeholder) */
 function FeaturedSplit({ item }: Props) {
   return (
-    <Link href={`/news/${item.id}`} className="block group">
+    <NewsItemWrapper item={item} className="block group">
       <article className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
         <div className="rounded-xl overflow-hidden">
           <NewsImage src={item.coverImage} alt={item.title} ratio="video" />
@@ -81,6 +111,6 @@ function FeaturedSplit({ item }: Props) {
           </span>
         </div>
       </article>
-    </Link>
+    </NewsItemWrapper>
   );
 }
