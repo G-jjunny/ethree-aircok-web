@@ -13,6 +13,8 @@
     "prisma:migrate": "prisma migrate dev",
     "prisma:seed": "ts-node --project tsconfig.json prisma/seed.ts",
     "prisma:seed:timeline": "ts-node --project tsconfig.json prisma/seed-timeline.ts",
+    "prisma:seed:news": "ts-node --project tsconfig.json prisma/seed-news.ts",
+    "prisma:update:news-images": "ts-node --project tsconfig.json prisma/update-news-images.ts",
     "migrate:images-to-r2": "ts-node -r tsconfig-paths/register prisma/migrate-images-to-r2.ts"
   },
   "dependencies": {
