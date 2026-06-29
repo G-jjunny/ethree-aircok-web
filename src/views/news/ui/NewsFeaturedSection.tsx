@@ -1,38 +1,21 @@
 import Link from 'next/link';
 import { DateLabel, LocationTag, NewsImage } from '@/shared/ui';
-import { SITE } from '@/shared/config';
 import type { NewsSummary } from '@/entities/news';
 
 interface Props {
   item: NewsSummary;
 }
 
-interface SectionProps extends Props {
-  /** 페이지 타이틀과 대표 기사 사이에 배치할 슬롯 (연도 필터 탭 등). design.md §4. */
-  filterSlot?: React.ReactNode;
-}
-
 /**
  * 매거진 목록 최상단 Featured 섹션.
- * 페이지 레이블 + 타이틀 + (선택) 필터 슬롯 + 대표 기사 1건(News Featured Hero).
+ * 대표 기사 1건(News Featured Hero)을 렌더한다.
+ * 페이지 헤더는 PageHero(shared/ui)로 분리됨.
  * coverImage 있으면 Overlay 변형, 없으면 텍스트 분리형 폴백.
  */
-export function NewsFeaturedSection({ item, filterSlot }: SectionProps) {
+export function NewsFeaturedSection({ item }: Props) {
   return (
     <section className="bg-surface-light py-16 md:py-20">
       <div className="content-container flex flex-col gap-8">
-        {/* 페이지 헤더 */}
-        <div className="flex flex-col gap-3">
-          <p className="text-aircok-blue text-sm font-body tracking-widest uppercase">
-            NEWS
-          </p>
-          <h1 className="text-[40px] font-display font-semibold text-heading-dark leading-[1.10] tracking-[-0.3px] [word-break:keep-all]">
-            {SITE.pages.news.title}
-          </h1>
-        </div>
-
-        {filterSlot}
-
         {item.coverImage ? (
           <FeaturedOverlay item={item} />
         ) : (

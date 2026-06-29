@@ -534,6 +534,9 @@ export const SITE = {
     catalog: {
       title: "카탈로그",
       description: "스마트 에어콕 제품 카탈로그를 다운로드하세요.",
+      hero: {
+        label: "Product Catalog",
+      },
     },
     faq: {
       title: "FAQ",
@@ -551,6 +554,9 @@ export const SITE = {
     news: {
       title: "뉴스",
       description: "스마트 에어콕의 최신 뉴스와 보도자료를 확인하세요.",
+      hero: {
+        label: "NEWS",
+      },
     },
     blog: {
       title: "블로그",

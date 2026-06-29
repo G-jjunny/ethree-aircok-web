@@ -2,6 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query'
 import { SITE } from '@/shared/config'
+import { PageHero } from '@/shared/ui'
 import { catalogImageListQueryOptions } from '@/entities/catalog'
 import { FlipBookViewer } from './FlipBookViewer'
 import { useCatalogPages } from './useCatalogPages'
@@ -21,25 +22,14 @@ export function CatalogView() {
   const downloadUrl: string | null = null
 
   return (
-    <main className="min-h-screen bg-surface-white">
-      <div className="content-container py-16 lg:py-20">
-        <header className="flex flex-col gap-4 mb-10">
-          <div className="flex items-center justify-between gap-4 flex-wrap">
-            <h1 className="text-heading-dark font-display text-[40px] font-semibold">
-              {SITE.pages.catalog.title}
-            </h1>
-            {/*
-              타 뷰어 제거 시(3D 슬라이스/라우트 삭제 시) 이 링크 삭제
-              <Link
-                href="/catalog/3d"
-                className="inline-flex items-center justify-center rounded-md border border-border-light bg-surface-white px-4 py-2 min-h-[44px] text-sm font-medium text-heading-dark hover:bg-surface-light transition-colors"
-              >
-                3D 뷰어로 보기
-              </Link>
-            */}
-          </div>
-          <p className="text-body-dark">{SITE.pages.catalog.description}</p>
-        </header>
+    <>
+      <PageHero
+        label={SITE.pages.catalog.hero.label}
+        title={SITE.pages.catalog.title}
+        body={SITE.pages.catalog.description}
+      />
+      <main className="min-h-screen bg-surface-white">
+        <div className="content-container py-16 lg:py-20">
 
         {isLoading || (isRendering && pages.length === 0) ? (
           <div className="flex justify-center py-20">
@@ -81,7 +71,8 @@ export function CatalogView() {
             </a>
           </div>
         )}
-      </div>
-    </main>
+        </div>
+      </main>
+    </>
   )
 }

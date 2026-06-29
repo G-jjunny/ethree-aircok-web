@@ -2,7 +2,6 @@
 
 import { useId, useMemo, useState } from 'react';
 import type { NewsSummary } from '@/entities/news';
-import { SITE } from '@/shared/config';
 import { NewsFeaturedSection } from './NewsFeaturedSection';
 import { NewsRowListSection } from './NewsRowListSection';
 import { NewsSecondaryGridSection } from './NewsSecondaryGridSection';
@@ -64,32 +63,28 @@ export function NewsMagazine({ items }: Props) {
     />
   );
 
+  const tabBar = (
+    <section className="bg-surface-white border-b border-border-light">
+      <div className="content-container py-4">
+        {yearTabs}
+      </div>
+    </section>
+  );
+
   // 방어적 처리: 선택 연도에 기사가 없는 경우 (연도 탭은 데이터 있는 연도만 노출하므로 보통 발생 안 함)
   if (filtered.length === 0) {
     return (
       <main className="min-h-screen bg-surface-white">
-        <section className="bg-surface-light py-16 md:py-20">
-          <div className="content-container flex flex-col gap-8">
-            <div className="flex flex-col gap-3">
-              <p className="text-aircok-blue text-sm font-body tracking-widest uppercase">
-                NEWS
-              </p>
-              <h1 className="text-[40px] font-display font-semibold text-heading-dark leading-[1.10] tracking-[-0.3px] [word-break:keep-all]">
-                {SITE.pages.news.title}
-              </h1>
-            </div>
-            {yearTabs}
-            <div
-              id={panelId}
-              role="tabpanel"
-              className="py-24 text-center"
-            >
-              <p className="text-secondary-dark font-body text-[17px]">
-                해당 연도에 등록된 뉴스가 없습니다.
-              </p>
-            </div>
-          </div>
-        </section>
+        {tabBar}
+        <div
+          id={panelId}
+          role="tabpanel"
+          className="py-24 text-center"
+        >
+          <p className="text-secondary-dark font-body text-[17px]">
+            해당 연도에 등록된 뉴스가 없습니다.
+          </p>
+        </div>
       </main>
     );
   }
@@ -101,8 +96,9 @@ export function NewsMagazine({ items }: Props) {
 
   return (
     <main className="min-h-screen bg-surface-white">
-      <NewsFeaturedSection item={featured} filterSlot={yearTabs} />
+      {tabBar}
       <div id={panelId} role="tabpanel">
+        <NewsFeaturedSection item={featured} />
         <NewsRowListSection items={primaryRows} />
         <NewsSecondaryGridSection items={secondary} />
       </div>
