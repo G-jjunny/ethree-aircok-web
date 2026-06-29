@@ -3,6 +3,10 @@ import { readFileSync, existsSync } from 'fs';
 import { join, extname } from 'path';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { PrismaClient } from '@prisma/client';
+import { PrismaPg } from '@prisma/adapter-pg';
+import pg from 'pg';
+
+const UPLOAD_DELAY_MS = 200;
 
 const EXT_TO_MIME: Record<string, string> = {
   '.jpg': 'image/jpeg',
@@ -49,7 +53,8 @@ async function main() {
   // publicUrl 끝 슬래시 제거
   const baseUrl = publicUrl.replace(/\/$/, '');
 
-  const prisma = new PrismaClient();
+  const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
+  const prisma = new PrismaClient({ adapter: new PrismaPg(pool) });
 
   try {
     // DB에서 로컬 경로로 저장된 coverImage 레코드 조회
@@ -70,7 +75,8 @@ async function main() {
       return;
     }
 
-    const publicDir = join(__dirname, '..', 'public');
+    // 이미지는 Next.js 앱의 public/ 디렉토리에 위치 (server/../public)
+    const publicDir = join(__dirname, '..', '..', 'public');
 
     let uploaded = 0;
     let skipped = 0;
@@ -109,6 +115,9 @@ async function main() {
 
       console.log(`[OK] ${item.coverImage} -> ${newUrl}`);
       uploaded++;
+
+      // rate limit 안전 딜레이
+      await new Promise((r) => setTimeout(r, UPLOAD_DELAY_MS));
     }
 
     console.log(
