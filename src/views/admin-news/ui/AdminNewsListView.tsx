@@ -7,6 +7,7 @@ import {
   AdminNewsApiError,
   type NewsListResponse,
 } from '@/entities/news';
+import { AdminPageHeader } from '@/shared/ui';
 import { DeleteButton } from './DeleteButton';
 
 function formatDate(dateStr: string): string {
@@ -22,20 +23,14 @@ export function AdminNewsListView() {
 
   return (
     <div>
-      {/* 페이지 헤더 — §15.2 */}
-      <div className="bg-surface-white border-b border-border-light px-6 lg:px-8 py-5 flex items-center justify-between">
-        <div>
-          <h1 className="text-[22px] font-display font-semibold text-heading-dark">
-            뉴스 관리
-          </h1>
-        </div>
+      <AdminPageHeader title="뉴스 관리">
         <Link
           href="/console/news/new"
           className="inline-flex items-center justify-center bg-aircok-blue text-heading-light text-sm font-medium rounded-md px-4 py-2 min-h-[44px] hover:bg-aircok-blue-dark active:scale-[0.97] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:ring-offset-2"
         >
           새 뉴스 작성
         </Link>
-      </div>
+      </AdminPageHeader>
 
       {/* 콘텐츠 영역 */}
       <div className="p-6 lg:p-8">

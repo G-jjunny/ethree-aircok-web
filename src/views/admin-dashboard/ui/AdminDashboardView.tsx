@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { AdminPageHeader } from '@/shared/ui';
 import { NewInquiryAlertCard } from './NewInquiryAlertCard';
 import { SiteInfoSummaryPanel } from './SiteInfoSummaryPanel';
 
@@ -141,15 +142,7 @@ const DASHBOARD_CARDS = [
 export function AdminDashboardView() {
   return (
     <div>
-      {/* 페이지 헤더 */}
-      <div className="bg-surface-white border-b border-border-light px-6 lg:px-8 py-5">
-        <h1 className="text-2xl font-display font-semibold text-heading-dark">
-          어드민 대시보드
-        </h1>
-        <p className="mt-1 text-nav text-secondary-dark">
-          콘텐츠를 관리하고 사이트를 운영하세요
-        </p>
-      </div>
+      <AdminPageHeader title="어드민 대시보드" description="콘텐츠를 관리하고 사이트를 운영하세요" />
 
       <div className="p-6 lg:p-8 flex flex-col gap-6">
         {/* 신규 문의 알림 카드 */}
