@@ -6,12 +6,15 @@ import {
   mailSettingQueryOptions,
   MailSettingApiError,
 } from '@/entities/mail-setting';
+import { inquiryFieldsQueryOptions } from '@/entities/inquiry-field';
 import { MailSettingForm } from '@/features/mail-setting-form';
 
 export function AdminMailSettingView() {
   const { data, error, isPending, isError, refetch, isRefetching } = useQuery(
     mailSettingQueryOptions(),
   );
+
+  const { data: fields = [] } = useQuery(inquiryFieldsQueryOptions());
 
   const isAuthError = error instanceof MailSettingApiError && error.isAuthError;
 
@@ -50,7 +53,7 @@ export function AdminMailSettingView() {
           </button>
         </div>
       ) : (
-        <MailSettingForm initialData={data} />
+        <MailSettingForm initialData={data} fields={fields} />
       )}
     </div>
   );
