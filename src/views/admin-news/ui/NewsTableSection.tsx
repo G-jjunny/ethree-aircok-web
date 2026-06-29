@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import type { NewsSummary } from '@/entities/news';
 import { DeleteButton } from './DeleteButton';
 
@@ -119,10 +119,12 @@ function PreviewPanel({
 export function NewsTableSection({ items }: Props) {
   const [selectedItem, setSelectedItem] = useState<NewsSummary | null>(null);
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const prevItemsRef = useRef(items);
 
-  useEffect(() => {
+  if (prevItemsRef.current !== items) {
+    prevItemsRef.current = items;
     setCurrentPage(1);
-  }, [items]);
+  }
 
   const totalPages = Math.ceil(items.length / PAGE_SIZE);
   const pagedItems = items.slice(
