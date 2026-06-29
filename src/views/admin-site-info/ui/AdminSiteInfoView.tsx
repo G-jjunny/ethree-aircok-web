@@ -5,7 +5,7 @@ import { PartnerListSection } from './PartnerListSection'
 export function AdminSiteInfoView() {
   return (
     <div>
-      <AdminPageHeader title="사이트 설정" />
+      <AdminPageHeader title="사이트 설정" description="회사 기본 정보와 파트너사 목록을 관리합니다." />
 
       {/* 콘텐츠 영역 */}
       <div className="p-6 lg:p-8">

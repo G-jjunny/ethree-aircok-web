@@ -127,7 +127,7 @@ export function AdminFaqView() {
 
   return (
     <div>
-      <AdminPageHeader title="FAQ 관리">
+      <AdminPageHeader title="FAQ 관리" description="자주 묻는 질문을 카테고리별로 관리합니다.">
         <button
           type="button"
           onClick={() => setShowCreateCategory(true)}

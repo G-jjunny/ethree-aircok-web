@@ -18,7 +18,7 @@ export function AdminCatalogView() {
 
   return (
     <div>
-      <AdminPageHeader title="카탈로그 관리" />
+      <AdminPageHeader title="카탈로그 관리" description="제품 카탈로그 이미지를 업로드·정렬·삭제합니다." />
 
       {/* 콘텐츠 영역 */}
       <div className="p-6 lg:p-8 flex flex-col gap-8">
