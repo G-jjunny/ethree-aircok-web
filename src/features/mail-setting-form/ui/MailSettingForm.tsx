@@ -14,6 +14,7 @@ import {
   mailSettingSchema,
   type MailSettingFormValues,
 } from '../model/mailSettingSchema';
+import { type InquiryField } from '@/entities/inquiry-field';
 
 /** subject/body 양쪽에서 사용 가능한 치환 변수 안내 */
 const TEMPLATE_VARIABLES = [
@@ -26,10 +27,16 @@ const TEMPLATE_VARIABLES = [
 
 interface Props {
   initialData: MailSetting;
+  fields?: InquiryField[];
 }
 
-export function MailSettingForm({ initialData }: Props) {
+export function MailSettingForm({ initialData, fields }: Props) {
   const queryClient = useQueryClient();
+
+  const dynamicVariables =
+    fields && fields.length > 0
+      ? fields.map((f) => ({ token: `{{${f.key}}}`, label: f.label }))
+      : TEMPLATE_VARIABLES.map((v) => ({ token: v.token, label: v.label }));
 
   const {
     register,
@@ -83,7 +90,7 @@ export function MailSettingForm({ initialData }: Props) {
           치환됩니다.
         </p>
         <ul className="flex flex-wrap gap-2">
-          {TEMPLATE_VARIABLES.map((v) => (
+          {dynamicVariables.map((v) => (
             <li
               key={v.token}
               className="text-secondary-dark text-xs font-body rounded-md border border-border-light bg-surface-white px-2 py-1"
