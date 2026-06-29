@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateNewsDto } from './dto/create-news.dto';
 import { UpdateNewsDto } from './dto/update-news.dto';
+import { NewsType } from './dto/news-type.enum';
 
 @Injectable()
 export class NewsService {
@@ -24,6 +25,8 @@ export class NewsService {
           location: true,
           published: true,
           coverImage: true,
+          type: true,
+          externalUrl: true,
           createdAt: true,
           updatedAt: true,
         },
@@ -50,6 +53,8 @@ export class NewsService {
           location: true,
           published: true,
           coverImage: true,
+          type: true,
+          externalUrl: true,
           createdAt: true,
           updatedAt: true,
         },
@@ -73,11 +78,13 @@ export class NewsService {
       data: {
         title: dto.title,
         description: dto.description,
-        content: dto.content,
+        content: dto.content ?? null,
         date: new Date(dto.date),
         location: dto.location,
         published: dto.published ?? false,
         coverImage: dto.coverImage || null,
+        type: dto.type ?? NewsType.BLOG,
+        externalUrl: dto.externalUrl ?? null,
       },
     });
   }
@@ -93,6 +100,8 @@ export class NewsService {
     if (dto.location !== undefined) data.location = dto.location;
     if (dto.published !== undefined) data.published = dto.published;
     if (dto.coverImage !== undefined) data.coverImage = dto.coverImage || null;
+    if (dto.type !== undefined) data.type = dto.type;
+    if (dto.externalUrl !== undefined) data.externalUrl = dto.externalUrl || null;
 
     return this.prisma.newsPost.update({ where: { id }, data });
   }

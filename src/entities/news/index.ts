@@ -1,4 +1,4 @@
-export type { NewsSummary, NewsPost, NewsListResponse } from './model/types';
+export type { NewsSummary, NewsPost, NewsListResponse, NewsType } from './model/types';
 export {
   getNewsList,
   getAdminNewsList,

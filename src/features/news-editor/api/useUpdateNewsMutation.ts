@@ -5,11 +5,13 @@ import { adminNewsKeys } from '@/entities/news'
 interface NewsPayload {
   title: string
   description: string
-  content: string
+  content?: string | null
   date: string
   published: boolean
   location?: string
   coverImage?: string
+  type?: 'BLOG' | 'LINK'
+  externalUrl?: string | null
 }
 
 export function useUpdateNewsMutation() {

@@ -28,7 +28,7 @@ export function DeleteButton({ id }: Props) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="text-error text-sm hover:opacity-70 transition-opacity"
+        className="text-[13px] text-error hover:underline font-medium"
       >
         삭제
       </button>

@@ -14,6 +14,14 @@ enum CatalogFileType {
   pdf
 }
 
+/// 뉴스 게시물 타입 (#66). BLOG/LINK 이원화 정책.
+/// - BLOG: 에디터로 작성한 본문(content)을 가지는 블로그형 게시물.
+/// - LINK: 외부 URL(externalUrl)로 연결되는 링크형 게시물. content 불필요.
+enum NewsType {
+  BLOG
+  LINK
+}
+
 model AdminUser {
   id             String   @id @default(cuid())
   username       String   @unique
@@ -22,17 +30,33 @@ model AdminUser {
   updatedAt      DateTime @updatedAt
 }
 
+/// 뉴스 게시물 (#66 타입 이원화).
+///
+/// 타입 정책:
+/// - type=BLOG(기본값): 에디터로 작성한 본문(content)을 가지는 게시물.
+///   content 를 채워 사용한다. externalUrl 은 null 로 두는 것을 권장.
+/// - type=LINK: 외부 URL(externalUrl)로 연결되는 링크형 게시물.
+///   externalUrl 이 필수이며, content 는 선택(요약 목적 허용 — NOT NULL 제약 없음).
+///
+/// content null 정책:
+/// - content 는 nullable(@db.Text). LINK 타입 신규 생성 시 미전달이면 null 저장.
+/// - BLOG 타입도 빈 문자열/null 모두 허용(서비스에서 null coalescing 처리).
 model NewsPost {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   title       String
   description String
-  content     String   @db.Text
+  /// 게시물 본문. BLOG 타입에서 사용. LINK 타입에서는 nullable.
+  content     String?   @db.Text
   date        DateTime
   location    String?
-  published   Boolean  @default(false)
+  published   Boolean   @default(false)
   coverImage  String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  /// 뉴스 타입. 기본값 BLOG.
+  type        NewsType  @default(BLOG)
+  /// 외부 링크 URL. type=LINK 일 때 필수.
+  externalUrl String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
 
 /// 문의하기(Inquiry) 접수 레코드.

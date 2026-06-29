@@ -13,7 +13,9 @@ export async function NewsDetailView({ params }: Props) {
   return (
     <main className="min-h-screen bg-surface-white">
       <NewsDetailHeroSection post={post} />
-      <NewsDetailContentSection content={post.content} />
+      {post.content && (
+        <NewsDetailContentSection content={post.content} />
+      )}
     </main>
   );
 }
