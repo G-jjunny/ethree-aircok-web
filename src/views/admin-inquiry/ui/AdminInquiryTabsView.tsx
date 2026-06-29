@@ -5,7 +5,7 @@ import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { AdminInquiryListView } from '@/widgets/admin-inquiry-list';
 import { AdminInquiryFormBuilderView } from '@/widgets/admin-inquiry-form-builder';
 import { AdminMailSettingView } from '@/widgets/admin-mail-setting';
-import { AdminMapSettingView } from '@/widgets/admin-map-setting';
+import { AdminPageHeader } from '@/shared/ui';
 import { SITE } from '@/shared/config/site';
 
 type TabKey = (typeof SITE.admin.inquiryTabs)[number]['key'];
@@ -57,20 +57,14 @@ export function AdminInquiryTabsView() {
 
   return (
     <div>
-      {/* 페이지 헤더 + 탭 바 — §15.2 + §15 탭 연결 구조 */}
-      <div className="bg-surface-white px-6 lg:px-8">
-        {/* 상단 row: 제목 */}
-        <div className="pt-5 flex items-center justify-between">
-          <h1 className="text-[22px] font-display font-semibold text-heading-dark">
-            문의 관리
-          </h1>
-        </div>
+      <AdminPageHeader title="문의 관리" description="접수된 문의를 관리하고 폼·이메일 설정을 합니다." />
 
-        {/* 탭 바 — 헤더 하단에 자연스럽게 연결 */}
+      {/* 탭 바 */}
+      <div className="bg-surface-white px-6 lg:px-8">
         <div
           role="tablist"
           aria-label="문의 관리 탭"
-          className="flex items-center gap-1 mt-4 border-b border-border-light overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+          className="flex items-center gap-1 border-b border-border-light overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
         >
           {TABS.map((tab, index) => {
             const active = tab.key === activeTab;
@@ -128,15 +122,6 @@ export function AdminInquiryTabsView() {
           hidden={activeTab !== 'mail'}
         >
           {activeTab === 'mail' && <AdminMailSettingView />}
-        </div>
-
-        <div
-          role="tabpanel"
-          id="panel-map"
-          aria-labelledby="tab-map"
-          hidden={activeTab !== 'map'}
-        >
-          {activeTab === 'map' && <AdminMapSettingView />}
         </div>
       </div>
     </div>
