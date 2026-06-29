@@ -2,6 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query'
 import { catalogImageListQueryOptions } from '@/entities/catalog'
+import { AdminPageHeader } from '@/shared/ui'
 import { CatalogUploadSection } from './CatalogUploadSection'
 import { CatalogImageGridSection } from './CatalogImageGridSection'
 
@@ -17,12 +18,7 @@ export function AdminCatalogView() {
 
   return (
     <div>
-      {/* 페이지 헤더 — §15.2 */}
-      <div className="bg-surface-white border-b border-border-light px-6 lg:px-8 py-5">
-        <h1 className="text-[22px] font-display font-semibold text-heading-dark leading-tight [word-break:keep-all]">
-          카탈로그 관리
-        </h1>
-      </div>
+      <AdminPageHeader title="카탈로그 관리" description="제품 카탈로그 이미지를 업로드·정렬·삭제합니다." />
 
       {/* 콘텐츠 영역 */}
       <div className="p-6 lg:p-8 flex flex-col gap-8">

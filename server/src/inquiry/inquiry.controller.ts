@@ -92,13 +92,22 @@ export class InquiryController {
     return this.inquiryService.removeField(id);
   }
 
+  // 정적 경로 'count' 는 ':id' path-param 라우트보다 위에 두어
+  // 라우트 매칭 충돌(모호성)을 명확히 회피한다.
+  @UseGuards(JwtAuthGuard)
+  @Get('count')
+  count(@Query('status') status?: string) {
+    return this.inquiryService.count(status);
+  }
+
   @UseGuards(JwtAuthGuard)
   @Get()
   findAll(
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
     @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
+    @Query('status') status?: string,
   ) {
-    return this.inquiryService.findAll(page, limit);
+    return this.inquiryService.findAll(page, limit, status);
   }
 
   @UseGuards(JwtAuthGuard)

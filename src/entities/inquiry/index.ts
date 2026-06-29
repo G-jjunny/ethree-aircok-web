@@ -12,4 +12,6 @@ export {
   updateInquiryStatus,
   deleteInquiry,
   InquiryApiError,
+  newInquiryCountQueryOptions,
+  newInquiryCountKeys,
 } from './api/inquiryApi';

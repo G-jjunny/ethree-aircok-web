@@ -32,3 +32,7 @@ export interface InquiryListResponse {
 export interface CreateInquiryBody {
   answers: Record<string, string>;
 }
+
+export interface InquiryCountResponse {
+  count: number;
+}

@@ -183,19 +183,27 @@ export class InquiryService {
     return this.prisma.inquiryField.delete({ where: { id } });
   }
 
-  async findAll(page: number, limit: number) {
+  async findAll(page: number, limit: number, status?: string) {
     const skip = (page - 1) * limit;
+    const where = status ? { status } : {};
 
     const [data, total] = await this.prisma.$transaction([
       this.prisma.inquiry.findMany({
         skip,
         take: limit,
         orderBy: { createdAt: 'desc' },
+        where,
       }),
-      this.prisma.inquiry.count(),
+      this.prisma.inquiry.count({ where }),
     ]);
 
     return { data, total, page, limit };
+  }
+
+  async count(status?: string) {
+    const where = status ? { status } : {};
+    const count = await this.prisma.inquiry.count({ where });
+    return { count };
   }
 
   async findOne(id: string) {
