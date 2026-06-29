@@ -130,6 +130,50 @@ export async function updateInquiryStatus(
 }
 
 /**
+ * 신규 문의 건수를 브라우저에서 직접 조회한다.
+ * 현재 계약: GET /api/inquiry?status=NEW&limit=1 → InquiryListResponse.total 사용.
+ * 추후 GET /api/inquiry/count?status=NEW → { count: number } 형태로 전환 예정이므로
+ * 함수명·타입을 교체하기 쉽게 단일 함수로 분리한다.
+ */
+export async function getNewInquiryCount(): Promise<number> {
+  try {
+    const { data } = await axiosInstance.get<InquiryListResponse>('/inquiry', {
+      params: { status: 'NEW', limit: 1 },
+    });
+    return data.total;
+  } catch (err) {
+    if (axios.isAxiosError(err)) {
+      const status = err.response?.status ?? 0;
+      const message =
+        status === 401 || status === 403
+          ? '로그인이 필요합니다.'
+          : status === 0
+            ? '네트워크 오류로 문의 건수를 불러오지 못했습니다.'
+            : '문의 건수를 불러오는 데 실패했습니다.';
+      throw new InquiryApiError(status, message);
+    }
+    throw new InquiryApiError(0, '네트워크 오류로 문의 건수를 불러오지 못했습니다.');
+  }
+}
+
+export const newInquiryCountKeys = {
+  count: ['admin-inquiry-count', 'NEW'] as const,
+};
+
+/**
+ * 신규 문의 건수 TanStack Query 옵션.
+ * staleTime 0 — 대시보드 방문마다 항상 최신 카운트를 표시한다.
+ */
+export function newInquiryCountQueryOptions() {
+  return queryOptions({
+    queryKey: newInquiryCountKeys.count,
+    queryFn: getNewInquiryCount,
+    staleTime: 0,
+    retry: authAwareRetry,
+  });
+}
+
+/**
  * 문의 삭제(DELETE). 인증 필요(JwtAuthGuard).
  * 성공 시 204(본문 없음).
  */

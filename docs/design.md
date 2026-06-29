@@ -1282,29 +1282,33 @@ TipTap 등 rich text 에디터의 HTML 출력을 렌더링하는 스타일 가�
 </blockquote>
 ```
 
-### Page Sub-Hero (페이지 서브 히어로)
+### Page Sub-Hero (페이지 서브 히어로) — `shared/ui/PageHero`
 
-About·Services 등 서브 페이지 상단의 텍스트 전용 히어로.
+About·Services·FAQ·Contact·Diagnosis 등 모든 서브 페이지 상단의 텍스트 전용 히어로. **About 디자인(Air Spine + SectionHeader)을 표준으로 통일**하며, `shared/ui/PageHero` 가 이 패턴의 **단일 구현체**다. 각 페이지에서 손수 eyebrow+h1+p 를 마크업하지 않고 반드시 `PageHero` 를 사용한다.
+
+> **적용 범위**: 텍스트 전용 일반 서브 페이지 히어로에만 적용한다. 기사/상세형 히어로(`news/ui/NewsDetailHeroSection` — coverImage overlay·뒤로가기 바·날짜/장소 메타)는 §4 "News Detail Hero" 패턴을 따르는 별도 구성이며 **이 통일 대상이 아니다**.
 
 - 배경: `bg-surface-dark`
-- 레이아웃: `min-h-[480px] flex items-center` (full-width)
+- 셸: `content-container min-h-[480px] flex items-center` (full-width 다크 섹션)
 - 내부 콘텐츠: left-align (메인 히어로와 달리 center 아님)
-- **소형 레이블**: 12px, weight 600, `text-aircok-blue-light`, `uppercase tracking-widest`
-- **H1**: Section Heading (40px, weight 600), `text-heading-light`, `leading-[1.10]`, `tracking-[-0.3px]`, `[word-break:keep-all]`. 모바일 28px.
-- **본문 p**: Body (17px, weight 400), `text-body-light`, `leading-[1.65]`, `[word-break:keep-all]`
-- 콘텐츠 스택: `flex flex-col gap-4 py-20`
+- **Air Spine 시그니처(표준 구성)**: 콘텐츠 좌측에 수직 룰 `mt-1.5 block w-0.5 shrink-0 self-stretch bg-aircok-blue`. `aria-hidden`. 메인 히어로와 서브 페이지를 잇는 브랜드 시그니처로, 모든 Page Sub-Hero에 기본 포함한다.
+- **콘텐츠 래퍼**: Spine 과 텍스트를 묶는 `flex items-stretch gap-6 py-20 md:gap-8`
+- **텍스트 블록**: `SectionHeader` 를 `theme="dark"`, `titleAs="h1"` 로 조합한다(중복 마크업 금지). SectionHeader 가 레이블/H1/본문 타이포를 표준대로 렌더한다.
+  - 소형 레이블: 12px, weight 600, `text-aircok-blue-light`, `uppercase tracking-widest`
+  - H1: Section Heading (40px, weight 600), `text-heading-light`, `leading-[1.10]`, `tracking-[-0.3px]`, `[word-break:keep-all]`, 모바일 28px. 기본 `maxWidth="max-w-[760px]"`.
+  - 본문 p: Body (17px, weight 400), `text-body-light`, `leading-[1.65]`, `[word-break:keep-all]`
+
+`PageHero` props: `label: string`(eyebrow), `title: string`, `body?: string`, `titleAs?: 'h1' | 'h2'`(기본 `'h1'`), `maxWidth?: string`(기본 `'max-w-[760px]'`). 셸·Spine·SectionHeader 조합은 컴포넌트 내부에 고정되어 있어 호출부는 콘텐츠만 전달한다.
 
 ```tsx
-// Page Sub-Hero 예시
-<section className="bg-surface-dark">
-  <div className="max-w-[1200px] mx-auto px-5 min-h-[480px] flex items-center">
-    <div className="flex flex-col gap-4 py-20">
-      <span className="text-aircok-blue-light text-xs font-semibold uppercase tracking-widest">레이블</span>
-      <h1 className="text-[28px] sm:text-[40px] font-semibold text-heading-light leading-[1.10] tracking-[-0.3px] [word-break:keep-all] max-w-[720px]">헤딩</h1>
-      <p className="text-[17px] text-body-light leading-[1.65] [word-break:keep-all] max-w-[640px]">본문</p>
-    </div>
-  </div>
-</section>
+// Page Sub-Hero — PageHero 공용 컴포넌트 사용
+import { PageHero } from '@/shared/ui'
+
+<PageHero
+  label={SITE.about.hero.label}
+  title={SITE.about.hero.headline}
+  body={SITE.about.hero.body}
+/>
 ```
 
 ### History Timeline (연혁 타임라인 — Spine 변형)
