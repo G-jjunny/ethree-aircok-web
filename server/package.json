@@ -12,7 +12,8 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:seed": "ts-node --project tsconfig.json prisma/seed.ts",
-    "prisma:seed:timeline": "ts-node --project tsconfig.json prisma/seed-timeline.ts"
+    "prisma:seed:timeline": "ts-node --project tsconfig.json prisma/seed-timeline.ts",
+    "prisma:seed:news": "ts-node --project tsconfig.json prisma/seed-news.ts"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",
