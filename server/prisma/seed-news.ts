@@ -119,7 +119,16 @@ async function seedNews() {
     return;
   }
 
-  const allNews = [...BLOG_NEWS, ...LINK_NEWS];
+  const allNews = [
+    ...BLOG_NEWS.map((item, i) => ({
+      ...item,
+      coverImage: `/news/image${i + 1}.png`,
+    })),
+    ...LINK_NEWS.map((item, i) => {
+      const n = i + 34;
+      return { ...item, coverImage: n === 71 ? '/news/image71.jpeg' : `/news/image${n}.png` };
+    }),
+  ];
   const result = await prisma.newsPost.createMany({ data: allNews });
 
   console.log(
