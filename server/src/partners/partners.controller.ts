@@ -14,13 +14,13 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
-import { join } from 'path';
+import { memoryStorage } from 'multer';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CreatePartnerDto } from './dto/create-partner.dto';
 import { UpdatePartnerDto } from './dto/update-partner.dto';
 import { ReorderPartnersDto } from './dto/reorder-partners.dto';
 import { PartnersService } from './partners.service';
+import { R2Service } from '../upload/r2.service';
 
 // 파트너 로고 업로드 허용 MIME 타입 화이트리스트 (#48). 이미지 전용.
 const ALLOWED_LOGO_MIMETYPES = [
@@ -31,16 +31,7 @@ const ALLOWED_LOGO_MIMETYPES = [
 ];
 
 const multerOptions = {
-  storage: diskStorage({
-    destination: join(__dirname, '..', '..', '..', 'public', 'uploads'),
-    filename: (
-      _req: Express.Request,
-      file: Express.Multer.File,
-      cb: (error: Error | null, filename: string) => void,
-    ) => {
-      cb(null, `${Date.now()}-${file.originalname}`);
-    },
-  }),
+  storage: memoryStorage(),
   // 허용 목록 외 mimetype 은 거부한다.
   fileFilter: (
     _req: Express.Request,
@@ -61,7 +52,10 @@ const multerOptions = {
 
 @Controller('partners')
 export class PartnersController {
-  constructor(private readonly partnersService: PartnersService) {}
+  constructor(
+    private readonly partnersService: PartnersService,
+    private readonly r2Service: R2Service,
+  ) {}
 
   /** GET /api/partners — 공개 엔드포인트. order ASC, createdAt ASC 정렬. */
   @Get()
@@ -103,14 +97,15 @@ export class PartnersController {
     return this.partnersService.remove(id);
   }
 
-  /** POST /api/partners/:id/logo — JWT 인증 필요. 로고 이미지 업로드. */
+  /** POST /api/partners/:id/logo — JWT 인증 필요. 로고 이미지 R2 업로드. */
   @UseGuards(JwtAuthGuard)
   @Post(':id/logo')
   @UseInterceptors(FileInterceptor('file', multerOptions))
-  uploadLogo(
+  async uploadLogo(
     @Param('id') id: string,
     @UploadedFile() file: Express.Multer.File,
   ) {
-    return this.partnersService.uploadLogo(id, file);
+    const url = await this.r2Service.upload(file, 'partners');
+    return this.partnersService.uploadLogo(id, url);
   }
 }
