@@ -152,7 +152,7 @@ export function HistorySection() {
             >
               {/* 연도 컬럼 (데스크탑 sticky) */}
               {/* token 없음: md:top-24 — Nav 높이(52px) + 여유 여백(44px) 합산 1회성 sticky 오프셋 */}
-              <div className="self-start pb-10 md:sticky md:top-24">
+              <div className="self-start pb-6 md:sticky md:top-24">
                 <p className="text-[28px] font-bold leading-none text-aircok-blue sm:text-[40px]">
                   {group.year}
                 </p>
@@ -161,7 +161,7 @@ export function HistorySection() {
                 </p>
               </div>
               {/* 이벤트 컬럼 + 레일 */}
-              <div className="relative pb-10">
+              <div className="relative pb-6">
                 <span
                   aria-hidden="true"
                   className="absolute bottom-0 left-1 top-1.5 w-px bg-border-light"
@@ -171,13 +171,13 @@ export function HistorySection() {
                   className="absolute left-0 top-1 h-2.5 w-2.5 rounded-pill bg-aircok-blue ring-4 ring-surface-white"
                 />
                 {/* 월 2단계 묶음 */}
-                <div className="flex flex-col gap-7 pl-8">
+                <div className="flex flex-col gap-4 pl-8">
                   {group.months.map((monthGroup) => (
                     <div key={monthGroup.monthNum}>
-                      <p className="mb-3 text-sm font-bold text-aircok-blue">
+                      <p className="mb-2 text-sm font-bold text-aircok-blue">
                         {monthGroup.monthLabel}
                       </p>
-                      <ul className="flex flex-col gap-5">
+                      <ul className="flex flex-col gap-3">
                         {monthGroup.contents.map((content, idx) => (
                           <li
                             key={`${monthGroup.monthNum}-${idx}`}
