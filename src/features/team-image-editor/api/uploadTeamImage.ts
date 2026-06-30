@@ -6,8 +6,8 @@ import type { TeamImage } from '@/entities/team-image'
  *   ① POST /team-images/uploads (multipart, field명 `file`) → { url } (catalog와 달리 fileType 없음)
  *   ② POST /team-images (json) body { imageUrl } → 생성된 단건 TeamImage 반환
  *
- * order는 전송하지 않는다 — 서버가 자동으로 append 한다.
- * 이미 3개면 ②에서 400 BadRequest가 발생하며, 메시지는 error.response.data.message(문자열)에 담긴다.
+ * order는 전송하지 않는다 — 서버가 자동으로 처리한다.
+ * 이미지가 이미 존재하면 기존 레코드가 새 URL로 교체된다(replace).
  */
 export async function uploadTeamImage(file: File): Promise<TeamImage> {
   const formData = new FormData()
