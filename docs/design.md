@@ -1027,22 +1027,25 @@ TipTap 등 rich text 에디터의 HTML 출력을 렌더링하는 스타일 가�
 - **호버 인터랙션 (라이트 elevation)**: 정지 시 **무그림자** → 호버 시 `hover:-translate-y-1 hover:shadow-card`, `transition-all duration-200` (다크 카드의 배경색 단계 대신 라이트에서는 그림자로 elevation 표현)
 - 카드 높이는 `h-full` + 그리드 `items-stretch`로 통일
 
-**콘텐츠 위계 (위에서 아래로)**: 블루 액센트 룰 → 아이콘 칩 → category 레이블 → 대형 수치 → 제목 → 설명 → 출처
+**콘텐츠 위계 (위에서 아래로)**: 블루 액센트 룰 → category 레이블 → [아이콘 칩 + 대형 수치 *(같은 행)*] → 제목 → 설명 → 출처
 - **카드 상단 블루 액센트 룰**: `block h-0.5 w-10 bg-aircok-blue` (`aria-hidden="true"`) — 4개 카드를 브랜드 컬러로 묶되 순서를 암시하지 않는다(번호 마커 금지). Air Spine Continuum의 수직 룰과 같은 블루로, 섹션 상단 수직 룰의 리듬을 카드 단위에서 가로 룰로 변주한다.
-- **아이콘 칩**: `flex size-11 items-center justify-center rounded-lg bg-surface-light text-aircok-blue` (라이트 배경용 — 다크의 `bg-overlay-white-10` 대신 `bg-surface-light` chip + `text-aircok-blue`). 아이콘은 §Stat Category Icon 규칙의 라인 SVG 4종을 그대로 재사용(`size-6`, `stroke="currentColor"`, 칩 색 상속)
-- **category 레이블**: `text-aircok-blue text-xs font-semibold uppercase tracking-widest`
-- **대형 수치**: `text-6xl font-bold leading-none text-heading-dark` (가장 강한 시각 무게이되 색은 절제된 다크 그레이 — **블루 아님**)
+- **category 레이블**: `text-aircok-blue text-xs font-semibold uppercase tracking-widest` — eyebrow로서 아이콘+수치 행 **위**에 둔다(아이콘과 수치를 하나의 hero pair로 묶기 위함).
+- **아이콘 칩 + 대형 수치 (같은 행)**: 행 래퍼 `flex items-center gap-3` 로 아이콘 칩과 대형 수치를 **한 줄에 나란히** 배치한다(예: `[icon] 50%`). 아이콘 칩은 수치의 카테고리 동반자로 읽히며, `items-center`로 칩을 `text-6xl` 수치 블록에 광학적으로 중앙 정렬한다.
+  - **아이콘 칩**: `flex size-11 items-center justify-center rounded-lg bg-surface-light text-aircok-blue` (라이트 배경용 — 다크의 `bg-overlay-white-10` 대신 `bg-surface-light` chip + `text-aircok-blue`). 아이콘은 §Stat Category Icon 규칙의 라인 SVG 4종을 그대로 재사용(`size-6`, `stroke="currentColor"`, 칩 색 상속). `size-11`(44px)은 옆의 `text-6xl`(60px) 수치보다 한 단계 작아 수치의 시각 무게 우위를 유지한다.
+  - **대형 수치**: `text-6xl font-bold leading-none text-heading-dark` (가장 강한 시각 무게이되 색은 절제된 다크 그레이 — **블루 아님**)
 - **title**: `text-2xl font-bold leading-[1.19] text-heading-dark [word-break:keep-all] lg:min-h-[2.4em]` (제목 위계 강화 + DarkStatCard와 동일한 *title 정렬 규칙* — `lg`에서만 2줄 min-height로 description 시작점 통일)
 - **description**: `flex-1 text-sm leading-[1.65] text-body-dark [word-break:keep-all]`
 - **source (출처)**: `mt-auto text-xs italic text-secondary-dark`
 
 ```tsx
-// LightStatCard 마크업 (위계: 액센트 룰 → 아이콘 칩 → category → 수치 → 제목 → 설명 → 출처)
+// LightStatCard 마크업 (위계: 액센트 룰 → category → [아이콘 칩 + 수치 동일 행] → 제목 → 설명 → 출처)
 <div className="group flex h-full flex-col gap-4 overflow-hidden rounded-xl border border-border-light bg-surface-white px-5 py-6 transition-all duration-200 hover:-translate-y-1 hover:shadow-card">
   <span aria-hidden="true" className="block h-0.5 w-10 bg-aircok-blue" />
-  <span className="flex size-11 items-center justify-center rounded-lg bg-surface-light text-aircok-blue">{/* 라인 아이콘 SVG */}</span>
   <span className="text-xs font-semibold uppercase tracking-widest text-aircok-blue">{/* category */}</span>
-  <span className="text-6xl font-bold leading-none text-heading-dark">{/* stat */}</span>
+  <div className="flex items-center gap-3">
+    <span className="flex size-11 items-center justify-center rounded-lg bg-surface-light text-aircok-blue">{/* 라인 아이콘 SVG */}</span>
+    <span className="text-6xl font-bold leading-none text-heading-dark">{/* stat */}</span>
+  </div>
   <h3 className="text-2xl font-bold leading-[1.19] text-heading-dark [word-break:keep-all] lg:min-h-[2.4em]">{/* title */}</h3>
   <p className="flex-1 text-sm leading-[1.65] text-body-dark [word-break:keep-all]">{/* description */}</p>
   <p className="mt-auto text-xs italic text-secondary-dark">{/* source */}</p>

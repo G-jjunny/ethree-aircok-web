@@ -64,18 +64,21 @@ export function LightStatCard({
     <div className="group flex h-full flex-col gap-4 overflow-hidden rounded-xl border border-border-light bg-surface-white px-5 py-6 transition-all duration-200 hover:-translate-y-1 hover:shadow-card">
       {/* 카드 상단 블루 액센트 룰 — 4개 카드를 브랜드 컬러로 묶음 (순서를 암시하지 않음) */}
       <span aria-hidden="true" className="block h-0.5 w-10 bg-aircok-blue" />
-      {icon && (
-        <span className="flex size-11 items-center justify-center rounded-lg bg-surface-light text-aircok-blue">
-          {icon}
-        </span>
-      )}
       <span className="text-xs font-semibold uppercase tracking-widest text-aircok-blue">
         {category}
       </span>
-      {/* 대형 수치: 절제된 다크 그레이 — 블루 아님(블루는 액센트 룰/아이콘/레이블에만) */}
-      <span className="text-6xl font-bold leading-none text-heading-dark">
-        {stat}
-      </span>
+      {/* 아이콘 칩 + 대형 수치를 같은 행에 나란히 배치 (아이콘이 수치의 카테고리 동반자로 읽힘) */}
+      <div className="flex items-center gap-3">
+        {icon && (
+          <span className="flex size-11 items-center justify-center rounded-lg bg-surface-light text-aircok-blue">
+            {icon}
+          </span>
+        )}
+        {/* 대형 수치: 절제된 다크 그레이 — 블루 아님(블루는 액센트 룰/아이콘/레이블에만) */}
+        <span className="text-6xl font-bold leading-none text-heading-dark">
+          {stat}
+        </span>
+      </div>
       {/* lg:min-h-[2.4em]: 4열 좁은 폭에서 1줄/2줄 제목 모두 동일 영역 점유 → description 시작점 통일 (design.md "title 정렬 규칙") */}
       <h3 className="text-2xl font-bold leading-[1.19] text-heading-dark [word-break:keep-all] lg:min-h-[2.4em]">
         {title}
