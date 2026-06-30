@@ -10,6 +10,8 @@ import { SiteInfoModule } from './site-info/site-info.module';
 import { PartnersModule } from './partners/partners.module';
 import { TeamModule } from './team/team.module';
 import { TimelineModule } from './timeline/timeline.module';
+import { ServiceImageModule } from './service-image/service-image.module';
+import { DiagnosisImageModule } from './diagnosis-image/diagnosis-image.module';
 
 @Module({
   imports: [
@@ -29,6 +31,8 @@ import { TimelineModule } from './timeline/timeline.module';
     PartnersModule,
     TeamModule,
     TimelineModule,
+    ServiceImageModule,
+    DiagnosisImageModule,
   ],
 })
 export class AppModule {}
