@@ -20,9 +20,8 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { TeamService } from './team.service';
 import { CreateTeamImageDto } from './dto/create-team-image.dto';
 import { UpdateTeamImageDto } from './dto/update-team-image.dto';
-import { ReorderTeamImagesDto } from './dto/reorder-team-images.dto';
 
-// OUR Team 이미지 업로드 허용 MIME 타입 화이트리스트 (#57). 이미지 전용.
+// OUR Team 이미지 업로드 허용 MIME 타입 화이트리스트. 이미지 전용.
 const ALLOWED_IMAGE_MIMETYPES = [
   'image/png',
   'image/jpeg',
@@ -77,23 +76,15 @@ export class TeamController {
     return { url: `/uploads/${file.filename}` };
   }
 
-  /** POST /api/team-images — JWT 인증 필요. 201 Created. */
+  /**
+   * POST /api/team-images — JWT 인증 필요. 201 Created.
+   * 단일 이미지 대체(replace) 방식: 기존 이미지가 있으면 해당 레코드를 업데이트한다.
+   */
   @UseGuards(JwtAuthGuard)
   @Post()
   @HttpCode(HttpStatus.CREATED)
   create(@Body() dto: CreateTeamImageDto) {
     return this.teamService.create(dto);
-  }
-
-  /**
-   * PATCH /api/team-images/reorder — JWT 인증 필요.
-   * 주의: 반드시 PATCH /:id 보다 먼저 선언해야 한다.
-   * 그렇지 않으면 NestJS 라우터가 'reorder' 를 :id 로 매칭한다.
-   */
-  @UseGuards(JwtAuthGuard)
-  @Patch('reorder')
-  reorder(@Body() dto: ReorderTeamImagesDto) {
-    return this.teamService.reorder(dto);
   }
 
   /** PATCH /api/team-images/:id — JWT 인증 필요. */

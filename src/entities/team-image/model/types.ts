@@ -8,10 +8,8 @@ export interface TeamImage {
 
 export interface TeamImageCreateBody {
   imageUrl: string;
-  order?: number;
 }
 
 export interface TeamImageUpdateBody {
   imageUrl?: string;
-  order?: number;
 }

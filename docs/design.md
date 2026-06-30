@@ -1178,6 +1178,69 @@ TipTap 등 rich text 에디터의 HTML 출력을 렌더링하는 스타일 가�
 
 > **패턴 선택 기준**: 균일한 4열 카드 그리드가 적합한 경우(병렬적 특징 나열)는 Watermark Step Card를, 순서·진행 방향이 핵심이고 타이포로 개성을 주고 싶은 경우는 Numeral Spine Process Timeline을 사용한다.
 
+### Value Highlight Card (핵심 가치 강조 카드) — About IntroSection
+
+회사의 핵심 가치(병렬 항목)를 강하게 시각적으로 강조하는 다크 카드 패턴. `About IntroSection`에서 4열 그리드로 배치. 각 카드 상단에 대형 솔리드 인덱스 숫자(`01`–`04`)를 `text-aircok-blue`로 두어 카드를 가장 먼저 인식하게 한다. 숫자는 순서(sequence)가 아니라 **핵심 가치를 구분하는 식별자**로 사용하므로, `STEP` 레이블 없이 숫자만 단독 표기한다. 신규 색상 토큰 없음 — 기존 다크 서피스 토큰 재활용.
+
+**배경 전략**: 섹션 배경을 `bg-surface-dark`로 전환해 위·아래 라이트 섹션과 강한 대비를 만든다. 카드 배경은 `bg-surface-dark-1`로 배경보다 한 단계 밝아 카드가 떠 보이는 depth를 그림자 없이 표현한다.
+
+**위계 규칙 (인덱스 숫자 > 제목 > 설명)**
+- **인덱스 숫자**: `text-aircok-blue font-display font-bold text-5xl leading-none tracking-[-0.3px]` — 카드당 단 하나, 솔리드 채움(워터마크 opacity 아님)
+- **제목**: Card Title (21px, weight 700), `text-heading-light`, `text-subheading`
+- **설명**: Body (17px, weight 400), `text-body-light`, `leading-[1.65]`, `[word-break:keep-all]`
+
+**구조 규칙**
+- 섹션 배경: `bg-surface-dark`
+- 섹션 패딩: `py-24`
+- 카드 래퍼: `flex flex-col gap-5 rounded-xl bg-surface-dark-1 p-8`
+- 인덱스 숫자와 제목+설명 블록 사이 구분: `gap-5` (인덱스 무게감이 호흡 공간을 만들므로 하단 액센트 룰 불필요)
+- 호버(선택): `hover:bg-surface-dark-2 transition-colors duration-200` (그림자 없음, 배경색 차이만으로 elevation)
+- 그리드: 4열(데스크탑, `lg:grid-cols-4`) → 2열(태블릿, `sm:grid-cols-2`) → 1열(모바일)
+
+**FeatureCard 미사용 이유**: 기존 `shared/ui/FeatureCard`는 라이트/다크 2가지 배경 변형을 제공하지만 인덱스 숫자 요소가 없어 이 패턴을 담을 수 없다. IntroSection 로컬 마크업으로 직접 구현한다.
+
+```tsx
+// Value Highlight Card — About IntroSection (로컬 마크업)
+// 섹션 배경 변경: bg-surface-white → bg-surface-dark
+<section className="bg-surface-dark py-24">
+  <div className="content-container flex flex-col gap-14">
+    <SectionHeader
+      label={SITE.about.intro.label}
+      title={SITE.about.intro.title}
+      body={SITE.about.intro.body}
+      theme="dark"
+      maxWidth="max-w-[760px]"
+    />
+    <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      {SITE.about.intro.values.map((value, index) => (
+        <li
+          key={value.title}
+          className="flex flex-col gap-5 rounded-xl bg-surface-dark-1 p-8 transition-colors duration-200 hover:bg-surface-dark-2"
+        >
+          {/* 인덱스 숫자: 순서 식별자(sequence 아님) — STEP 레이블 없음 */}
+          <span
+            aria-hidden="true"
+            className="font-display font-bold text-5xl leading-none tracking-[-0.3px] text-aircok-blue select-none"
+          >
+            {String(index + 1).padStart(2, '0')}
+          </span>
+          <div className="flex flex-col gap-3">
+            <h3 className="text-subheading font-bold font-display text-heading-light leading-[1.19] [word-break:keep-all]">
+              {value.title}
+            </h3>
+            <p className="text-[17px] text-body-light leading-[1.65] [word-break:keep-all]">
+              {value.description}
+            </p>
+          </div>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+```
+
+> **섹션 배경 리듬 주의**: IntroSection이 `bg-surface-dark`로 바뀌면 전후 섹션(`PageHero`도 `bg-surface-dark`)과 연속 다크 구간이 생길 수 있다. About 페이지 전체 섹션 순서를 확인해 라이트↔다크 교차 리듬을 유지한다. IntroSection 직후에 라이트 섹션(팀, 연혁 등)이 이어질 경우 자연스러운 전환이 된다.
+
 ### Accent Bar Stat Card (액센트 바 수치 카드)
 
 수치(통계) 하이라이트를 좌측 액센트 바 + 큰 타이포로 위계화한 흰 배경 카드. `WhatYouGetSection` 우측 통계 스택에서 사용. 라이트 섹션(`bg-surface-light`) 위 흰 카드. 신규 토큰 없음.

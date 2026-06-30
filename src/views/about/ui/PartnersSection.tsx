@@ -67,7 +67,7 @@ export function PartnersSection() {
           {partners.map((partner) => (
             <li key={partner.id}>
               {partner.logoUrl ? (
-                <div className="flex h-20 w-full items-center justify-center overflow-hidden rounded-lg bg-surface-white px-6">
+                <div className="relative group flex h-20 w-full items-center justify-center overflow-hidden rounded-lg bg-surface-white px-6">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={resolveLogoSrc(partner.logoUrl)}
@@ -75,14 +75,24 @@ export function PartnersSection() {
                     width={128}
                     height={56}
                     loading="lazy"
-                    className="max-h-10 w-auto object-contain"
+                    className="max-h-10 w-auto object-contain transition-opacity duration-200 group-hover:opacity-30"
                   />
+                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                    <span className="text-xs font-semibold text-heading-dark text-center px-2 [word-break:keep-all]">
+                      {partner.name}
+                    </span>
+                  </div>
                 </div>
               ) : (
-                <div className="flex h-20 w-full items-center justify-center rounded-lg bg-overlay-white-10 px-6 text-center">
-                  <span className="text-sm text-body-light [word-break:keep-all]">
+                <div className="relative group flex h-20 w-full items-center justify-center overflow-hidden rounded-lg bg-overlay-white-10 px-6 text-center">
+                  <span className="text-sm text-body-light [word-break:keep-all] transition-opacity duration-200 group-hover:opacity-0">
                     {partner.name}
                   </span>
+                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                    <span className="text-xs font-semibold text-body-light text-center px-2 [word-break:keep-all]">
+                      {partner.name}
+                    </span>
+                  </div>
                 </div>
               )}
             </li>

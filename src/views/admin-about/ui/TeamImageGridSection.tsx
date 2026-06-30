@@ -3,10 +3,7 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { ConfirmDialog } from '@/shared/ui'
-import {
-  useDeleteTeamImageMutation,
-  useReorderTeamImagesMutation,
-} from '@/features/team-image-editor'
+import { useDeleteTeamImageMutation } from '@/features/team-image-editor'
 import type { TeamImage } from '@/entities/team-image'
 
 /** 이미지 항목은 백엔드 절대 URL로 보정한다(catalog SortableImageCard 패턴). */
@@ -22,54 +19,15 @@ interface TeamImageGridSectionProps {
 
 /**
  * 팀 이미지 그리드(어드민).
- * 위/아래 이동 버튼으로 순서를 바꾸고(useReorderTeamImagesMutation, items 매핑),
  * 카드별 삭제(ConfirmDialog)를 제공한다.
+ * 삭제 후 TanStack Query invalidate가 images props를 자동 갱신한다.
  */
 export function TeamImageGridSection({
   images,
   isLoading,
 }: TeamImageGridSectionProps) {
-  // 즉각적인 UI 반영을 위한 로컬 순서 상태.
-  // 서버 데이터(images)가 갱신되면 "렌더 중 state 조정" 패턴으로 동기화한다.
-  const [items, setItems] = useState<TeamImage[]>(images)
-  const [syncedFrom, setSyncedFrom] = useState<TeamImage[]>(images)
   const [deletingId, setDeletingId] = useState<string | null>(null)
-
-  if (syncedFrom !== images) {
-    setSyncedFrom(images)
-    setItems(images)
-  }
-
   const deleteMutation = useDeleteTeamImageMutation()
-  const reorderMutation = useReorderTeamImagesMutation()
-
-  const reorder = (next: TeamImage[]) => {
-    setItems(next) // 낙관적 업데이트
-    reorderMutation.mutate(
-      next.map((img, index) => ({ id: img.id, order: index })),
-      {
-        onSuccess: () => toast.success('순서가 변경되었습니다'),
-        onError: () => {
-          toast.error('순서 변경에 실패했습니다')
-          setItems(images) // 롤백
-        },
-      },
-    )
-  }
-
-  const handleMoveUp = (index: number) => {
-    if (index <= 0) return
-    const next = [...items]
-    ;[next[index - 1], next[index]] = [next[index], next[index - 1]]
-    reorder(next)
-  }
-
-  const handleMoveDown = (index: number) => {
-    if (index >= items.length - 1) return
-    const next = [...items]
-    ;[next[index + 1], next[index]] = [next[index], next[index + 1]]
-    reorder(next)
-  }
 
   const handleDeleteConfirm = () => {
     if (!deletingId) return
@@ -100,7 +58,7 @@ export function TeamImageGridSection({
     )
   }
 
-  if (items.length === 0) {
+  if (images.length === 0) {
     return (
       <div className="bg-surface-white rounded-xl border border-border-light px-6 py-16 flex flex-col items-center justify-center text-center gap-3">
         <svg
@@ -139,63 +97,18 @@ export function TeamImageGridSection({
 
   return (
     <section className="bg-surface-white rounded-xl border border-border-light p-6 flex flex-col gap-4">
-      <div className="flex items-center justify-between border-b border-border-light pb-4">
+      <div className="border-b border-border-light pb-4">
         <h2 className="text-nav font-semibold text-heading-dark">
-          팀 이미지 ({items.length})
+          팀 이미지 ({images.length})
         </h2>
-        <p className="text-xs text-secondary-dark">
-          위/아래 버튼으로 순서를 변경하세요
-        </p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {items.map((image, index) => (
+        {images.map((image, index) => (
           <div
             key={image.id}
             className="relative flex flex-col gap-2 rounded-lg border border-border-light bg-surface-white p-3"
           >
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-secondary-dark tabular-nums">
-                {index + 1}
-              </span>
-              <div className="flex items-center gap-1">
-                <button
-                  type="button"
-                  aria-label="위로 이동"
-                  onClick={() => handleMoveUp(index)}
-                  disabled={index === 0 || reorderMutation.isPending}
-                  className="inline-flex items-center justify-center w-8 h-8 rounded-md text-secondary-dark hover:text-heading-dark hover:bg-surface-light transition-colors disabled:opacity-30 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:ring-offset-2"
-                >
-                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-                    <path
-                      d="M7 11V3m0 0L3.5 6.5M7 3l3.5 3.5"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </button>
-                <button
-                  type="button"
-                  aria-label="아래로 이동"
-                  onClick={() => handleMoveDown(index)}
-                  disabled={index === items.length - 1 || reorderMutation.isPending}
-                  className="inline-flex items-center justify-center w-8 h-8 rounded-md text-secondary-dark hover:text-heading-dark hover:bg-surface-light transition-colors disabled:opacity-30 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:ring-offset-2"
-                >
-                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-                    <path
-                      d="M7 3v8m0 0l3.5-3.5M7 11L3.5 7.5"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </button>
-              </div>
-            </div>
-
             <div className="relative w-full aspect-square overflow-hidden rounded-md bg-surface-light">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img

@@ -23,7 +23,7 @@ export function AdminAboutView() {
 
       {/* 콘텐츠 영역 */}
       <div className="p-6 lg:p-8 flex flex-col gap-8">
-        <TeamImageUploadSection count={images.length} />
+        <TeamImageUploadSection />
         <TeamImageGridSection images={images} isLoading={isLoading} />
         <TimelineManageSection />
       </div>
