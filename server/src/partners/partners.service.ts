@@ -72,9 +72,8 @@ export class PartnersService {
     return this.prisma.partner.delete({ where: { id } });
   }
 
-  async uploadLogo(id: string, file: Express.Multer.File) {
+  async uploadLogo(id: string, logoUrl: string) {
     await this.findOne(id);
-    const logoUrl = `/uploads/${file.filename}`;
     await this.prisma.partner.update({
       where: { id },
       data: { logoUrl },
