@@ -372,7 +372,7 @@ Apple 스타일의 '제품 우선 프레젠테이션'을 Aircok 브랜드에 적
 - 서브 카피: `text-subheading`, `text-body-light`, `leading-[1.65]`(한글), `[word-break:keep-all]`. 중앙 정렬 가독성 확보를 위해 `max-w-xl`로 폭을 제한한다
 - CTA 2개 나란히(중앙 정렬): "도입 문의" (Filled Blue, `rounded-md`) + "제품 보기" (Pill Outline, `rounded-pill`), 둘 다 `min-h-[44px]`. 모바일 세로 적층 → `sm:flex-row`
 
-**배경 — 다크 순수 캔버스**: Hero는 패턴·이미지·그라디언트·헤일로 없이 순수 `bg-surface-stat`(딥 네이비)만 깐다("여백이 곧 공기"). 바로 아래 `StatSection`(동일 `bg-surface-stat`)과 하나의 "측정된 공기" 흐름으로 연속해 읽히게 하고, 리듬 전환(다크→라이트)은 그 아래 `MethodologySection`에서 한다. 배경 장식은 금지(§Visual Theme), 신규 색 토큰도 추가하지 않는다.
+**배경 — 다크 순수 캔버스**: Hero는 패턴·이미지·그라디언트·헤일로 없이 순수 `bg-surface-stat`(딥 네이비)만 깐다("여백이 곧 공기"). 배경 장식은 금지(§Visual Theme), 신규 색 토큰도 추가하지 않는다. **리듬 전환(다크→라이트)은 이제 바로 아래 `StatSection`에서 한다** — 기존에는 `StatSection`까지 다크 캔버스를 연장하고 그 아래 `MethodologySection`에서 전환했으나, 전환 시점을 한 단계 앞당겨 Hero(다크) → StatSection(라이트)으로 하드 엣지 전환한다. Hero는 여전히 다크지만, 그 아래 첫 콘텐츠 섹션인 StatSection은 라이트(`bg-surface-light`)다. 경계는 그라디언트/페이드 없이 명확한 색 전환으로 두되, 아래 *라이트 경계 Air Spine 재사용* 노트의 수직 룰로 시각적 연속성을 잇는다.
 
 **Signature — Air Spine(브랜드 수직 룰)**: 헤드라인 위 eyebrow에 짧은 수직 Aircok Blue 룰 하나 + 영문 워드마크(`SITE.nameEn`)를 **중앙 정렬**로 가로로 모아 브랜드의 "공기 밸브(cock)" 은유를 인코딩한다(`flex items-center justify-center gap-3`). 단 하나의 액센트로 절제하며, 장식적 반복(여러 룰·아이콘)은 금지. 헤드라인 내 핵심 어구 한 곳에만 `text-aircok-blue-light` 강조를 줄 수 있다(다크 배경 가독성). 모션은 절제 — 페이지 로드 시 1회성 reveal 외 hover 상승·scale 없음.
 
@@ -383,6 +383,8 @@ Apple 스타일의 '제품 우선 프레젠테이션'을 Aircok 브랜드에 적
   <span className="text-aircok-blue-light text-sm font-medium tracking-[0.2em]">{/* SITE.nameEn */}</span>
 </div>
 ```
+
+**보조 노트 — 라이트 경계 Air Spine 재사용("Air Spine Continuum")**: Hero의 Air Spine 수직 룰(`h-6 w-0.5 bg-aircok-blue`)을 바로 아래 라이트 `StatSection` 최상단(SectionHeader 위)에도 **단독으로 재사용**한다. 이 한 줄의 블루 수직 룰이 다크 Hero → 라이트 StatSection의 하드 엣지 경계를 가로질러 시각적으로 잇는 "Air Spine Continuum" 패턴이다. 라이트 섹션에서는 워드마크 없이 룰만 좌측 정렬로 배치하며(`mb-6 block h-6 w-0.5 bg-aircok-blue`), Hero와 동일한 단일 액센트 절제를 유지한다(룰 반복·장식 금지). 이로써 두 섹션은 색은 전환되되 브랜드 수직 축(spine)은 끊기지 않고 이어진다.
 
 ### Product Grid Tile
 
@@ -1014,31 +1016,42 @@ TipTap 등 rich text 에디터의 HTML 출력을 렌더링하는 스타일 가�
 - `[&_img]`: `rounded-xl w-full my-8 shadow-card`
 - `[&_a]`: `text-aircok-blue hover:underline`
 
-### Stat Card (통계 카드)
+### Stat Card (라이트 통계 카드 — `LightStatCard`)
 
-통계·수치 데이터를 강조하는 정보 카드. `StatSection`에서 4열 그리드로 배치.
+통계·수치 데이터를 강조하는 정보 카드. 홈 `StatSection`(라이트 `bg-surface-light`)에서 4열 그리드로 배치하며, **`shared/ui`의 `LightStatCard` 공용 컴포넌트로 구현**한다(props: `category`, `stat`, `title`, `description`, `source?`). **4개 카드를 단일 default 스타일로 균등하게** 처리한다(개별 카드 색/크기 강조 없음). 블루는 **카드 상단 액센트 룰 + 아이콘 칩 + category 레이블에만 제한적으로** 쓰고, **대형 수치는 절대 블루가 아니다**(절제된 다크 그레이 `text-heading-dark`).
 
-- 배경: `bg-surface-white`
-- 테두리: `border border-border-light`
-- Radius: `rounded-lg` (12px)
-- 패딩: `p-6` (32px)
-- **category 레이블**: 12px (Micro), weight 600, `text-aircok-blue`, `uppercase`, letter-spacing 약간 (`tracking-wide`)
-- **title 헤드라인**: 21px (Card Title), weight 700, `text-heading-dark`
-- **description**: 17px (Body), weight 400, `text-body-dark`, `word-break: keep-all`
-- **source (출처)**: 12px (Micro), weight 400, `text-secondary-dark`, italic
-- 그리드: 4열(데스크탑) → 2열(태블릿, `sm:grid-cols-2`) → 1열(모바일)
+**카드 컨테이너**
+- 배경: `bg-surface-white`, 테두리: `border border-border-light`, Radius: `rounded-xl` (16px)
+- 패딩: **비대칭 `px-5 py-6`** (가로 24px / 세로 32px — 좁은 4열 폭에서 한글 줄바꿈 최소화, DarkStatCard와 동일 근거)
+- 래퍼: `group flex h-full flex-col gap-4 overflow-hidden`
+- **호버 인터랙션 (라이트 elevation)**: 정지 시 **무그림자** → 호버 시 `hover:-translate-y-1 hover:shadow-card`, `transition-all duration-200` (다크 카드의 배경색 단계 대신 라이트에서는 그림자로 elevation 표현)
+- 카드 높이는 `h-full` + 그리드 `items-stretch`로 통일
+
+**콘텐츠 위계 (위에서 아래로)**: 블루 액센트 룰 → 아이콘 칩 → category 레이블 → 대형 수치 → 제목 → 설명 → 출처
+- **카드 상단 블루 액센트 룰**: `block h-0.5 w-10 bg-aircok-blue` (`aria-hidden="true"`) — 4개 카드를 브랜드 컬러로 묶되 순서를 암시하지 않는다(번호 마커 금지). Air Spine Continuum의 수직 룰과 같은 블루로, 섹션 상단 수직 룰의 리듬을 카드 단위에서 가로 룰로 변주한다.
+- **아이콘 칩**: `flex size-11 items-center justify-center rounded-lg bg-surface-light text-aircok-blue` (라이트 배경용 — 다크의 `bg-overlay-white-10` 대신 `bg-surface-light` chip + `text-aircok-blue`). 아이콘은 §Stat Category Icon 규칙의 라인 SVG 4종을 그대로 재사용(`size-6`, `stroke="currentColor"`, 칩 색 상속)
+- **category 레이블**: `text-aircok-blue text-xs font-semibold uppercase tracking-widest`
+- **대형 수치**: `text-6xl font-bold leading-none text-heading-dark` (가장 강한 시각 무게이되 색은 절제된 다크 그레이 — **블루 아님**)
+- **title**: `text-2xl font-bold leading-[1.19] text-heading-dark [word-break:keep-all] lg:min-h-[2.4em]` (제목 위계 강화 + DarkStatCard와 동일한 *title 정렬 규칙* — `lg`에서만 2줄 min-height로 description 시작점 통일)
+- **description**: `flex-1 text-sm leading-[1.65] text-body-dark [word-break:keep-all]`
+- **source (출처)**: `mt-auto text-xs italic text-secondary-dark`
 
 ```tsx
-// Stat Card 예시
-<div className="bg-surface-white border border-border-light rounded-lg p-6">
-  <p className="text-[12px] font-semibold text-aircok-blue uppercase tracking-wide">category</p>
-  <h3 className="text-[21px] font-bold text-heading-dark mt-2">핵심 수치</h3>
-  <p className="text-[17px] text-body-dark mt-3 leading-[1.65] [word-break:keep-all]">설명 텍스트</p>
-  <p className="text-[12px] text-secondary-dark italic mt-4">출처: OOO</p>
+// LightStatCard 마크업 (위계: 액센트 룰 → 아이콘 칩 → category → 수치 → 제목 → 설명 → 출처)
+<div className="group flex h-full flex-col gap-4 overflow-hidden rounded-xl border border-border-light bg-surface-white px-5 py-6 transition-all duration-200 hover:-translate-y-1 hover:shadow-card">
+  <span aria-hidden="true" className="block h-0.5 w-10 bg-aircok-blue" />
+  <span className="flex size-11 items-center justify-center rounded-lg bg-surface-light text-aircok-blue">{/* 라인 아이콘 SVG */}</span>
+  <span className="text-xs font-semibold uppercase tracking-widest text-aircok-blue">{/* category */}</span>
+  <span className="text-6xl font-bold leading-none text-heading-dark">{/* stat */}</span>
+  <h3 className="text-2xl font-bold leading-[1.19] text-heading-dark [word-break:keep-all] lg:min-h-[2.4em]">{/* title */}</h3>
+  <p className="flex-1 text-sm leading-[1.65] text-body-dark [word-break:keep-all]">{/* description */}</p>
+  <p className="mt-auto text-xs italic text-secondary-dark">{/* source */}</p>
 </div>
 ```
 
-### Dark Stat Card (다크 섹션 통계 카드)
+### Dark Stat Card (다크 섹션 통계 카드 — `DarkStatCard`, 현재 미사용)
+
+> **상태(2026-06 기준): 현재 어떤 라이트/다크 섹션에서도 사용되지 않음.** 홈 `StatSection`이 라이트(`bg-surface-light`)로 재디자인되며 `LightStatCard`로 교체되었고(§Stat Card 라이트), 다른 다크 섹션에서도 본 카드를 쓰지 않는다. 컴포넌트(`shared/ui/DarkStatCard`)와 본 스펙은 **향후 딥 네이비 다크 섹션 재도입 시 참조용으로 보존**한다. 새 다크 섹션을 만들 때 이 스펙을 재사용하되, 사용처가 없으면 컴포넌트 제거를 검토할 수 있다. 아래 내용은 보존된 참조 스펙이다.
 
 라이트 Stat Card의 다크 배경 변형. `StatSection`이 딥 네이비 배경(`bg-surface-stat`)에 배치될 때 사용. **4개 카드를 단일 default 스타일로 균등하게** 처리한다(개별 카드 색/크기 강조 없음). 강조는 카드 부각이 아니라 **각 카드의 결과 제목(title) 텍스트 위계 강화**로 표현한다 — 수치 다음으로 강한 시각 무게를 제목에 부여한다.
 

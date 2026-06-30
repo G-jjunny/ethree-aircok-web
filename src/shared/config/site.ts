@@ -46,6 +46,14 @@ export const SITE = {
     },
   },
 
+  home: {
+    statsHeader: {
+      eyebrow: "Measured Impact",
+      title: "공기는 숫자로 증명됩니다",
+      body: "집중력, 자산 가치, 에너지 비용, 공기질 — 스마트 에어콕이 실내 공기를 바꿀 때 달라지는 네 가지 지표를 데이터로 확인하세요.",
+    },
+  },
+
   stats: [
     {
       category: "Concentration",
