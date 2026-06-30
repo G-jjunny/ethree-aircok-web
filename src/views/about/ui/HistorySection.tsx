@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect, useRef } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { SITE } from '@/shared/config'
 import { SectionHeader } from '@/shared/ui'
@@ -16,6 +17,21 @@ interface NormalizedEvent {
   /** 표시용 월 라벨 ("1월" 등) */
   monthLabel: string
   content: string
+}
+
+/** 연도 → 월 2단계 묶음 결과 */
+interface MonthGroup {
+  monthNum: number
+  monthLabel: string
+  contents: string[]
+}
+
+interface YearGroup {
+  year: number
+  /** 월 내림차순 정렬 */
+  months: MonthGroup[]
+  /** 연도 내 전체 이벤트 수 */
+  eventCount: number
 }
 
 type FallbackItem = (typeof SITE.about.history.items)[number]
@@ -48,26 +64,36 @@ function normalizeFromFallback(items: readonly FallbackItem[]): (NormalizedEvent
 }
 
 /**
- * 연도 내림차순, 연 그룹 내 월 내림차순으로 묶는다.
+ * 연도 내림차순, 연도 그룹 내 월 내림차순으로 2단계 묶음을 생성한다.
  */
 function groupByYear(
   items: { year: number; monthNum: number; monthLabel: string; content: string }[],
-): { year: number; events: NormalizedEvent[] }[] {
-  const map = new Map<number, NormalizedEvent[]>()
+): YearGroup[] {
+  // year → Map<monthNum, { monthLabel, contents[] }>
+  const yearMap = new Map<number, Map<number, { monthLabel: string; contents: string[] }>>()
+
   for (const item of items) {
-    if (!map.has(item.year)) map.set(item.year, [])
-    map.get(item.year)!.push({
-      monthNum: item.monthNum,
-      monthLabel: item.monthLabel,
-      content: item.content,
-    })
+    if (!yearMap.has(item.year)) {
+      yearMap.set(item.year, new Map())
+    }
+    const monthMap = yearMap.get(item.year)!
+    if (!monthMap.has(item.monthNum)) {
+      monthMap.set(item.monthNum, { monthLabel: item.monthLabel, contents: [] })
+    }
+    monthMap.get(item.monthNum)!.contents.push(item.content)
   }
-  return Array.from(map.entries())
+
+  return Array.from(yearMap.entries())
     .sort(([a], [b]) => b - a)
-    .map(([year, events]) => ({
-      year,
-      events: events.sort((a, b) => b.monthNum - a.monthNum),
-    }))
+    .map(([year, monthMap]) => {
+      const months: MonthGroup[] = Array.from(monthMap.entries())
+        .sort(([a], [b]) => b - a)
+        .map(([monthNum, { monthLabel, contents }]) => ({ monthNum, monthLabel, contents }))
+
+      const eventCount = months.reduce((sum, m) => sum + m.contents.length, 0)
+
+      return { year, months, eventCount }
+    })
 }
 
 export function HistorySection() {
@@ -79,6 +105,35 @@ export function HistorySection() {
     ? groupByYear(normalizeFromApi(data))
     : groupByYear(normalizeFromFallback(SITE.about.history.items))
 
+  // IntersectionObserver: 각 연도 그룹 li가 뷰포트에 진입할 때 fade-in + slide-up
+  const groupRefs = useRef<(HTMLLIElement | null)[]>([])
+
+  useEffect(() => {
+    const observers: IntersectionObserver[] = []
+
+    groupRefs.current.forEach((el) => {
+      if (!el) return
+
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            el.classList.remove('opacity-0', 'translate-y-4')
+            el.classList.add('opacity-100', 'translate-y-0')
+            observer.disconnect()
+          }
+        },
+        { threshold: 0.1 },
+      )
+
+      observer.observe(el)
+      observers.push(observer)
+    })
+
+    return () => {
+      observers.forEach((o) => o.disconnect())
+    }
+  }, [historyGroups])
+
   return (
     <section className="bg-surface-white py-24">
       <div className="content-container flex flex-col gap-14">
@@ -89,18 +144,20 @@ export function HistorySection() {
         />
         {/* History Timeline (Spine 변형) — 연도 컬럼 + 연속 레일 + 노드 */}
         <ol className="flex flex-col">
-          {historyGroups.map((group) => (
+          {historyGroups.map((group, groupIdx) => (
             <li
               key={group.year}
-              className="grid grid-cols-[88px_1fr] gap-6 md:grid-cols-[120px_1fr] md:gap-10"
+              ref={(el) => { groupRefs.current[groupIdx] = el }}
+              className="grid grid-cols-[88px_1fr] gap-6 opacity-0 translate-y-4 transition-all duration-500 ease-out md:grid-cols-[120px_1fr] md:gap-10"
             >
               {/* 연도 컬럼 (데스크탑 sticky) */}
+              {/* token 없음: md:top-24 — Nav 높이(52px) + 여유 여백(44px) 합산 1회성 sticky 오프셋 */}
               <div className="self-start pb-10 md:sticky md:top-24">
                 <p className="text-[28px] font-bold leading-none text-aircok-blue sm:text-[40px]">
                   {group.year}
                 </p>
                 <p className="mt-1.5 text-xs font-medium text-secondary-dark">
-                  {group.events.length}건
+                  {group.eventCount}건
                 </p>
               </div>
               {/* 이벤트 컬럼 + 레일 */}
@@ -113,26 +170,34 @@ export function HistorySection() {
                   aria-hidden="true"
                   className="absolute left-0 top-1 h-2.5 w-2.5 rounded-pill bg-aircok-blue ring-4 ring-surface-white"
                 />
-                <ul className="flex flex-col gap-5 pl-8">
-                  {group.events.map((event, idx) => (
-                    <li
-                      key={`${event.monthLabel}-${idx}`}
-                      className="relative flex gap-4 [word-break:keep-all]"
-                    >
-                      {/* token 없음: 이벤트 노드를 레일 중심(pl-8 기준 -27px)에 맞추는 1회성 정렬 오프셋 */}
-                      <span
-                        aria-hidden="true"
-                        className="absolute -left-[27px] top-2 h-1.5 w-1.5 rounded-pill bg-border-light"
-                      />
-                      <span className="w-12 shrink-0 pt-0.5 text-sm font-semibold tabular-nums text-secondary-dark">
-                        {event.monthLabel}
-                      </span>
-                      <span className="text-[17px] leading-[1.65] text-body-dark">
-                        {event.content}
-                      </span>
-                    </li>
+                {/* 월 2단계 묶음 */}
+                <div className="flex flex-col gap-7 pl-8">
+                  {group.months.map((monthGroup) => (
+                    <div key={monthGroup.monthNum}>
+                      <p className="mb-3 text-sm font-bold text-aircok-blue">
+                        {monthGroup.monthLabel}
+                      </p>
+                      <ul className="flex flex-col gap-5">
+                        {monthGroup.contents.map((content, idx) => (
+                          <li
+                            key={`${monthGroup.monthNum}-${idx}`}
+                            className="relative flex [word-break:keep-all]"
+                          >
+                            {/* token 없음: 이벤트 노드를 레일 중심(pl-8 기준 -27px)에 맞추는 1회성 정렬 오프셋 */}
+                            <span
+                              aria-hidden="true"
+                              className="absolute -left-[27px] top-2 h-1.5 w-1.5 rounded-pill bg-border-light"
+                            />
+                            {/* token 없음: text-[17px] — Tailwind 기본 scale에 없는 Body(17px) 크기, design.md Body 타이포 규칙 */}
+                            <span className="text-[17px] leading-[1.65] text-body-dark">
+                              {content}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
                   ))}
-                </ul>
+                </div>
               </div>
             </li>
           ))}
