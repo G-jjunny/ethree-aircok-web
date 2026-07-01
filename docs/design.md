@@ -615,6 +615,19 @@ Apple 스타일의 '제품 우선 프레젠테이션'을 Aircok 브랜드에 적
 </div>
 ```
 
+### Zoomable Image · Lightbox (인라인 확대 라이트박스) — 공통
+
+세로형 인포그래픽·시스템 구성도처럼 본문 폭에서는 작게 보이지만 클릭 시 전체 화면으로 확대해 읽어야 하는 이미지를 위한 패턴. 서비스 소개(`ServiceImage*Section`)·진단 슬라이드 등에서 동일하게 사용한다. 신규 색상 토큰 없이 기존 `bg-overlay-dark`(다크 모달 오버레이) 토큰을 재활용한다 — **오버레이를 `bg-black/80` 등으로 하드코딩하는 것은 금지.**
+
+- **인라인 이미지**: `content-container` 안에 `max-w-[780px] mx-auto` ({/* token 없음: 세로형 인포그래픽 최적 가독 너비, 1회성 수치 */})로 폭을 제한하고, 이미지는 `w-full h-auto object-contain cursor-zoom-in` (클릭 시 확대 가능함을 커서로 암시)
+- **섹션 패딩**: 라이트 배경(`bg-surface-white`) 위 상하 `py-20`으로 스택 시 균일한 수직 리듬 유지 (인접 확대 이미지 섹션들과 동일 패딩)
+- **라이트박스 오버레이**: `fixed inset-0 bg-overlay-dark z-50 flex items-center justify-center p-4` — 배경 클릭 시 닫힘
+- **모달 컨테이너**: `relative max-w-[90vw] max-h-[90vh] overflow-auto` ({/* token 없음: 뷰포트 기준 모달 크기 제한, 1회성 수치 */}), 내부 클릭은 `stopPropagation`으로 닫힘 방지
+- **닫기 버튼**: `absolute top-2 right-2 text-heading-light text-3xl leading-none z-10`, `aria-label="닫기"`
+- **확대 이미지**: `w-auto h-auto object-contain`
+
+> 이 패턴이 2~3곳 이상 반복되면 페이지별 인라인 구현 대신 `shared/ui`의 공용 컴포넌트(예: `ZoomableImage`)로 분리하고 동일 토큰 계약을 유지한다.
+
 ### Team Member Placeholder Card (팀원 자리표시 카드) — About
 
 팀원 사진/프로필이 아직 없을 때(데이터 연동 전) 표시하는 정사각 카드. "준비 중"이 미완성이 아니라 의도된 상태로 읽히도록, 중앙 아바타 실루엣 + 이름/역할 자리표시 라인으로 구성한다. 신규 색 토큰 없이 라이트 표면·보조 텍스트 토큰만 재활용한다.

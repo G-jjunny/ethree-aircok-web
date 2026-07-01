@@ -1,7 +1,11 @@
 'use client'
 
-import Image from 'next/image'
 import { useState } from 'react'
+
+const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001'
+function resolveSrc(src: string): string {
+  return src.startsWith('http') ? src : `${API_BASE}${src}`
+}
 
 type ImageLightboxProps = {
   src: string
@@ -12,21 +16,14 @@ export function ImageLightbox({ src, alt }: ImageLightboxProps) {
   const [isOpen, setIsOpen] = useState(false)
 
   return (
-    <section className="bg-surface-white py-20">
-      <div className="content-container">
-        {/* max-w-[780px]: 인포그래픽 최적 가독 너비, 토큰 없음 */}
-        <div className="max-w-[780px] mx-auto">
-          <Image
-            src={src}
-            alt={alt}
-            width={1200}
-            height={1800}
-            className="w-full h-auto object-contain cursor-zoom-in"
-            sizes="(max-width: 780px) 100vw, 780px"
-            onClick={() => setIsOpen(true)}
-          />
-        </div>
-      </div>
+    <div className="w-full">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={resolveSrc(src)}
+        alt={alt}
+        className="w-full h-auto object-contain cursor-zoom-in"
+        onClick={() => setIsOpen(true)}
+      />
 
       {isOpen && (
         <div
@@ -46,17 +43,15 @@ export function ImageLightbox({ src, alt }: ImageLightboxProps) {
             >
               &times;
             </button>
-            <Image
-              src={src}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={resolveSrc(src)}
               alt={alt}
-              width={1200}
-              height={1800}
-              className="w-auto h-auto object-contain"
-              sizes="90vw"
+              className="w-auto h-auto object-contain max-w-[90vw] max-h-[90vh]"
             />
           </div>
         </div>
       )}
-    </section>
+    </div>
   )
 }
