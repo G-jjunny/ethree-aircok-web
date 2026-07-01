@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { AdminPageHeader } from "@/shared/ui";
 import { NewInquiryAlertCard } from "./NewInquiryAlertCard";
+import { NewDiagnosisConsultationAlertCard } from "./NewDiagnosisConsultationAlertCard";
 import { SiteInfoSummaryPanel } from "./SiteInfoSummaryPanel";
 import { DASHBOARD_CARDS } from "../model/dashboard-list";
 
@@ -15,8 +16,11 @@ export function AdminDashboardView() {
       />
 
       <div className="p-6 lg:p-8 flex flex-col gap-6">
-        {/* 신규 문의 알림 카드 */}
-        <NewInquiryAlertCard />
+        {/* 알림 카드 */}
+        <div className="flex flex-col gap-3">
+          <NewInquiryAlertCard />
+          <NewDiagnosisConsultationAlertCard />
+        </div>
 
         {/* 6개 카드 그리드 */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
