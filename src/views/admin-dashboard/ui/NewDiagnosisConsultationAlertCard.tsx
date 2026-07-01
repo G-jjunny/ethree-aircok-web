@@ -17,14 +17,14 @@ export function NewDiagnosisConsultationAlertCard() {
       className={[
         'group rounded-xl border p-5 flex items-center gap-4 transition-all',
         hasNew
-          ? 'bg-aircok-blue/5 border-aircok-blue/40 hover:bg-aircok-blue/10 hover:shadow-card'
-          : 'bg-surface-white border-border-light hover:border-aircok-blue/40 hover:shadow-card',
+          ? 'bg-warning/5 border-warning/40 hover:bg-warning/10 hover:shadow-card'
+          : 'bg-surface-white border-border-light hover:border-warning/40 hover:shadow-card',
       ].join(' ')}
     >
       <div
         className={[
           'inline-flex items-center justify-center w-11 h-11 rounded-lg flex-shrink-0',
-          hasNew ? 'bg-aircok-blue text-heading-light' : 'bg-aircok-blue/10 text-aircok-blue',
+          hasNew ? 'bg-warning text-heading-light' : 'bg-warning/10 text-warning',
         ].join(' ')}
       >
         <svg
@@ -48,8 +48,8 @@ export function NewDiagnosisConsultationAlertCard() {
           className={[
             'text-nav font-display font-semibold transition-colors',
             hasNew
-              ? 'text-aircok-blue'
-              : 'text-heading-dark group-hover:text-aircok-blue',
+              ? 'text-warning'
+              : 'text-heading-dark group-hover:text-warning',
           ].join(' ')}
         >
           신규 진단서비스 신청 알림
@@ -64,7 +64,7 @@ export function NewDiagnosisConsultationAlertCard() {
       </div>
 
       {hasNew && (
-        <span className="ml-auto flex-shrink-0 inline-flex items-center justify-center min-w-6 h-6 px-1.5 rounded-pill bg-aircok-blue text-heading-light text-xs font-bold">
+        <span className="ml-auto flex-shrink-0 inline-flex items-center justify-center min-w-6 h-6 px-1.5 rounded-pill bg-warning text-heading-light text-xs font-bold">
           {count}
         </span>
       )}
