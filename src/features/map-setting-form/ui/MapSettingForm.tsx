@@ -59,7 +59,10 @@ export function MapSettingForm({ initialData }: Props) {
     new window.daum.Postcode({
       oncomplete: (data) => {
         // 도로명 주소 우선, 없으면 지번 주소 사용
-        const selected = data.roadAddress || data.jibunAddress;
+        const baseAddress = data.roadAddress || data.jibunAddress;
+        // 건물명이 있으면 주소 뒤에 붙여 Google Maps 핀 라벨에 건물명이 표시되게 한다
+        const buildingName = data.buildingName?.trim();
+        const selected = buildingName ? `${baseAddress} ${buildingName}` : baseAddress;
         // RHF setValue로 채워야 watch('address') 미리보기가 자동 갱신됨
         setValue('address', selected, {
           shouldValidate: true,

@@ -16,6 +16,8 @@ export interface DaumPostcodeData {
   address: string;
   /** 우편번호 (5자리) */
   zonecode: string;
+  /** 건물명 (예: "성수 생각공장 데시앙플렉스"). 없으면 빈 문자열 */
+  buildingName: string;
 }
 
 export interface DaumPostcodeOptions {
