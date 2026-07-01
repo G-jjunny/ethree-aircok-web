@@ -3,8 +3,10 @@ import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
+import { toast } from 'sonner'
 import { useCreatePartnerMutation, useUpdatePartnerMutation } from '@/features/partner-editor'
 import type { Partner } from '@/entities/partner'
+import { extractUploadError } from '@/shared/api'
 
 const schema = z.object({
   name: z.string().min(1, '이름을 입력하세요'),
@@ -58,12 +60,22 @@ export function PartnerFormModal({ open, onClose, partner }: PartnerFormModalPro
     if (partner) {
       updateMutation.mutate(
         { id: partner.id, body: { name: values.name, type: values.type, order } },
-        { onSuccess: onClose },
+        {
+          onSuccess: onClose,
+          onError: (error) => {
+            toast.error(extractUploadError(error, '파트너 수정에 실패했습니다'))
+          },
+        },
       )
     } else {
       createMutation.mutate(
         { name: values.name, type: values.type, order },
-        { onSuccess: onClose },
+        {
+          onSuccess: onClose,
+          onError: (error) => {
+            toast.error(extractUploadError(error, '파트너 추가에 실패했습니다'))
+          },
+        },
       )
     }
   }

@@ -8,6 +8,7 @@ import { z } from 'zod';
 import { useRef } from 'react';
 import { toast } from 'sonner';
 import { uploadNewsImage, useCreateNewsMutation, useUpdateNewsMutation } from '@/features/news-editor';
+import { extractUploadError } from '@/shared/api';
 
 const NewsEditor = dynamic(
   () => import('@/features/news-editor').then((m) => m.NewsEditor),
@@ -104,8 +105,8 @@ export function AdminNewsForm({ initialData, onSuccess }: Props) {
     try {
       const url = await uploadNewsImage(file);
       setValue('coverImage', url);
-    } catch {
-      toast.error('커버 이미지 업로드에 실패했습니다.');
+    } catch (error) {
+      toast.error(extractUploadError(error, '커버 이미지 업로드에 실패했습니다.'))
     } finally {
       if (coverImageInputRef.current) coverImageInputRef.current.value = '';
     }

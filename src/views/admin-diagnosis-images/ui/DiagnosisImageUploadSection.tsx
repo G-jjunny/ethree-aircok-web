@@ -3,6 +3,7 @@
 import { useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { useUploadDiagnosisImageMutation } from '@/features/diagnosis-image-editor'
+import { extractUploadError } from '@/shared/api'
 
 /** 이미지 파일만 허용한다. */
 function isImageFile(file: File): boolean {
@@ -29,8 +30,8 @@ export function DiagnosisImageUploadSection() {
       try {
         await uploadMutation.mutateAsync(file)
         success += 1
-      } catch {
-        toast.error(`"${file.name}" 업로드에 실패했습니다`)
+      } catch (error) {
+        toast.error(extractUploadError(error, `"${file.name}" 업로드에 실패했습니다`))
       }
     }
     if (success > 0) toast.success(`${success}개 이미지가 업로드되었습니다`)

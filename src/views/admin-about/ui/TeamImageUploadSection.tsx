@@ -1,9 +1,9 @@
 'use client'
 
 import { useRef, useState } from 'react'
-import { isAxiosError } from 'axios'
 import { toast } from 'sonner'
 import { useUploadTeamImageMutation } from '@/features/team-image-editor'
+import { extractUploadError } from '@/shared/api'
 
 /** 업로드 가능한 파일인지 판별한다(이미지 전용). */
 function isImageFile(file: File): boolean {
@@ -25,16 +25,7 @@ export function TeamImageUploadSection() {
       await uploadMutation.mutateAsync(file)
       toast.success('이미지가 업로드되었습니다')
     } catch (error) {
-      const data = isAxiosError(error) ? error.response?.data : undefined
-      const rawMessage =
-        data && typeof data === 'object' && 'message' in data
-          ? (data as { message: unknown }).message
-          : undefined
-      const serverMessage =
-        typeof rawMessage === 'string'
-          ? rawMessage
-          : `"${file.name}" 업로드에 실패했습니다`
-      toast.error(serverMessage)
+      toast.error(extractUploadError(error, `"${file.name}" 업로드에 실패했습니다`))
     }
   }
 
