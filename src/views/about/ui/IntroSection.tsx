@@ -1,41 +1,34 @@
+'use client'
+
+import { useQuery } from '@tanstack/react-query'
+import { coreValueListQueryOptions } from '@/entities/core-value'
 import { SITE } from '@/shared/config'
 import { SectionHeader } from '@/shared/ui'
+import { ValueCardStack } from './ValueCardStack'
 
 export function IntroSection() {
+  const { data: coreValues = [], isLoading, isError } = useQuery(coreValueListQueryOptions())
+
+  const hasValues = coreValues.length > 0
+
   return (
-    <section className="bg-surface-dark py-24">
+    <section className="bg-surface-white py-24">
       <div className="content-container flex flex-col gap-14">
         <SectionHeader
           label={SITE.about.intro.label}
           title={SITE.about.intro.title}
           body={SITE.about.intro.body}
-          theme="dark"
+          theme="light"
           maxWidth="max-w-[760px]"
         />
-        <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {SITE.about.intro.values.map((value, index) => (
-            <li
-              key={value.title}
-              className="flex flex-col gap-5 rounded-xl bg-surface-dark-1 p-8 transition-colors duration-200 hover:bg-surface-dark-2"
-            >
-              {/* 인덱스 숫자: 순서 식별자(sequence 아님) — STEP 레이블 없음 */}
-              <span
-                aria-hidden="true"
-                className="select-none font-display text-5xl font-bold leading-none tracking-[-0.3px] text-aircok-blue"
-              >
-                {String(index + 1).padStart(2, '0')}
-              </span>
-              <div className="flex flex-col gap-3">
-                <h3 className="text-subheading font-bold font-display text-heading-light leading-[1.19] [word-break:keep-all]">
-                  {value.title}
-                </h3>
-                <p className="text-[17px] text-body-light leading-[1.65] [word-break:keep-all]">
-                  {value.description}
-                </p>
-              </div>
-            </li>
-          ))}
-        </ul>
+
+        {isLoading ? (
+          // h-[500px]: token 없음 — ValueCardStack 스테이지(cardH+60, cardW=300 기준 450px)
+          // + 네비게이션 버튼(mt-2 + h-11) 높이 근사, 스켈레톤 전용 1회성 수치
+          <div className="h-[500px] rounded-xl bg-surface-light animate-pulse" />
+        ) : isError ? null : hasValues ? (
+          <ValueCardStack values={coreValues} />
+        ) : null}
       </div>
     </section>
   )

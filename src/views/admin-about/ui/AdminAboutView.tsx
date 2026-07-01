@@ -6,6 +6,7 @@ import { AdminPageHeader } from '@/shared/ui'
 import { TeamImageUploadSection } from './TeamImageUploadSection'
 import { TeamImageGridSection } from './TeamImageGridSection'
 import { TimelineManageSection } from './TimelineManageSection'
+import { ValueCardManageSection } from './ValueCardManageSection'
 
 /**
  * 소개 페이지(OUR Team) 관리 어드민 뷰.
@@ -25,6 +26,7 @@ export function AdminAboutView() {
       <div className="p-6 lg:p-8 flex flex-col gap-8">
         <TeamImageUploadSection />
         <TeamImageGridSection images={images} isLoading={isLoading} />
+        <ValueCardManageSection />
         <TimelineManageSection />
       </div>
     </div>

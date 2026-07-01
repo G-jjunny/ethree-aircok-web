@@ -1208,68 +1208,446 @@ TipTap 등 rich text 에디터의 HTML 출력을 렌더링하는 스타일 가�
 
 > **패턴 선택 기준**: 균일한 4열 카드 그리드가 적합한 경우(병렬적 특징 나열)는 Watermark Step Card를, 순서·진행 방향이 핵심이고 타이포로 개성을 주고 싶은 경우는 Numeral Spine Process Timeline을 사용한다.
 
-### Value Highlight Card (핵심 가치 강조 카드) — About IntroSection
+### Staggered Notched Value Card Carousel (계단식 노치 카드 캐러셀) — About IntroSection
 
-회사의 핵심 가치(병렬 항목)를 강하게 시각적으로 강조하는 다크 카드 패턴. `About IntroSection`에서 4열 그리드로 배치. 각 카드 상단에 대형 솔리드 인덱스 숫자(`01`–`04`)를 `text-aircok-blue`로 두어 카드를 가장 먼저 인식하게 한다. 숫자는 순서(sequence)가 아니라 **핵심 가치를 구분하는 식별자**로 사용하므로, `STEP` 레이블 없이 숫자만 단독 표기한다. 신규 색상 토큰 없음 — 기존 다크 서피스 토큰 재활용.
+> **대체 이력**: 이전 "Value Highlight Card(핵심 가치 강조 카드, 다크 4열 그리드)" 패턴을 대체한다. 인덱스 숫자(01–04) 시그니처는 계승하되, 배경을 라이트로 전환하고 정적 그리드 대신 인터랙티브 카드 스택으로 재해석한다.
 
-**배경 전략**: 섹션 배경을 `bg-surface-dark`로 전환해 위·아래 라이트 섹션과 강한 대비를 만든다. 카드 배경은 `bg-surface-dark-1`로 배경보다 한 단계 밝아 카드가 떠 보이는 depth를 그림자 없이 표현한다.
+회사의 핵심 가치(어드민 CRUD로 관리되는 가변 개수 리스트, `entities/core-value`의 `CoreValue[]`)를 계단식으로 겹쳐 쌓은 카드 스택으로 표현하고, 클릭 또는 prev/next 버튼으로 활성 카드를 순환시키는 패턴. `About IntroSection`에서 사용. 신규 색상 토큰 없음 — 기존 라이트 표면·브랜드 블루·그림자 토큰만 재활용.
 
-**위계 규칙 (인덱스 숫자 > 제목 > 설명)**
-- **인덱스 숫자**: `text-aircok-blue font-display font-bold text-5xl leading-none tracking-[-0.3px]` — 카드당 단 하나, 솔리드 채움(워터마크 opacity 아님)
-- **제목**: Card Title (21px, weight 700), `text-heading-light`, `text-subheading`
-- **설명**: Body (17px, weight 400), `text-body-light`, `leading-[1.65]`, `[word-break:keep-all]`
+> **문서-구현 구조 표기 안내**: 아래 표·예시는 실제 구현(`src/views/about/ui/ValueCardStack.tsx`)의 좌우대칭 `pos`/`absPos` 구조를 기준으로 서술한다. `pos`는 `index - Math.floor(n/2)`로 계산되는 활성 카드 기준 상대 위치(음수=좌측, 0=활성, 양수=우측)이며, `absPos = Math.abs(pos)`가 아래 표의 `absPos` 열(옛 `distance`, 0=활성, 항상 0 이상)에 대응한다. 즉 `absPos`는 "활성 카드로부터 좌우 어느 쪽이든 몇 칸 떨어져 있는가"를 나타내는 값이고, 실제로 좌측(pos<0)과 우측(pos>0)에 동시에 같은 `absPos` 값을 가진 카드가 존재할 수 있다(예: n=4면 pos -2/-1/0/+1 → absPos 2/1/0/1). 순서 회전은 `order`(단방향 배열, distance 0..n-1) 대신 `list`(회전 배열) + `move(steps)`(왼쪽/오른쪽 회전)로 구현되어 있으며, 카드 클릭 시 `handleManualMove(pos)`로 클릭한 카드의 상대 위치만큼 배열을 회전시켜 활성화한다(= 결과적으로 클릭한 카드가 활성화되는 것은 동일하나, 배열 맨 앞으로 이동시키는 방식이 아니라 회전 방식).
 
-**구조 규칙**
-- 섹션 배경: `bg-surface-dark`
-- 섹션 패딩: `py-24`
-- 카드 래퍼: `flex flex-col gap-5 rounded-xl bg-surface-dark-1 p-8`
-- 인덱스 숫자와 제목+설명 블록 사이 구분: `gap-5` (인덱스 무게감이 호흡 공간을 만들므로 하단 액센트 룰 불필요)
-- 호버(선택): `hover:bg-surface-dark-2 transition-colors duration-200` (그림자 없음, 배경색 차이만으로 elevation)
-- 그리드: 4열(데스크탑, `lg:grid-cols-4`) → 2열(태블릿, `sm:grid-cols-2`) → 1열(모바일)
+**배경 전환 — `bg-surface-dark` → `bg-surface-white` (결정 근거)**
 
-**FeatureCard 미사용 이유**: 기존 `shared/ui/FeatureCard`는 라이트/다크 2가지 배경 변형을 제공하지만 인덱스 숫자 요소가 없어 이 패턴을 담을 수 없다. IntroSection 로컬 마크업으로 직접 구현한다.
+About 섹션 순서(본 결정 시점): `PageHeroSection`(`bg-surface-dark`) → `IntroSection` → `TeamSection`(`bg-surface-light`) → `PartnersSection`(당시 `bg-surface-dark`) → `HistorySection`(`bg-surface-white`).
+
+§2 Surface 정의상 Pure White(`#ffffff`)는 "기본 페이지 배경·카드 배경", Light Gray(`#f5f5f7`)는 "정보성 섹션 배경(흰색보다 살짝 따뜻해 무균질함 방지)"이다. `IntroSection`을 `bg-surface-light`로 바꾸면 바로 다음 `TeamSection`도 `bg-surface-light`라 **라이트-라이트 인접**이 생겨 섹션 경계가 흐려진다. `bg-surface-white`를 선택하면 전체 리듬이 `Dark(Hero) → White(Intro) → Light(Team) → Dark(Partners) → White(History)`가 되어 인접한 모든 섹션 쌍이 서로 다른 톤(다크-화이트, 화이트-라이트, 라이트-다크, 다크-화이트)으로 구분된다. 이는 §1 "라이트/다크 섹션 교차로 시네마틱 리듬 구성" 원칙에 더 부합하므로 **`bg-surface-white`를 채택**한다.
+
+> **후속 갱신 안내**: `PartnersSection`의 `bg-surface-dark`는 이후 별도 PR에서 `bg-surface-light`로 전환되었다(아래 "Dual-Row Logo Marquee" 패턴 문서의 "배경 결정" 항목 및 1472번 줄 근처 "섹션 배경 리듬" 노트 참조). 위 리듬 서술은 그 결정 이전 시점의 기록이므로 실제 현재 리듬은 최신 노트를 따른다.
+
+- `SectionHeader`의 `theme`도 `"dark"` → `"light"`로 변경한다(컴포넌트가 자동으로 `text-heading-dark`/`text-body-dark`/레이블 `text-aircok-blue`로 전환).
+
+**비활성 카드 배경/경계 — `bg-surface-white` → `bg-surface-light` 전환 (경계 시인성 문제 해결)**
+
+초기 구현에서 비활성 카드가 섹션과 동일한 `bg-surface-white`를 사용해 `border-2 border-border-light`(연한 회색 보더)만으로 경계를 구분했는데, 흰 배경 위 흰 카드라 보더 대비가 약해 카드 형태가 거의 안 보이는 문제가 있었다. §4 Product Card 라이트 변형과 동일한 관례(라이트 섹션 위 카드는 반대 톤의 라이트 표면)를 따라 **비활성 카드 배경을 `bg-surface-light`로 전환**한다. `bg-surface-white` 섹션 위에 `bg-surface-light`(`#f5f5f7`) 카드가 놓여 배경색 자체로 1차 경계가 생기고, 여기에 기존 `border border-border-light`(1px, 과도한 강조 방지 위해 `border-2`→`border`로 축소)를 더해 2차 경계선을 준다. 별도 그림자는 주지 않는다(§6 Shadow 철학 — 그림자는 극도로 아껴 쓰고 depth는 배경색 차이로 표현).
+
+- 비활성 카드: `bg-surface-light border border-border-light`
+- 비활성 카드 hover: `hover:border-aircok-blue/40`(클릭 가능함을 암시, 기존과 동일하게 유지)
+- 활성 카드: `bg-aircok-blue`(변경 없음) — 이미 섹션 배경과 명확히 대비되는 브랜드 컬러라 경계 문제가 없었음.
+
+**구조 — 카드 스택**
+
+- 컨테이너: `role="region" aria-roledescription="carousel" aria-label="핵심 가치"` 안에 카드 스테이지(`relative w-full overflow-hidden`) + prev/next 버튼. 카드 개수(`n`)가 가변적이므로 `<ul>`/`<li>` 대신 스테이지에 `<button>`들을 직접 절대 배치하는 구조다(시맨틱 리스트가 필요하면 후속 개선 대상이나, 각 카드가 이미 `role` 없는 네이티브 `<button>`으로 포커스 가능하므로 접근성 결손은 없음).
+- 각 카드는 네이티브 `<button type="button">` 자체 — 별도 `<li>` 래퍼 없이 버튼에 절대 위치 스타일(`position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%) translateX() translateY() rotate()`)과 `clipPath`를 인라인 `style`로 직접 지정한다. 카드 크기(`cardW`/`cardH`)가 뷰포트 폭에 따라 JS로 계산되는 동적 값(뷰포트 640px 기준 260px/300px)이라 Tailwind 정적 클래스로 표현할 수 없어 인라인 style을 사용한다({/* token 없음: 카드 폭 계산값이 런타임 분기라 유틸리티 클래스로 대체 불가 */}).
+- 카드 내부 레이아웃(패딩·flex·타이포)은 Tailwind 클래스로, 위치·크기·클리핑만 인라인 style로 분리하는 것이 원칙이다 — 신규 시각 패턴에서도 이 분리를 유지한다.
+
+**노치(notch) clip-path**
+
+카드의 모든 모서리를 대각선으로 잘라내 "정밀하게 재단된" 인상을 준다(브랜드 톤 "정밀함"과 연결). 신규 radius 토큰이 아닌 1회성 지오메트리 값이므로 주석 필수. 실제 구현은 8포인트 폴리곤으로 4개 모서리를 모두 50px 대각 컷하며, 우측 상단 모서리를 가로지르는 대각선 장식(`<span>`)이 추가로 있다(재단 흔적을 시각적으로 강조하는 디테일):
+
+```css
+/* token 없음: 노치 카드 형태 — 4개 모서리 50px 대각 컷, 1회성 지오메트리 값 */
+clip-path: polygon(
+  50px 0%, calc(100% - 50px) 0%, 100% 50px,
+  100% 100%, calc(100% - 50px) 100%, 50px 100%,
+  0 100%, 0 0
+);
+```
+
+- 대각선 장식: 우측 상단 모서리(노치 컷 라인) 위에 겹쳐지는 `absolute` `<span>`, `origin-top-right rotate-45`, 두께 2px, 길이는 노치 정사각형의 대각선(`50px * sqrt(2)`). 색상은 활성 카드 `bg-white/25`, 비활성 카드 `bg-border-light`, `aria-hidden="true"`.
+- Tailwind 임의값 유틸리티 대신 인라인 `style.clipPath`를 사용한다(위 "구조" 항목 참조 — 카드 크기 자체가 동적이라 노치 좌표도 정적 유틸리티 클래스보다 인라인 style이 일관적).
+
+> **구현 주의 (2-레이어 구조 불필요로 확정)**: `clip-path`는 같은 요소의 `box-shadow`도 함께 잘라낸다. 그러나 이 캐러셀은 활성 카드에도 `shadow-product`를 적용하지 않는 방향으로 확정했으므로(아래 "활성/비활성 카드 상태" 참조), 그림자 전용 래퍼로 감싸는 2-레이어 구조는 **불필요하다**. 카드는 단일 `<button>`에 `clipPath` + Tailwind 배경/타이포 클래스를 함께 적용하는 단일 레이어로 충분하다.
+
+**활성/비활성 카드 상태 (`absPos` = 활성 카드로부터의 좌우 거리, 0이 활성. `pos`의 절댓값)**
+
+카드 개수(`n`)가 어드민 CRUD로 가변적이라 `absPos`가 3을 초과할 수 있다. **`absPos >= 3`은 모두 아래 표의 `absPos 3` 행 값으로 클램프**하고, **`absPos >= 4`인 카드는 렌더링하되 시각적으로 사실상 사라지는 `opacity-0`으로 처리**해 카드 수가 많아져도 스택이 무한히 넓어지거나 화면 밖으로 카드가 튀어나가지 않도록 한다(DOM에는 유지 — 순환 시 트랜지션이 끊기지 않게 하기 위함).
+
+| absPos | translateX | translateY / rotate | scale | opacity | z-index | shadow |
+|---|---|---|---|---|---|---|
+| 0 (활성) | `0` | `-20px` / `0deg` | `100%` | `100%` | `n`(최상단) | 없음 |
+| 1 | `±hStep`(1칸) | `∓15px` / `∓2.5deg` | `95%` | `75%` | `n-1` | 없음 |
+| 2 | `±hStep×2` | `∓15px` / `∓2.5deg` | `88%` | `55%` | `n-2` | 없음 |
+| 3 (클램프 하한) | `±hStep×3` | `∓15px` / `∓2.5deg` | `80%` | `35%` | `n-3` | 없음 |
+| 4 이상 | 3과 동일 위치 유지 | 3과 동일 | 3과 동일 | `0`(사실상 숨김) | `n-absPos` | 없음 |
+
+- `hStep`은 기존 구현값(`cardW / 1.5`)을 유지하는 런타임 계산값이므로 Tailwind 정적 클래스가 아닌 인라인 style로 유지한다({/* token 없음: hStep이 cardW(런타임 분기값)에서 파생되는 계산값 */}).
+- translateY/rotate 부호는 홀짝 지그재그(`pos % 2 !== 0`)로 갈라지는 기존 구현을 유지한다 — 카드가 완전히 일직선으로 겹치지 않고 계단식으로 흩어지는 인상을 준다.
+- scale/opacity는 Tailwind 정적 클래스(`scale-100`/`scale-95`/`opacity-100`/`opacity-75` 등)가 아닌 인라인 style 수치로 관리한다 — `pos`가 좌우 대칭이라 절댓값 계산(`absPos`)을 거쳐야 하고, 클램프 로직도 함께 있어 정적 클래스 매핑보다 인라인 계산이 실제 구현과 일치한다.
+- **shadow 미적용으로 확정**: 활성 카드가 이미 `bg-aircok-blue` 솔리드 배경으로 섹션과 명확히 구분되고, 카드가 여러 장(가변 `n`) 겹치는 구조에서 그림자까지 추가하면 노치 클리핑과 결합해 시각적으로 번잡해진다. §6 Shadow 철학("그림자는 극도로 아껴 쓴다")에 따라 **depth 신호는 scale·opacity·z-index만 사용**하고 shadow는 이 컴포넌트에서 사용하지 않는다(design.md 초안의 `shadow-product` 적용 계획은 폐기).
+
+**호버 상태 (비활성 카드)**
+
+비활성 카드에 마우스를 올리면 클릭 가능함을 암시하도록 보더 색상만 전환한다(배경 전환에 따라 opacity/scale 호버 강조 대신 보더로 단순화):
+
+- 비활성 카드 hover: `hover:border-aircok-blue/40`
+- 활성 카드(`absPos 0`)는 `cursor-default`로 클릭 불필요를 표시하며 hover 스타일이 없다.
+
+**카드 콘텐츠 (인덱스 숫자 계승 + 활성/비활성 대비 강화)**
+
+기존 Value Highlight Card의 대형 솔리드 인덱스 숫자 정체성을 계승한다. 아이콘(lucide-react)은 가치 각각에 정확히 대응하는 은유가 매번 확보되지 않을 수 있어 기본값으로 채택하지 않는다 — 이미 확립된 인덱스 숫자 시그니처를 우선한다.
+
+- **인덱스 숫자**: `select-none font-display text-5xl font-bold leading-none tracking-[-0.3px]` — 비활성 `text-aircok-blue`(계승, 유지 필수), 활성 `text-white/40`(기존 `text-white/50`보다 낮춰 제목과의 밀도 대비를 키움 — 활성 카드에서는 숫자가 배경 텍스처처럼 물러나고 제목이 전면에 나서도록).
+- **제목**: `font-display text-xl font-bold leading-[1.19] [word-break:keep-all]` — 비활성 `text-heading-dark`, 활성 `text-white`.
+- **설명**: `text-[15px] leading-[1.65] [word-break:keep-all]` — 비활성 `text-body-dark`, 활성 `text-white/80`.
+- **활성/비활성 spacing 차등**: 비활성 카드는 인덱스 숫자와 텍스트 블록 사이 `gap-5`(기존과 동일, 축소해 보조 정보임을 암시)를, 활성 카드는 `gap-6`으로 한 단계 넓혀 활성 카드의 콘텐츠가 더 여유 있게 "숨 쉬는" 인상을 준다({/* token 없음: 활성/비활성 gap 차등값, §5 Spacing System 4px 그리드 내 임의 선택 */}). 카드 최상단 패딩은 기존 `p-8` 유지.
+
+**인터랙션 — 순환 로직**
+
+- 카드 순서는 `list: number[]`(값의 인덱스 배열, 회전 배열) 상태로 관리한다. 활성 인덱스는 항상 `Math.floor(n / 2)`에 고정되어 있고(리스트 자체가 회전하는 방식), `pos = listIndex - Math.floor(n / 2)`로 각 카드의 좌우 상대 위치를 구한다.
+- **카드 클릭**: 클릭된 카드의 `pos`만큼 `move(steps)`로 배열을 회전시켜 해당 카드가 `Math.floor(n/2)` 위치(활성)로 오게 한다.
+- **다음 버튼**: `move(1)` — 배열을 왼쪽으로 1칸 회전, 활성 카드가 좌측으로 물러나고 우측 카드가 새로 활성화.
+- **이전 버튼**: `move(-1)` — 배열을 오른쪽으로 1칸 회전, 좌측 카드가 새로 활성화.
+- **자동재생**: `AUTOPLAY_INTERVAL = 5000`ms마다 `move(1)`, hover/focus 중이거나 `prefers-reduced-motion`이면 일시정지. 수동 조작(`handleManualMove`) 시 `resetKey`를 증가시켜 자동재생 타이머를 리셋한다.
+- transition: 카드 자체는 인라인 `style.transition = 'all 500ms ease-in-out'`(Tailwind `transition-all duration-500 ease-out`과 이징 곡선만 다름 — `ease-in-out`으로 유지, 위치·회전·스케일이 동시에 바뀌는 절대 위치 배치라 인라인 style 그룹과 함께 관리하는 것이 일관적이므로 Tailwind 클래스로 옮기지 않음), 버튼 hover는 `transition-colors duration-200`. 이 프로젝트에 별도 duration 토큰이 없으므로 Tailwind 기본 `duration-200`을 그대로 사용한다(신규 토큰 불필요).
+
+**prev/next 버튼**
 
 ```tsx
-// Value Highlight Card — About IntroSection (로컬 마크업)
-// 섹션 배경 변경: bg-surface-white → bg-surface-dark
-<section className="bg-surface-dark py-24">
+<button
+  type="button"
+  aria-label="이전 가치 보기"
+  className="flex h-11 w-11 items-center justify-center rounded-pill border border-border-light bg-surface-white text-aircok-blue transition-colors duration-200 hover:bg-aircok-blue hover:text-white active:scale-[0.97] focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:ring-offset-2"
+>
+  <ChevronLeft className="h-5 w-5" aria-hidden="true" />
+</button>
+```
+
+- `h-11 w-11`(44px)로 §4 CTA 버튼과 동일한 최소 터치 타깃 유지.
+- `active:scale-[0.97]`은 §4 Buttons의 CTA 버튼과 동일한 클릭 피드백 컨벤션이며, 이 프로젝트 전역 버튼 규약이므로 prev/next 버튼에도 동일하게 적용한다.
+- 아이콘: `lucide-react`의 `ChevronLeft`/`ChevronRight`. 다음 버튼은 `aria-label="다음 가치 보기"`로 동일 스타일.
+
+**반응형 — 모바일 폴백: 비활성 카드 숨김(스와이프 아님)**
+
+터치 스와이프 제스처는 이 프로젝트에 선례가 없고 별도 제스처 라이브러리 없이 정확히 구현하기 어렵다. 따라서 모바일(`sm` 미만, 640px)에서는 **겹침 스택을 접고 활성 카드 1장만 노출**하며, 데스크탑과 동일한 prev/next 버튼 클릭으로 순환한다(제스처 없음, 인터랙션 방식 통일).
+
+- `sm` 미만: `!isActive`(즉 `absPos > 0`)인 카드 버튼에 `hidden sm:flex`를 적용해 비활성 카드를 렌더링에서 숨긴다. 활성 카드만 남아 스테이지(`relative w-full overflow-hidden`, 높이는 `cardH + 60`) 중앙에 보인다.
+- `sm` 이상: `hidden sm:flex`가 해제되며 위 표의 계단식 스택이 클램프 범위 내에서 모두 노출된다.
+
+**접근성**
+
+- 컨테이너: `role="region" aria-roledescription="carousel" aria-label="에어콕 핵심 가치"`.
+- 카드: 시맨틱 `<ul>`/`<li>` 리스트 래퍼 없이, 스테이지 안에 네이티브 `<button type="button">`을 절대 위치로 직접 배치한다(위 "구조" 항목 참조 — 카드 크기가 런타임 계산값이라 리스트 마크업보다 버튼 직접 배치가 실제 구현과 일치). 네이티브 `<button>`이므로 Tab 이동·Enter/Space 활성화는 별도 핸들러 없이 동작.
+- 활성 카드 버튼에 `aria-current="true"` 부여, 비활성 카드 버튼에는 `aria-label="{제목} 카드로 이동"`을 부여해 시각 정보 없이도 어느 카드로 이동하는지 알 수 있게 한다(활성 카드는 `aria-label` 생략, 이미 보이는 콘텐츠와 `aria-current`로 충분).
+- 순서 변경을 스크린리더에 알리는 시각적으로 숨겨진 라이브 리전: `<p className="sr-only" aria-live="polite">{활성 값 제목} 카드 표시 중</p>`.
+- 카드 버튼: Tab으로 순환 가능한 모든 비활성 카드도 포커스 대상이므로 `focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:ring-offset-2` 포커스 링을 카드 버튼에도 동일하게 적용한다(이 프로젝트 전역 버튼 Focus 규칙과 동일한 컨벤션).
+- prev/next 버튼: `aria-label="이전 가치 보기"`/`aria-label="다음 가치 보기"` 필수, `focus-visible:ring-2 focus-visible:ring-aircok-blue` 포커스 링 유지(Primary Blue 버튼 Focus 규칙과 동일).
+- 인덱스 숫자는 장식(식별자)이므로 `aria-hidden="true"` 유지 — 의미 정보는 제목 텍스트가 전달한다.
+- 자동재생 캐러셀 표준 접근성: `prefers-reduced-motion` 감지 시 자동재생 정지, 컨테이너 `onMouseEnter`/`onMouseLeave`/`onFocus`/`onBlur`로 hover/focus 중 자동재생 일시정지.
+
+**컴포넌트 위치 — 로컬 마크업 (`views/about/ui`)**
+
+현재 이 패턴을 사용하는 곳은 About `IntroSection` 1곳뿐이다. `shared/ui` 분리 기준(2~3곳 이상 반복/반복 예상)을 아직 충족하지 않으므로, `src/views/about/ui/ValueCardStack.tsx`에 로컬 구현하고 `IntroSection.tsx`에서 조합한다. 추후 다른 페이지(제품 상세 특징 비교, 도입 사례 캐러셀 등)에서 동일한 스택+노치+순환 패턴이 반복되면 그때 `shared/ui`로 승격한다.
+
+```tsx
+// Staggered Notched Value Card Carousel — About IntroSection
+// 실제 구현: src/views/about/ui/ValueCardStack.tsx (스타일 갱신 반영 예시, 자동재생/reduced-motion 로직은 생략)
+'use client'
+
+import { useState, useCallback } from 'react'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
+
+// token 없음: 노치 카드 형태 — 4개 모서리 50px 대각 컷, 1회성 지오메트리 값
+const NOTCH = 50
+const NOTCH_DIAGONAL = Math.sqrt(NOTCH * NOTCH * 2)
+const CLIP_PATH = `polygon(${NOTCH}px 0%, calc(100% - ${NOTCH}px) 0%, 100% ${NOTCH}px, 100% 100%, calc(100% - ${NOTCH}px) 100%, ${NOTCH}px 100%, 0 100%, 0 0)`
+
+// absPos(0~3+, 0이 활성)별 scale/opacity — 3 초과는 3의 위치를 유지한 채 opacity만 0으로 클램프
+const SCALE_BY_ABS_POS = [1, 0.95, 0.88, 0.8]
+const OPACITY_BY_ABS_POS = [1, 0.75, 0.55, 0.35]
+const clamp3 = (absPos: number) => Math.min(absPos, 3)
+
+export function ValueCardStack({ values }: { values: readonly { title: string; description: string }[] }) {
+  const [list, setList] = useState(() => values.map((_, i) => i))
+  const n = list.length
+  const activeIndex = Math.floor(n / 2)
+  const cardW = 300
+  const cardH = Math.round(cardW * 1.3)
+  const hStep = Math.round(cardW / 1.5)
+
+  const move = useCallback((steps: number) => {
+    setList(prev => {
+      const next = [...prev]
+      if (steps > 0) for (let i = 0; i < steps; i++) next.push(next.shift()!)
+      else for (let i = 0; i < -steps; i++) next.unshift(next.pop()!)
+      return next
+    })
+  }, [])
+
+  return (
+    <div role="region" aria-roledescription="carousel" aria-label="에어콕 핵심 가치" className="flex flex-col items-center gap-8">
+      <p className="sr-only" aria-live="polite">{values[list[activeIndex]].title} 카드 표시 중</p>
+      <div className="relative w-full overflow-hidden" style={{ height: cardH + 60 }}>
+        {list.map((valueIndex, listIndex) => {
+          const pos = listIndex - activeIndex
+          const isActive = pos === 0
+          const absPos = clamp3(Math.abs(pos))
+          const isZigzagOdd = pos % 2 !== 0
+
+          return (
+            <button
+              key={valueIndex}
+              type="button"
+              onClick={() => move(pos)}
+              aria-current={isActive ? 'true' : undefined}
+              aria-label={isActive ? undefined : `${values[valueIndex].title} 카드로 이동`}
+              style={{
+                width: cardW,
+                height: cardH,
+                clipPath: CLIP_PATH,
+                position: 'absolute',
+                left: '50%',
+                top: '50%',
+                zIndex: n - Math.abs(pos),
+                opacity: Math.abs(pos) > 3 ? 0 : OPACITY_BY_ABS_POS[absPos],
+                transform: `
+                  translate(-50%, -50%)
+                  translateX(${hStep * (pos > 3 ? 3 : pos < -3 ? -3 : pos)}px)
+                  translateY(${isActive ? -20 : isZigzagOdd ? 15 : -15}px)
+                  rotate(${isActive ? 0 : isZigzagOdd ? 2.5 : -2.5}deg)
+                  scale(${SCALE_BY_ABS_POS[absPos]})
+                `,
+                transition: 'all 500ms ease-in-out',
+              }}
+              className={[
+                isActive ? 'gap-6' : 'gap-5',
+                'flex flex-col p-8 text-left',
+                'focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:ring-offset-2',
+                isActive
+                  ? 'bg-aircok-blue cursor-default'
+                  : 'bg-surface-light border border-border-light hover:border-aircok-blue/40 cursor-pointer',
+                !isActive ? 'hidden sm:flex' : 'flex',
+              ].join(' ')}
+            >
+              {/* 노치 모서리를 가로지르는 장식선 */}
+              <span
+                aria-hidden="true"
+                className={`absolute block origin-top-right rotate-45 ${isActive ? 'bg-white/25' : 'bg-border-light'}`}
+                style={{ right: -2, top: NOTCH - 2, width: NOTCH_DIAGONAL, height: 2 }}
+              />
+              <span
+                aria-hidden="true"
+                className={`select-none font-display text-5xl font-bold leading-none tracking-[-0.3px] ${isActive ? 'text-white/40' : 'text-aircok-blue'}`}
+              >
+                {String(valueIndex + 1).padStart(2, '0')}
+              </span>
+              <div className="flex flex-col gap-3">
+                <h3 className={`font-display text-xl font-bold leading-[1.19] [word-break:keep-all] ${isActive ? 'text-white' : 'text-heading-dark'}`}>
+                  {values[valueIndex].title}
+                </h3>
+                <p className={`text-[15px] leading-[1.65] [word-break:keep-all] ${isActive ? 'text-white/80' : 'text-body-dark'}`}>
+                  {values[valueIndex].description}
+                </p>
+              </div>
+            </button>
+          )
+        })}
+      </div>
+      <div className="flex items-center justify-center gap-3">
+        <button type="button" aria-label="이전 가치 보기" onClick={() => move(-1)} className="flex h-11 w-11 items-center justify-center rounded-pill border border-border-light bg-surface-white text-aircok-blue transition-colors duration-200 hover:bg-aircok-blue hover:text-white active:scale-[0.97] focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:ring-offset-2">
+          <ChevronLeft className="h-5 w-5" aria-hidden="true" />
+        </button>
+        <button type="button" aria-label="다음 가치 보기" onClick={() => move(1)} className="flex h-11 w-11 items-center justify-center rounded-pill border border-border-light bg-surface-white text-aircok-blue transition-colors duration-200 hover:bg-aircok-blue hover:text-white active:scale-[0.97] focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:ring-offset-2">
+          <ChevronRight className="h-5 w-5" aria-hidden="true" />
+        </button>
+      </div>
+    </div>
+  )
+}
+
+// IntroSection.tsx 조합 지점 (섹션 배경 bg-surface-dark → bg-surface-white, SectionHeader theme="dark" → "light")
+<section className="bg-surface-white py-24">
   <div className="content-container flex flex-col gap-14">
     <SectionHeader
       label={SITE.about.intro.label}
       title={SITE.about.intro.title}
       body={SITE.about.intro.body}
-      theme="dark"
+      theme="light"
       maxWidth="max-w-[760px]"
     />
-    <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-      {SITE.about.intro.values.map((value, index) => (
-        <li
-          key={value.title}
-          className="flex flex-col gap-5 rounded-xl bg-surface-dark-1 p-8 transition-colors duration-200 hover:bg-surface-dark-2"
-        >
-          {/* 인덱스 숫자: 순서 식별자(sequence 아님) — STEP 레이블 없음 */}
-          <span
-            aria-hidden="true"
-            className="font-display font-bold text-5xl leading-none tracking-[-0.3px] text-aircok-blue select-none"
-          >
-            {String(index + 1).padStart(2, '0')}
-          </span>
-          <div className="flex flex-col gap-3">
-            <h3 className="text-subheading font-bold font-display text-heading-light leading-[1.19] [word-break:keep-all]">
-              {value.title}
-            </h3>
-            <p className="text-[17px] text-body-light leading-[1.65] [word-break:keep-all]">
-              {value.description}
-            </p>
-          </div>
-        </li>
-      ))}
-    </ul>
+    <ValueCardStack values={coreValues} />
   </div>
 </section>
 ```
 
-> **섹션 배경 리듬 주의**: IntroSection이 `bg-surface-dark`로 바뀌면 전후 섹션(`PageHero`도 `bg-surface-dark`)과 연속 다크 구간이 생길 수 있다. About 페이지 전체 섹션 순서를 확인해 라이트↔다크 교차 리듬을 유지한다. IntroSection 직후에 라이트 섹션(팀, 연혁 등)이 이어질 경우 자연스러운 전환이 된다.
+> **그림자 미적용 확정 배경**: 이전 초안은 활성 카드에 `shadow-product`를 적용하기 위해 그림자 전용 래퍼(clip 없음) + 내부 clip 레이어의 2-레이어 구조를 전제했다. 실제로는 활성 카드가 `bg-aircok-blue` 솔리드 배경만으로 충분히 두드러지고, 가변 개수 카드가 겹치는 스택에 그림자까지 더하면 시각적으로 번잡해진다고 판단해 **shadow를 아예 쓰지 않는 방향으로 확정**했다. 따라서 2-레이어 구조도 필요 없어졌고, 카드는 단일 `<button>` 레이어로 유지한다.
+
+> **섹션 배경 리듬 (갱신: `PartnersSection` 다크→라이트 전환 이후)**: `PageHeroSection`(다크) → `IntroSection`(`bg-surface-white`) → `TeamSection`(`bg-surface-light`) → `PartnersSection`(`bg-surface-light`) → `HistorySection`(`bg-surface-white`). `PartnersSection`이 다크에서 라이트로 전환되면서 `TeamSection`-`PartnersSection` 인접 구간이 라이트-라이트 연속이 된다(트레이드오프 상세는 아래 "Dual-Row Logo Marquee" 패턴 문서의 "배경 결정" 항목 참조). 이 한 구간을 제외하면 나머지 인접 쌍(다크-화이트, 라이트-화이트)은 여전히 서로 다른 톤이며, 라이트-라이트 연속 구간은 `border-t border-border-light` 구분선으로 경계를 보완한다. About 페이지 섹션이 재배치되거나 신규 섹션이 삽입되면 이 리듬을 다시 검토한다.
+
+### Dual-Row Logo Marquee (2줄 반대 방향 로고 마퀴) — About PartnersSection
+
+파트너/협력사 로고가 많아 정적 그리드로는 한 화면에 다 담기 어려울 때, 로고를 2줄로 나눠 각 줄이 반대 방향으로 끊김 없이 무한 스크롤되는 패턴. `About PartnersSection`에서 사용(실 데이터 17개). 신규 색상 토큰 없음 — 기존 표면·보더 토큰만 재활용. 신규 애니메이션 토큰(`--animate-marquee-left`/`-right`)만 `app/globals.css`에 추가.
+
+**트리거 기준 — 10개 초과**
+
+- 파트너 로고 개수 `n <= 10`: 기존 정적 그리드(`grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4`)를 그대로 유지한다. 로고가 적을 때 억지로 마퀴를 돌리면 스크롤할 콘텐츠가 부족해 부자연스럽게 반복되거나 지나치게 빨리 순환한다.
+- `n > 10`: 이 마퀴 패턴으로 전환한다. 17개 기준 각 줄 8~9개면 한 줄의 실제 콘텐츠 폭이 충분히 확보되어 자연스러운 순환 속도가 나온다.
+
+**배경 결정 — `bg-surface-dark` → `bg-surface-light` (근거)**
+
+About 섹션 순서: `PageHeroSection`(다크) → `IntroSection`(`bg-surface-white`) → `TeamSection`(`bg-surface-light`) → `PartnersSection`(전환 전 다크) → `HistorySection`(`bg-surface-white`).
+
+§1 "라이트/다크 섹션 교차로 시네마틱 리듬 구성" 원칙상 어느 라이트 톤을 선택해도 인접 톤 1쌍은 반드시 동일해진다(트레이드오프가 대칭적):
+
+| 선택 | Team↔Partners | Partners↔History | 동일톤 인접 개수 |
+|---|---|---|---|
+| `bg-surface-light` | light-light (동일) | light-white (구분됨) | 1쌍 |
+| `bg-surface-white` | light-white (구분됨) | white-white (동일) | 1쌍 |
+
+동일 개수의 트레이드오프이므로 **로고 타일 구현 비용과 기존 톤 유지 관성**을 2차 기준으로 판단한다:
+
+- `bg-surface-light` 선택 시: 로고 타일은 기존 `bg-surface-white`를 그대로 유지할 수 있다 — light(`#f5f5f7`) 섹션 위 white(`#ffffff`) 타일은 색상 차이가 존재해 최소한의 자체 구분이 가능하고(§2 Surface 정의상 두 토큰이 애초에 "약간의 명도차를 위해 분리된" 토큰), 로고 배경 로직을 새로 설계할 필요가 없다.
+- `bg-surface-white` 선택 시: 로고 타일에 `bg-surface-white`를 쓰면 섹션과 완전히 같은 색이 되어(§4 Product Card 라이트 변형과 동일 문제, `ValueCardStack` 비활성 카드 선례 참조) 타일 배경을 `bg-surface-light`로 새로 바꿔야 한다. 그러나 흰 배경 PNG 로고가 아니라 investor deck 스타일의 투명 배경 로고는 순수 백색 위에서 가장 선명하게 보이는 경우가 많아, 타일을 light로 바꾸면 로고 자체의 시인성이 오히려 떨어질 위험이 있다.
+
+두 조건을 종합해 **`bg-surface-light`를 채택**한다 — 유일한 동일톤 인접(Team↔Partners)은 아래 "완화 장치"로 보완하고, 로고 타일은 기존 `bg-surface-white`를 유지해 로고 시인성 손실 없이 구현 비용도 최소화한다.
+
+- `SectionHeader`의 `theme`을 `"dark"` → `"light"`로 변경한다(컴포넌트가 자동으로 `text-heading-dark`/`text-body-dark`/레이블 `text-aircok-blue`로 전환).
+- 섹션 배경: `bg-surface-light`.
+
+**완화 장치 — Team↔Partners 라이트-라이트 인접 경계 보완**
+
+두 라이트 섹션이 연속되며 흐려지는 경계를 `border-t border-border-light` 구분선으로 보완한다. 이는 신규 패턴이 아니라 §4 "Bottom CTA Section"에서 이미 쓰인 `bg-surface-light border-t border-border-light` 조합(위 참조)을 그대로 재사용하는 것이다 — 신규 토큰·신규 클래스 없음.
+
+- `PartnersSection` 섹션 루트: `bg-surface-light border-t border-border-light`.
+
+**로고 타일 배경 재검토 — `bg-surface-white` 유지 (근거)**
+
+섹션 배경이 `bg-surface-light`(`#f5f5f7`)로 바뀌므로, 로고 타일이 기존과 동일한 `bg-surface-white`(`#ffffff`)를 쓰면 두 표면 토큰 사이에 실제 명도차가 존재해(§2 Surface 정의상 Light Gray는 애초에 "흰색보다 살짝 따뜻해 무균질함 방지"용으로 분리된 토큰) `ValueCardStack`이 겪었던 "동일 색 섹션 위 동일 색 카드"와 같은 문제는 발생하지 않는다. 다만 `#f5f5f7`과 `#ffffff`의 명도차는 미세하므로, 안전장치로 얇은 보더를 추가해 타일 경계를 명시적으로 보강한다.
+
+- 로고 타일(로고 있음): `bg-surface-white border border-border-light` (기존 `bg-surface-white`에 `border border-border-light` 추가, 그 외 레이아웃 클래스는 기존 유지).
+- 로고 타일(로고 없음, 이름 칩 폴백): 다크 배경 전용이었던 `bg-overlay-white-10`을 라이트 배경에 그대로 쓰면 거의 보이지 않으므로 `bg-surface-white border border-border-light`로 통일하고, 텍스트 색상도 `text-body-light`/`text-heading-dark` 다크 대응 색상으로 전환한다(§2 Surface 정의상 `overlay-white-10`은 다크 표면 전용 오버레이 토큰).
+
+**hover 시 파트너명 오버레이 (정보 보강)**
+
+로고만으로는 회사명을 알 수 없는 사용자를 위해, 타일에 `group` hover 시 로고(또는 이름 칩)가 옅어지며(`group-hover:opacity-30`/`group-hover:opacity-0`) 중앙에 `absolute inset-0` 오버레이로 파트너명(`text-xs font-semibold text-heading-dark`)이 `opacity-0 → group-hover:opacity-100`으로 나타나는 전환을 추가한다(`transition-opacity duration-200`, 다른 hover 전환과 동일 duration). 로고 유무 타일 모두 동일 오버레이 구조를 공유한다.
+
+**구조 — 2줄 분배 + 무한 루프**
+
+- **줄 분배 방식**: 짝수/홀수 인덱스 분배(`partners.filter((_, i) => i % 2 === 0)` / `i % 2 === 1`)를 채택한다. 앞/뒤 절반 분할(`slice(0, n/2)` / `slice(n/2)`)은 로고 목록이 등록 순서(예: 계약 시점)로 정렬되어 있을 때 한 줄에 특정 시기 파트너만 몰릴 수 있는 반면, 짝/홀 분배는 원본 순서상의 다양성을 두 줄에 고르게 섞어 각 줄이 비슷한 밀도·다양성을 갖게 한다.
+- **무한 루프 기법**: 각 줄의 로고 배열을 정확히 2배로 복제해 이어붙인 뒤(`[...rowLogos, ...rowLogos]`), 컨테이너를 `flex w-max` + `overflow-hidden` 부모로 감싸고, `translateX`로 전체 콘텐츠 폭의 정확히 50%(= 원본 로고 세트 1회분 폭)만큼 이동시켜 리셋한다. 원본과 복제본이 완전히 동일하므로 50% 이동 지점에서 시각적으로 끊김이 없다(표준 CSS marquee 기법). 두 로고 세트 폭이 정확히 같아야 하므로(반응형 로고 크기 변화와 무관하게 항상 원본=복제본), 복제는 반드시 동일한 배열을 그대로 재사용해야 한다(별도 계산·가공 없이 `[...rowLogos, ...rowLogos]`).
+- **keyframes**: `app/globals.css`의 `@theme inline` 블록에 애니메이션 토큰으로 등록해 Tailwind가 `animate-marquee-left`/`animate-marquee-right` 유틸리티 클래스를 자동 생성하게 한다(Tailwind v4 관례 — 임의값 `animate-[...]` 대신 재사용 가능한 이름 있는 유틸리티로 등록). `@keyframes` 자체는 `@theme inline` 블록 밖, 파일 하단 `@layer utilities` 옆에 정의한다.
+
+```css
+/* app/globals.css — @theme inline 블록 안 */
+--animate-marquee-left:  marquee-left 40s linear infinite;
+--animate-marquee-right: marquee-right 40s linear infinite;
+
+/* app/globals.css — @theme inline 블록 밖, 최상위 */
+@keyframes marquee-left {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+@keyframes marquee-right {
+  from { transform: translateX(-50%); }
+  to   { transform: translateX(0); }
+}
+```
+
+- **방향**: 첫 번째 줄(짝수 인덱스) = 왼쪽→오른쪽 이동(`animate-marquee-right`, 시작 위치가 이미 -50%인 상태에서 0%로 이동하므로 시각적으로 좌→우), 두 번째 줄(홀수 인덱스) = 오른쪽→왼쪽 이동(`animate-marquee-left`, 0%에서 -50%로 이동하므로 시각적으로 우→좌). 두 줄이 반대 방향으로 흘러야 시각적 리듬이 단조롭지 않다.
+- **duration — 40s**: 일반적인 로고 마퀴 관례상 40~60s 범위가 "읽을 수 있을 만큼 느리되 지루하지 않을 만큼 빠른" 절충점이다. 이 프로젝트는 한 줄당 로고 8~9개(복제 전 기준)로 개수가 많지 않은 편이라 범위의 하단인 **40s**를 채택한다(로고가 훨씬 많아지면 후속 조정 시 60s 쪽으로 늘리는 것을 검토). 두 줄 모두 동일 40s를 사용해 속도 차로 인한 산만함을 피한다.
+
+**모션 접근성 — `prefers-reduced-motion: reduce`**
+
+`ValueCardStack` 자동재생과 동일한 원칙(모션 최소화 선호 시 애니메이션 정지)을 따르되, 이 패턴은 순수 CSS 애니메이션이라 JS `matchMedia` 감지 대신 CSS `@media (prefers-reduced-motion: reduce)` 쿼리로 직접 처리한다(메커니즘은 다르나 "정지" 라는 최종 동작은 동일).
+
+```css
+/* app/globals.css */
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee-left,
+  .animate-marquee-right {
+    animation: none;
+  }
+}
+```
+
+- 애니메이션이 정지되면 두 줄 모두 첫 로고 세트가 정적으로 보이는 상태로 폴백된다(복제본은 화면 밖에 고정되어 남아있으나 시각적으로 문제없음 — `overflow-hidden` 부모가 잘라낸다).
+
+**hover 시 일시정지**
+
+마우스를 올린 동안 로고를 자세히 볼 수 있도록 각 줄에 hover 일시정지를 추가한다. Tailwind 임의값 variant로 표현한다.
+
+- 각 줄 컨테이너: `hover:[animation-play-state:paused]`.
+
+**로고 이미지 크롭 방지**
+
+현재 코드(`max-h-10 w-auto object-contain`)는 높이만 제한하고 폭 제한이 없어, 가로로 긴 로고가 타일 폭을 넘기면 부모의 `overflow-hidden`에 잘릴 수 있다. 폭도 함께 제한해 원본 비율을 유지한 채 타일 안에 완전히 들어오게 한다.
+
+- 로고 이미지: `max-h-10 max-w-full w-auto object-contain`(기존 클래스에 `max-w-full` 추가). 이 수정은 마퀴 전환 여부와 무관하게 기존 정적 그리드 경로에도 동일하게 적용한다(정적 그리드에서도 동일한 크롭 버그가 존재하므로).
+
+**타일 고정폭 분리 — `LogoTile`은 `w-full`, 고정폭은 마퀴 래퍼가 담당 (근거)**
+
+`LogoTile`은 정적 그리드(`<li>` grid item)와 마퀴(`flex` 자식) 양쪽에서 공유되는데, 두 경로가 요구하는 폭 성질이 다르다:
+
+- 마퀴 경로: `flex` 부모 안에서 각 로고가 항상 동일한 고정폭이어야 두 배 복제본이 정확히 50% 지점에서 이어붙는다(위 "무한 루프 기법" 참조) — 고정폭 필수.
+- 정적 그리드 경로: 그리드 컬럼 폭은 `grid-cols-2 sm:grid-cols-3 lg:grid-cols-4`로 컨테이너 폭에 따라 가변적이다(`content-container` 기준 1200px 근방에서 4열 셀 폭 약 277px, 375px 모바일 2열에서도 약 160px 근접~초과). `LogoTile`이 `w-40`(160px) 고정폭을 가지면 셀이 더 넓은 대부분의 뷰포트에서 타일이 셀 좌측에 붙고 우측에 불균형한 빈 공간이 남는다 — 고정폭이 오히려 문제.
+
+따라서 **`LogoTile` 자체는 고정폭을 갖지 않고 `w-full`로 부모 폭을 그대로 채운다.** 고정폭이 필요한 마퀴 경로에서만 `LogoMarqueeRow`가 각 타일을 `<div className="w-40 shrink-0">` 래퍼로 감싸 폭을 지정한다. 정적 그리드는 `<li>`가 grid item이므로 별도 래퍼 없이 `LogoTile`의 `w-full`이 셀 폭을 그대로 채운다.
+
+- `LogoTile` 래퍼: `h-20 w-full`(기존 `h-20 w-40 shrink-0`에서 폭 고정 제거).
+- `LogoMarqueeRow`의 `doubled.map` 렌더링: 각 항목을 `<div key={...} className="w-40 shrink-0"><LogoTile partner={partner} /></div>`로 감싼다(`key`는 이 래퍼로 이동).
+- 정적 그리드의 `<li key={partner.id}><LogoTile partner={partner} /></li>`는 변경 없음 — 래퍼 불필요.
+
+**컴포넌트 위치 — 로컬 마크업 (`views/about/ui`)**
+
+현재 이 패턴을 사용하는 곳은 About `PartnersSection` 1곳뿐이다. `ValueCardStack`과 동일한 `shared/ui` 분리 기준(2~3곳 이상 반복/반복 예상)을 아직 충족하지 않으므로, `src/views/about/ui/PartnersSection.tsx`에 로컬로 구현한다(마퀴 로직이 복잡해지면 `src/views/about/ui/PartnerLogoMarquee.tsx` 같은 로컬 하위 컴포넌트로 분리해도 되나, 여전히 `views/about/ui` 안에 둔다). 추후 다른 페이지(예: 고객사 로고, 인증 마크 나열)에서 동일한 2줄 반대 방향 마퀴가 반복되면 그때 `shared/ui`로 승격한다.
+
+```tsx
+// Dual-Row Logo Marquee — About PartnersSection 구현 예시
+// 실제 구현: src/views/about/ui/PartnersSection.tsx
+
+const MARQUEE_THRESHOLD = 10
+
+// LogoTile은 고정폭을 갖지 않는다(w-full) — 정적 그리드/마퀴 양쪽에서 공유되며,
+// 고정폭이 필요한 마퀴 경로는 LogoMarqueeRow가 래퍼로 폭을 지정한다(위 "타일 고정폭 분리" 참조).
+function LogoTile({ partner }: { partner: Partner }) {
+  return partner.logoUrl ? (
+    <div className="relative flex h-20 w-full items-center justify-center overflow-hidden rounded-lg bg-surface-white border border-border-light px-6">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={resolveLogoSrc(partner.logoUrl)}
+        alt={partner.name}
+        width={128}
+        height={56}
+        loading="lazy"
+        className="max-h-10 max-w-full w-auto object-contain"
+      />
+    </div>
+  ) : (
+    <div className="relative flex h-20 w-full items-center justify-center overflow-hidden rounded-lg bg-surface-white border border-border-light px-6 text-center">
+      <span className="text-sm text-body-dark [word-break:keep-all]">{partner.name}</span>
+    </div>
+  )
+}
+
+function LogoMarqueeRow({ partners, direction }: { partners: Partner[]; direction: 'left' | 'right' }) {
+  const doubled = [...partners, ...partners]
+  return (
+    <div className="overflow-hidden">
+      <div
+        className={`flex w-max gap-4 ${direction === 'left' ? 'animate-marquee-left' : 'animate-marquee-right'} hover:[animation-play-state:paused]`}
+      >
+        {doubled.map((partner, i) => (
+          // 마퀴 경로에서만 고정폭 래퍼로 감싼다 — LogoTile 자체는 w-full
+          <div key={`${partner.id}-${i}`} className="w-40 shrink-0">
+            <LogoTile partner={partner} />
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// PartnersSection 조합 지점
+{partners.length > MARQUEE_THRESHOLD ? (
+  <div className="flex flex-col gap-4">
+    <LogoMarqueeRow partners={partners.filter((_, i) => i % 2 === 0)} direction="right" />
+    <LogoMarqueeRow partners={partners.filter((_, i) => i % 2 === 1)} direction="left" />
+  </div>
+) : (
+  <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+    {/* 기존 정적 그리드, LogoTile 재사용 — 래퍼 불필요, w-full이 그리드 셀 폭을 그대로 채움 */}
+  </ul>
+)}
+```
 
 ### Accent Bar Stat Card (액센트 바 수치 카드)
 
