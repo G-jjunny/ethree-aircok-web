@@ -57,7 +57,7 @@ export function AdminInquiryTabsView() {
 
   return (
     <div>
-      <AdminPageHeader title="문의 관리" description="접수된 문의를 관리하고 폼·이메일 설정을 합니다." />
+      <AdminPageHeader title="문의 관리" description="문의하기 페이지의 접수된 문의를 관리하고 폼·이메일 설정을 합니다." />
 
       {/* 탭 바 */}
       <div className="bg-surface-white px-6 lg:px-8">

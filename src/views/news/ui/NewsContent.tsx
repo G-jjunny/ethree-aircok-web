@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
 import DOMPurify from 'dompurify';
 
 interface Props {
@@ -8,11 +8,7 @@ interface Props {
 }
 
 export function NewsContent({ content }: Props) {
-  const [sanitized, setSanitized] = useState(content);
-
-  useEffect(() => {
-    setSanitized(DOMPurify.sanitize(content));
-  }, [content]);
+  const sanitized = useMemo(() => DOMPurify.sanitize(content), [content]);
 
   return (
     <div

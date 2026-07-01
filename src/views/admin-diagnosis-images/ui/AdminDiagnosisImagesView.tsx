@@ -20,7 +20,7 @@ export function AdminDiagnosisImagesView() {
     <div>
       <AdminPageHeader
         title="진단 이미지 관리"
-        description="진단 서비스 안내 이미지를 업로드·정렬·삭제합니다."
+        description="진단서비스 페이지의 안내 이미지를 업로드·정렬·삭제합니다."
       />
 
       {/* 콘텐츠 영역 */}

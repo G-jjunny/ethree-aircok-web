@@ -1,8 +1,49 @@
 export const DASHBOARD_CARDS = [
   {
+    href: "/console/about",
+    title: "소개 페이지 관리",
+    description: "소개(About) 페이지의 팀 이미지와 회사 연혁을 관리합니다.",
+    icon: (
+      <svg
+        className="w-6 h-6"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        aria-hidden="true"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"
+        />
+      </svg>
+    ),
+  },
+  {
+    href: "/console/services-images",
+    title: "서비스 이미지 관리",
+    description: "서비스 페이지의 공기질 관리 제품군 이미지를 관리합니다.",
+    icon: (
+      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+      </svg>
+    ),
+  },
+  {
+    href: "/console/diagnosis-images",
+    title: "진단 이미지 관리",
+    description: "진단서비스 페이지의 안내 이미지를 관리합니다.",
+    icon: (
+      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 15.75l-2.489-2.489m0 0a3.375 3.375 0 10-4.773-4.773 3.375 3.375 0 004.774 4.774zM21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+    ),
+  },
+  {
     href: "/console/news",
     title: "뉴스 관리",
-    description: "뉴스 게시글을 작성하고 관리합니다",
+    description: "뉴스 페이지의 뉴스 기사를 작성·수정·삭제합니다.",
     icon: (
       <svg
         className="w-6 h-6"
@@ -21,30 +62,9 @@ export const DASHBOARD_CARDS = [
     ),
   },
   {
-    href: "/console/inquiries",
-    title: "문의 관리",
-    description: "고객 문의를 확인하고 설정을 관리합니다",
-    icon: (
-      <svg
-        className="w-6 h-6"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        aria-hidden="true"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z"
-        />
-      </svg>
-    ),
-  },
-  {
     href: "/console/faq",
     title: "FAQ 관리",
-    description: "자주 묻는 질문 카테고리와 항목을 관리합니다",
+    description: "FAQ 페이지의 자주 묻는 질문을 카테고리별로 관리합니다.",
     icon: (
       <svg
         className="w-6 h-6"
@@ -65,7 +85,7 @@ export const DASHBOARD_CARDS = [
   {
     href: "/console/catalog",
     title: "카탈로그 관리",
-    description: "카탈로그 이미지를 업로드하고 순서를 관리합니다",
+    description: "카탈로그 페이지의 제품 카탈로그 이미지를 관리합니다.",
     icon: (
       <svg
         className="w-6 h-6"
@@ -84,9 +104,30 @@ export const DASHBOARD_CARDS = [
     ),
   },
   {
+    href: "/console/inquiries",
+    title: "문의 관리",
+    description: "문의하기 페이지의 접수된 문의와 폼·이메일 설정을 관리합니다.",
+    icon: (
+      <svg
+        className="w-6 h-6"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        aria-hidden="true"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z"
+        />
+      </svg>
+    ),
+  },
+  {
     href: "/console/site-info",
-    title: "사이트 정보",
-    description: "회사 기본 정보와 사이트 설정을 관리합니다",
+    title: "사이트 설정",
+    description: "회사 기본 정보, 파트너사 목록, 지도 설정을 관리합니다.",
     icon: (
       <svg
         className="w-6 h-6"
@@ -105,27 +146,6 @@ export const DASHBOARD_CARDS = [
           strokeLinecap="round"
           strokeLinejoin="round"
           d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-        />
-      </svg>
-    ),
-  },
-  {
-    href: "/console/about",
-    title: "소개 페이지 관리",
-    description: "팀 소개와 회사 타임라인을 관리합니다",
-    icon: (
-      <svg
-        className="w-6 h-6"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        aria-hidden="true"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"
         />
       </svg>
     ),
