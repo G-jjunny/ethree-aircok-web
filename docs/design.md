@@ -1218,9 +1218,11 @@ TipTap 등 rich text 에디터의 HTML 출력을 렌더링하는 스타일 가�
 
 **배경 전환 — `bg-surface-dark` → `bg-surface-white` (결정 근거)**
 
-About 섹션 순서: `PageHeroSection`(`bg-surface-dark`) → `IntroSection` → `TeamSection`(`bg-surface-light`) → `PartnersSection`(`bg-surface-dark`) → `HistorySection`(`bg-surface-white`).
+About 섹션 순서(본 결정 시점): `PageHeroSection`(`bg-surface-dark`) → `IntroSection` → `TeamSection`(`bg-surface-light`) → `PartnersSection`(당시 `bg-surface-dark`) → `HistorySection`(`bg-surface-white`).
 
 §2 Surface 정의상 Pure White(`#ffffff`)는 "기본 페이지 배경·카드 배경", Light Gray(`#f5f5f7`)는 "정보성 섹션 배경(흰색보다 살짝 따뜻해 무균질함 방지)"이다. `IntroSection`을 `bg-surface-light`로 바꾸면 바로 다음 `TeamSection`도 `bg-surface-light`라 **라이트-라이트 인접**이 생겨 섹션 경계가 흐려진다. `bg-surface-white`를 선택하면 전체 리듬이 `Dark(Hero) → White(Intro) → Light(Team) → Dark(Partners) → White(History)`가 되어 인접한 모든 섹션 쌍이 서로 다른 톤(다크-화이트, 화이트-라이트, 라이트-다크, 다크-화이트)으로 구분된다. 이는 §1 "라이트/다크 섹션 교차로 시네마틱 리듬 구성" 원칙에 더 부합하므로 **`bg-surface-white`를 채택**한다.
+
+> **후속 갱신 안내**: `PartnersSection`의 `bg-surface-dark`는 이후 별도 PR에서 `bg-surface-light`로 전환되었다(아래 "Dual-Row Logo Marquee" 패턴 문서의 "배경 결정" 항목 및 1472번 줄 근처 "섹션 배경 리듬" 노트 참조). 위 리듬 서술은 그 결정 이전 시점의 기록이므로 실제 현재 리듬은 최신 노트를 따른다.
 
 - `SectionHeader`의 `theme`도 `"dark"` → `"light"`로 변경한다(컴포넌트가 자동으로 `text-heading-dark`/`text-body-dark`/레이블 `text-aircok-blue`로 전환).
 
@@ -1469,7 +1471,183 @@ export function ValueCardStack({ values }: { values: readonly { title: string; d
 
 > **그림자 미적용 확정 배경**: 이전 초안은 활성 카드에 `shadow-product`를 적용하기 위해 그림자 전용 래퍼(clip 없음) + 내부 clip 레이어의 2-레이어 구조를 전제했다. 실제로는 활성 카드가 `bg-aircok-blue` 솔리드 배경만으로 충분히 두드러지고, 가변 개수 카드가 겹치는 스택에 그림자까지 더하면 시각적으로 번잡해진다고 판단해 **shadow를 아예 쓰지 않는 방향으로 확정**했다. 따라서 2-레이어 구조도 필요 없어졌고, 카드는 단일 `<button>` 레이어로 유지한다.
 
-> **섹션 배경 리듬**: `PageHeroSection`(다크) → `IntroSection`(`bg-surface-white`) → `TeamSection`(`bg-surface-light`) → `PartnersSection`(다크) → `HistorySection`(`bg-surface-white`) 순으로, 인접한 모든 섹션 쌍이 서로 다른 톤이라 라이트-라이트/다크-다크 연속 구간이 없다. About 페이지 섹션이 재배치되거나 신규 섹션이 삽입되면 이 리듬을 다시 검토한다.
+> **섹션 배경 리듬 (갱신: `PartnersSection` 다크→라이트 전환 이후)**: `PageHeroSection`(다크) → `IntroSection`(`bg-surface-white`) → `TeamSection`(`bg-surface-light`) → `PartnersSection`(`bg-surface-light`) → `HistorySection`(`bg-surface-white`). `PartnersSection`이 다크에서 라이트로 전환되면서 `TeamSection`-`PartnersSection` 인접 구간이 라이트-라이트 연속이 된다(트레이드오프 상세는 아래 "Dual-Row Logo Marquee" 패턴 문서의 "배경 결정" 항목 참조). 이 한 구간을 제외하면 나머지 인접 쌍(다크-화이트, 라이트-화이트)은 여전히 서로 다른 톤이며, 라이트-라이트 연속 구간은 `border-t border-border-light` 구분선으로 경계를 보완한다. About 페이지 섹션이 재배치되거나 신규 섹션이 삽입되면 이 리듬을 다시 검토한다.
+
+### Dual-Row Logo Marquee (2줄 반대 방향 로고 마퀴) — About PartnersSection
+
+파트너/협력사 로고가 많아 정적 그리드로는 한 화면에 다 담기 어려울 때, 로고를 2줄로 나눠 각 줄이 반대 방향으로 끊김 없이 무한 스크롤되는 패턴. `About PartnersSection`에서 사용(실 데이터 17개). 신규 색상 토큰 없음 — 기존 표면·보더 토큰만 재활용. 신규 애니메이션 토큰(`--animate-marquee-left`/`-right`)만 `app/globals.css`에 추가.
+
+**트리거 기준 — 10개 초과**
+
+- 파트너 로고 개수 `n <= 10`: 기존 정적 그리드(`grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4`)를 그대로 유지한다. 로고가 적을 때 억지로 마퀴를 돌리면 스크롤할 콘텐츠가 부족해 부자연스럽게 반복되거나 지나치게 빨리 순환한다.
+- `n > 10`: 이 마퀴 패턴으로 전환한다. 17개 기준 각 줄 8~9개면 한 줄의 실제 콘텐츠 폭이 충분히 확보되어 자연스러운 순환 속도가 나온다.
+
+**배경 결정 — `bg-surface-dark` → `bg-surface-light` (근거)**
+
+About 섹션 순서: `PageHeroSection`(다크) → `IntroSection`(`bg-surface-white`) → `TeamSection`(`bg-surface-light`) → `PartnersSection`(전환 전 다크) → `HistorySection`(`bg-surface-white`).
+
+§1 "라이트/다크 섹션 교차로 시네마틱 리듬 구성" 원칙상 어느 라이트 톤을 선택해도 인접 톤 1쌍은 반드시 동일해진다(트레이드오프가 대칭적):
+
+| 선택 | Team↔Partners | Partners↔History | 동일톤 인접 개수 |
+|---|---|---|---|
+| `bg-surface-light` | light-light (동일) | light-white (구분됨) | 1쌍 |
+| `bg-surface-white` | light-white (구분됨) | white-white (동일) | 1쌍 |
+
+동일 개수의 트레이드오프이므로 **로고 타일 구현 비용과 기존 톤 유지 관성**을 2차 기준으로 판단한다:
+
+- `bg-surface-light` 선택 시: 로고 타일은 기존 `bg-surface-white`를 그대로 유지할 수 있다 — light(`#f5f5f7`) 섹션 위 white(`#ffffff`) 타일은 색상 차이가 존재해 최소한의 자체 구분이 가능하고(§2 Surface 정의상 두 토큰이 애초에 "약간의 명도차를 위해 분리된" 토큰), 로고 배경 로직을 새로 설계할 필요가 없다.
+- `bg-surface-white` 선택 시: 로고 타일에 `bg-surface-white`를 쓰면 섹션과 완전히 같은 색이 되어(§4 Product Card 라이트 변형과 동일 문제, `ValueCardStack` 비활성 카드 선례 참조) 타일 배경을 `bg-surface-light`로 새로 바꿔야 한다. 그러나 흰 배경 PNG 로고가 아니라 investor deck 스타일의 투명 배경 로고는 순수 백색 위에서 가장 선명하게 보이는 경우가 많아, 타일을 light로 바꾸면 로고 자체의 시인성이 오히려 떨어질 위험이 있다.
+
+두 조건을 종합해 **`bg-surface-light`를 채택**한다 — 유일한 동일톤 인접(Team↔Partners)은 아래 "완화 장치"로 보완하고, 로고 타일은 기존 `bg-surface-white`를 유지해 로고 시인성 손실 없이 구현 비용도 최소화한다.
+
+- `SectionHeader`의 `theme`을 `"dark"` → `"light"`로 변경한다(컴포넌트가 자동으로 `text-heading-dark`/`text-body-dark`/레이블 `text-aircok-blue`로 전환).
+- 섹션 배경: `bg-surface-light`.
+
+**완화 장치 — Team↔Partners 라이트-라이트 인접 경계 보완**
+
+두 라이트 섹션이 연속되며 흐려지는 경계를 `border-t border-border-light` 구분선으로 보완한다. 이는 신규 패턴이 아니라 §4 "Bottom CTA Section"에서 이미 쓰인 `bg-surface-light border-t border-border-light` 조합(위 참조)을 그대로 재사용하는 것이다 — 신규 토큰·신규 클래스 없음.
+
+- `PartnersSection` 섹션 루트: `bg-surface-light border-t border-border-light`.
+
+**로고 타일 배경 재검토 — `bg-surface-white` 유지 (근거)**
+
+섹션 배경이 `bg-surface-light`(`#f5f5f7`)로 바뀌므로, 로고 타일이 기존과 동일한 `bg-surface-white`(`#ffffff`)를 쓰면 두 표면 토큰 사이에 실제 명도차가 존재해(§2 Surface 정의상 Light Gray는 애초에 "흰색보다 살짝 따뜻해 무균질함 방지"용으로 분리된 토큰) `ValueCardStack`이 겪었던 "동일 색 섹션 위 동일 색 카드"와 같은 문제는 발생하지 않는다. 다만 `#f5f5f7`과 `#ffffff`의 명도차는 미세하므로, 안전장치로 얇은 보더를 추가해 타일 경계를 명시적으로 보강한다.
+
+- 로고 타일(로고 있음): `bg-surface-white border border-border-light` (기존 `bg-surface-white`에 `border border-border-light` 추가, 그 외 레이아웃 클래스는 기존 유지).
+- 로고 타일(로고 없음, 이름 칩 폴백): 다크 배경 전용이었던 `bg-overlay-white-10`을 라이트 배경에 그대로 쓰면 거의 보이지 않으므로 `bg-surface-white border border-border-light`로 통일하고, 텍스트 색상도 `text-body-light`/`text-heading-dark` 다크 대응 색상으로 전환한다(§2 Surface 정의상 `overlay-white-10`은 다크 표면 전용 오버레이 토큰).
+
+**hover 시 파트너명 오버레이 (정보 보강)**
+
+로고만으로는 회사명을 알 수 없는 사용자를 위해, 타일에 `group` hover 시 로고(또는 이름 칩)가 옅어지며(`group-hover:opacity-30`/`group-hover:opacity-0`) 중앙에 `absolute inset-0` 오버레이로 파트너명(`text-xs font-semibold text-heading-dark`)이 `opacity-0 → group-hover:opacity-100`으로 나타나는 전환을 추가한다(`transition-opacity duration-200`, 다른 hover 전환과 동일 duration). 로고 유무 타일 모두 동일 오버레이 구조를 공유한다.
+
+**구조 — 2줄 분배 + 무한 루프**
+
+- **줄 분배 방식**: 짝수/홀수 인덱스 분배(`partners.filter((_, i) => i % 2 === 0)` / `i % 2 === 1`)를 채택한다. 앞/뒤 절반 분할(`slice(0, n/2)` / `slice(n/2)`)은 로고 목록이 등록 순서(예: 계약 시점)로 정렬되어 있을 때 한 줄에 특정 시기 파트너만 몰릴 수 있는 반면, 짝/홀 분배는 원본 순서상의 다양성을 두 줄에 고르게 섞어 각 줄이 비슷한 밀도·다양성을 갖게 한다.
+- **무한 루프 기법**: 각 줄의 로고 배열을 정확히 2배로 복제해 이어붙인 뒤(`[...rowLogos, ...rowLogos]`), 컨테이너를 `flex w-max` + `overflow-hidden` 부모로 감싸고, `translateX`로 전체 콘텐츠 폭의 정확히 50%(= 원본 로고 세트 1회분 폭)만큼 이동시켜 리셋한다. 원본과 복제본이 완전히 동일하므로 50% 이동 지점에서 시각적으로 끊김이 없다(표준 CSS marquee 기법). 두 로고 세트 폭이 정확히 같아야 하므로(반응형 로고 크기 변화와 무관하게 항상 원본=복제본), 복제는 반드시 동일한 배열을 그대로 재사용해야 한다(별도 계산·가공 없이 `[...rowLogos, ...rowLogos]`).
+- **keyframes**: `app/globals.css`의 `@theme inline` 블록에 애니메이션 토큰으로 등록해 Tailwind가 `animate-marquee-left`/`animate-marquee-right` 유틸리티 클래스를 자동 생성하게 한다(Tailwind v4 관례 — 임의값 `animate-[...]` 대신 재사용 가능한 이름 있는 유틸리티로 등록). `@keyframes` 자체는 `@theme inline` 블록 밖, 파일 하단 `@layer utilities` 옆에 정의한다.
+
+```css
+/* app/globals.css — @theme inline 블록 안 */
+--animate-marquee-left:  marquee-left 40s linear infinite;
+--animate-marquee-right: marquee-right 40s linear infinite;
+
+/* app/globals.css — @theme inline 블록 밖, 최상위 */
+@keyframes marquee-left {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+@keyframes marquee-right {
+  from { transform: translateX(-50%); }
+  to   { transform: translateX(0); }
+}
+```
+
+- **방향**: 첫 번째 줄(짝수 인덱스) = 왼쪽→오른쪽 이동(`animate-marquee-right`, 시작 위치가 이미 -50%인 상태에서 0%로 이동하므로 시각적으로 좌→우), 두 번째 줄(홀수 인덱스) = 오른쪽→왼쪽 이동(`animate-marquee-left`, 0%에서 -50%로 이동하므로 시각적으로 우→좌). 두 줄이 반대 방향으로 흘러야 시각적 리듬이 단조롭지 않다.
+- **duration — 40s**: 일반적인 로고 마퀴 관례상 40~60s 범위가 "읽을 수 있을 만큼 느리되 지루하지 않을 만큼 빠른" 절충점이다. 이 프로젝트는 한 줄당 로고 8~9개(복제 전 기준)로 개수가 많지 않은 편이라 범위의 하단인 **40s**를 채택한다(로고가 훨씬 많아지면 후속 조정 시 60s 쪽으로 늘리는 것을 검토). 두 줄 모두 동일 40s를 사용해 속도 차로 인한 산만함을 피한다.
+
+**모션 접근성 — `prefers-reduced-motion: reduce`**
+
+`ValueCardStack` 자동재생과 동일한 원칙(모션 최소화 선호 시 애니메이션 정지)을 따르되, 이 패턴은 순수 CSS 애니메이션이라 JS `matchMedia` 감지 대신 CSS `@media (prefers-reduced-motion: reduce)` 쿼리로 직접 처리한다(메커니즘은 다르나 "정지" 라는 최종 동작은 동일).
+
+```css
+/* app/globals.css */
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee-left,
+  .animate-marquee-right {
+    animation: none;
+  }
+}
+```
+
+- 애니메이션이 정지되면 두 줄 모두 첫 로고 세트가 정적으로 보이는 상태로 폴백된다(복제본은 화면 밖에 고정되어 남아있으나 시각적으로 문제없음 — `overflow-hidden` 부모가 잘라낸다).
+
+**hover 시 일시정지**
+
+마우스를 올린 동안 로고를 자세히 볼 수 있도록 각 줄에 hover 일시정지를 추가한다. Tailwind 임의값 variant로 표현한다.
+
+- 각 줄 컨테이너: `hover:[animation-play-state:paused]`.
+
+**로고 이미지 크롭 방지**
+
+현재 코드(`max-h-10 w-auto object-contain`)는 높이만 제한하고 폭 제한이 없어, 가로로 긴 로고가 타일 폭을 넘기면 부모의 `overflow-hidden`에 잘릴 수 있다. 폭도 함께 제한해 원본 비율을 유지한 채 타일 안에 완전히 들어오게 한다.
+
+- 로고 이미지: `max-h-10 max-w-full w-auto object-contain`(기존 클래스에 `max-w-full` 추가). 이 수정은 마퀴 전환 여부와 무관하게 기존 정적 그리드 경로에도 동일하게 적용한다(정적 그리드에서도 동일한 크롭 버그가 존재하므로).
+
+**타일 고정폭 분리 — `LogoTile`은 `w-full`, 고정폭은 마퀴 래퍼가 담당 (근거)**
+
+`LogoTile`은 정적 그리드(`<li>` grid item)와 마퀴(`flex` 자식) 양쪽에서 공유되는데, 두 경로가 요구하는 폭 성질이 다르다:
+
+- 마퀴 경로: `flex` 부모 안에서 각 로고가 항상 동일한 고정폭이어야 두 배 복제본이 정확히 50% 지점에서 이어붙는다(위 "무한 루프 기법" 참조) — 고정폭 필수.
+- 정적 그리드 경로: 그리드 컬럼 폭은 `grid-cols-2 sm:grid-cols-3 lg:grid-cols-4`로 컨테이너 폭에 따라 가변적이다(`content-container` 기준 1200px 근방에서 4열 셀 폭 약 277px, 375px 모바일 2열에서도 약 160px 근접~초과). `LogoTile`이 `w-40`(160px) 고정폭을 가지면 셀이 더 넓은 대부분의 뷰포트에서 타일이 셀 좌측에 붙고 우측에 불균형한 빈 공간이 남는다 — 고정폭이 오히려 문제.
+
+따라서 **`LogoTile` 자체는 고정폭을 갖지 않고 `w-full`로 부모 폭을 그대로 채운다.** 고정폭이 필요한 마퀴 경로에서만 `LogoMarqueeRow`가 각 타일을 `<div className="w-40 shrink-0">` 래퍼로 감싸 폭을 지정한다. 정적 그리드는 `<li>`가 grid item이므로 별도 래퍼 없이 `LogoTile`의 `w-full`이 셀 폭을 그대로 채운다.
+
+- `LogoTile` 래퍼: `h-20 w-full`(기존 `h-20 w-40 shrink-0`에서 폭 고정 제거).
+- `LogoMarqueeRow`의 `doubled.map` 렌더링: 각 항목을 `<div key={...} className="w-40 shrink-0"><LogoTile partner={partner} /></div>`로 감싼다(`key`는 이 래퍼로 이동).
+- 정적 그리드의 `<li key={partner.id}><LogoTile partner={partner} /></li>`는 변경 없음 — 래퍼 불필요.
+
+**컴포넌트 위치 — 로컬 마크업 (`views/about/ui`)**
+
+현재 이 패턴을 사용하는 곳은 About `PartnersSection` 1곳뿐이다. `ValueCardStack`과 동일한 `shared/ui` 분리 기준(2~3곳 이상 반복/반복 예상)을 아직 충족하지 않으므로, `src/views/about/ui/PartnersSection.tsx`에 로컬로 구현한다(마퀴 로직이 복잡해지면 `src/views/about/ui/PartnerLogoMarquee.tsx` 같은 로컬 하위 컴포넌트로 분리해도 되나, 여전히 `views/about/ui` 안에 둔다). 추후 다른 페이지(예: 고객사 로고, 인증 마크 나열)에서 동일한 2줄 반대 방향 마퀴가 반복되면 그때 `shared/ui`로 승격한다.
+
+```tsx
+// Dual-Row Logo Marquee — About PartnersSection 구현 예시
+// 실제 구현: src/views/about/ui/PartnersSection.tsx
+
+const MARQUEE_THRESHOLD = 10
+
+// LogoTile은 고정폭을 갖지 않는다(w-full) — 정적 그리드/마퀴 양쪽에서 공유되며,
+// 고정폭이 필요한 마퀴 경로는 LogoMarqueeRow가 래퍼로 폭을 지정한다(위 "타일 고정폭 분리" 참조).
+function LogoTile({ partner }: { partner: Partner }) {
+  return partner.logoUrl ? (
+    <div className="relative flex h-20 w-full items-center justify-center overflow-hidden rounded-lg bg-surface-white border border-border-light px-6">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={resolveLogoSrc(partner.logoUrl)}
+        alt={partner.name}
+        width={128}
+        height={56}
+        loading="lazy"
+        className="max-h-10 max-w-full w-auto object-contain"
+      />
+    </div>
+  ) : (
+    <div className="relative flex h-20 w-full items-center justify-center overflow-hidden rounded-lg bg-surface-white border border-border-light px-6 text-center">
+      <span className="text-sm text-body-dark [word-break:keep-all]">{partner.name}</span>
+    </div>
+  )
+}
+
+function LogoMarqueeRow({ partners, direction }: { partners: Partner[]; direction: 'left' | 'right' }) {
+  const doubled = [...partners, ...partners]
+  return (
+    <div className="overflow-hidden">
+      <div
+        className={`flex w-max gap-4 ${direction === 'left' ? 'animate-marquee-left' : 'animate-marquee-right'} hover:[animation-play-state:paused]`}
+      >
+        {doubled.map((partner, i) => (
+          // 마퀴 경로에서만 고정폭 래퍼로 감싼다 — LogoTile 자체는 w-full
+          <div key={`${partner.id}-${i}`} className="w-40 shrink-0">
+            <LogoTile partner={partner} />
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// PartnersSection 조합 지점
+{partners.length > MARQUEE_THRESHOLD ? (
+  <div className="flex flex-col gap-4">
+    <LogoMarqueeRow partners={partners.filter((_, i) => i % 2 === 0)} direction="right" />
+    <LogoMarqueeRow partners={partners.filter((_, i) => i % 2 === 1)} direction="left" />
+  </div>
+) : (
+  <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+    {/* 기존 정적 그리드, LogoTile 재사용 — 래퍼 불필요, w-full이 그리드 셀 폭을 그대로 채움 */}
+  </ul>
+)}
+```
 
 ### Accent Bar Stat Card (액센트 바 수치 카드)
 
