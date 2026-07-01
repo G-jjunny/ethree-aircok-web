@@ -29,8 +29,11 @@ interface Props {
 export function MapSettingForm({ initialData }: Props) {
   const queryClient = useQueryClient();
 
-  // Daum 우편번호 스크립트 로드 완료 여부
-  const [isPostcodeReady, setIsPostcodeReady] = useState(false);
+  // 재마운트 시 스크립트가 이미 로드된 경우를 즉시 감지한다.
+  // lazy initializer는 마운트 시 한 번만 실행되므로 useEffect 없이 안전하다.
+  const [isPostcodeReady, setIsPostcodeReady] = useState(
+    () => typeof window !== 'undefined' && !!(window.daum?.Postcode),
+  );
 
   const {
     register,
@@ -103,8 +106,9 @@ export function MapSettingForm({ initialData }: Props) {
       {/* Daum 우편번호 스크립트: 클라이언트에서 지연 로드, 완료 시 상태 갱신 */}
       <Script
         src={DAUM_POSTCODE_SRC}
-        strategy="lazyOnload"
+        strategy="afterInteractive"
         onLoad={() => setIsPostcodeReady(true)}
+        onError={() => toast.error('주소 검색 모듈을 불러오지 못했습니다. 페이지를 새로고침해 주세요.')}
       />
 
       {/* 회사 주소 */}
