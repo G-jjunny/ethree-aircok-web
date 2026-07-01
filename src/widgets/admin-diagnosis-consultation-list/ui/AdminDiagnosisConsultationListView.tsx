@@ -36,6 +36,12 @@ const STATUS_CLASSES: Record<DiagnosisConsultationStatus, string> = {
   DONE: 'bg-success/10 text-success',
 }
 
+const STATUS_SELECT_CLASSES: Record<DiagnosisConsultationStatus, string> = {
+  NEW: 'bg-aircok-blue/10 text-aircok-blue border-aircok-blue/20',
+  IN_PROGRESS: 'bg-warning/10 text-warning border-warning/20',
+  DONE: 'bg-success/10 text-success border-success/20',
+}
+
 const STATUS_OPTIONS: { value: DiagnosisConsultationStatus; label: string }[] = [
   { value: 'NEW', label: '신규' },
   { value: 'IN_PROGRESS', label: '진행중' },
@@ -258,7 +264,7 @@ function ConsultationDetailPanel({
             <select
               value={status}
               onChange={(e) => setStatus(e.target.value as DiagnosisConsultationStatus)}
-              className="bg-surface-light text-body-dark text-sm font-body rounded-md px-3 py-2 border border-border-light focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue"
+              className={`text-sm font-medium font-body rounded-full px-3 py-2 border focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue ${STATUS_SELECT_CLASSES[status]}`}
             >
               {STATUS_OPTIONS.map((opt) => (
                 <option key={opt.value} value={opt.value}>

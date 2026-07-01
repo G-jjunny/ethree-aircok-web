@@ -15,6 +15,12 @@ const STATUS_OPTIONS: { value: InquiryStatus; label: string }[] = [
   { value: 'DONE', label: '완료' },
 ];
 
+const STATUS_SELECT_CLASSES: Record<InquiryStatus, string> = {
+  NEW: 'bg-aircok-blue/10 text-aircok-blue border-aircok-blue/20',
+  IN_PROGRESS: 'bg-warning/10 text-warning border-warning/20',
+  DONE: 'bg-success/10 text-success border-success/20',
+};
+
 interface Props {
   id: string;
   status: InquiryStatus;
@@ -47,7 +53,7 @@ export function StatusSelect({ id, status }: Props) {
       disabled={updating}
       onChange={(e) => handleChange(e.target.value as InquiryStatus)}
       aria-label="문의 상태 변경"
-      className="bg-surface-light text-body-dark text-sm font-body rounded-md px-2 py-1 border border-border-light focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue disabled:opacity-60 disabled:cursor-not-allowed"
+      className={`text-sm font-medium font-body rounded-full px-3 py-1 border focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue disabled:opacity-60 disabled:cursor-not-allowed ${STATUS_SELECT_CLASSES[value]}`}
     >
       {STATUS_OPTIONS.map((opt) => (
         <option key={opt.value} value={opt.value}>
