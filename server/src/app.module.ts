@@ -13,6 +13,7 @@ import { TimelineModule } from './timeline/timeline.module';
 import { ServiceImageModule } from './service-image/service-image.module';
 import { DiagnosisImageModule } from './diagnosis-image/diagnosis-image.module';
 import { DiagnosisConsultationModule } from './diagnosis-consultation/diagnosis-consultation.module';
+import { CoreValuesModule } from './core-values/core-values.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { DiagnosisConsultationModule } from './diagnosis-consultation/diagnosis-
     ServiceImageModule,
     DiagnosisImageModule,
     DiagnosisConsultationModule,
+    CoreValuesModule,
   ],
 })
 export class AppModule {}

@@ -330,6 +330,31 @@ model TimelineItem {
   updatedAt DateTime @updatedAt
 }
 
+/// 에어콕 소개(About) 페이지 IntroSection 핵심가치(Core Value) 카드 (#93).
+///
+/// 운용 방식:
+/// - 이전에는 프론트 `SITE.about.intro.values` 정적 배열로 하드코딩되어 있던 4개 카드
+///   (직원 생산성 향상 / 소유빌딩 가치상승 / 에너지 관리비용 개선 / 공기질 개선)를
+///   어드민이 CRUD + 순서변경 가능한 DB 콘텐츠로 전환한 모델이다.
+/// - 이미지/로고 없는 단순 텍스트 카드(제목 + 설명)이며, 파일 업로드 엔드포인트는 없다.
+/// - 공개 목록(GET /api/core-values)은 order 오름차순, 동률 시 createdAt 오름차순(보조) 정렬로 노출한다.
+/// - 어드민은 드래그앤드롭으로 순서를 일괄 변경한다(PATCH /api/core-values/reorder, body { items: [{ id, order }] }).
+///   reorder 는 트랜잭션 갱신 후 갱신된 전체 배열을 반환한다(partners 패턴).
+///
+/// 컬럼 정책:
+/// - id: cuid (String). 기존 모델 패턴 통일.
+/// - title: 카드 제목(짧은 문구). NOT NULL.
+/// - description: 카드 설명 문구. NOT NULL.
+/// - order: 표시 순서(오름차순). 기본값 0. order 미지정 생성 시 맨 뒤(마지막 order + 1)에 자동 채번한다.
+model CoreValue {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
 /// 공기질 관리 제품군(서비스) 소개 이미지 (#83).
 ///
 /// 운용 방식:
