@@ -32,8 +32,8 @@ export const DASHBOARD_CARDS = [
   },
   {
     href: "/console/diagnosis-images",
-    title: "진단 이미지 관리",
-    description: "진단서비스 페이지의 안내 이미지를 관리합니다.",
+    title: "진단서비스 신청 관리",
+    description: "진단서비스 페이지의 이미지와 상담 신청 내역을 관리합니다.",
     icon: (
       <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
         <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 15.75l-2.489-2.489m0 0a3.375 3.375 0 10-4.773-4.773 3.375 3.375 0 004.774 4.774zM21 12a9 9 0 11-18 0 9 9 0 0118 0z" />

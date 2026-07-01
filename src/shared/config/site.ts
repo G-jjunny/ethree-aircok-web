@@ -592,7 +592,7 @@ export const SITE = {
       { label: "대시보드", href: "/console" },
       { label: "소개 페이지 관리", href: "/console/about" },
       { label: "서비스 이미지 관리", href: "/console/services-images" },
-      { label: "진단 이미지 관리", href: "/console/diagnosis-images" },
+      { label: "진단서비스 신청 관리", href: "/console/diagnosis-images" },
       { label: "뉴스 관리", href: "/console/news" },
       { label: "FAQ 관리", href: "/console/faq" },
       { label: "카탈로그 관리", href: "/console/catalog" },
