@@ -1,6 +1,7 @@
 'use client'
 import { useRef, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
+import { toast } from 'sonner'
 import { partnerListQueryOptions } from '@/entities/partner'
 import type { Partner } from '@/entities/partner'
 import {
@@ -9,6 +10,7 @@ import {
   useUploadPartnerLogoMutation,
 } from '@/features/partner-editor'
 import { ConfirmDialog } from '@/shared/ui'
+import { extractUploadError } from '@/shared/api'
 import { PartnerFormModal } from './PartnerFormModal'
 
 type TabType = 'partner' | 'client'
@@ -52,13 +54,21 @@ export function PartnerListSection() {
 
   const handleLogoChange = (id: string, file: File | undefined) => {
     if (!file) return
-    uploadLogoMutation.mutate({ id, file })
+    uploadLogoMutation.mutate({ id, file }, {
+      onError: (error) => {
+        toast.error(extractUploadError(error, '로고 업로드에 실패했습니다'))
+      },
+    })
   }
 
   const handleDeleteConfirm = () => {
     if (!deletingId) return
     deleteMutation.mutate(deletingId, {
       onSuccess: () => setDeletingId(null),
+      onError: (error) => {
+        toast.error(extractUploadError(error, '파트너 삭제에 실패했습니다'))
+        setDeletingId(null)
+      },
     })
   }
 

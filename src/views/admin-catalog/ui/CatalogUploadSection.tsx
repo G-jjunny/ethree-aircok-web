@@ -3,6 +3,7 @@
 import { useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { useUploadCatalogImageMutation } from '@/features/catalog-editor'
+import { extractUploadError } from '@/shared/api'
 
 /** 업로드 가능한 파일인지 판별한다(이미지 또는 PDF). */
 function isAllowedFile(file: File): boolean {
@@ -30,8 +31,8 @@ export function CatalogUploadSection() {
       try {
         await uploadMutation.mutateAsync(file)
         success += 1
-      } catch {
-        toast.error(`"${file.name}" 업로드에 실패했습니다`)
+      } catch (error) {
+        toast.error(extractUploadError(error, `"${file.name}" 업로드에 실패했습니다`))
       }
     }
     if (success > 0) toast.success(`${success}개 파일이 업로드되었습니다`)

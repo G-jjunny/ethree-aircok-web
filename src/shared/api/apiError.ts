@@ -1,3 +1,5 @@
+import { isAxiosError } from 'axios';
+
 /**
  * 모든 도메인 API 에러의 베이스 클래스.
  * HTTP 상태코드 기반 공통 판별(인증/검증/충돌 등)을 제공한다.
@@ -65,4 +67,20 @@ export function parseAxiosMessages(data: unknown): string[] | undefined {
 export function authAwareRetry(failureCount: number, error: unknown): boolean {
   if (error instanceof ApiError && error.isAuthError) return false;
   return failureCount < 1;
+}
+
+/**
+ * axios 에러 응답에서 서버 메시지를 추출하고, 없으면 fallback을 반환한다.
+ * 업로드 컴포넌트의 catch 블록에서 toast.error() 메시지 생성에 사용한다.
+ */
+export function extractUploadError(error: unknown, fallback: string): string {
+  if (isAxiosError(error)) {
+    const data = error.response?.data;
+    if (data && typeof data === 'object' && 'message' in data) {
+      const raw = (data as { message: unknown }).message;
+      if (typeof raw === 'string' && raw.length > 0) return raw;
+      if (Array.isArray(raw) && raw.length > 0 && typeof raw[0] === 'string') return raw[0];
+    }
+  }
+  return fallback;
 }
