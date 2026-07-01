@@ -15,6 +15,11 @@ const NOTCH = 50
 const NOTCH_DIAGONAL = Math.sqrt(NOTCH * NOTCH * 2)
 const CLIP_PATH = `polygon(${NOTCH}px 0%, calc(100% - ${NOTCH}px) 0%, 100% ${NOTCH}px, 100% 100%, calc(100% - ${NOTCH}px) 100%, ${NOTCH}px 100%, 0 100%, 0 0)`
 
+// absPos(0~3+, 0이 활성)별 scale/opacity — 3 초과는 3의 위치를 유지한 채 opacity만 0으로 클램프
+const SCALE_BY_ABS_POS = [1, 0.95, 0.88, 0.8]
+const OPACITY_BY_ABS_POS = [1, 0.75, 0.55, 0.35]
+const clamp3 = (absPos: number) => Math.min(absPos, 3)
+
 export function ValueCardStack({ values }: ValueCardStackProps) {
   const [list, setList] = useState(() => values.map((_, i) => i))
   const [cardW, setCardW] = useState(300)
@@ -103,7 +108,7 @@ export function ValueCardStack({ values }: ValueCardStackProps) {
         {list.map((valueIndex, listIndex) => {
           const pos = getPos(listIndex)
           const isActive = pos === 0
-          const absPos = Math.abs(pos)
+          const absPos = clamp3(Math.abs(pos))
 
           return (
             <button
@@ -119,21 +124,24 @@ export function ValueCardStack({ values }: ValueCardStackProps) {
                 position: 'absolute',
                 left: '50%',
                 top: '50%',
-                zIndex: n - absPos,
+                zIndex: n - Math.abs(pos),
+                opacity: Math.abs(pos) > 3 ? 0 : OPACITY_BY_ABS_POS[absPos],
                 transform: `
                   translate(-50%, -50%)
-                  translateX(${hStep * pos}px)
+                  translateX(${hStep * (pos > 3 ? 3 : pos < -3 ? -3 : pos)}px)
                   translateY(${isActive ? -20 : pos % 2 !== 0 ? 15 : -15}px)
                   rotate(${isActive ? 0 : pos % 2 !== 0 ? 2.5 : -2.5}deg)
+                  scale(${SCALE_BY_ABS_POS[absPos]})
                 `,
                 transition: 'all 500ms ease-in-out',
               }}
               className={[
-                'flex flex-col gap-5 p-8 text-left',
+                isActive ? 'gap-6' : 'gap-5',
+                'flex flex-col p-8 text-left',
                 'focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:ring-offset-2',
                 isActive
                   ? 'bg-aircok-blue cursor-default'
-                  : 'bg-surface-white border-2 border-border-light hover:border-aircok-blue/40 cursor-pointer',
+                  : 'bg-surface-light border border-border-light hover:border-aircok-blue/40 cursor-pointer',
                 // 모바일: 비활성 카드 숨김 (sm 이상에서 전체 표시)
                 !isActive ? 'hidden sm:flex' : 'flex',
               ].join(' ')}
@@ -156,7 +164,7 @@ export function ValueCardStack({ values }: ValueCardStackProps) {
               <span
                 aria-hidden="true"
                 className={`select-none font-display text-5xl font-bold leading-none tracking-[-0.3px] ${
-                  isActive ? 'text-white/50' : 'text-aircok-blue'
+                  isActive ? 'text-white/40' : 'text-aircok-blue'
                 }`}
               >
                 {String(valueIndex + 1).padStart(2, '0')}

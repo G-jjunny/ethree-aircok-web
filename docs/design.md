@@ -1212,7 +1212,9 @@ TipTap 등 rich text 에디터의 HTML 출력을 렌더링하는 스타일 가�
 
 > **대체 이력**: 이전 "Value Highlight Card(핵심 가치 강조 카드, 다크 4열 그리드)" 패턴을 대체한다. 인덱스 숫자(01–04) 시그니처는 계승하되, 배경을 라이트로 전환하고 정적 그리드 대신 인터랙티브 카드 스택으로 재해석한다.
 
-회사의 핵심 가치(4개, 병렬이자 상호 배타적 식별자)를 계단식으로 겹쳐 쌓은 카드 스택으로 표현하고, 클릭 또는 prev/next 버튼으로 활성 카드를 순환시키는 패턴. `About IntroSection`에서 사용. 신규 색상 토큰 없음 — 기존 라이트 표면·브랜드 블루·그림자 토큰만 재활용.
+회사의 핵심 가치(어드민 CRUD로 관리되는 가변 개수 리스트, `entities/core-value`의 `CoreValue[]`)를 계단식으로 겹쳐 쌓은 카드 스택으로 표현하고, 클릭 또는 prev/next 버튼으로 활성 카드를 순환시키는 패턴. `About IntroSection`에서 사용. 신규 색상 토큰 없음 — 기존 라이트 표면·브랜드 블루·그림자 토큰만 재활용.
+
+> **문서-구현 구조 표기 안내**: 아래 표·예시는 실제 구현(`src/views/about/ui/ValueCardStack.tsx`)의 좌우대칭 `pos`/`absPos` 구조를 기준으로 서술한다. `pos`는 `index - Math.floor(n/2)`로 계산되는 활성 카드 기준 상대 위치(음수=좌측, 0=활성, 양수=우측)이며, `absPos = Math.abs(pos)`가 아래 표의 `absPos` 열(옛 `distance`, 0=활성, 항상 0 이상)에 대응한다. 즉 `absPos`는 "활성 카드로부터 좌우 어느 쪽이든 몇 칸 떨어져 있는가"를 나타내는 값이고, 실제로 좌측(pos<0)과 우측(pos>0)에 동시에 같은 `absPos` 값을 가진 카드가 존재할 수 있다(예: n=4면 pos -2/-1/0/+1 → absPos 2/1/0/1). 순서 회전은 `order`(단방향 배열, distance 0..n-1) 대신 `list`(회전 배열) + `move(steps)`(왼쪽/오른쪽 회전)로 구현되어 있으며, 카드 클릭 시 `handleManualMove(pos)`로 클릭한 카드의 상대 위치만큼 배열을 회전시켜 활성화한다(= 결과적으로 클릭한 카드가 활성화되는 것은 동일하나, 배열 맨 앞으로 이동시키는 방식이 아니라 회전 방식).
 
 **배경 전환 — `bg-surface-dark` → `bg-surface-white` (결정 근거)**
 
@@ -1221,67 +1223,80 @@ About 섹션 순서: `PageHeroSection`(`bg-surface-dark`) → `IntroSection` →
 §2 Surface 정의상 Pure White(`#ffffff`)는 "기본 페이지 배경·카드 배경", Light Gray(`#f5f5f7`)는 "정보성 섹션 배경(흰색보다 살짝 따뜻해 무균질함 방지)"이다. `IntroSection`을 `bg-surface-light`로 바꾸면 바로 다음 `TeamSection`도 `bg-surface-light`라 **라이트-라이트 인접**이 생겨 섹션 경계가 흐려진다. `bg-surface-white`를 선택하면 전체 리듬이 `Dark(Hero) → White(Intro) → Light(Team) → Dark(Partners) → White(History)`가 되어 인접한 모든 섹션 쌍이 서로 다른 톤(다크-화이트, 화이트-라이트, 라이트-다크, 다크-화이트)으로 구분된다. 이는 §1 "라이트/다크 섹션 교차로 시네마틱 리듬 구성" 원칙에 더 부합하므로 **`bg-surface-white`를 채택**한다.
 
 - `SectionHeader`의 `theme`도 `"dark"` → `"light"`로 변경한다(컴포넌트가 자동으로 `text-heading-dark`/`text-body-dark`/레이블 `text-aircok-blue`로 전환).
-- 카드 자체는 섹션 배경(`surface-white`)과 구분되도록 `bg-surface-light` 표면을 사용한다(§4 Product Card 라이트 변형과 동일한 관례 — 라이트 섹션 위 카드는 반대 톤의 라이트 표면).
+
+**비활성 카드 배경/경계 — `bg-surface-white` → `bg-surface-light` 전환 (경계 시인성 문제 해결)**
+
+초기 구현에서 비활성 카드가 섹션과 동일한 `bg-surface-white`를 사용해 `border-2 border-border-light`(연한 회색 보더)만으로 경계를 구분했는데, 흰 배경 위 흰 카드라 보더 대비가 약해 카드 형태가 거의 안 보이는 문제가 있었다. §4 Product Card 라이트 변형과 동일한 관례(라이트 섹션 위 카드는 반대 톤의 라이트 표면)를 따라 **비활성 카드 배경을 `bg-surface-light`로 전환**한다. `bg-surface-white` 섹션 위에 `bg-surface-light`(`#f5f5f7`) 카드가 놓여 배경색 자체로 1차 경계가 생기고, 여기에 기존 `border border-border-light`(1px, 과도한 강조 방지 위해 `border-2`→`border`로 축소)를 더해 2차 경계선을 준다. 별도 그림자는 주지 않는다(§6 Shadow 철학 — 그림자는 극도로 아껴 쓰고 depth는 배경색 차이로 표현).
+
+- 비활성 카드: `bg-surface-light border border-border-light`
+- 비활성 카드 hover: `hover:border-aircok-blue/40`(클릭 가능함을 암시, 기존과 동일하게 유지)
+- 활성 카드: `bg-aircok-blue`(변경 없음) — 이미 섹션 배경과 명확히 대비되는 브랜드 컬러라 경계 문제가 없었음.
 
 **구조 — 카드 스택**
 
-- 컨테이너: `role="region" aria-roledescription="carousel" aria-label="핵심 가치"` 안에 `<ul>` 카드 스택 + prev/next 버튼.
-- 스택 컨테이너: `relative mx-auto flex min-h-[380px] sm:min-h-[420px] w-full max-w-[420px] items-center justify-center` ({/* token 없음: 캐러셀 스택 최소 높이/폭 — 카드 콘텐츠(제목+설명 3~4줄) 기준 1회성 수치 */})
-- 각 카드는 `<li>` 안에 `<button type="button">`으로 감싼다 — 네이티브 `<button>`이라 Tab 이동·Enter/Space 활성화가 별도 핸들러 없이 동작.
-- 카드 배경/형태: `bg-surface-light rounded-xl p-8 flex flex-col gap-4 text-left transition-all duration-500 ease-out` + 아래 **노치 clip-path**. `<li>`는 `absolute inset-0`로 스택 안에 겹쳐 배치하고, `distance`(활성 카드로부터의 순환 거리 0~3)에 따라 transform/scale/opacity/z-index/shadow를 다르게 준다.
+- 컨테이너: `role="region" aria-roledescription="carousel" aria-label="핵심 가치"` 안에 카드 스테이지(`relative w-full overflow-hidden`) + prev/next 버튼. 카드 개수(`n`)가 가변적이므로 `<ul>`/`<li>` 대신 스테이지에 `<button>`들을 직접 절대 배치하는 구조다(시맨틱 리스트가 필요하면 후속 개선 대상이나, 각 카드가 이미 `role` 없는 네이티브 `<button>`으로 포커스 가능하므로 접근성 결손은 없음).
+- 각 카드는 네이티브 `<button type="button">` 자체 — 별도 `<li>` 래퍼 없이 버튼에 절대 위치 스타일(`position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%) translateX() translateY() rotate()`)과 `clipPath`를 인라인 `style`로 직접 지정한다. 카드 크기(`cardW`/`cardH`)가 뷰포트 폭에 따라 JS로 계산되는 동적 값(뷰포트 640px 기준 260px/300px)이라 Tailwind 정적 클래스로 표현할 수 없어 인라인 style을 사용한다({/* token 없음: 카드 폭 계산값이 런타임 분기라 유틸리티 클래스로 대체 불가 */}).
+- 카드 내부 레이아웃(패딩·flex·타이포)은 Tailwind 클래스로, 위치·크기·클리핑만 인라인 style로 분리하는 것이 원칙이다 — 신규 시각 패턴에서도 이 분리를 유지한다.
 
 **노치(notch) clip-path**
 
-카드의 좌상단·우하단 모서리를 대각선으로 잘라내 "정밀하게 재단된" 인상을 준다(브랜드 톤 "정밀함"과 연결). 신규 radius 토큰이 아닌 1회성 지오메트리 값이므로 주석 필수:
+카드의 모든 모서리를 대각선으로 잘라내 "정밀하게 재단된" 인상을 준다(브랜드 톤 "정밀함"과 연결). 신규 radius 토큰이 아닌 1회성 지오메트리 값이므로 주석 필수. 실제 구현은 8포인트 폴리곤으로 4개 모서리를 모두 50px 대각 컷하며, 우측 상단 모서리를 가로지르는 대각선 장식(`<span>`)이 추가로 있다(재단 흔적을 시각적으로 강조하는 디테일):
 
 ```css
-/* token 없음: 노치 카드 형태 — 좌상단/우하단 20px 대각 컷, 1회성 지오메트리 값 */
-clip-path: polygon(20px 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%, 0 20px);
+/* token 없음: 노치 카드 형태 — 4개 모서리 50px 대각 컷, 1회성 지오메트리 값 */
+clip-path: polygon(
+  50px 0%, calc(100% - 50px) 0%, 100% 50px,
+  100% 100%, calc(100% - 50px) 100%, 50px 100%,
+  0 100%, 0 0
+);
 ```
 
-Tailwind 임의값 유틸리티: `[clip-path:polygon(20px_0,100%_0,100%_calc(100%-20px),calc(100%-20px)_100%,0_100%,0_20px)]`
+- 대각선 장식: 우측 상단 모서리(노치 컷 라인) 위에 겹쳐지는 `absolute` `<span>`, `origin-top-right rotate-45`, 두께 2px, 길이는 노치 정사각형의 대각선(`50px * sqrt(2)`). 색상은 활성 카드 `bg-white/25`, 비활성 카드 `bg-border-light`, `aria-hidden="true"`.
+- Tailwind 임의값 유틸리티 대신 인라인 `style.clipPath`를 사용한다(위 "구조" 항목 참조 — 카드 크기 자체가 동적이라 노치 좌표도 정적 유틸리티 클래스보다 인라인 style이 일관적).
 
-> **구현 주의**: `clip-path`는 같은 요소의 `box-shadow`도 함께 잘라낸다. 활성 카드의 `shadow-product`가 노치 모서리 부근에서 잘려 보이면, 그림자 전용 래퍼(clip 없이 `shadow-product`만 적용)로 감싸고 내부에 clip된 배경/콘텐츠 레이어를 중첩하는 2-레이어 구조로 조정한다(신규 토큰 불필요, 마크업 구조만 변경).
+> **구현 주의 (2-레이어 구조 불필요로 확정)**: `clip-path`는 같은 요소의 `box-shadow`도 함께 잘라낸다. 그러나 이 캐러셀은 활성 카드에도 `shadow-product`를 적용하지 않는 방향으로 확정했으므로(아래 "활성/비활성 카드 상태" 참조), 그림자 전용 래퍼로 감싸는 2-레이어 구조는 **불필요하다**. 카드는 단일 `<button>`에 `clipPath` + Tailwind 배경/타이포 클래스를 함께 적용하는 단일 레이어로 충분하다.
 
-**활성/비활성 카드 상태 (distance = 순환 거리, 0이 활성)**
+**활성/비활성 카드 상태 (`absPos` = 활성 카드로부터의 좌우 거리, 0이 활성. `pos`의 절댓값)**
 
-| distance | transform | scale | opacity | z-index | shadow |
-|---|---|---|---|---|---|
-| 0 (활성) | `translate-x-0 translate-y-0 rotate-0` | `scale-100` | `opacity-100` | `z-40` | `shadow-product` |
-| 1 | `translate-x-6 sm:translate-x-10 -translate-y-2 rotate-3` | `scale-95` | `opacity-70` | `z-30` | 없음 |
-| 2 | `translate-x-12 sm:translate-x-20 -translate-y-4 rotate-6` | `scale-90` | `opacity-50` | `z-20` | 없음 |
-| 3 (최후미) | `translate-x-16 sm:translate-x-28 -translate-y-6 rotate-12` | `scale-75` | `opacity-30` | `z-10` | 없음 |
+카드 개수(`n`)가 어드민 CRUD로 가변적이라 `absPos`가 3을 초과할 수 있다. **`absPos >= 3`은 모두 아래 표의 `absPos 3` 행 값으로 클램프**하고, **`absPos >= 4`인 카드는 렌더링하되 시각적으로 사실상 사라지는 `opacity-0`으로 처리**해 카드 수가 많아져도 스택이 무한히 넓어지거나 화면 밖으로 카드가 튀어나가지 않도록 한다(DOM에는 유지 — 순환 시 트랜지션이 끊기지 않게 하기 위함).
 
-- `rotate-3`/`rotate-6`/`rotate-12`, `scale-95`/`scale-90`/`scale-75`는 Tailwind 기본 스케일이며 신규 토큰이 아니다.
-- 활성 카드만 `shadow-product`(제품 이미지급 강한 elevation)로 앞에 튀어나온 인상을 준다. 비활성 카드는 그림자 없이 opacity·scale 감소만으로 depth를 표현한다(§6 Depth & Elevation 원칙과 동일 — 다크 카드가 그림자 대신 배경색 차이로 depth를 표현하듯, 여기서는 그림자 대신 opacity/scale 차이를 depth 신호로 사용).
+| absPos | translateX | translateY / rotate | scale | opacity | z-index | shadow |
+|---|---|---|---|---|---|---|
+| 0 (활성) | `0` | `-20px` / `0deg` | `100%` | `100%` | `n`(최상단) | 없음 |
+| 1 | `±hStep`(1칸) | `∓15px` / `∓2.5deg` | `95%` | `75%` | `n-1` | 없음 |
+| 2 | `±hStep×2` | `∓15px` / `∓2.5deg` | `88%` | `55%` | `n-2` | 없음 |
+| 3 (클램프 하한) | `±hStep×3` | `∓15px` / `∓2.5deg` | `80%` | `35%` | `n-3` | 없음 |
+| 4 이상 | 3과 동일 위치 유지 | 3과 동일 | 3과 동일 | `0`(사실상 숨김) | `n-absPos` | 없음 |
+
+- `hStep`은 기존 구현값(`cardW / 1.5`)을 유지하는 런타임 계산값이므로 Tailwind 정적 클래스가 아닌 인라인 style로 유지한다({/* token 없음: hStep이 cardW(런타임 분기값)에서 파생되는 계산값 */}).
+- translateY/rotate 부호는 홀짝 지그재그(`pos % 2 !== 0`)로 갈라지는 기존 구현을 유지한다 — 카드가 완전히 일직선으로 겹치지 않고 계단식으로 흩어지는 인상을 준다.
+- scale/opacity는 Tailwind 정적 클래스(`scale-100`/`scale-95`/`opacity-100`/`opacity-75` 등)가 아닌 인라인 style 수치로 관리한다 — `pos`가 좌우 대칭이라 절댓값 계산(`absPos`)을 거쳐야 하고, 클램프 로직도 함께 있어 정적 클래스 매핑보다 인라인 계산이 실제 구현과 일치한다.
+- **shadow 미적용으로 확정**: 활성 카드가 이미 `bg-aircok-blue` 솔리드 배경으로 섹션과 명확히 구분되고, 카드가 여러 장(가변 `n`) 겹치는 구조에서 그림자까지 추가하면 노치 클리핑과 결합해 시각적으로 번잡해진다. §6 Shadow 철학("그림자는 극도로 아껴 쓴다")에 따라 **depth 신호는 scale·opacity·z-index만 사용**하고 shadow는 이 컴포넌트에서 사용하지 않는다(design.md 초안의 `shadow-product` 적용 계획은 폐기).
 
 **호버 상태 (비활성 카드)**
 
-비활성 카드에 마우스를 올리면 클릭 가능함을 암시하도록, 해당 카드의 기본 opacity/scale에서 소폭 끌어올린 값으로 전환한다. 위치(transform의 translate/rotate)는 그대로 유지하고 depth 신호(opacity·scale)만 강조해 스택 질서를 흐트러뜨리지 않는다. distance 0(활성)은 이미 최대치이므로 hover 스타일이 없다.
+비활성 카드에 마우스를 올리면 클릭 가능함을 암시하도록 보더 색상만 전환한다(배경 전환에 따라 opacity/scale 호버 강조 대신 보더로 단순화):
 
-| distance | hover opacity | hover scale |
-|---|---|---|
-| 1 | `hover:opacity-90` | `hover:scale-[0.97]` |
-| 2 | `hover:opacity-70` | `hover:scale-[0.93]` |
-| 3 | `hover:opacity-50` | `hover:scale-[0.78]` |
+- 비활성 카드 hover: `hover:border-aircok-blue/40`
+- 활성 카드(`absPos 0`)는 `cursor-default`로 클릭 불필요를 표시하며 hover 스타일이 없다.
 
-{/* token 없음: hover 시 opacity/scale 상승폭 — 기본값 대비 임의 조정된 1회성 수치 */}
+**카드 콘텐츠 (인덱스 숫자 계승 + 활성/비활성 대비 강화)**
 
-**카드 콘텐츠 (인덱스 숫자 계승)**
+기존 Value Highlight Card의 대형 솔리드 인덱스 숫자 정체성을 계승한다. 아이콘(lucide-react)은 가치 각각에 정확히 대응하는 은유가 매번 확보되지 않을 수 있어 기본값으로 채택하지 않는다 — 이미 확립된 인덱스 숫자 시그니처를 우선한다.
 
-기존 Value Highlight Card의 대형 솔리드 인덱스 숫자(01–04) 정체성을 계승한다. 아이콘(lucide-react)은 4개 가치 각각에 정확히 대응하는 은유가 매번 확보되지 않을 수 있어 기본값으로 채택하지 않는다 — 이미 확립된 인덱스 숫자 시그니처를 우선한다.
-
-- **인덱스 숫자**: `text-aircok-blue font-display font-bold text-5xl leading-none tracking-[-0.3px] select-none`, `aria-hidden="true"`
-- **제목**: `text-subheading font-bold font-display text-heading-dark leading-[1.19] [word-break:keep-all]`
-- **설명**: `text-[17px] text-body-dark leading-[1.65] [word-break:keep-all]`
+- **인덱스 숫자**: `select-none font-display text-5xl font-bold leading-none tracking-[-0.3px]` — 비활성 `text-aircok-blue`(계승, 유지 필수), 활성 `text-white/40`(기존 `text-white/50`보다 낮춰 제목과의 밀도 대비를 키움 — 활성 카드에서는 숫자가 배경 텍스처처럼 물러나고 제목이 전면에 나서도록).
+- **제목**: `font-display text-xl font-bold leading-[1.19] [word-break:keep-all]` — 비활성 `text-heading-dark`, 활성 `text-white`.
+- **설명**: `text-[15px] leading-[1.65] [word-break:keep-all]` — 비활성 `text-body-dark`, 활성 `text-white/80`.
+- **활성/비활성 spacing 차등**: 비활성 카드는 인덱스 숫자와 텍스트 블록 사이 `gap-5`(기존과 동일, 축소해 보조 정보임을 암시)를, 활성 카드는 `gap-6`으로 한 단계 넓혀 활성 카드의 콘텐츠가 더 여유 있게 "숨 쉬는" 인상을 준다({/* token 없음: 활성/비활성 gap 차등값, §5 Spacing System 4px 그리드 내 임의 선택 */}). 카드 최상단 패딩은 기존 `p-8` 유지.
 
 **인터랙션 — 순환 로직**
 
-- 카드 순서는 `order: number[]`(값의 인덱스 배열) 상태로 관리한다. `order[0]`이 활성(distance 0), 이후 원소가 순서대로 distance 1/2/3에 매핑된다.
-- **카드 클릭**: 클릭된 카드의 인덱스를 `order`에서 찾아 배열 맨 앞으로 이동시키고 나머지는 상대 순서를 유지한다(= 클릭한 카드가 즉시 활성화).
-- **다음 버튼**: `order`를 왼쪽으로 1칸 회전 — 활성 카드가 뒤로 물러나고 다음 카드가 활성화.
-- **이전 버튼**: `order`를 오른쪽으로 1칸 회전 — 최후미 카드가 활성화.
-- transition: 카드 자체는 `transition-all duration-500 ease-out`(여러 속성이 동시에 이동하므로 느긋하게), 버튼 hover는 `transition-colors duration-200`. 이 프로젝트에 별도 duration 토큰이 없으므로 Tailwind 기본 `duration-200`/`duration-500`을 그대로 사용한다(신규 토큰 불필요).
+- 카드 순서는 `list: number[]`(값의 인덱스 배열, 회전 배열) 상태로 관리한다. 활성 인덱스는 항상 `Math.floor(n / 2)`에 고정되어 있고(리스트 자체가 회전하는 방식), `pos = listIndex - Math.floor(n / 2)`로 각 카드의 좌우 상대 위치를 구한다.
+- **카드 클릭**: 클릭된 카드의 `pos`만큼 `move(steps)`로 배열을 회전시켜 해당 카드가 `Math.floor(n/2)` 위치(활성)로 오게 한다.
+- **다음 버튼**: `move(1)` — 배열을 왼쪽으로 1칸 회전, 활성 카드가 좌측으로 물러나고 우측 카드가 새로 활성화.
+- **이전 버튼**: `move(-1)` — 배열을 오른쪽으로 1칸 회전, 좌측 카드가 새로 활성화.
+- **자동재생**: `AUTOPLAY_INTERVAL = 5000`ms마다 `move(1)`, hover/focus 중이거나 `prefers-reduced-motion`이면 일시정지. 수동 조작(`handleManualMove`) 시 `resetKey`를 증가시켜 자동재생 타이머를 리셋한다.
+- transition: 카드 자체는 인라인 `style.transition = 'all 500ms ease-in-out'`(Tailwind `transition-all duration-500 ease-out`과 이징 곡선만 다름 — `ease-in-out`으로 유지, 위치·회전·스케일이 동시에 바뀌는 절대 위치 배치라 인라인 style 그룹과 함께 관리하는 것이 일관적이므로 Tailwind 클래스로 옮기지 않음), 버튼 hover는 `transition-colors duration-200`. 이 프로젝트에 별도 duration 토큰이 없으므로 Tailwind 기본 `duration-200`을 그대로 사용한다(신규 토큰 불필요).
 
 **prev/next 버튼**
 
@@ -1289,7 +1304,7 @@ Tailwind 임의값 유틸리티: `[clip-path:polygon(20px_0,100%_0,100%_calc(100
 <button
   type="button"
   aria-label="이전 가치 보기"
-  className="flex h-11 w-11 items-center justify-center rounded-pill border border-border-light bg-surface-white text-aircok-blue transition-colors duration-200 hover:bg-aircok-blue hover:text-heading-light active:scale-[0.97] focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:ring-offset-2"
+  className="flex h-11 w-11 items-center justify-center rounded-pill border border-border-light bg-surface-white text-aircok-blue transition-colors duration-200 hover:bg-aircok-blue hover:text-white active:scale-[0.97] focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:ring-offset-2"
 >
   <ChevronLeft className="h-5 w-5" aria-hidden="true" />
 </button>
@@ -1303,97 +1318,133 @@ Tailwind 임의값 유틸리티: `[clip-path:polygon(20px_0,100%_0,100%_calc(100
 
 터치 스와이프 제스처는 이 프로젝트에 선례가 없고 별도 제스처 라이브러리 없이 정확히 구현하기 어렵다. 따라서 모바일(`sm` 미만, 640px)에서는 **겹침 스택을 접고 활성 카드 1장만 노출**하며, 데스크탑과 동일한 prev/next 버튼 클릭으로 순환한다(제스처 없음, 인터랙션 방식 통일).
 
-- `sm` 미만: `distance > 0`인 `<li>`에 `hidden sm:block`을 적용해 비활성 카드를 렌더링에서 숨긴다. 활성 카드만 남아 `absolute inset-0`이 스택 컨테이너에 꽉 차 보인다(부모 `<ul>`가 `relative`).
-- `sm` 이상: `hidden sm:block`이 해제되며 위 표의 계단식 스택 4장이 모두 노출된다.
+- `sm` 미만: `!isActive`(즉 `absPos > 0`)인 카드 버튼에 `hidden sm:flex`를 적용해 비활성 카드를 렌더링에서 숨긴다. 활성 카드만 남아 스테이지(`relative w-full overflow-hidden`, 높이는 `cardH + 60`) 중앙에 보인다.
+- `sm` 이상: `hidden sm:flex`가 해제되며 위 표의 계단식 스택이 클램프 범위 내에서 모두 노출된다.
 
 **접근성**
 
-- 컨테이너: `role="region" aria-roledescription="carousel" aria-label="핵심 가치"`.
-- 카드 리스트: `<ul>`/`<li>` 시맨틱 리스트, 각 카드는 내부 `<button type="button">`으로 감싸 네이티브 포커스/키보드 활성화(Tab 이동, Enter/Space) 확보.
-- 활성 카드 버튼에 `aria-current="true"` 부여(비활성은 속성 생략).
+- 컨테이너: `role="region" aria-roledescription="carousel" aria-label="에어콕 핵심 가치"`.
+- 카드: 시맨틱 `<ul>`/`<li>` 리스트 래퍼 없이, 스테이지 안에 네이티브 `<button type="button">`을 절대 위치로 직접 배치한다(위 "구조" 항목 참조 — 카드 크기가 런타임 계산값이라 리스트 마크업보다 버튼 직접 배치가 실제 구현과 일치). 네이티브 `<button>`이므로 Tab 이동·Enter/Space 활성화는 별도 핸들러 없이 동작.
+- 활성 카드 버튼에 `aria-current="true"` 부여, 비활성 카드 버튼에는 `aria-label="{제목} 카드로 이동"`을 부여해 시각 정보 없이도 어느 카드로 이동하는지 알 수 있게 한다(활성 카드는 `aria-label` 생략, 이미 보이는 콘텐츠와 `aria-current`로 충분).
 - 순서 변경을 스크린리더에 알리는 시각적으로 숨겨진 라이브 리전: `<p className="sr-only" aria-live="polite">{활성 값 제목} 카드 표시 중</p>`.
 - 카드 버튼: Tab으로 순환 가능한 모든 비활성 카드도 포커스 대상이므로 `focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:ring-offset-2` 포커스 링을 카드 버튼에도 동일하게 적용한다(이 프로젝트 전역 버튼 Focus 규칙과 동일한 컨벤션).
-- prev/next 버튼: 위 `aria-label` 필수, `focus-visible:ring-2 focus-visible:ring-aircok-blue` 포커스 링 유지(Primary Blue 버튼 Focus 규칙과 동일).
+- prev/next 버튼: `aria-label="이전 가치 보기"`/`aria-label="다음 가치 보기"` 필수, `focus-visible:ring-2 focus-visible:ring-aircok-blue` 포커스 링 유지(Primary Blue 버튼 Focus 규칙과 동일).
 - 인덱스 숫자는 장식(식별자)이므로 `aria-hidden="true"` 유지 — 의미 정보는 제목 텍스트가 전달한다.
+- 자동재생 캐러셀 표준 접근성: `prefers-reduced-motion` 감지 시 자동재생 정지, 컨테이너 `onMouseEnter`/`onMouseLeave`/`onFocus`/`onBlur`로 hover/focus 중 자동재생 일시정지.
 
 **컴포넌트 위치 — 로컬 마크업 (`views/about/ui`)**
 
-현재 이 패턴을 사용하는 곳은 About `IntroSection` 1곳뿐이다. `shared/ui` 분리 기준(2~3곳 이상 반복/반복 예상)을 아직 충족하지 않으므로, `src/views/about/ui/` 내 별도 파일(예: `ValueCardStack.tsx`)로 로컬 구현하고 `IntroSection.tsx`에서 조합한다. 추후 다른 페이지(제품 상세 특징 비교, 도입 사례 캐러셀 등)에서 동일한 스택+노치+순환 패턴이 반복되면 그때 `shared/ui`로 승격한다.
+현재 이 패턴을 사용하는 곳은 About `IntroSection` 1곳뿐이다. `shared/ui` 분리 기준(2~3곳 이상 반복/반복 예상)을 아직 충족하지 않으므로, `src/views/about/ui/ValueCardStack.tsx`에 로컬 구현하고 `IntroSection.tsx`에서 조합한다. 추후 다른 페이지(제품 상세 특징 비교, 도입 사례 캐러셀 등)에서 동일한 스택+노치+순환 패턴이 반복되면 그때 `shared/ui`로 승격한다.
 
 ```tsx
 // Staggered Notched Value Card Carousel — About IntroSection
-// 로컬 마크업 예시: src/views/about/ui/ValueCardStack.tsx (실제 구현 기준)
+// 실제 구현: src/views/about/ui/ValueCardStack.tsx (스타일 갱신 반영 예시, 자동재생/reduced-motion 로직은 생략)
 'use client'
 
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 
-// distance(0~3, 0이 활성)별 transform/scale/opacity/z-index
-const STACK_STYLES = [
-  'z-40 translate-x-0 translate-y-0 rotate-0 scale-100 opacity-100',
-  'z-30 translate-x-6 sm:translate-x-10 -translate-y-2 rotate-3 scale-95 opacity-70',
-  'z-20 translate-x-12 sm:translate-x-20 -translate-y-4 rotate-6 scale-90 opacity-50',
-  'z-10 translate-x-16 sm:translate-x-28 -translate-y-6 rotate-12 scale-75 opacity-30',
-]
+// token 없음: 노치 카드 형태 — 4개 모서리 50px 대각 컷, 1회성 지오메트리 값
+const NOTCH = 50
+const NOTCH_DIAGONAL = Math.sqrt(NOTCH * NOTCH * 2)
+const CLIP_PATH = `polygon(${NOTCH}px 0%, calc(100% - ${NOTCH}px) 0%, 100% ${NOTCH}px, 100% 100%, calc(100% - ${NOTCH}px) 100%, ${NOTCH}px 100%, 0 100%, 0 0)`
 
-// 비활성 카드 hover 시 opacity/scale 소폭 상승(클릭 가능함을 암시) — 위 "호버 상태" 표와 동일
-const HOVER_STYLES = [
-  '',
-  'hover:opacity-90 hover:scale-[0.97]',
-  'hover:opacity-70 hover:scale-[0.93]',
-  'hover:opacity-50 hover:scale-[0.78]',
-]
-
-// token 없음: 노치 카드 형태 — 좌상단/우하단 20px 대각 컷, 1회성 지오메트리 값
-const NOTCH_CLIP_PATH =
-  '[clip-path:polygon(20px_0,100%_0,100%_calc(100%-20px),calc(100%-20px)_100%,0_100%,0_20px)]'
+// absPos(0~3+, 0이 활성)별 scale/opacity — 3 초과는 3의 위치를 유지한 채 opacity만 0으로 클램프
+const SCALE_BY_ABS_POS = [1, 0.95, 0.88, 0.8]
+const OPACITY_BY_ABS_POS = [1, 0.75, 0.55, 0.35]
+const clamp3 = (absPos: number) => Math.min(absPos, 3)
 
 export function ValueCardStack({ values }: { values: readonly { title: string; description: string }[] }) {
-  const [order, setOrder] = useState(() => values.map((_, i) => i))
-  const goToNext = () => setOrder((prev) => [...prev.slice(1), prev[0]])
-  const goToPrev = () => setOrder((prev) => [prev[prev.length - 1], ...prev.slice(0, -1)])
-  const activeValue = values[order[0]]
+  const [list, setList] = useState(() => values.map((_, i) => i))
+  const n = list.length
+  const activeIndex = Math.floor(n / 2)
+  const cardW = 300
+  const cardH = Math.round(cardW * 1.3)
+  const hStep = Math.round(cardW / 1.5)
+
+  const move = useCallback((steps: number) => {
+    setList(prev => {
+      const next = [...prev]
+      if (steps > 0) for (let i = 0; i < steps; i++) next.push(next.shift()!)
+      else for (let i = 0; i < -steps; i++) next.unshift(next.pop()!)
+      return next
+    })
+  }, [])
 
   return (
-    <div role="region" aria-roledescription="carousel" aria-label="핵심 가치" className="flex flex-col items-center gap-8">
-      <p className="sr-only" aria-live="polite">{activeValue.title} 카드 표시 중</p>
-      <ul className="relative mx-auto flex min-h-[380px] sm:min-h-[420px] w-full max-w-[420px] items-center justify-center">
-        {order.map((valueIndex, distance) => {
-          const value = values[valueIndex]
-          const isActive = distance === 0
+    <div role="region" aria-roledescription="carousel" aria-label="에어콕 핵심 가치" className="flex flex-col items-center gap-8">
+      <p className="sr-only" aria-live="polite">{values[list[activeIndex]].title} 카드 표시 중</p>
+      <div className="relative w-full overflow-hidden" style={{ height: cardH + 60 }}>
+        {list.map((valueIndex, listIndex) => {
+          const pos = listIndex - activeIndex
+          const isActive = pos === 0
+          const absPos = clamp3(Math.abs(pos))
+          const isZigzagOdd = pos % 2 !== 0
+
           return (
-            <li
-              key={value.title}
-              className={`absolute inset-0 transition-all duration-500 ease-out ${STACK_STYLES[distance]} ${HOVER_STYLES[distance]} ${distance > 0 ? 'hidden sm:block' : ''}`}
+            <button
+              key={valueIndex}
+              type="button"
+              onClick={() => move(pos)}
+              aria-current={isActive ? 'true' : undefined}
+              aria-label={isActive ? undefined : `${values[valueIndex].title} 카드로 이동`}
+              style={{
+                width: cardW,
+                height: cardH,
+                clipPath: CLIP_PATH,
+                position: 'absolute',
+                left: '50%',
+                top: '50%',
+                zIndex: n - Math.abs(pos),
+                opacity: Math.abs(pos) > 3 ? 0 : OPACITY_BY_ABS_POS[absPos],
+                transform: `
+                  translate(-50%, -50%)
+                  translateX(${hStep * (pos > 3 ? 3 : pos < -3 ? -3 : pos)}px)
+                  translateY(${isActive ? -20 : isZigzagOdd ? 15 : -15}px)
+                  rotate(${isActive ? 0 : isZigzagOdd ? 2.5 : -2.5}deg)
+                  scale(${SCALE_BY_ABS_POS[absPos]})
+                `,
+                transition: 'all 500ms ease-in-out',
+              }}
+              className={[
+                isActive ? 'gap-6' : 'gap-5',
+                'flex flex-col p-8 text-left',
+                'focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:ring-offset-2',
+                isActive
+                  ? 'bg-aircok-blue cursor-default'
+                  : 'bg-surface-light border border-border-light hover:border-aircok-blue/40 cursor-pointer',
+                !isActive ? 'hidden sm:flex' : 'flex',
+              ].join(' ')}
             >
-              {/* 그림자 전용 래퍼: clip-path 없이 shadow-product만 적용해 노치 모서리에서 그림자가 잘리는 문제를 방지 (§ 구현 주의) */}
-              <div className={`h-full w-full rounded-xl ${isActive ? 'shadow-product' : ''}`}>
-                <button
-                  type="button"
-                  aria-current={isActive ? 'true' : undefined}
-                  onClick={() => setOrder((prev) => [valueIndex, ...prev.filter((i) => i !== valueIndex)])}
-                  className={`flex h-full w-full flex-col gap-4 rounded-xl bg-surface-light p-8 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:ring-offset-2 ${NOTCH_CLIP_PATH}`}
-                >
-                  <span aria-hidden="true" className="select-none font-display text-5xl font-bold leading-none tracking-[-0.3px] text-aircok-blue">
-                    {String(valueIndex + 1).padStart(2, '0')}
-                  </span>
-                  <h3 className="text-subheading font-bold font-display text-heading-dark leading-[1.19] [word-break:keep-all]">
-                    {value.title}
-                  </h3>
-                  <p className="text-[17px] text-body-dark leading-[1.65] [word-break:keep-all]">
-                    {value.description}
-                  </p>
-                </button>
+              {/* 노치 모서리를 가로지르는 장식선 */}
+              <span
+                aria-hidden="true"
+                className={`absolute block origin-top-right rotate-45 ${isActive ? 'bg-white/25' : 'bg-border-light'}`}
+                style={{ right: -2, top: NOTCH - 2, width: NOTCH_DIAGONAL, height: 2 }}
+              />
+              <span
+                aria-hidden="true"
+                className={`select-none font-display text-5xl font-bold leading-none tracking-[-0.3px] ${isActive ? 'text-white/40' : 'text-aircok-blue'}`}
+              >
+                {String(valueIndex + 1).padStart(2, '0')}
+              </span>
+              <div className="flex flex-col gap-3">
+                <h3 className={`font-display text-xl font-bold leading-[1.19] [word-break:keep-all] ${isActive ? 'text-white' : 'text-heading-dark'}`}>
+                  {values[valueIndex].title}
+                </h3>
+                <p className={`text-[15px] leading-[1.65] [word-break:keep-all] ${isActive ? 'text-white/80' : 'text-body-dark'}`}>
+                  {values[valueIndex].description}
+                </p>
               </div>
-            </li>
+            </button>
           )
         })}
-      </ul>
-      <div className="flex items-center justify-center gap-4">
-        <button type="button" aria-label="이전 가치 보기" onClick={goToPrev} className="flex h-11 w-11 items-center justify-center rounded-pill border border-border-light bg-surface-white text-aircok-blue transition-colors duration-200 hover:bg-aircok-blue hover:text-heading-light active:scale-[0.97] focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:ring-offset-2">
+      </div>
+      <div className="flex items-center justify-center gap-3">
+        <button type="button" aria-label="이전 가치 보기" onClick={() => move(-1)} className="flex h-11 w-11 items-center justify-center rounded-pill border border-border-light bg-surface-white text-aircok-blue transition-colors duration-200 hover:bg-aircok-blue hover:text-white active:scale-[0.97] focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:ring-offset-2">
           <ChevronLeft className="h-5 w-5" aria-hidden="true" />
         </button>
-        <button type="button" aria-label="다음 가치 보기" onClick={goToNext} className="flex h-11 w-11 items-center justify-center rounded-pill border border-border-light bg-surface-white text-aircok-blue transition-colors duration-200 hover:bg-aircok-blue hover:text-heading-light active:scale-[0.97] focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:ring-offset-2">
+        <button type="button" aria-label="다음 가치 보기" onClick={() => move(1)} className="flex h-11 w-11 items-center justify-center rounded-pill border border-border-light bg-surface-white text-aircok-blue transition-colors duration-200 hover:bg-aircok-blue hover:text-white active:scale-[0.97] focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:ring-offset-2">
           <ChevronRight className="h-5 w-5" aria-hidden="true" />
         </button>
       </div>
@@ -1411,12 +1462,12 @@ export function ValueCardStack({ values }: { values: readonly { title: string; d
       theme="light"
       maxWidth="max-w-[760px]"
     />
-    <ValueCardStack values={SITE.about.intro.values} />
+    <ValueCardStack values={coreValues} />
   </div>
 </section>
 ```
 
-> **그림자 레이어 형태 vs 노치 카드 윤곽**: 그림자 전용 `div`는 `rounded-xl`(둥근 사각형)이고 그 안의 `button`만 노치 clip이 적용되어, 엄밀히는 그림자 윤곽과 카드 윤곽이 100% 일치하지 않는다. 다만 `shadow-product`의 blur 반경(30px)이 노치 컷(20px 대각선)보다 커서 육안상 차이가 흡수되므로, 완전한 노치 형태 그림자를 위한 추가 CSS 복잡도(예: SVG filter 기반 커스텀 그림자)는 도입하지 않는다.
+> **그림자 미적용 확정 배경**: 이전 초안은 활성 카드에 `shadow-product`를 적용하기 위해 그림자 전용 래퍼(clip 없음) + 내부 clip 레이어의 2-레이어 구조를 전제했다. 실제로는 활성 카드가 `bg-aircok-blue` 솔리드 배경만으로 충분히 두드러지고, 가변 개수 카드가 겹치는 스택에 그림자까지 더하면 시각적으로 번잡해진다고 판단해 **shadow를 아예 쓰지 않는 방향으로 확정**했다. 따라서 2-레이어 구조도 필요 없어졌고, 카드는 단일 `<button>` 레이어로 유지한다.
 
 > **섹션 배경 리듬**: `PageHeroSection`(다크) → `IntroSection`(`bg-surface-white`) → `TeamSection`(`bg-surface-light`) → `PartnersSection`(다크) → `HistorySection`(`bg-surface-white`) 순으로, 인접한 모든 섹션 쌍이 서로 다른 톤이라 라이트-라이트/다크-다크 연속 구간이 없다. About 페이지 섹션이 재배치되거나 신규 섹션이 삽입되면 이 리듬을 다시 검토한다.
 
