@@ -16,7 +16,7 @@ export function AdminServicesImagesView() {
 
   return (
     <div>
-      <AdminPageHeader title="서비스 이미지 관리" description="서비스 소개 이미지를 업로드·정렬·삭제합니다." />
+      <AdminPageHeader title="서비스 이미지 관리" description="서비스 페이지의 공기질 관리 제품군 이미지를 업로드·정렬·삭제합니다." />
       <div className="p-6 lg:p-8 flex flex-col gap-8">
         <ServiceImageUploadSection />
         <ServiceImageGridSection images={images} isLoading={isLoading} />

@@ -42,7 +42,7 @@ export function AdminNewsListView() {
 
   return (
     <div>
-      <AdminPageHeader title="뉴스 관리" description="뉴스 기사를 작성·수정·삭제합니다.">
+      <AdminPageHeader title="뉴스 관리" description="뉴스 페이지의 뉴스 기사를 작성·수정·삭제합니다.">
         <Link
           href="/console/news/new"
           className="inline-flex items-center justify-center bg-aircok-blue text-heading-light text-sm font-medium rounded-md px-4 py-2 min-h-[44px] hover:bg-aircok-blue-dark active:scale-[0.97] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:ring-offset-2"

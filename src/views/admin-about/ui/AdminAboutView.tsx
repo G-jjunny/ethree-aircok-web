@@ -18,7 +18,7 @@ export function AdminAboutView() {
     <div>
       <AdminPageHeader
         title="소개 페이지 관리"
-        description="OUR Team 섹션에 노출할 이미지를 등록·정렬·삭제합니다."
+        description="소개(About) 페이지의 팀 이미지와 회사 연혁을 관리합니다."
       />
 
       {/* 콘텐츠 영역 */}
