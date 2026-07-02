@@ -707,13 +707,22 @@ Apple 스타일의 '제품 우선 프레젠테이션'을 Aircok 브랜드에 적
 **공통 구조**
 - 래퍼: `group flex flex-col sm:flex-row gap-5 sm:gap-6 items-start`
 - 썸네일 영역: `w-full sm:w-[280px] shrink-0 rounded-lg overflow-hidden` (`sm:w-[280px]` {/* token 없음: row 썸네일 고정 너비, 매거진 가로형 전용 1회성 수치 */})
-- 썸네일 이미지: `aspect-row-thumb w-full object-cover group-hover:scale-[1.02] transition-transform duration-200`
+- 썸네일 이미지: `aspect-row-thumb w-full object-contain {레터박스 배경} group-hover:scale-[1.02] transition-transform duration-200` — `object-contain`으로 원본 비율 전체를 보존한다(원본이 4:3이 아닐 때 crop되어 일부가 잘려나가는 문제 해결). 레터박스 배경은 라이트 섹션 `bg-surface-light`, 다크 섹션 `bg-surface-dark-1`(아래 "결정 근거" 참조)
 - 썸네일 없음: Image Placeholder(`aspect-row-thumb` 적용) — 라이트 섹션은 라이트 변형, 다크 섹션은 다크 변형
 - 텍스트 영역: `flex flex-col gap-2 min-w-0 flex-1`
 - 날짜: `text-aircok-blue text-xs font-body tracking-wide`
 - 제목: `font-display font-semibold text-[21px] leading-snug [word-break:keep-all]` (Card Title 수준, hover 시 색 변화 없음 — 카드 전체 hover는 썸네일 scale로만)
 - 설명: `text-sm font-body line-clamp-2 [word-break:keep-all]`
 - 장소: Location Pin Icon 패턴, `text-xs mt-1`
+
+**결정 근거 — `row-thumb`만 `object-contain` 분기, `video`/`featured`는 `object-cover` 유지**
+
+`<NewsImage>`는 `video`(Featured Hero 텍스트 분리형 등)·`featured`(Featured Hero Overlay)·`row-thumb`(이 컴포넌트) 3개 ratio를 공유하는데, 두 그룹의 이미지 성격이 다르다.
+
+- `video`/`featured`: Featured Hero 1건에만 쓰이는 대형 커버 이미지로, 넓은 와이드 비율(16/7, 16/9)로 큐레이션되는 것을 전제한 시네마틱 처리다. 여기서 크롭은 이미 의도된 art-direction이며(§4 "News Featured Hero" hover scale 효과와 함께 설계), `object-contain` 전환 시 대형 히어로에 레터박스 여백이 크게 생겨 시각적 완결성이 깨진다. → **`object-cover` 유지**.
+- `row-thumb`: 목록에서 여러 건이 작게 반복 노출되는 썸네일로, 원본 이미지가 4:3이 아닌 경우(세로 사진, 스크린샷 등)가 실제로 자주 발생한다. 작은 썸네일에서 crop으로 얼굴·핵심 정보가 잘리는 문제가 실사용상 더 크므로 **전체 가시성 우선**이 낫다. 작은 영역이라 레터박스 여백도 시각적으로 크게 두드러지지 않는다. → **`object-contain`으로 전환**.
+- 레터박스 배경 처리: `object-contain`으로 생기는 여백을 투명하게 두면 섹션 배경과 이미지 사이에 이질감이 생긴다. 이미 §4 "Image Placeholder"가 이미지 없음 상태에서 라이트 `bg-surface-light` / 다크 `bg-surface-dark-1` 톤을 쓰고 있으므로, 있음/없음 상태의 "이미지 주변 표면 톤"을 통일하기 위해 **동일 톤을 레터박스 배경으로 재사용**한다(신규 색상 토큰 없음).
+- 최종 className 조합: `<img>`에 `aspect-row-thumb w-full object-contain {테마별 배경} ...`을 적용한다. 테마별 배경은 라이트 `bg-surface-light`, 다크 `bg-surface-dark-1`(§13.3 `<NewsImage>` 계약에 반영).
 
 **라이트 변형** (`bg-surface-white` / `bg-surface-light` 섹션)
 - 제목: `text-heading-dark`
@@ -728,13 +737,15 @@ Apple 스타일의 '제품 우선 프레젠테이션'을 Aircok 브랜드에 적
 - 장소: `text-body-light opacity-60`
 - 썸네일 placeholder: Image Placeholder 다크 변형
 
+> **`theme` prop 유지 근거**: News Magazine Layout 전환(위 "배경 결정") 이후 현재 `NewsHorizontalRow`는 `NewsRowListSection`/`NewsSecondaryGridSection` 두 곳 모두 `theme="light"`로만 호출되어 다크 변형은 당장 사용되지 않는다. 그러나 `NewsHorizontalRow`는 `entities/news` 데이터에만 의존하는 순수 표현 컴포넌트로 다른 다크 섹션(예: 향후 신규 페이지)에서도 재사용될 수 있으므로, `theme` prop과 다크 분기 코드는 데드 코드가 아니라 **의도된 재사용 대비 인터페이스**로 유지한다. 삭제하지 않는다.
+
 ```tsx
 // News Horizontal Row 예시 (라이트 변형)
 <Link href={`/news/${item.id}`} className="block">
   <article className="group flex flex-col sm:flex-row gap-5 sm:gap-6 items-start">
     {/* 썸네일 (고정 너비) */}
     <div className="w-full sm:w-[280px] shrink-0 rounded-lg overflow-hidden"> {/* token 없음: row 썸네일 고정 너비 280px */}
-      <img src="..." alt="..." className="aspect-row-thumb w-full object-cover group-hover:scale-[1.02] transition-transform duration-200" />
+      <img src="..." alt="..." className="aspect-row-thumb w-full object-contain bg-surface-light group-hover:scale-[1.02] transition-transform duration-200" /> {/* 다크 변형은 bg-surface-dark-1 */}
     </div>
     {/* 텍스트 */}
     <div className="flex flex-col gap-2 min-w-0 flex-1">
@@ -871,7 +882,15 @@ Apple 스타일의 '제품 우선 프레젠테이션'을 Aircok 브랜드에 적
 
 ### News Magazine Layout (매거진형 목록 페이지 구성)
 
-뉴스 목록 페이지(`/news`)의 전체 섹션 리듬. §1/§7 섹션 교차 원칙을 따라 라이트↔다크 섹션을 교차해 시네마틱 리듬을 만든다. 카테고리/태그 분류는 도입하지 않으며, 가용 데이터(id·title·description·date·location·coverImage)만 사용한다.
+뉴스 목록 페이지(`/news`)의 전체 섹션 리듬. **(갱신) 더 이상 라이트↔다크를 교차하지 않고 페이지 전체를 라이트 톤으로 통일한다** — §1/§7의 "라이트/다크 섹션 교차로 시네마틱 리듬 구성" 원칙 자체는 다른 페이지(About 등)에는 여전히 유효하며 삭제하지 않는다. News Magazine Layout은 그 일반 원칙의 예외로, `bg-surface-light`/`bg-surface-white`의 미세한 라이트 톤 차이만으로 섹션 리듬을 만드는 것으로 실제 구현이 바뀌었다(아래 "배경 결정" 참조). 카테고리/태그 분류는 도입하지 않으며, 가용 데이터(id·title·description·date·location·coverImage)만 사용한다.
+
+**배경 결정 — 보조 그리드 섹션 `bg-surface-dark` → `bg-surface-light` (근거)**
+
+기존 3번 "보조 그리드 섹션"은 `bg-surface-dark`로 2번 "주요 기사 row 섹션"(`bg-surface-white`)과 교대하며 라이트↔다크 리듬을 만들었으나, 다크 배경을 걷어내고 라이트 톤으로 전환한다.
+
+- `bg-surface-light` vs `bg-surface-white` 중 **`bg-surface-light`를 채택**한다. 바로 위 2번 섹션이 이미 `bg-surface-white`이므로, 3번도 같은 `bg-surface-white`를 쓰면 두 섹션이 완전한 동일 색으로 이어져 경계가 사라진다. `bg-surface-light`(`#f5f5f7`)는 White(`#ffffff`)와 애초에 "약간의 명도차를 위해 분리된" 토큰(§2 Surface 정의)이므로, 이 명도차만으로 두 섹션의 경계가 자연스럽게 드러난다.
+- 이는 About `PartnersSection` 배경 전환 선례(위 "Dual-Row Logo Marquee" 패턴 문서 참조)와 달리 **완전 동일 톤 인접이 아니므로** `border-t border-border-light` 같은 별도 구분선 보강은 필수가 아니다(선택 사항으로는 여전히 허용).
+- **`NewsHorizontalRow`의 `theme` prop을 `"dark"` → `"light"`로 변경 필수**. 배경이 밝아졌는데 다크 텍스트 스타일(`text-heading-light`/`text-body-light` 등)을 유지하면 밝은 배경 위에서 가독성이 깨진다.
 
 **섹션 순서·배경 리듬**
 
@@ -879,8 +898,8 @@ Apple 스타일의 '제품 우선 프레젠테이션'을 Aircok 브랜드에 적
 
 1. **Featured 섹션** (`bg-surface-light py-16 md:py-20`) — 상단 페이지 레이블(`text-aircok-blue ... uppercase` NEWS) + 페이지 타이틀(H1, Section Heading) 후, (연도 필터 사용 시 News Year Filter Tab을 배치한 뒤) 대표 기사 1건을 **News Featured Hero**로 노출. 데이터 1건일 때는 featured만 렌더.
 2. **주요 기사 row 섹션** (`bg-surface-white py-16`) — 다음 N건(예: 2~5번째)을 **News Horizontal Row 라이트 변형**으로 세로 나열. row 사이 구분선: `divide-y divide-border-light`(각 row에 상하 패딩 `py-8`).
-3. **보조 그리드 섹션** (`bg-surface-dark py-16 md:py-20`) — 나머지 기사를 **News Horizontal Row 다크 변형**으로 2열(`md:grid-cols-2`)로 배치. 다크 섹션이므로 카드 대신 다크 row를 사용한다. 이 섹션이 라이트↔다크 교차 리듬을 완성한다.
-4. (선택) 기사 수가 많을 때 라이트/다크 교차를 한 번 더 반복.
+3. **보조 그리드 섹션** (`bg-surface-light py-16 md:py-20`, **변경: 기존 다크 → 라이트**) — 나머지 기사를 **News Horizontal Row 라이트 변형**으로 2열(`md:grid-cols-2`)로 배치. `theme="light"`로 전달한다. 위 2번 섹션(`bg-surface-white`)과의 톤 차이만으로 경계가 구분된다.
+4. (선택) 기사 수가 많을 때 `bg-surface-white`↔`bg-surface-light` 톤을 한 번 더 교차 반복해 리듬을 유지할 수 있다. (라이트↔다크 교차는 News Magazine Layout의 기본 흐름에 더 이상 포함되지 않는다.)
 
 - 각 섹션 내부 콘텐츠는 반드시 `content-container` 사용.
 - 빈 상태: 데이터 0건이면 Featured 섹션 자리에 빈 상태 메시지(`py-24 text-center` + `text-secondary-dark`).
@@ -907,10 +926,10 @@ Apple 스타일의 '제품 우선 프레젠테이션'을 Aircok 브랜드에 적
     </div>
   </section>
 
-  {/* 3. 보조 그리드 (다크) */}
-  <section className="bg-surface-dark py-16 md:py-20">
+  {/* 3. 보조 그리드 (라이트) */}
+  <section className="bg-surface-light py-16 md:py-20">
     <div className="content-container grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-12">
-      {/* News Horizontal Row 다크 변형 * N */}
+      {/* News Horizontal Row 라이트 변형 * N (theme="light") */}
     </div>
   </section>
 </main>
@@ -2822,9 +2841,12 @@ NewsCard·NewsHorizontalRow·NewsFeaturedHero·NewsDetailHero 등 4곳+에서 �
   - `theme?: 'light' | 'dark'` (기본 `'light'`) — placeholder 배경 변형
   - `className?: string` (object-cover/scale 등 추가)
 - 이미지 분기:
-  - `src` 있음: `<img className="{aspect} w-full object-cover ...">`, URL은 `src.startsWith('http') ? src : ${API_BASE}${src}` (현재 view들과 동일 규칙 — `NewsImage` 내부에서 env(`NEXT_PUBLIC_API_URL`)를 직접 읽어 URL을 정규화한다. FSD eslint-plugin-boundaries의 shared→shared 슬라이스 간 import 금지 규칙 때문에 `API_BASE` 상수를 `shared/config`로 중앙화하지는 않는다)
+  - `src` 있음: `ratio`별로 object-fit이 분기된다(§4 "News Horizontal Row" 결정 근거 참조) —
+    - `ratio="video"` / `ratio="featured"`: `<img className="{aspect} w-full object-cover ...">` (기존 그대로, 큐레이션된 대형 커버 이미지의 크롭은 의도된 art-direction)
+    - `ratio="row-thumb"`: `<img className="{aspect} w-full object-contain {theme === 'dark' ? 'bg-surface-dark-1' : 'bg-surface-light'} ...">` — 원본 비율을 그대로 보존하고, `object-contain`으로 생기는 레터박스 여백은 Image Placeholder와 동일한 테마별 표면 톤으로 채워 "이미지 있음/없음" 두 상태의 주변 톤을 통일한다.
+    - URL은 공통으로 `src.startsWith('http') ? src : ${API_BASE}${src}` (현재 view들과 동일 규칙 — `NewsImage` 내부에서 env(`NEXT_PUBLIC_API_URL`)를 직접 읽어 URL을 정규화한다. FSD eslint-plugin-boundaries의 shared→shared 슬라이스 간 import 금지 규칙 때문에 `API_BASE` 상수를 `shared/config`로 중앙화하지는 않는다)
   - `src` 없음: §4 "Image Placeholder" — light(`bg-surface-light` + `text-secondary-dark`) / dark(`bg-surface-dark-1` + `text-body-light opacity-40`)
-- 주의: `next/image` 대신 현재 코드처럼 `<img>` + eslint-disable 유지(외부/동적 호스트). 비즈니스 로직(URL 결합)은 단순 문자열 처리이므로 마크업 컴포넌트 범위로 간주.
+- 주의: `next/image` 대신 현재 코드처럼 `<img>` + eslint-disable 유지(외부/동적 호스트). 비즈니스 로직(URL 결합)은 단순 문자열 처리이므로 마크업 컴포넌트 범위로 간주. object-fit 분기는 `ratio` prop만으로 결정되므로 내부에 `OBJECT_FIT: Record<ratio, string>` 맵을 두고 `ASPECT`와 나란히 관리하는 것을 권장(신규 prop 불필요).
 
 > 추출 우선순위: (1) `LocationTag`(이모지 제거가 즉시 필요), (2) `DateLabel`, (3) `NewsImage`. 세 컴포넌트 모두 `entities/news` 데이터(`NewsSummary`/`NewsPost`)에 의존하지 않는 순수 표현 컴포넌트로 설계해 `shared/ui`에 위치 가능하게 한다.
 
