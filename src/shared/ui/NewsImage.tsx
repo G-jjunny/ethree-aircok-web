@@ -27,7 +27,9 @@ function resolveSrc(src: string): string {
 /**
  * 뉴스 커버 이미지 + 폴백 placeholder. 이미지 있으면 <img>, 없으면 §4 Image Placeholder.
  * 외부/동적 호스트이므로 next/image 대신 <img> + eslint-disable 유지.
- * design.md §13.3 계약.
+ * ratio별 object-fit 분기: video/featured는 object-cover(의도된 크롭 art-direction),
+ * row-thumb은 object-contain + 테마별 레터박스 배경(원본 비율 전체 보존).
+ * design.md §4 "News Horizontal Row" 결정 근거 / §13.3 계약.
  */
 export function NewsImage({
   src,
@@ -40,12 +42,20 @@ export function NewsImage({
   const iconSize = ratio === 'featured' ? 'w-10 h-10' : 'w-6 h-6'
 
   if (src) {
+    // row-thumb만 object-contain으로 원본 비율을 보존하고, 레터박스 여백을
+    // Image Placeholder와 동일한 테마별 표면 톤으로 채운다(design.md §4/§13.3).
+    // video/featured는 큐레이션된 대형 커버 이미지의 의도된 크롭이므로 object-cover 유지.
+    const objectFitClass =
+      ratio === 'row-thumb'
+        ? `object-contain ${theme === 'dark' ? 'bg-surface-dark-1' : 'bg-surface-light'}`
+        : 'object-cover'
+
     return (
       // eslint-disable-next-line @next/next/no-img-element
       <img
         src={resolveSrc(src)}
         alt={alt}
-        className={`${aspect} w-full object-cover ${className}`.trim()}
+        className={`${aspect} w-full ${objectFitClass} ${className}`.trim()}
       />
     )
   }
