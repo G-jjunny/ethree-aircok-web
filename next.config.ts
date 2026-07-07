@@ -6,6 +6,20 @@ const nextConfig: NextConfig = {
   // Enables 'use cache' directive, cacheLife/cacheTag, and Partial Prerendering (PPR) by default.
   cacheComponents: true,
 
+  images: {
+    // 최신 포맷 우선 서빙 (원본 대비 용량 절감)
+    formats: ['image/avif', 'image/webp'],
+    remotePatterns: [
+      // Cloudflare R2 public bucket — 뉴스/서비스/카탈로그 이미지 원본.
+      // 업로드 이미지는 /uploads rewrite로 동일 출처 프록시되므로 별도 패턴 불필요.
+      {
+        protocol: 'https',
+        hostname: 'pub-046c2c24be4d444aaa70d8be1a5cd092.r2.dev',
+        pathname: '/**',
+      },
+    ],
+  },
+
   cacheLife: {
     // 실시간성이 중요한 데이터 (재고, 알림 등)
     realtime: {

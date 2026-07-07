@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { HeroSection } from './HeroSection';
 import { StatSection } from './StatSection';
 import { MethodologySection } from './MethodologySection';
@@ -14,7 +15,9 @@ export function HomeView() {
       <WhatYouGetSection />
       <WhyChooseUsSection />
       <WhyChooseUsFeatureSection />
-      <PartnersSection />
+      <Suspense fallback={<div className="min-h-[320px] bg-surface-light" />}>
+        <PartnersSection />
+      </Suspense>
     </main>
   );
 }

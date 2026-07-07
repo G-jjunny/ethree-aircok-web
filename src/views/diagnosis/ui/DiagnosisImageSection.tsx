@@ -1,12 +1,20 @@
-'use client'
-
-import { useQuery } from '@tanstack/react-query'
-import { diagnosisImageListQueryOptions } from '@/entities/diagnosis-image'
+import { connection } from 'next/server'
+import { getDiagnosisImageList, type DiagnosisImage } from '@/entities/diagnosis-image'
 import { ImageLightbox } from './ImageLightbox'
 
-export function DiagnosisImageSection() {
-  const { data: images = [] } = useQuery(diagnosisImageListQueryOptions())
+export async function DiagnosisImageSection() {
+  // 빌드 타임 프리렌더(백엔드 미기동)에서 fetch가 실행되지 않도록 요청 시점으로 미룬다.
+  await connection()
+
+  let images: DiagnosisImage[] = []
+  try {
+    images = await getDiagnosisImageList()
+  } catch {
+    images = []
+  }
+
   if (images.length === 0) return null
+
   return (
     <section className="bg-surface-white py-20">
       {/* token 없음: 780px는 세로형 슬라이드 가독성을 위한 1회성 콘텐츠 폭 제한 */}

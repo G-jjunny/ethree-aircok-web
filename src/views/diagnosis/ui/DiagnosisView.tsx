@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import { SITE } from '@/shared/config'
 import { SubHeroSection } from './SubHeroSection'
 import { DiagnosisImageSection } from './DiagnosisImageSection'
@@ -11,7 +12,9 @@ export function DiagnosisView() {
         title={SITE.pages.diagnosis.title}
         description={SITE.pages.diagnosis.description}
       />
-      <DiagnosisImageSection />
+      <Suspense fallback={<div className="min-h-[400px] bg-surface-white" />}>
+        <DiagnosisImageSection />
+      </Suspense>
       <DiagnosisFormSection />
     </main>
   )

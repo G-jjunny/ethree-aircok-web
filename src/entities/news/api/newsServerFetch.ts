@@ -1,3 +1,4 @@
+import { cache } from 'react';
 import axios from 'axios';
 import { ApiError } from '@/shared/api';
 import type { NewsPost, NewsListResponse } from '../model/types';
@@ -32,7 +33,9 @@ export async function getNewsList(
   }
 }
 
-export async function getNewsPost(id: string): Promise<NewsPost> {
+// getNewsPost is axios-based, so it is NOT auto-memoized like Next fetch.
+// Wrap with React cache() so generateMetadata + NewsDetailView dedupe within one request.
+export const getNewsPost = cache(async (id: string): Promise<NewsPost> => {
   try {
     const { data } = await axios.get<NewsPost>(
       `${getApiBaseUrl()}/news/${id}`,
@@ -48,4 +51,4 @@ export async function getNewsPost(id: string): Promise<NewsPost> {
     }
     throw new NewsApiError(0, '네트워크 오류');
   }
-}
+});

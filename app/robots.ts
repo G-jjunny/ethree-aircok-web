@@ -1,16 +1,13 @@
-import type { MetadataRoute } from "next";
-
-// TODO: 실제 도메인으로 변경
-const BASE_URL = "https://www.aircok.com";
+import type { MetadataRoute } from 'next';
+import { SITE } from '@/shared/config';
 
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: {
-      userAgent: "*",
-      allow: "/",
-      // TODO: 크롤링 차단이 필요한 경로 추가 (예: "/admin", "/api")
-      disallow: [],
+      userAgent: '*',
+      allow: '/',
+      disallow: ['/console', '/api'],
     },
-    sitemap: `${BASE_URL}/sitemap.xml`,
+    sitemap: `${SITE.url}/sitemap.xml`,
   };
 }

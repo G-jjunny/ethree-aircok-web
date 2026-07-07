@@ -1,13 +1,14 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import {
   adminDiagnosisConsultationQueryOptions,
+  diagnosisConsultationDetailQueryOptions,
   diagnosisConsultationKeys,
   updateDiagnosisConsultation,
-  type DiagnosisConsultation,
+  type DiagnosisConsultationListItem,
   type DiagnosisConsultationStatus,
   type UpdateDiagnosisConsultationBody,
 } from '@/entities/diagnosis-consultation'
@@ -61,10 +62,13 @@ function StatusBadge({ status }: { status: DiagnosisConsultationStatus }) {
 }
 
 export function AdminDiagnosisConsultationListView() {
-  const { data, isPending, isError, refetch, isRefetching } = useQuery(
+  // TRANSITIONAL(B2): query now returns a paginated envelope { data, total, page, limit }.
+  const { data: res, isPending, isError, refetch, isRefetching } = useQuery(
     adminDiagnosisConsultationQueryOptions(),
   )
-  const [selected, setSelected] = useState<DiagnosisConsultation | null>(null)
+  const [selected, setSelected] = useState<DiagnosisConsultationListItem | null>(
+    null,
+  )
 
   if (isPending) {
     return (
@@ -94,7 +98,7 @@ export function AdminDiagnosisConsultationListView() {
     )
   }
 
-  if (!data || data.length === 0) {
+  if (!res || res.total === 0) {
     return (
       <div className="flex flex-col items-center justify-center text-center gap-4 rounded-xl border border-border-light bg-surface-white px-6 py-16">
         <p className="text-body-dark font-body text-nav leading-[1.43]">
@@ -125,7 +129,7 @@ export function AdminDiagnosisConsultationListView() {
             </tr>
           </thead>
           <tbody className="divide-y divide-border-light">
-            {data.map((item) => (
+            {res.data.map((item) => (
               <tr
                 key={item.id}
                 className="hover:bg-surface-light transition-colors cursor-pointer"
@@ -163,6 +167,7 @@ export function AdminDiagnosisConsultationListView() {
       >
         {selected && (
           <ConsultationDetailPanel
+            key={selected.id}
             item={selected}
             onClose={() => setSelected(null)}
             onUpdated={(updated) => setSelected(updated)}
@@ -178,17 +183,38 @@ function ConsultationDetailPanel({
   onClose,
   onUpdated,
 }: {
-  item: DiagnosisConsultation
+  item: DiagnosisConsultationListItem
   onClose: () => void
-  onUpdated: (updated: DiagnosisConsultation) => void
+  onUpdated: (updated: DiagnosisConsultationListItem) => void
 }) {
   const queryClient = useQueryClient()
+
+  // 목록 응답에는 consultant/notes가 없으므로 상세 조회로만 prefill한다.
+  const {
+    data: detail,
+    isPending: isDetailPending,
+    isError: isDetailError,
+    refetch: refetchDetail,
+    isRefetching: isDetailRefetching,
+  } = useQuery(diagnosisConsultationDetailQueryOptions(item.id))
+
   const [status, setStatus] = useState<DiagnosisConsultationStatus>(item.status)
-  const [consultationDate, setConsultationDate] = useState(
-    formatDateForInput(item.consultationDate),
-  )
-  const [consultant, setConsultant] = useState(item.consultant ?? '')
-  const [notes, setNotes] = useState(item.notes ?? '')
+  const [consultationDate, setConsultationDate] = useState('')
+  const [consultant, setConsultant] = useState('')
+  const [notes, setNotes] = useState('')
+
+  // 상세 응답 도착 시 최초 1회만 폼을 초기화한다.
+  // (panel은 selected.id를 key로 remount되므로 item마다 ref가 새로 시작됨)
+  const initializedRef = useRef(false)
+  useEffect(() => {
+    if (detail && !initializedRef.current) {
+      initializedRef.current = true
+      setStatus(detail.status)
+      setConsultationDate(formatDateForInput(detail.consultationDate))
+      setConsultant(detail.consultant ?? '')
+      setNotes(detail.notes ?? '')
+    }
+  }, [detail])
 
   const { mutate, isPending } = useMutation({
     mutationFn: (body: UpdateDiagnosisConsultationBody) =>
@@ -196,6 +222,10 @@ function ConsultationDetailPanel({
     onSuccess: (updated) => {
       toast.success('저장되었습니다')
       queryClient.invalidateQueries({ queryKey: diagnosisConsultationKeys.all })
+      queryClient.setQueryData(
+        diagnosisConsultationKeys.detail(item.id),
+        updated,
+      )
       onUpdated(updated)
     },
     onError: () => {
@@ -203,7 +233,12 @@ function ConsultationDetailPanel({
     },
   })
 
+  // 상세 미도착/실패 시 빈칸 저장 사고를 막기 위해 폼과 저장을 잠근다.
+  const isFormReady = !!detail
+  const isSaveDisabled = isPending || !isFormReady
+
   const handleSave = () => {
+    if (!isFormReady) return
     mutate({
       status,
       consultationDate: consultationDate || undefined,
@@ -259,52 +294,94 @@ function ConsultationDetailPanel({
         <div className="border-t border-border-light pt-6 flex flex-col gap-4">
           <h3 className="text-sm font-display font-semibold text-heading-dark">상담 관리</h3>
 
-          <div className="flex flex-col gap-1">
-            <label className="text-sm font-body font-medium text-secondary-dark">상태</label>
-            <select
-              value={status}
-              onChange={(e) => setStatus(e.target.value as DiagnosisConsultationStatus)}
-              className={`text-sm font-medium font-body rounded-full px-3 py-2 border focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue ${STATUS_SELECT_CLASSES[status]}`}
-            >
-              {STATUS_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.label}
-                </option>
-              ))}
-            </select>
-          </div>
+          {isDetailPending ? (
+            <div className="flex flex-col gap-4" aria-busy="true">
+              {/* 상태 (select) */}
+              <div className="flex flex-col gap-1">
+                <div className="h-3.5 w-8 rounded-sm bg-surface-light animate-pulse" />
+                <div className="h-9 w-24 rounded-full bg-surface-light animate-pulse" />
+              </div>
+              {/* 상담일자 (date) */}
+              <div className="flex flex-col gap-1">
+                <div className="h-3.5 w-14 rounded-sm bg-surface-light animate-pulse" />
+                <div className="h-9 rounded-md bg-surface-light animate-pulse" />
+              </div>
+              {/* 상담자 (text) */}
+              <div className="flex flex-col gap-1">
+                <div className="h-3.5 w-12 rounded-sm bg-surface-light animate-pulse" />
+                <div className="h-9 rounded-md bg-surface-light animate-pulse" />
+              </div>
+              {/* 추가내용 (textarea) */}
+              <div className="flex flex-col gap-1">
+                <div className="h-3.5 w-14 rounded-sm bg-surface-light animate-pulse" />
+                <div className="h-24 rounded-md bg-surface-light animate-pulse" />
+              </div>
+            </div>
+          ) : isDetailError ? (
+            <div className="flex flex-col items-start gap-4 rounded-lg border border-border-light bg-surface-white p-4">
+              <p className="text-error font-body text-sm leading-[1.43] [word-break:keep-all]">
+                상담 상세 정보를 불러오지 못했습니다. 덮어쓰기 방지를 위해 저장이
+                비활성화되었습니다.
+              </p>
+              <button
+                type="button"
+                onClick={() => refetchDetail()}
+                disabled={isDetailRefetching}
+                className="inline-flex items-center justify-center bg-surface-light text-heading-dark text-sm font-medium rounded-md px-4 py-2 min-h-[44px] hover:bg-border-light active:scale-[0.97] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                {isDetailRefetching ? '다시 시도 중...' : '다시 시도'}
+              </button>
+            </div>
+          ) : (
+            <>
+              <div className="flex flex-col gap-1">
+                <label className="text-sm font-body font-medium text-secondary-dark">상태</label>
+                <select
+                  value={status}
+                  onChange={(e) => setStatus(e.target.value as DiagnosisConsultationStatus)}
+                  className={`text-sm font-medium font-body rounded-full px-3 py-2 border focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue ${STATUS_SELECT_CLASSES[status]}`}
+                >
+                  {STATUS_OPTIONS.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-          <div className="flex flex-col gap-1">
-            <label className="text-sm font-body font-medium text-secondary-dark">상담일자</label>
-            <input
-              type="date"
-              value={consultationDate}
-              onChange={(e) => setConsultationDate(e.target.value)}
-              className="bg-surface-light text-body-dark text-sm font-body rounded-md px-3 py-2 border border-border-light focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue"
-            />
-          </div>
+              <div className="flex flex-col gap-1">
+                <label className="text-sm font-body font-medium text-secondary-dark">상담일자</label>
+                <input
+                  type="date"
+                  value={consultationDate}
+                  onChange={(e) => setConsultationDate(e.target.value)}
+                  className="bg-surface-light text-body-dark text-sm font-body rounded-md px-3 py-2 border border-border-light focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue"
+                />
+              </div>
 
-          <div className="flex flex-col gap-1">
-            <label className="text-sm font-body font-medium text-secondary-dark">상담자</label>
-            <input
-              type="text"
-              value={consultant}
-              onChange={(e) => setConsultant(e.target.value)}
-              placeholder="담당자 이름"
-              className="bg-surface-light text-body-dark text-sm font-body rounded-md px-3 py-2 border border-border-light focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue placeholder:text-secondary-dark"
-            />
-          </div>
+              <div className="flex flex-col gap-1">
+                <label className="text-sm font-body font-medium text-secondary-dark">상담자</label>
+                <input
+                  type="text"
+                  value={consultant}
+                  onChange={(e) => setConsultant(e.target.value)}
+                  placeholder="담당자 이름"
+                  className="bg-surface-light text-body-dark text-sm font-body rounded-md px-3 py-2 border border-border-light focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue placeholder:text-secondary-dark"
+                />
+              </div>
 
-          <div className="flex flex-col gap-1">
-            <label className="text-sm font-body font-medium text-secondary-dark">추가내용</label>
-            <textarea
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              placeholder="상담 메모"
-              rows={4}
-              className="bg-surface-light text-body-dark text-sm font-body rounded-md px-3 py-2 border border-border-light focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue placeholder:text-secondary-dark resize-none"
-            />
-          </div>
+              <div className="flex flex-col gap-1">
+                <label className="text-sm font-body font-medium text-secondary-dark">추가내용</label>
+                <textarea
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  placeholder="상담 메모"
+                  rows={4}
+                  className="bg-surface-light text-body-dark text-sm font-body rounded-md px-3 py-2 border border-border-light focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue placeholder:text-secondary-dark resize-none"
+                />
+              </div>
+            </>
+          )}
         </div>
       </div>
 
@@ -312,10 +389,10 @@ function ConsultationDetailPanel({
         <button
           type="button"
           onClick={handleSave}
-          disabled={isPending}
+          disabled={isSaveDisabled}
           className="w-full inline-flex items-center justify-center bg-aircok-blue text-heading-light text-sm font-medium rounded-md px-4 py-2 min-h-[44px] hover:bg-aircok-blue-dark active:scale-[0.97] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed"
         >
-          {isPending ? '저장 중...' : '저장'}
+          {isPending ? '저장 중...' : isDetailPending ? '불러오는 중...' : '저장'}
         </button>
       </div>
     </>

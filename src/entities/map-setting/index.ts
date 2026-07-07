@@ -6,3 +6,4 @@ export {
   updateMapSetting,
   MapSettingApiError,
 } from './api/mapSettingApi';
+export { MapSettingServerApiError, getMapSettingServer } from './api/mapSettingServerFetch';

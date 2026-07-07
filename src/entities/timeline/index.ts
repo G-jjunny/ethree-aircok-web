@@ -5,3 +5,4 @@ export {
   getTimelineList,
   timelineListQueryOptions,
 } from './api/timelineApi'
+export { TimelineServerApiError, getTimelineListServer } from './api/timelineServerFetch'

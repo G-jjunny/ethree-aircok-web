@@ -57,6 +57,8 @@ model NewsPost {
   externalUrl String?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+
+  @@index([published, date(sort: Desc)])
 }
 
 /// 문의하기(Inquiry) 접수 레코드.
@@ -85,6 +87,8 @@ model Inquiry {
   status    String   @default("NEW")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([status, createdAt(sort: Desc)])
 }
 
 /// 문의하기 동적 폼 필드 정의 (#33).
@@ -196,6 +200,8 @@ model FaqItem {
   order      Int         @default(0)
   createdAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt
+
+  @@index([categoryId, order])
 }
 
 /// 스마트에어콕 카탈로그 파일 (이미지/PDF) (#44).
@@ -224,6 +230,8 @@ model CatalogImage {
   order     Int             @default(0)
   createdAt DateTime        @default(now())
   updatedAt DateTime        @updatedAt
+
+  @@index([order])
 }
 
 /// 파트너/고객사 구분 enum (#48).
@@ -287,6 +295,8 @@ model Partner {
   order     Int         @default(0)
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
+
+  @@index([order])
 }
 
 /// 에어콕 소개 페이지 OUR Team 섹션 이미지 (#57).
@@ -307,6 +317,8 @@ model TeamImage {
   order     Int      @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([order])
 }
 
 /// 에어콕 소개 페이지 연혁(타임라인) 항목 (#57).
@@ -328,6 +340,8 @@ model TimelineItem {
   content   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([year(sort: Desc), month(sort: Desc)])
 }
 
 /// 에어콕 소개(About) 페이지 IntroSection 핵심가치(Core Value) 카드 (#93).
@@ -353,6 +367,8 @@ model CoreValue {
   order       Int      @default(0)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  @@index([order])
 }
 
 /// 공기질 관리 제품군(서비스) 소개 이미지 (#83).
@@ -376,6 +392,8 @@ model ServiceImage {
   order     Int      @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([order])
 }
 
 /// 진단 서비스 신청 소개 이미지 (#83).
@@ -399,6 +417,8 @@ model DiagnosisImage {
   order     Int      @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([order])
 }
 
 /// 진단 서비스 상담 신청 레코드 (#91).
@@ -421,4 +441,6 @@ model DiagnosisConsultation {
   notes            String?   @db.Text
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
+
+  @@index([status, createdAt(sort: Desc)])
 }
