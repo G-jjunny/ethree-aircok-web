@@ -1,0 +1,1 @@
+export { pretendard } from './pretendard';

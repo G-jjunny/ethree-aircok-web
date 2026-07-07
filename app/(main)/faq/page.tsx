@@ -5,6 +5,9 @@ import { FaqView } from '@/views/faq'
 export const metadata: Metadata = {
   title: SITE.pages.faq.title,
   description: SITE.pages.faq.description,
+  alternates: {
+    canonical: '/faq',
+  },
   openGraph: {
     title: SITE.pages.faq.title,
     description: SITE.pages.faq.description,

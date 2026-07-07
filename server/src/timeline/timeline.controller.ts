@@ -9,8 +9,10 @@ import {
   Patch,
   Post,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { CacheControlInterceptor } from '../common/interceptors/http-cache.interceptor';
 import { CreateTimelineItemDto } from './dto/create-timeline-item.dto';
 import { UpdateTimelineItemDto } from './dto/update-timeline-item.dto';
 import { TimelineService } from './timeline.service';
@@ -20,6 +22,7 @@ export class TimelineController {
   constructor(private readonly timelineService: TimelineService) {}
 
   /** GET /api/timelines — 공개 엔드포인트. year DESC, month DESC, createdAt DESC 정렬. */
+  @UseInterceptors(new CacheControlInterceptor(60))
   @Get()
   findAll() {
     return this.timelineService.findAll();

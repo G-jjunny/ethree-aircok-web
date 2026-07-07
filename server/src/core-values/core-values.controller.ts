@@ -9,8 +9,10 @@ import {
   Patch,
   Post,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { CacheControlInterceptor } from '../common/interceptors/http-cache.interceptor';
 import { CreateCoreValueDto } from './dto/create-core-value.dto';
 import { UpdateCoreValueDto } from './dto/update-core-value.dto';
 import { ReorderCoreValuesDto } from './dto/reorder-core-values.dto';
@@ -21,6 +23,7 @@ export class CoreValuesController {
   constructor(private readonly coreValuesService: CoreValuesService) {}
 
   /** GET /api/core-values — 공개 엔드포인트. order ASC, createdAt ASC 정렬. */
+  @UseInterceptors(new CacheControlInterceptor(60))
   @Get()
   findAll() {
     return this.coreValuesService.findAll();

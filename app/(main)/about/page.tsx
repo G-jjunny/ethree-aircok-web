@@ -5,6 +5,9 @@ import { AboutView } from '@/views/about'
 export const metadata: Metadata = {
   title: SITE.pages.about.title,
   description: SITE.pages.about.description,
+  alternates: {
+    canonical: '/about',
+  },
   openGraph: {
     title: SITE.pages.about.title,
     description: SITE.pages.about.description,

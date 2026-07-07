@@ -1,6 +1,7 @@
 'use client'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { axiosInstance } from '@/shared/api'
+import { revalidateTimelineCache } from '@/entities/timeline'
 import { timelineKeys } from '@/entities/timeline'
 
 export function useDeleteTimelineMutation() {
@@ -11,6 +12,7 @@ export function useDeleteTimelineMutation() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: timelineKeys.all })
+      void revalidateTimelineCache()
     },
   })
 }

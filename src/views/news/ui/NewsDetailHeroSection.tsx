@@ -27,6 +27,7 @@ function DetailHeroOverlay({ post }: Props) {
         src={post.coverImage}
         alt={post.title}
         ratio="featured"
+        priority
         className="max-h-[640px]"
       />
       <div className="absolute inset-0 bg-overlay-dark-60" />

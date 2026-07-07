@@ -1,11 +1,40 @@
 'use client'
 
+import dynamic from 'next/dynamic'
 import { useQuery } from '@tanstack/react-query'
 import { SITE } from '@/shared/config'
 import { PageHero } from '@/shared/ui'
 import { catalogImageListQueryOptions } from '@/entities/catalog'
-import { FlipBookViewer } from './FlipBookViewer'
 import { useCatalogPages } from './useCatalogPages'
+
+/**
+ * FlipBookViewer(및 그 안의 react-pageflip 의존)를 클라이언트 전용 lazy chunk로 분리한다.
+ * react-pageflip은 DOM에 직접 접근하므로 SSR 대상이 아니며(ssr:false), 카탈로그 페이지에
+ * 진입해 데이터가 준비됐을 때만 로드되어 초기 번들에서 제외된다.
+ * 코드 스플리팅을 react-pageflip import가 아닌 FlipBookViewer 경계에서 수행하는 이유:
+ * react-pageflip은 flipNext/flipPrev를 위한 명령형 ref를 요구하는데 next/dynamic은 ref를
+ * 전달하지 않으므로, ref를 소유한 FlipBookViewer 전체를 분리해 명령형 API를 보존한다.
+ */
+/**
+ * 플립북 로딩 자리표시자 — dynamic import loading과 데이터 로딩 상태에서 공유.
+ * 실제 FlipBookViewer 캔버스(2페이지 스프레드) 치수에 맞춰 CLS를 방지한다.
+ */
+function FlipBookPlaceholder() {
+  return (
+    <div className="flex justify-center py-20">
+      {/* token 없음: 960x640 — 플립북 양면(2페이지) 스프레드 고정 캔버스 치수 자리표시자 */}
+      <div className="w-[960px] max-w-full h-[640px] rounded-md bg-surface-light animate-pulse" />
+    </div>
+  )
+}
+
+const FlipBookViewer = dynamic(
+  () => import('./FlipBookViewer').then((m) => m.FlipBookViewer),
+  {
+    ssr: false,
+    loading: () => <FlipBookPlaceholder />,
+  },
+)
 
 /**
  * 방식 A — react-pageflip 기반 2D 플립북 카탈로그 뷰어.
@@ -32,10 +61,7 @@ export function CatalogView() {
         <div className="content-container py-16 lg:py-20">
 
         {isLoading || (isRendering && pages.length === 0) ? (
-          <div className="flex justify-center py-20">
-            {/* token 없음: 960x640 — 플립북 양면(2페이지) 스프레드 비율 자리표시자 */}
-            <div className="w-[960px] max-w-full h-[640px] rounded-md bg-surface-light animate-pulse" />
-          </div>
+          <FlipBookPlaceholder />
         ) : isError ? (
           <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-border-light bg-surface-white px-6 py-20 text-center">
             <p className="text-nav text-heading-dark">
@@ -56,7 +82,7 @@ export function CatalogView() {
           </div>
         ) : (
           <div className="flex flex-col items-center gap-8">
-            <FlipBookViewer pages={pages} />
+            {pages.length > 0 && <FlipBookViewer pages={pages} />}
 
             <a
               href={downloadUrl ?? undefined}

@@ -1,17 +1,8 @@
-import type { Metadata } from 'next'
-import { SITE } from '@/shared/config'
-import { ProjectsView } from '@/views/projects'
+import { redirect } from 'next/navigation'
 
-export const metadata: Metadata = {
-  title: SITE.pages.projects.title,
-  description: SITE.pages.projects.description,
-  openGraph: {
-    title: SITE.pages.projects.title,
-    description: SITE.pages.projects.description,
-    url: `${SITE.url}/projects`,
-  },
-}
-
+// /projects는 diagnosis로 이전된 deprecated 경로다(SITE.pages.projects 참고).
+// SEO 중복/유령 페이지 방지를 위해 진단 페이지로 영구 리다이렉트한다.
+// (app/(main)/catalog/3d → /catalog 리다이렉트 패턴과 동일. sitemap.ts에서도 제외됨.)
 export default function ProjectsPage() {
-  return <ProjectsView />
+  redirect('/diagnosis')
 }

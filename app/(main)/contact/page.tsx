@@ -5,6 +5,9 @@ import { ContactView } from '@/views/contact'
 export const metadata: Metadata = {
   title: SITE.pages.contact.title,
   description: SITE.pages.contact.description,
+  alternates: {
+    canonical: '/contact',
+  },
   openGraph: {
     title: SITE.pages.contact.title,
     description: SITE.pages.contact.description,

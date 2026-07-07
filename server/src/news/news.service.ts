@@ -9,13 +9,16 @@ export class NewsService {
   constructor(private readonly prisma: PrismaService) {}
 
   async findAll(page: number, limit: number) {
-    const skip = (page - 1) * limit;
+    // limit/page 상한 clamp (오버페칭 방지). take 는 1~100 으로 제한한다.
+    const safePage = Math.max(page, 1);
+    const take = Math.min(Math.max(limit, 1), 100);
+    const skip = (safePage - 1) * take;
 
     const [data, total] = await this.prisma.$transaction([
       this.prisma.newsPost.findMany({
         where: { published: true },
         skip,
-        take: limit,
+        take,
         orderBy: { date: 'desc' },
         select: {
           id: true,
@@ -34,16 +37,19 @@ export class NewsService {
       this.prisma.newsPost.count({ where: { published: true } }),
     ]);
 
-    return { data, total, page, limit };
+    return { data, total, page: safePage, limit: take };
   }
 
   async findAllAdmin(page: number, limit: number) {
-    const skip = (page - 1) * limit;
+    // limit/page 상한 clamp (오버페칭 방지). take 는 1~100 으로 제한한다.
+    const safePage = Math.max(page, 1);
+    const take = Math.min(Math.max(limit, 1), 100);
+    const skip = (safePage - 1) * take;
 
     const [data, total] = await this.prisma.$transaction([
       this.prisma.newsPost.findMany({
         skip,
-        take: limit,
+        take,
         orderBy: { date: 'desc' },
         select: {
           id: true,
@@ -62,7 +68,7 @@ export class NewsService {
       this.prisma.newsPost.count(),
     ]);
 
-    return { data, total, page, limit };
+    return { data, total, page: safePage, limit: take };
   }
 
   async findOne(id: string) {

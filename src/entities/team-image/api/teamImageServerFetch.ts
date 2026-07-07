@@ -8,6 +8,9 @@ import type { TeamImage } from '../model/types';
  */
 export class TeamImageServerApiError extends ApiError {}
 
+/** 팀 이미지 캐시 태그. 어드민 팀 이미지 편집 뮤테이션 후 updateTag로 무효화한다. */
+export const TEAM_IMAGES_CACHE_TAG = 'team-images';
+
 /**
  * 서버/클라이언트 환경에 따라 API baseURL을 반환한다.
  * 서버 컴포넌트에서는 NestJS를 직접 가리키는 절대 URL을 사용한다(news/service-image 패턴).
@@ -21,7 +24,6 @@ function getApiBaseUrl(): string {
 
 /**
  * 팀 이미지 목록을 가져온다(서버 컴포넌트 안전).
- * GET /team-images — order ASC 서버 정렬.
  */
 export async function getTeamImageListServer(): Promise<TeamImage[]> {
   try {

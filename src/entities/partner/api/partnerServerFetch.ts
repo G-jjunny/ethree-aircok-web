@@ -8,6 +8,9 @@ import type { Partner } from '../model/types';
  */
 export class PartnerServerApiError extends ApiError {}
 
+/** 파트너 캐시 태그. 어드민 파트너 편집 뮤테이션 후 updateTag로 무효화한다. */
+export const PARTNERS_CACHE_TAG = 'partners';
+
 /**
  * 서버/클라이언트 환경에 따라 API baseURL을 반환한다.
  * 서버 컴포넌트에서는 NestJS를 직접 가리키는 절대 URL을 사용한다(news/service-image 패턴).

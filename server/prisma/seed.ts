@@ -27,6 +27,8 @@ async function main() {
   console.log('Admin user created/verified:', admin.username);
 
   await seedSiteInfo();
+  await seedMailSetting();
+  await seedMapSetting();
   await seedPartners();
   await seedFaq();
 }
@@ -264,6 +266,51 @@ async function seedSiteInfo() {
   });
 
   console.log('SiteInfo created/verified:', siteInfo.companyName);
+}
+
+// MailSetting/MapSetting 싱글톤 기본값.
+// 프론트/백엔드 상수(src/inquiry/mail-setting.constants.ts, map-setting.constants.ts)와
+// 값이 일치해야 한다. seed 는 @prisma/client 만 사용하므로 리터럴로 보유한다.
+const MAIL_SETTING_SEED = {
+  id: 'singleton',
+  recipientEmail: process.env.INQUIRY_RECIPIENT_EMAIL ?? '',
+  subjectTemplate: '[스마트에어콕] 새 문의가 접수되었습니다',
+  bodyTemplate: [
+    '새 문의가 접수되었습니다.',
+    '',
+    '회사/기관명: {{company}}',
+    '담당자명: {{name}}',
+    '전화: {{phone}}',
+    '이메일: {{email}}',
+    '',
+    '요청사항:',
+    '{{message}}',
+  ].join('\n'),
+} satisfies Prisma.MailSettingCreateInput;
+
+const MAP_SETTING_SEED = {
+  id: 'singleton',
+  address: '서울특별시 성동구 아차산로17길 49 성수 생각공장 데시앙플렉스 815호',
+} satisfies Prisma.MapSettingCreateInput;
+
+async function seedMailSetting() {
+  const mailSetting = await prisma.mailSetting.upsert({
+    where: { id: MAIL_SETTING_SEED.id },
+    update: {},
+    create: MAIL_SETTING_SEED,
+  });
+
+  console.log('MailSetting created/verified:', mailSetting.id);
+}
+
+async function seedMapSetting() {
+  const mapSetting = await prisma.mapSetting.upsert({
+    where: { id: MAP_SETTING_SEED.id },
+    update: {},
+    create: MAP_SETTING_SEED,
+  });
+
+  console.log('MapSetting created/verified:', mapSetting.id);
 }
 
 async function seedPartners() {

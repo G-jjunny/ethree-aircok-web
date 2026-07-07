@@ -1,10 +1,12 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001'
 function resolveSrc(src: string): string {
-  return src.startsWith('http') ? src : `${API_BASE}${src}`
+  if (src.startsWith('http')) return src
+  return src.startsWith('/') ? src : `${API_BASE}${src}`
 }
 
 type ImageLightboxProps = {
@@ -17,10 +19,13 @@ export function ImageLightbox({ src, alt }: ImageLightboxProps) {
 
   return (
     <div className="w-full">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
+      {/* 원본 비율 미상 세로형 이미지 — next/image 반응형 패턴(width/height=0 + sizes). 기본 lazy. */}
+      <Image
         src={resolveSrc(src)}
         alt={alt}
+        width={0}
+        height={0}
+        sizes="(min-width: 780px) 780px, 100vw"
         className="w-full h-auto object-contain cursor-zoom-in"
         onClick={() => setIsOpen(true)}
       />
