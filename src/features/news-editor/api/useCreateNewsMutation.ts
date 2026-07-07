@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { axiosInstance } from '@/shared/api'
-import { adminNewsKeys } from '@/entities/news'
+import { adminNewsKeys, revalidateNewsCache } from '@/entities/news'
 
 interface NewsPayload {
   title: string
@@ -21,6 +21,8 @@ export function useCreateNewsMutation() {
       axiosInstance.post('/news', payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: adminNewsKeys.all })
+      // 새 글은 목록 캐시만 무효화하면 된다.
+      void revalidateNewsCache()
     },
   })
 }

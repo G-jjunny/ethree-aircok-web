@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Controller, Get, Post, Patch, Delete,
   Param, Body, Query, UseGuards, UseInterceptors,
   UploadedFile, ParseIntPipe, DefaultValuePipe,
@@ -11,6 +12,34 @@ import { NewsService } from './news.service';
 import { CreateNewsDto } from './dto/create-news.dto';
 import { UpdateNewsDto } from './dto/update-news.dto';
 import { R2Service } from '../upload/r2.service';
+
+// 뉴스 이미지 업로드 허용 MIME 타입 화이트리스트. 이미지 전용.
+const ALLOWED_IMAGE_MIMETYPES = [
+  'image/png',
+  'image/jpeg',
+  'image/webp',
+  'image/gif',
+];
+
+const multerOptions = {
+  storage: memoryStorage(),
+  // 허용 목록 외 mimetype 은 거부한다.
+  fileFilter: (
+    _req: Express.Request,
+    file: Express.Multer.File,
+    cb: (error: Error | null, acceptFile: boolean) => void,
+  ) => {
+    if (ALLOWED_IMAGE_MIMETYPES.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new BadRequestException('허용되지 않은 파일 형식입니다.'), false);
+    }
+  },
+  // 최대 파일 크기 10MB. 초과 시 거부.
+  limits: {
+    fileSize: 10 * 1024 * 1024,
+  },
+};
 
 @Controller('news')
 export class NewsController {
@@ -29,7 +58,7 @@ export class NewsController {
 
   @UseGuards(JwtAuthGuard)
   @Post('images')
-  @UseInterceptors(FileInterceptor('image', { storage: memoryStorage() }))
+  @UseInterceptors(FileInterceptor('image', multerOptions))
   async uploadImage(@UploadedFile() file: Express.Multer.File) {
     const url = await this.r2Service.upload(file);
     return { url };

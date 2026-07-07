@@ -10,8 +10,10 @@ import {
   Post,
   Query,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { CacheControlInterceptor } from '../common/interceptors/http-cache.interceptor';
 import { FaqService } from './faq.service';
 import { CreateFaqCategoryDto } from './dto/create-faq-category.dto';
 import { UpdateFaqCategoryDto } from './dto/update-faq-category.dto';
@@ -23,11 +25,13 @@ export class FaqController {
   constructor(private readonly faqService: FaqService) {}
 
   // 공개 엔드포인트
+  @UseInterceptors(new CacheControlInterceptor(60))
   @Get('categories')
   findAllCategories() {
     return this.faqService.findAllCategories();
   }
 
+  @UseInterceptors(new CacheControlInterceptor(60))
   @Get('items')
   findAllItems(@Query('categoryId') categoryId?: string) {
     return this.faqService.findAllItems(categoryId);

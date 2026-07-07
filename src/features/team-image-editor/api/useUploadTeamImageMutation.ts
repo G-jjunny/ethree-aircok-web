@@ -1,6 +1,7 @@
 'use client'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { teamImageKeys } from '@/entities/team-image'
+import { revalidateTeamImagesCache } from '@/entities/team-image'
 import { uploadTeamImage } from './uploadTeamImage'
 
 /**
@@ -13,6 +14,7 @@ export function useUploadTeamImageMutation() {
     mutationFn: (file: File) => uploadTeamImage(file),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: teamImageKeys.all })
+      void revalidateTeamImagesCache()
     },
   })
 }

@@ -8,14 +8,21 @@ export class SiteInfoService {
 
   /**
    * GET 핸들러에서 호출.
-   * 행이 없으면 id='singleton' 빈 행을 lazy 생성 후 반환한다.
+   * 성능상 매 요청마다 쓰기(upsert)하지 않도록 findUnique 로 순수 읽기를 먼저 수행한다.
+   * 행이 없을 때만 id='singleton' 빈 행을 lazy 생성한다.
    * 실제 스키마는 companyName 등이 NOT NULL이므로 첫 생성 시
    * 빈 문자열로 초기화한다.
    */
   async findOrCreate() {
-    return this.prisma.siteInfo.upsert({
+    const existing = await this.prisma.siteInfo.findUnique({
       where: { id: 'singleton' },
-      create: {
+    });
+    if (existing) {
+      return existing;
+    }
+
+    return this.prisma.siteInfo.create({
+      data: {
         id: 'singleton',
         companyName: '',
         address: '',
@@ -24,7 +31,6 @@ export class SiteInfoService {
         bizNo: '',
         ceo: '',
       },
-      update: {},
     });
   }
 

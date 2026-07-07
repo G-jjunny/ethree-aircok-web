@@ -1,12 +1,14 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 import type { ServiceImage } from '@/entities/service-image'
 
-/** 이미지 항목은 백엔드 절대 URL로 보정한다(catalog/news 패턴). */
+/** R2(http)는 그대로, 상대 경로(/uploads)는 동일 출처 rewrite 서빙되도록 상대 유지. */
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001'
 function resolveSrc(src: string): string {
-  return src.startsWith('http') ? src : `${API_BASE}${src}`
+  if (src.startsWith('http')) return src
+  return src.startsWith('/') ? src : `${API_BASE}${src}`
 }
 
 /**
@@ -21,11 +23,15 @@ export function ServiceImageGallery({ images }: { images: ServiceImage[] }) {
     <>
       <div className="flex flex-col gap-0">
         {images.map((image, index) => (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
+          // 원본 비율을 알 수 없는 세로형 브로슈어 이미지 — next/image 반응형 패턴
+          // (width/height=0 + sizes + h-auto)으로 lazy 최적화. 기본 lazy(priority 미지정).
+          <Image
             key={image.id}
             src={resolveSrc(image.imageUrl)}
             alt={`서비스 소개 이미지 ${index + 1}`}
+            width={0}
+            height={0}
+            sizes="(min-width: 780px) 780px, 100vw"
             className="w-full h-auto object-contain cursor-zoom-in"
             onClick={() => setZoomedSrc(resolveSrc(image.imageUrl))}
           />

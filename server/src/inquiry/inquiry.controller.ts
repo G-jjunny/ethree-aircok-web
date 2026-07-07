@@ -14,6 +14,7 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
+import { ThrottlerGuard, Throttle } from '@nestjs/throttler';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { InquiryService } from './inquiry.service';
 import { CreateInquiryDto } from './dto/create-inquiry.dto';
@@ -27,6 +28,9 @@ import { UpdateInquiryFieldDto } from './dto/update-inquiry-field.dto';
 export class InquiryController {
   constructor(private readonly inquiryService: InquiryService) {}
 
+  // 공개 POST 스팸 방지: 분당 5회로 제한(라우트별 스로틀).
+  @UseGuards(ThrottlerGuard)
+  @Throttle({ default: { ttl: 60000, limit: 5 } })
   @Post()
   create(@Body() dto: CreateInquiryDto) {
     return this.inquiryService.create(dto);

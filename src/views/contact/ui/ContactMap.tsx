@@ -1,6 +1,15 @@
 import { connection } from 'next/server'
-import { getMapSettingServer, type MapSetting } from '@/entities/map-setting'
+import { cacheLife, cacheTag } from 'next/cache'
+import { getMapSettingServer, MAP_SETTING_CACHE_TAG, type MapSetting } from '@/entities/map-setting'
 import { SITE } from '@/shared/config'
+
+/** 지도 주소 설정 조회를 'use cache'로 캐싱(cacheTag: 'map-setting', cacheLife: static). */
+async function getCachedMapSetting(): Promise<MapSetting> {
+  'use cache'
+  cacheLife('static')
+  cacheTag(MAP_SETTING_CACHE_TAG)
+  return getMapSettingServer()
+}
 
 /**
  * 공개 문의 페이지의 회사 위치 지도.
@@ -13,7 +22,7 @@ export async function ContactMap() {
 
   let data: MapSetting | null = null
   try {
-    data = await getMapSettingServer()
+    data = await getCachedMapSetting()
   } catch {
     data = null
   }

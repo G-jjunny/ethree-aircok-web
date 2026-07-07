@@ -16,6 +16,7 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { CacheControlInterceptor } from '../common/interceptors/http-cache.interceptor';
 import { CreatePartnerDto } from './dto/create-partner.dto';
 import { UpdatePartnerDto } from './dto/update-partner.dto';
 import { ReorderPartnersDto } from './dto/reorder-partners.dto';
@@ -58,6 +59,7 @@ export class PartnersController {
   ) {}
 
   /** GET /api/partners — 공개 엔드포인트. order ASC, createdAt ASC 정렬. */
+  @UseInterceptors(new CacheControlInterceptor(60))
   @Get()
   findAll() {
     return this.partnersService.findAll();

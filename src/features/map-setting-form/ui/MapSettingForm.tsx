@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 import {
   updateMapSetting,
   mapSettingKeys,
+  revalidateMapSettingCache,
   MapSettingApiError,
   type MapSetting,
 } from '@/entities/map-setting';
@@ -88,6 +89,8 @@ export function MapSettingForm({ initialData }: Props) {
       queryClient.setQueryData(mapSettingKeys.all, updated);
       // 공개 문의 페이지의 지도 캐시 정합을 위해 무효화
       queryClient.invalidateQueries({ queryKey: mapSettingKeys.all });
+      // 공개 ContactMap의 'use cache'(cacheTag: 'map-setting') 서버 캐시도 무효화
+      void revalidateMapSettingCache();
       reset({
         address: updated.address,
       });

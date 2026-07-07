@@ -184,20 +184,32 @@ export class InquiryService {
   }
 
   async findAll(page: number, limit: number, status?: string) {
-    const skip = (page - 1) * limit;
+    // limit/page 상한 clamp (오버페칭 방지). take 는 1~100 으로 제한한다.
+    const safePage = Math.max(page, 1);
+    const take = Math.min(Math.max(limit, 1), 100);
+    const skip = (safePage - 1) * take;
     const where = status ? { status } : {};
 
     const [data, total] = await this.prisma.$transaction([
       this.prisma.inquiry.findMany({
         skip,
-        take: limit,
+        take,
         orderBy: { createdAt: 'desc' },
         where,
+        // 리스트뷰 경량 select. 대용량/legacy 컬럼(message @db.Text, company/name/
+        // phone/email 고정 컬럼)은 목록에서 제외한다. 목록 요약은 answers(JSON)로 그린다.
+        select: {
+          id: true,
+          answers: true,
+          status: true,
+          createdAt: true,
+          updatedAt: true,
+        },
       }),
       this.prisma.inquiry.count({ where }),
     ]);
 
-    return { data, total, page, limit };
+    return { data, total, page: safePage, limit: take };
   }
 
   async count(status?: string) {
@@ -229,15 +241,20 @@ export class InquiryService {
 
   /**
    * 문의 알림 메일 설정(고정 PK 싱글톤) 조회.
-   * - upsert 로 id = 'singleton' 행을 조회한다.
-   * - 행이 없으면 기본값으로 lazy 생성 후 반환한다(이후 GET/발송에서 자동 존재).
+   * - 성능상 매 요청마다 쓰기(upsert)하지 않도록 findUnique 로 순수 읽기를 먼저 수행한다.
+   * - 행이 없을 때만 기본값으로 lazy 생성 후 반환한다(이후 GET/발송에서 자동 존재).
    * - recipientEmail 기본값은 env INQUIRY_RECIPIENT_EMAIL, 없으면 빈 문자열.
    */
   async getMailSetting() {
-    return this.prisma.mailSetting.upsert({
+    const existing = await this.prisma.mailSetting.findUnique({
       where: { id: MAIL_SETTING_ID },
-      update: {},
-      create: {
+    });
+    if (existing) {
+      return existing;
+    }
+
+    return this.prisma.mailSetting.create({
+      data: {
         id: MAIL_SETTING_ID,
         recipientEmail: process.env.INQUIRY_RECIPIENT_EMAIL ?? '',
         subjectTemplate: DEFAULT_SUBJECT_TEMPLATE,
@@ -270,15 +287,20 @@ export class InquiryService {
 
   /**
    * 문의하기 지도 주소 설정(고정 PK 싱글톤) 조회.
-   * - upsert 로 id = 'singleton' 행을 조회한다.
-   * - 행이 없으면 기본 주소(DEFAULT_MAP_ADDRESS)로 lazy 생성 후 반환한다.
+   * - 성능상 매 요청마다 쓰기(upsert)하지 않도록 findUnique 로 순수 읽기를 먼저 수행한다.
+   * - 행이 없을 때만 기본 주소(DEFAULT_MAP_ADDRESS)로 lazy 생성 후 반환한다.
    * - 공개 엔드포인트(GET /api/inquiry/map-setting)에서 호출된다.
    */
   async getMapSetting() {
-    return this.prisma.mapSetting.upsert({
+    const existing = await this.prisma.mapSetting.findUnique({
       where: { id: MAP_SETTING_ID },
-      update: {},
-      create: {
+    });
+    if (existing) {
+      return existing;
+    }
+
+    return this.prisma.mapSetting.create({
+      data: {
         id: MAP_SETTING_ID,
         address: DEFAULT_MAP_ADDRESS,
       },

@@ -6,4 +6,5 @@ export {
   updateMapSetting,
   MapSettingApiError,
 } from './api/mapSettingApi';
-export { MapSettingServerApiError, getMapSettingServer } from './api/mapSettingServerFetch';
+export { MapSettingServerApiError, getMapSettingServer, MAP_SETTING_CACHE_TAG } from './api/mapSettingServerFetch';
+export { revalidateMapSettingCache } from './api/revalidateMapSetting';

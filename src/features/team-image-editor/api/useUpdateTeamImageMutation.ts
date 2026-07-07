@@ -2,6 +2,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { axiosInstance } from '@/shared/api'
 import { teamImageKeys } from '@/entities/team-image'
+import { revalidateTeamImagesCache } from '@/entities/team-image'
 import type { TeamImage, TeamImageUpdateBody } from '@/entities/team-image'
 
 /**
@@ -17,6 +18,7 @@ export function useUpdateTeamImageMutation() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: teamImageKeys.all })
+      void revalidateTeamImagesCache()
     },
   })
 }
