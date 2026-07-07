@@ -1,13 +1,19 @@
-'use client'
-
-import { useQuery } from '@tanstack/react-query'
-import { coreValueListQueryOptions } from '@/entities/core-value'
+import { connection } from 'next/server'
+import { getCoreValueListServer, type CoreValue } from '@/entities/core-value'
 import { SITE } from '@/shared/config'
 import { SectionHeader } from '@/shared/ui'
 import { ValueCardStack } from './ValueCardStack'
 
-export function IntroSection() {
-  const { data: coreValues = [], isLoading, isError } = useQuery(coreValueListQueryOptions())
+export async function IntroSection() {
+  // 빌드 타임 프리렌더(백엔드 미기동)에서 fetch가 실행되지 않도록 요청 시점으로 미룬다.
+  await connection()
+
+  let coreValues: CoreValue[] = []
+  try {
+    coreValues = await getCoreValueListServer()
+  } catch {
+    coreValues = []
+  }
 
   const hasValues = coreValues.length > 0
 
@@ -22,13 +28,7 @@ export function IntroSection() {
           maxWidth="max-w-[760px]"
         />
 
-        {isLoading ? (
-          // h-[500px]: token 없음 — ValueCardStack 스테이지(cardH+60, cardW=300 기준 450px)
-          // + 네비게이션 버튼(mt-2 + h-11) 높이 근사, 스켈레톤 전용 1회성 수치
-          <div className="h-[500px] rounded-xl bg-surface-light animate-pulse" />
-        ) : isError ? null : hasValues ? (
-          <ValueCardStack values={coreValues} />
-        ) : null}
+        {hasValues ? <ValueCardStack values={coreValues} /> : null}
       </div>
     </section>
   )

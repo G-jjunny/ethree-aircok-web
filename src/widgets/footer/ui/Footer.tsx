@@ -1,16 +1,25 @@
-'use client'
 import Link from 'next/link'
 import Image from 'next/image'
-import { useQuery } from '@tanstack/react-query'
+import { connection } from 'next/server'
 import { SITE } from '@/shared/config'
-import { siteInfoQueryOptions } from '@/entities/site-info'
+import { getSiteInfoServer, type SiteInfo } from '@/entities/site-info'
 
 function pick(apiValue: string | null | undefined, fallback: string): string {
   return apiValue?.trim() ? apiValue : fallback
 }
 
-export function Footer() {
-  const { data: siteInfo } = useQuery(siteInfoQueryOptions())
+export async function Footer() {
+  // 빌드 타임 프리렌더(백엔드 미기동)에서 fetch가 실행되지 않도록 요청 시점으로 미룬다.
+  // NewsView·app/sitemap.ts와 동일한 런타임 동적 패턴. <Suspense>가 PPR 스트리밍을 담당한다.
+  // cacheTag('site-info')를 통한 캐시/무효화는 백엔드 기동 후 도입으로 이연한다.
+  await connection()
+
+  let siteInfo: SiteInfo | null = null
+  try {
+    siteInfo = await getSiteInfoServer()
+  } catch {
+    siteInfo = null
+  }
 
   const companyName = pick(siteInfo?.legalName, pick(siteInfo?.companyName, SITE.legalName))
   const ceo = pick(siteInfo?.ceo, SITE.footer.ceo)

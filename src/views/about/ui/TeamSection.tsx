@@ -1,9 +1,7 @@
-'use client'
-
-import { useQuery } from '@tanstack/react-query'
+import { connection } from 'next/server'
+import { getTeamImageListServer, type TeamImage } from '@/entities/team-image'
 import { SITE } from '@/shared/config'
 import { SectionHeader } from '@/shared/ui'
-import { teamImageListQueryOptions } from '@/entities/team-image'
 
 /** 이미지 항목은 백엔드 절대 URL로 보정한다(catalog/news 패턴). */
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001'
@@ -11,7 +9,7 @@ function resolveSrc(src: string): string {
   return src.startsWith('http') ? src : `${API_BASE}${src}`
 }
 
-/** 데이터 없음/로딩/에러 시 표시할 단일 플레이스홀더 카드. */
+/** 데이터 없음/에러 시 표시할 단일 플레이스홀더 카드. */
 function TeamPlaceholder() {
   return (
     <div className="flex aspect-video w-full flex-col items-center justify-center gap-4 rounded-xl bg-surface-white p-8 text-center">
@@ -41,12 +39,18 @@ function TeamPlaceholder() {
   )
 }
 
-export function TeamSection() {
-  const { data: images = [], isLoading, isError } = useQuery(
-    teamImageListQueryOptions(),
-  )
+export async function TeamSection() {
+  // 빌드 타임 프리렌더(백엔드 미기동)에서 fetch가 실행되지 않도록 요청 시점으로 미룬다.
+  await connection()
 
-  const firstImage = !isLoading && !isError && images.length > 0 ? images[0] : null
+  let images: TeamImage[] = []
+  try {
+    images = await getTeamImageListServer()
+  } catch {
+    images = []
+  }
+
+  const firstImage = images.length > 0 ? images[0] : null
 
   return (
     <section className="bg-surface-light py-24">

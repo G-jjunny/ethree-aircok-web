@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { Nav } from '@/widgets/nav';
 import { Footer } from '@/widgets/footer';
 import { GlobalCta } from '@/widgets/global-cta';
@@ -9,7 +10,9 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
       <Nav />
       {children}
       <GlobalCta />
-      <Footer />
+      <Suspense fallback={<div className="min-h-[280px] bg-surface-dark" />}>
+        <Footer />
+      </Suspense>
       <Toaster position="top-center" richColors />
     </>
   );

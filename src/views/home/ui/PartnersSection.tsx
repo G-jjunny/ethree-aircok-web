@@ -1,14 +1,21 @@
-'use client'
-import { useQuery } from '@tanstack/react-query'
+import { connection } from 'next/server'
 import { SITE } from '@/shared/config'
 import { SectionHeader } from '@/shared/ui'
-import { partnerListQueryOptions } from '@/entities/partner'
+import { getPartnerListServer, type Partner } from '@/entities/partner'
 
-export function PartnersSection() {
-  const { data: apiPartners, isError } = useQuery(partnerListQueryOptions())
+export async function PartnersSection() {
+  // 빌드 타임 프리렌더(백엔드 미기동)에서 fetch가 실행되지 않도록 요청 시점으로 미룬다.
+  await connection()
+
+  let apiPartners: Partner[] = []
+  try {
+    apiPartners = await getPartnerListServer()
+  } catch {
+    apiPartners = []
+  }
 
   const partnerNames: readonly string[] =
-    apiPartners && !isError && apiPartners.length > 0
+    apiPartners.length > 0
       ? apiPartners.filter((p) => p.type === 'partner').map((p) => p.name)
       : SITE.partners.list
 

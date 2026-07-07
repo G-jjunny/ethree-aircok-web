@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import { SectionHeader } from '@/shared/ui'
 import { SITE } from '@/shared/config'
 import { InquiryForm } from '@/features/inquiry-form'
@@ -34,8 +35,14 @@ export function ContactInquirySection() {
           {/* 우측 칼럼: 지도 + 연락처 안내 세로 스택 — 좌측 폼 칼럼과 높이 균형 */}
           {/* max-w-[640px]: lg 미만에서 폼 카드와 동일 가독 폭 정렬, 1회성 레이아웃 수치 — 토큰 없음 */}
           <div className="flex flex-col gap-8 max-w-[640px] mx-auto lg:max-w-none lg:mx-0 w-full">
-            {/* 지도 — 어드민 설정 주소를 공개 GET으로 조회하는 클라이언트 컴포넌트 */}
-            <ContactMap />
+            {/* 지도 — 어드민 설정 주소를 공개 GET으로 조회하는 서버 컴포넌트 */}
+            <Suspense
+              fallback={
+                <div className="rounded-xl overflow-hidden border border-border-light aspect-video bg-surface-light" />
+              }
+            >
+              <ContactMap />
+            </Suspense>
 
             {/* 연락처 안내 — 카드/박스 없이 타이포 위계로만 구분 (홈 WhatYouGet 톤) */}
             <div>

@@ -1,13 +1,11 @@
-'use client'
-import { useQuery } from '@tanstack/react-query'
+import { connection } from 'next/server'
 import { SITE } from '@/shared/config'
 import { SectionHeader } from '@/shared/ui'
-import { partnerListQueryOptions, type Partner } from '@/entities/partner'
+import { getPartnerListServer, type Partner } from '@/entities/partner'
 
 /**
  * 백엔드 API 베이스 URL. 동적/외부 호스트 로고는 next/image 대신 <img>를 쓰는 것이
  * 프로젝트 컨벤션(NewsImage·admin PartnerListSection 패턴)이다.
- * shared/config import는 FSD 위반이 아니지만, 절대경로 보정은 NewsImage와 동일하게 env로 처리한다.
  */
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001'
 
@@ -66,7 +64,7 @@ function LogoTile({ partner }: { partner: Partner }) {
   )
 }
 
-/** 2줄 마퀴 중 한 줄 — 로고 배열을 2배 복제해 무한 루프 */
+/** 2줄 마퀴 중 한 줄 — 로고 배열을 2배 복제해 무한 루프 (CSS 애니메이션 전용, 클라이언트 상태 없음) */
 function LogoMarqueeRow({
   partners,
   direction,
@@ -92,13 +90,18 @@ function LogoMarqueeRow({
   )
 }
 
-export function PartnersSection() {
-  const { data: apiPartners, isError } = useQuery(partnerListQueryOptions())
+export async function PartnersSection() {
+  // 빌드 타임 프리렌더(백엔드 미기동)에서 fetch가 실행되지 않도록 요청 시점으로 미룬다.
+  await connection()
 
-  const partners: Partner[] =
-    apiPartners && !isError
-      ? apiPartners.filter((p) => p.type === 'partner')
-      : []
+  let apiPartners: Partner[] = []
+  try {
+    apiPartners = await getPartnerListServer()
+  } catch {
+    apiPartners = []
+  }
+
+  const partners = apiPartners.filter((p) => p.type === 'partner')
 
   // API 실패 또는 빈 목록 -> 기존 SITE.partners.list 이름 칩 폴백
   if (partners.length === 0) {

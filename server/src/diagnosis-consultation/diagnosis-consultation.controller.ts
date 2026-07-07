@@ -5,7 +5,10 @@ import {
   Patch,
   Param,
   Body,
+  Query,
   UseGuards,
+  DefaultValuePipe,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { DiagnosisConsultationService } from './diagnosis-consultation.service';
@@ -37,8 +40,18 @@ export class DiagnosisConsultationController {
   /** GET /api/diagnosis-consultation — JWT 필요. */
   @UseGuards(JwtAuthGuard)
   @Get()
-  findAll() {
-    return this.diagnosisConsultationService.findAll();
+  findAll(
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
+  ) {
+    return this.diagnosisConsultationService.findAll(page, limit);
+  }
+
+  /** GET /api/diagnosis-consultation/:id — JWT 필요. */
+  @UseGuards(JwtAuthGuard)
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.diagnosisConsultationService.findOne(id);
   }
 
   /** PATCH /api/diagnosis-consultation/:id — JWT 필요. */
