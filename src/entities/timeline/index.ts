@@ -5,4 +5,5 @@ export {
   getTimelineList,
   timelineListQueryOptions,
 } from './api/timelineApi'
-export { TimelineServerApiError, getTimelineListServer } from './api/timelineServerFetch'
+export { TimelineServerApiError, getTimelineListServer, TIMELINE_CACHE_TAG } from './api/timelineServerFetch'
+export { revalidateTimelineCache } from './api/revalidateTimeline'

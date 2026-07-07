@@ -1,6 +1,7 @@
 'use client'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { axiosInstance } from '@/shared/api'
+import { revalidatePartnersCache } from '@/entities/partner'
 import { partnerKeys } from '@/entities/partner'
 
 export function useDeletePartnerMutation() {
@@ -11,6 +12,7 @@ export function useDeletePartnerMutation() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: partnerKeys.all })
+      void revalidatePartnersCache()
     },
   })
 }

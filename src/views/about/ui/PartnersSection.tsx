@@ -1,19 +1,31 @@
+import Image from 'next/image'
 import { connection } from 'next/server'
+import { cacheLife, cacheTag } from 'next/cache'
 import { SITE } from '@/shared/config'
 import { SectionHeader } from '@/shared/ui'
-import { getPartnerListServer, type Partner } from '@/entities/partner'
+import { getPartnerListServer, PARTNERS_CACHE_TAG, type Partner } from '@/entities/partner'
 
-/**
- * 백엔드 API 베이스 URL. 동적/외부 호스트 로고는 next/image 대신 <img>를 쓰는 것이
- * 프로젝트 컨벤션(NewsImage·admin PartnerListSection 패턴)이다.
- */
+/** 파트너 조회를 'use cache'로 캐싱(cacheTag: 'partners', cacheLife: static). */
+async function getCachedPartners(): Promise<Partner[]> {
+  'use cache'
+  cacheLife('static')
+  cacheTag(PARTNERS_CACHE_TAG)
+  return getPartnerListServer()
+}
+
+/** 백엔드 API 베이스 URL(상대 경로 로고 폴백용). */
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001'
 
 /** 정적 그리드 → 2줄 마퀴 전환 기준 개수 */
 const MARQUEE_THRESHOLD = 10
 
+/**
+ * R2(절대 http URL)는 그대로, 상대 경로(/uploads/...)는 동일 출처 rewrite로 서빙되도록
+ * 상대 경로 유지 → next/image가 remotePatterns 없이 최적화한다.
+ */
 function resolveLogoSrc(src: string): string {
-  return src.startsWith('http') ? src : `${API_BASE}${src}`
+  if (src.startsWith('http')) return src
+  return src.startsWith('/') ? src : `${API_BASE}${src}`
 }
 
 /** 이름 텍스트 칩 폴백 (API 실패·빈 목록 공용) */
@@ -35,13 +47,12 @@ function NameChip({ name }: { name: string }) {
 function LogoTile({ partner }: { partner: Partner }) {
   return partner.logoUrl ? (
     <div className="relative group flex h-20 w-full items-center justify-center overflow-hidden rounded-lg bg-surface-white border border-border-light px-6">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
+      <Image
         src={resolveLogoSrc(partner.logoUrl)}
         alt={partner.name}
         width={128}
         height={56}
-        loading="lazy"
+        sizes="128px"
         className="max-h-10 max-w-full w-auto object-contain transition-opacity duration-200 group-hover:opacity-30"
       />
       <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
@@ -96,7 +107,7 @@ export async function PartnersSection() {
 
   let apiPartners: Partner[] = []
   try {
-    apiPartners = await getPartnerListServer()
+    apiPartners = await getCachedPartners()
   } catch {
     apiPartners = []
   }

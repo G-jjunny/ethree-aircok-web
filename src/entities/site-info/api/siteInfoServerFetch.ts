@@ -8,6 +8,9 @@ import type { SiteInfo } from '../model/types';
  */
 export class SiteInfoServerApiError extends ApiError {}
 
+/** 사이트 정보 캐시 태그. 어드민 수정(useUpdateSiteInfoMutation) 후 updateTag로 무효화한다. */
+export const SITE_INFO_CACHE_TAG = 'site-info';
+
 /**
  * 서버/클라이언트 환경에 따라 API baseURL을 반환한다.
  * 서버 컴포넌트에서는 NestJS를 직접 가리키는 절대 URL을 사용한다(news/service-image 패턴).
@@ -20,8 +23,10 @@ function getApiBaseUrl(): string {
 }
 
 /**
- * 사이트 기본 정보를 가져온다(서버 컴포넌트 안전).
+ * 사이트 기본 정보를 가져온다(서버 컴포넌트 안전, raw fetch).
  * GET /site-info — 공개 엔드포인트, 단일 객체 반환.
+ * 'use cache' 래핑은 소비 측 서버 뷰(Footer)에서 SITE_INFO_CACHE_TAG로 수행한다
+ * (이 모듈은 클라이언트 어드민이 barrel로 import하므로 next/cache를 두지 않는다).
  */
 export async function getSiteInfoServer(): Promise<SiteInfo> {
   try {

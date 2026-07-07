@@ -17,6 +17,9 @@ const eslintConfig = defineConfig([
     // eslint.config.mjs and its own lint command; it must not be
     // linted by this frontend config.
     "server/**",
+    // Node CJS build scripts (e.g. OG image generation) legitimately use
+    // require() and run outside the app bundle — exclude from app linting.
+    "scripts/**",
   ]),
   // FSD architecture boundaries: enforces the layer-direction import rule
   // and slice public-API (index.ts) entry points described in CLAUDE.md

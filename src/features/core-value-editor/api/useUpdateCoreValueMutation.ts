@@ -1,6 +1,7 @@
 'use client'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { axiosInstance } from '@/shared/api'
+import { revalidateCoreValuesCache } from '@/entities/core-value'
 import { coreValueKeys } from '@/entities/core-value'
 import type { CoreValue, CoreValueUpdateBody } from '@/entities/core-value'
 
@@ -13,6 +14,7 @@ export function useUpdateCoreValueMutation() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: coreValueKeys.all })
+      void revalidateCoreValuesCache()
     },
   })
 }

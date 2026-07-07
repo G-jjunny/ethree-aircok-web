@@ -4,12 +4,12 @@ import { SITE } from '@/shared/config';
 export function WhyChooseUsSection() {
   return (
     <section className="relative bg-surface-dark">
-      {/* 배경 이미지 */}
+      {/* 배경 이미지 — below-the-fold이므로 priority 제거(기본 lazy), fill+sizes로 CLS 방지 */}
       <Image
         src="/images/home/aircok_solution_bg.png"
         alt=""
         fill
-        priority
+        sizes="100vw"
         className="object-cover"
       />
       {/* 오버레이 — bg-overlay-dark-60(60%) 배경 이미지 일부 노출용 토큰 */}

@@ -10,6 +10,7 @@ import {
   DefaultValuePipe,
   ParseIntPipe,
 } from '@nestjs/common';
+import { ThrottlerGuard, Throttle } from '@nestjs/throttler';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { DiagnosisConsultationService } from './diagnosis-consultation.service';
 import { CreateDiagnosisConsultationDto } from './dto/create-diagnosis-consultation.dto';
@@ -22,6 +23,9 @@ export class DiagnosisConsultationController {
   ) {}
 
   /** POST /api/diagnosis-consultation — 공개 (인증 불필요). */
+  // 공개 POST 스팸 방지: 분당 5회로 제한(라우트별 스로틀).
+  @UseGuards(ThrottlerGuard)
+  @Throttle({ default: { ttl: 60000, limit: 5 } })
   @Post()
   create(@Body() dto: CreateDiagnosisConsultationDto) {
     return this.diagnosisConsultationService.create(dto);

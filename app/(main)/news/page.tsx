@@ -6,6 +6,9 @@ import { NewsView } from '@/views/news'
 export const metadata: Metadata = {
   title: SITE.pages.news.title,
   description: SITE.pages.news.description,
+  alternates: {
+    canonical: '/news',
+  },
   openGraph: {
     title: SITE.pages.news.title,
     description: SITE.pages.news.description,

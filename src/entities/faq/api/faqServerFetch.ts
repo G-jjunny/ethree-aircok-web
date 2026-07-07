@@ -8,6 +8,9 @@ import type { FaqCategory, FaqItem } from '../model/types'
  */
 export class FaqServerApiError extends ApiError {}
 
+/** FAQ 캐시 태그(카테고리·항목 공용). 어드민 FAQ 편집 뮤테이션 후 updateTag로 무효화한다. */
+export const FAQ_CACHE_TAG = 'faq'
+
 /**
  * 서버/클라이언트 환경에 따라 API baseURL을 반환한다.
  * 서버 컴포넌트에서는 NestJS를 직접 가리키는 절대 URL을 사용한다(news/service-image 패턴).
@@ -21,7 +24,6 @@ function getApiBaseUrl(): string {
 
 /**
  * FAQ 카테고리 목록을 가져온다(서버 컴포넌트 안전).
- * GET /faq/categories — 응답 래핑: { data: FaqCategory[] }.
  */
 export async function getFaqCategoryList(): Promise<FaqCategory[]> {
   try {
@@ -43,7 +45,6 @@ export async function getFaqCategoryList(): Promise<FaqCategory[]> {
 
 /**
  * FAQ 전체 항목 목록을 가져온다(서버 컴포넌트 안전).
- * GET /faq/items — 응답 래핑: { data: FaqItem[] }.
  */
 export async function getFaqItemList(): Promise<FaqItem[]> {
   try {

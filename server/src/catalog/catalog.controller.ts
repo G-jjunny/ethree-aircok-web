@@ -17,6 +17,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { join } from 'path';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { CacheControlInterceptor } from '../common/interceptors/http-cache.interceptor';
 import { CatalogService } from './catalog.service';
 import { CreateCatalogImageDto } from './dto/create-catalog-image.dto';
 import { UpdateCatalogImageDto } from './dto/update-catalog-image.dto';
@@ -60,6 +61,8 @@ const multerOptions = {
 export class CatalogController {
   constructor(private readonly catalogService: CatalogService) {}
 
+  /** GET /api/catalog — 공개 엔드포인트. */
+  @UseInterceptors(new CacheControlInterceptor(60))
   @Get()
   findAll() {
     return this.catalogService.findAll();

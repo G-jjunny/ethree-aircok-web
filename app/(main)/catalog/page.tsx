@@ -5,6 +5,9 @@ import { CatalogView } from '@/views/catalog'
 export const metadata: Metadata = {
   title: SITE.pages.catalog.title,
   description: SITE.pages.catalog.description,
+  alternates: {
+    canonical: '/catalog',
+  },
   openGraph: {
     title: SITE.pages.catalog.title,
     description: SITE.pages.catalog.description,

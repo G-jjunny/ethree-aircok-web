@@ -1,7 +1,7 @@
 'use client'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { axiosInstance } from '@/shared/api'
-import { siteInfoKeys } from '@/entities/site-info'
+import { siteInfoKeys, revalidateSiteInfoCache } from '@/entities/site-info'
 import type { SiteInfo, SiteInfoUpdateBody } from '@/entities/site-info'
 
 export function useUpdateSiteInfoMutation() {
@@ -13,6 +13,7 @@ export function useUpdateSiteInfoMutation() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: siteInfoKeys.all })
+      void revalidateSiteInfoCache()
     },
   })
 }

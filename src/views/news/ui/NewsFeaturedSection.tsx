@@ -65,6 +65,7 @@ function FeaturedOverlay({ item }: Props) {
           src={item.coverImage}
           alt={item.title}
           ratio="featured"
+          priority
           className="group-hover:scale-[1.02] transition-transform duration-300"
         />
         <div className="absolute inset-0 bg-overlay-dark-60" />

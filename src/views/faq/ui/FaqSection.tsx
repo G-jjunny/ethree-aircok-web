@@ -1,12 +1,30 @@
 import { connection } from 'next/server'
+import { cacheLife, cacheTag } from 'next/cache'
 import { SectionHeader } from '@/shared/ui'
 import {
   getFaqCategoryList,
   getFaqItemList,
+  FAQ_CACHE_TAG,
   type FaqCategory,
   type FaqItem,
 } from '@/entities/faq'
 import { FaqBrowser } from './FaqBrowser'
+
+/** FAQ 카테고리 조회를 'use cache'로 캐싱(cacheTag: 'faq', cacheLife: default). */
+async function getCachedFaqCategories(): Promise<FaqCategory[]> {
+  'use cache'
+  cacheLife('default')
+  cacheTag(FAQ_CACHE_TAG)
+  return getFaqCategoryList()
+}
+
+/** FAQ 항목 조회를 'use cache'로 캐싱(cacheTag: 'faq', cacheLife: default). */
+async function getCachedFaqItems(): Promise<FaqItem[]> {
+  'use cache'
+  cacheLife('default')
+  cacheTag(FAQ_CACHE_TAG)
+  return getFaqItemList()
+}
 
 export async function FaqSection() {
   // 빌드 타임 프리렌더(백엔드 미기동)에서 fetch가 실행되지 않도록 요청 시점으로 미룬다.
@@ -16,8 +34,8 @@ export async function FaqSection() {
   let items: FaqItem[] = []
   try {
     const [categoryList, itemList] = await Promise.all([
-      getFaqCategoryList(),
-      getFaqItemList(),
+      getCachedFaqCategories(),
+      getCachedFaqItems(),
     ])
     categories = categoryList
     items = itemList

@@ -1,12 +1,23 @@
+import Image from 'next/image'
 import { connection } from 'next/server'
-import { getTeamImageListServer, type TeamImage } from '@/entities/team-image'
+import { cacheLife, cacheTag } from 'next/cache'
+import { getTeamImageListServer, TEAM_IMAGES_CACHE_TAG, type TeamImage } from '@/entities/team-image'
 import { SITE } from '@/shared/config'
 import { SectionHeader } from '@/shared/ui'
 
-/** 이미지 항목은 백엔드 절대 URL로 보정한다(catalog/news 패턴). */
+/** 팀 이미지 조회를 'use cache'로 캐싱(cacheTag: 'team-images', cacheLife: default). */
+async function getCachedTeamImages(): Promise<TeamImage[]> {
+  'use cache'
+  cacheLife('default')
+  cacheTag(TEAM_IMAGES_CACHE_TAG)
+  return getTeamImageListServer()
+}
+
+/** R2(http)는 그대로, 상대 경로(/uploads)는 동일 출처 rewrite로 서빙되도록 상대 유지. */
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001'
 function resolveSrc(src: string): string {
-  return src.startsWith('http') ? src : `${API_BASE}${src}`
+  if (src.startsWith('http')) return src
+  return src.startsWith('/') ? src : `${API_BASE}${src}`
 }
 
 /** 데이터 없음/에러 시 표시할 단일 플레이스홀더 카드. */
@@ -45,7 +56,7 @@ export async function TeamSection() {
 
   let images: TeamImage[] = []
   try {
-    images = await getTeamImageListServer()
+    images = await getCachedTeamImages()
   } catch {
     images = []
   }
@@ -67,11 +78,12 @@ export async function TeamSection() {
         {firstImage ? (
           <div className="max-w-3xl mx-auto w-full overflow-hidden rounded-xl">
             <div className="relative aspect-video w-full overflow-hidden bg-surface-light">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <Image
                 src={resolveSrc(firstImage.imageUrl)}
                 alt={SITE.about.team.title}
-                className="absolute inset-0 h-full w-full object-cover"
+                fill
+                sizes="(min-width: 768px) 768px, 100vw"
+                className="object-cover"
               />
             </div>
           </div>

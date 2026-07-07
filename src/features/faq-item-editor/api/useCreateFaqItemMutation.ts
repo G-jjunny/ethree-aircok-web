@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { axiosInstance } from '@/shared/api'
 import { faqItemKeys } from '@/entities/faq'
+import { revalidateFaqCache } from '@/entities/faq'
 
 interface CreateFaqItemPayload {
   categoryId: string
@@ -16,6 +17,7 @@ export function useCreateFaqItemMutation() {
       axiosInstance.post('/faq/items', payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: faqItemKeys.all })
+      void revalidateFaqCache()
     },
   })
 }
