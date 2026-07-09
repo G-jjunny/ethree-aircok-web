@@ -211,12 +211,12 @@ import { SITE } from '@/shared/config/site'
 
 ## 서브에이전트 구조
 
-`.claude/agents/`에 정의된 3단계 위임 구조:
+`.claude/agents/`에 정의된 위임 구조 (design은 orchestrator 직속):
 
 ```
 orchestrator (Task만 사용, Write 불가)
+├── design                  — 디자인 토큰/시스템(Bootstrap), 신규 shared/ui 공용 컴포넌트(Pre), 토큰 정리(Polish). orchestrator 직속
 ├── frontend-leader
-│   ├── design              — docs/design.md 토큰, 마크업/className
 │   ├── frontend-implementer — entities/features/widgets/views 구현
 │   └── frontend-reviewer    — lint/typecheck/build + 디자인 & Next.js 규칙 리뷰
 └── backend-leader
@@ -226,9 +226,10 @@ orchestrator (Task만 사용, Write 불가)
 ```
 
 - `orchestrator`는 위임만 합니다(Task 툴); 파일을 직접 수정하지 않습니다.
+- `design`은 frontend-leader 하위가 아니라 **orchestrator 직속** 스페셜리스트입니다. 디자인 토큰/시스템과 shared/ui 공용 컴포넌트(Pre)·토큰 정리(Polish)를 담당하며, frontend-leader가 Pre/Polish가 필요하면 orchestrator에 요청해 design 위임을 받습니다.
 - 리더들은 크로스팀 사안(API 계약)을 오케스트레이터에게 올리지 않고 서로 직접 협의합니다.
-- 리뷰어(`frontend-reviewer`, `backend-reviewer`)는 직접 문제를 수정하지 않습니다 — 리더에게 보고하고, 리더가 해당 구현자/디자이너에게 재위임합니다.
-- 모든 리더 → 오케스트레이터, 스페셜리스트 → 리더 보고는 `summary`, `changedFiles`, `complianceCheck`, `unresolvedIssues`, `crossTeamNotes` 구조화 스키마를 사용합니다.
+- 리뷰어(`frontend-reviewer`, `backend-reviewer`)는 직접 문제를 수정하지 않습니다 — 리더에게 보고하고, 리더가 해당 구현자(마크업·토큰 문제는 orchestrator 경유 design)에게 재위임합니다.
+- 모든 리더·design → 오케스트레이터, 구현·리뷰 스페셜리스트 → 리더 보고는 `summary`, `changedFiles`, `complianceCheck`, `unresolvedIssues`, `crossTeamNotes` 구조화 스키마를 사용합니다.
 - 각 에이전트의 정확한 툴 권한과 책임은 `.claude/agents/*.md`의 frontmatter를 참조하세요.
 
 ## views 슬라이스 내 섹션 분리 규칙
