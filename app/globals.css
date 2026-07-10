@@ -1,96 +1,117 @@
 @import "tailwindcss";
 
 /* ════════════════════════════════════════════════════════════════
-   Aircok Design Tokens — 신(新) 체계 (구조 재설정, 이슈 #100)
+   Aircok Design Tokens — Blue-Tech 체계 (이슈 #102, 시안 확정 재추출)
    ────────────────────────────────────────────────────────────────
-   ⚠️ 값은 잠정(placeholder)이다. 실제 OKLCH 색상은 시안 확정 후 교체한다.
-      "TBD: 시안 확정 후" 주석이 붙은 값은 전부 임시값.
-   ⚠️ 이 블록은 [신 구조 토큰] + [구 토큰 → 신 토큰 deprecated alias]가
-      공존한다. 구 토큰은 컴포넌트 마이그레이션 완료 후 제거한다.
-   SSOT 문서: docs/design.md · 에이전트 규칙: .claude/skills/design-system/SKILL.md
+   방향: 밝은 배경(흰색/연회색) + 다크 네이비 섹션 교차, 프라이머리 블루
+   #2b6bff · 포인트 시안 #12b5cf · 디스플레이 Sora + 본문 Pretendard.
+   색상은 전부 OKLCH. 블루 계열 뉴트럴은 --brand-hue 파생.
+   구 토큰(aircok-blue/olive/accent 등)은 하단 DEPRECATED 블록에 alias 로 유지.
+   SSOT: docs/design.md · 에이전트 규칙: .claude/skills/design-system/SKILL.md
    ════════════════════════════════════════════════════════════════ */
 @theme inline {
   /* ── Fonts ─────────────────────────────── */
-  /* 영문/숫자/eyebrow → font-display, 한글 본문 → font-body(Pretendard self-host).
-     TBD: Manrope 웹폰트 로드 후 --font-display 선두에 반영 (현재는 Pretendard fallback). */
-  --font-sans:    var(--font-pretendard), 'SF Pro Text', -apple-system, 'Helvetica Neue', sans-serif;
-  --font-display: 'Manrope', var(--font-pretendard), 'SF Pro Display', -apple-system, sans-serif; /* TBD: Manrope 폰트 로드 필요 */
-  --font-body:    var(--font-pretendard), 'SF Pro Text', -apple-system, 'Helvetica Neue', sans-serif;
+  /* 영문/숫자/eyebrow/워드마크 → font-display(Sora), 한글 헤딩·본문 → font-body(Pretendard). */
+  /* Sora 는 app/layout 에서 로드 필요 (미로드 시 Pretendard fallback). */
+  --font-sans:    var(--font-pretendard), system-ui, 'Helvetica Neue', sans-serif;
+  --font-display: var(--font-sora), 'Sora', var(--font-pretendard), system-ui, sans-serif;
+  --font-body:    var(--font-pretendard), system-ui, 'Helvetica Neue', sans-serif;
 
-  /* ── Brand (──brand-hue 파생 아키텍처) ──── */
-  /* --brand-hue 하나로 brand 계열 파생 토큰을 계산한다. TBD: 시안 확정 후 hue/L/C 교체. */
-  --brand-hue:          263;                                   /* TBD: 시안 확정 후 */
-  --color-brand:        oklch(55% 0.24 var(--brand-hue));      /* TBD: 시안 확정 후 · 주요 CTA */
-  --color-brand-hover:  oklch(47% 0.22 var(--brand-hue));      /* TBD: 시안 확정 후 · CTA hover */
-  --color-brand-ink:    oklch(100% 0 0);                       /* brand 위 텍스트(흰색) */
+  /* ── Brand (--brand-hue 파생 아키텍처) ──── */
+  /* --brand-hue 하나로 blue 계열(brand·ink·surface·navy) 을 함께 이동시킨다. */
+  --brand-hue:          263;                                  /* #2b6bff 실측 hue ≈ 263 */
+  --color-brand:        oklch(58% 0.23 var(--brand-hue));     /* #2b6bff · 주요 CTA/링크/강조 */
+  --color-brand-hover:  oklch(49% 0.21 var(--brand-hue));     /* #1e4fd6 · CTA hover/그라디언트 끝 */
+  --color-brand-ink:    oklch(100% 0 0);                      /* brand 위 텍스트(흰색) */
+  --color-brand-soft:   oklch(82% 0.09 var(--brand-hue));     /* #a8c4ff · 다크 위 라이트블루 텍스트/배지/링크 */
 
-  /* ── Ink / Muted (라이트 배경 텍스트) ───── */
-  --color-ink:       oklch(22% 0.005 270);   /* TBD: 시안 확정 후 · 헤딩·강본문·다크섹션 배경 겸용 */
-  --color-ink-soft:  oklch(40% 0.01 270);    /* TBD: 시안 확정 후 · 보조 본문 */
-  --color-muted:     oklch(56% 0.01 270);    /* TBD: 시안 확정 후 · 메타/날짜/캡션 */
+  /* ── Cyan (포인트 · 다크 위 강조/수치 단위) ── */
+  --color-cyan:        oklch(71% 0.12 213);   /* #12b5cf · 시안 포인트 */
+  --color-cyan-hover:  oklch(60% 0.10 213);   /* #0c8fa5 · 시안 딥 variant */
 
-  /* ── Surface ────────────────────────────── */
-  --color-surface:        oklch(97% 0.008 95);   /* TBD: 시안 확정 후 · 페이지 배경(크림) */
-  --color-surface-white:  oklch(100% 0 0);       /* 카드 배경(흰색) */
+  /* ── Ink / 뉴트럴 (라이트 배경 텍스트) ──── */
+  --color-ink:       oklch(20% 0.037 var(--brand-hue));   /* #0d1526 · 헤딩·강본문 */
+  --color-ink-soft:  oklch(43% 0.027 var(--brand-hue));   /* #48505f · 카드 본문 */
+  --color-muted:     oklch(50% 0.034 var(--brand-hue));   /* #5a6478 · 보조 본문/설명 */
+  --color-faint:     oklch(72% 0.03 var(--brand-hue));    /* #9aa6b8 · 메타/출처/플레이스홀더 라벨 */
 
-  /* ── Olive (밴드/eyebrow 계열) ──────────── */
-  --color-olive:        oklch(44% 0.06 128);   /* TBD: 시안 확정 후 · 올리브 밴드 배경 */
-  --color-olive-label:  oklch(52% 0.08 128);   /* TBD: 시안 확정 후 · 라이트 위 eyebrow */
-  --color-olive-soft:   oklch(82% 0.04 128);   /* TBD: 시안 확정 후 · 올리브 위 eyebrow */
-  --color-olive-muted:  oklch(64% 0.06 128);   /* TBD: 시안 확정 후 · 카드 번호 */
+  /* ── Surface / Tint / Hairline ──────────── */
+  --color-surface:        oklch(98% 0.006 var(--brand-hue));  /* #f5f7fb · 연회색 섹션 배경 */
+  --color-surface-white:  oklch(100% 0 0);                    /* #ffffff · 카드/기본 흰 배경 */
+  --color-surface-2:      oklch(99% 0.004 var(--brand-hue));  /* #f8fafd · 비활성 탭 배경 */
+  --color-tint:           oklch(96% 0.017 var(--brand-hue));  /* #eef3ff · 아이콘 박스 연블루 tint */
+  --color-tint-border:    oklch(92% 0.036 var(--brand-hue));  /* #dce6ff · 연블루 보더 */
+  --color-hairline:       oklch(94% 0.01 var(--brand-hue));   /* #e6eaf1 · 기본 hairline 보더 */
 
-  /* ── Accent (다크 위 포인트) ────────────── */
-  --color-accent:  oklch(87% 0.19 125);   /* TBD: 시안 확정 후 · 다크 배경 위 라임 포인트 */
+  /* ── Navy (다크 섹션 배경) ──────────────── */
+  --color-navy:       oklch(18% 0.035 var(--brand-hue));  /* #0a1020 · 기본 다크 섹션 */
+  --color-navy-deep:  oklch(14% 0.025 var(--brand-hue));  /* #070b16 · footer/hero 끝 최암부 */
+  --color-navy-tint:  oklch(27% 0.082 var(--brand-hue));  /* #12224d · 히어로 radial 상단 블루네이비 */
 
-  /* ── Tint / Hairline ────────────────────── */
-  --color-tint:      oklch(94% 0.05 128);          /* TBD: 시안 확정 후 · 아이콘 배경(연녹) */
-  --color-hairline:  oklch(22% 0.005 270 / 0.08);  /* 라이트 hairline 보더 */
+  /* ── AQI 상태색 (공기질 지수 · 실시간 카드) ── */
+  --color-aqi-good:     oklch(76% 0.17 155);   /* #34d17f · 좋음 */
+  --color-aqi-normal:   oklch(75% 0.13 260);   /* #7fb0ff · 보통 */
+  --color-aqi-warning:  oklch(78% 0.16 72);    /* #f5a524 · 주의 */
+  --color-aqi-bad:      oklch(64% 0.21 25);    /* #ef4444 · 나쁨 */
 
-  /* ── Feedback (상태 — 신 팔레트 외 기능 토큰) ── */
-  --color-success: oklch(72% 0.19 145);   /* TBD: 시안 확정 후 */
-  --color-warning: oklch(78% 0.16 68);    /* TBD: 시안 확정 후 */
-  --color-error:   oklch(64% 0.23 25);    /* TBD: 시안 확정 후 */
+  /* ── Feedback (기능 토큰 · AQI 팔레트 정렬) ── */
+  --color-success: oklch(76% 0.17 155);   /* aqi-good 정렬 */
+  --color-warning: oklch(78% 0.16 72);    /* aqi-warning 정렬 */
+  --color-error:   oklch(64% 0.21 25);    /* aqi-bad 정렬 */
 
   /* ── Typography Scale (네이밍 토큰) ─────── */
-  /* 값은 잠정. 네이밍이 신 체계의 기준이다. */
-  --text-hero:     4rem;        /* 64 */
-  --text-mega:     4.5rem;      /* 72 */
-  --text-h1:       2.375rem;    /* 38 */
-  --text-h2:       2.25rem;     /* 36 */
-  --text-h3:       1.75rem;     /* 28 */
-  --text-logo:     1.625rem;    /* 26 */
-  --text-item:     1.1875rem;   /* 19 */
-  --text-lead:     1.0625rem;   /* 17 */
-  --text-list:     0.96875rem;  /* 15.5 */
-  --text-body-sm:  0.9375rem;   /* 15 */
-  --text-detail:   0.90625rem;  /* 14.5 */
-  --text-meta:     0.84375rem;  /* 13.5 */
-  --text-eyebrow:  0.8125rem;   /* 13 */
-  --text-caption:  0.78125rem;  /* 12.5 */
-  --text-mini:     0.6875rem;   /* 11 */
+  /* 비표준 사이즈만 네이밍. 표준 구간(72/48/24/20/18/16/14/12)은 기본 유틸 재사용. */
+  --text-hero:      3.75rem;      /* 60 · 히어로 h1 */
+  --text-display:   3.5rem;       /* 56 · 실시간 지수 큰 숫자 */
+  --text-h1:        3.25rem;      /* 52 · About 히어로 h1 */
+  --text-stat:      2.875rem;     /* 46 · STATS 숫자 */
+  --text-h2:        2.75rem;      /* 44 · Our Value h2 */
+  --text-h3:        2.375rem;     /* 38 · 섹션 h2/지표 숫자 */
+  --text-h4:        2.25rem;      /* 36 · Impact h2 */
+  --text-h5:        2.125rem;     /* 34 · About 섹션 h2 */
+  --text-h6:        1.75rem;      /* 28 · 히어로 통계/탭 패널 h3 */
+  --text-subtitle:  1.625rem;     /* 26 · 탭 패널 h3 */
+  --text-lead:      1.0625rem;    /* 17 · 히어로/step 본문 */
+  --text-lead-sm:   1.03125rem;   /* 16.5 · 섹션 리드 본문 */
+  --text-meta:      0.84375rem;   /* 13.5 · step 설명/통계 라벨/eyebrow 대 */
+  --text-eyebrow:   0.78125rem;   /* 12.5 · eyebrow/배지/팁 */
+  --text-mini:      0.6875rem;    /* 11 · 카드 eyebrow(소)/mini 라벨 */
+  --text-nano:      0.65625rem;   /* 10.5 · 탭 en 라벨/이미지 자리 라벨 */
 
   /* ── Tracking (letter-spacing) ──────────── */
-  --tracking-headline: -0.01em;
-  --tracking-caption:   0.1em;
-  --tracking-label:     0.14em;
-  --tracking-eyebrow:   0.2em;
-  --tracking-hero:      0.22em;
+  --tracking-wordmark:   -0.03em;   /* 워드마크 */
+  --tracking-headline:   -0.02em;   /* 헤드라인 기본 */
+  --tracking-label-sm:    0.05em;   /* 파트너 라벨 */
+  --tracking-label:       0.1em;    /* 플레이스홀더 라벨/footer 태그라인 */
+  --tracking-caption:     0.12em;   /* 히어로 하단 라벨 */
+  --tracking-eyebrow:     0.14em;   /* 카드 eyebrow/트러스트 */
+  --tracking-eyebrow-lg:  0.18em;   /* 섹션 eyebrow */
+  --tracking-wide:        0.4em;    /* 워드마크 서브 (CLEAN AIR · SMART SPACE) */
 
   /* ── Border Radius ──────────────────────── */
-  --radius-card:   0.25rem;   /* 4  · 카드 */
-  --radius-image:  0.5rem;    /* 8  · 이미지 */
-  --radius-pill:   1.75rem;   /* 28 · pill */
-  --radius-full:   9999px;
+  --radius-btn:      0.75rem;    /* 12 · 버튼/소카드/로고칩 */
+  --radius-image:    1.125rem;   /* 18 · Value 이미지/아이콘 박스 */
+  --radius-card:     1.25rem;    /* 20 · 다크 통계 카드/이미지 박스 */
+  --radius-card-lg:  1.375rem;   /* 22 · 히어로 실시간 카드/팀 이미지 */
+  --radius-pill:     999px;      /* pill 버튼/배지 */
+  --radius-full:     9999px;     /* 원형 */
+
+  /* ── Shadows (블루/블랙 글로우) ─────────── */
+  --shadow-brand-sm:  0 6px 18px oklch(58% 0.23 263 / 0.4);    /* 헤더 pill 버튼 */
+  --shadow-brand:     0 10px 30px oklch(58% 0.23 263 / 0.45);  /* 히어로/플랫폼 CTA */
+  --shadow-soft:      0 12px 30px oklch(0% 0 0 / 0.2);         /* CTA 흰 버튼 */
+  --shadow-float:     0 30px 70px oklch(0% 0 0 / 0.45);        /* 히어로 플로팅 카드 */
+  --shadow-card:      0 4px 24px oklch(0% 0 0 / 0.08);         /* 관리자 패널 카드 */
 
   /* ── Motion ─────────────────────────────── */
-  --duration-fast: 150ms;
+  --duration-fast: 200ms;
   --ease-out:      cubic-bezier(0.16, 1, 0.3, 1);
 
   /* ────────────────────────────────────────────────────────────
-     기능 토큰 (신 팔레트 외 · 마이그레이션 대상 아님, 유지)
+     기능 토큰 (팔레트 외 · 마이그레이션 대상 아님, 유지)
      ──────────────────────────────────────────────────────────── */
 
-  /* Nav / Overlay */
+  /* Nav / Overlay — nav-bg 는 현행 라이트 헤더 유지(다크 헤더는 랜딩 마이그레이션 시 명시 클래스로 처리) */
   --color-nav-bg:           oklch(100% 0 0 / 0.80);
   --color-nav-bg-mobile:    oklch(100% 0 0 / 0.95);
   --color-overlay-white-10: oklch(100% 0 0 / 0.10);
@@ -101,9 +122,7 @@
   --aspect-featured:  16 / 7;   /* News Featured / Detail hero 와이드 */
   --aspect-row-thumb: 4 / 3;    /* News 가로형 row 썸네일 */
 
-  /* Spacing — steps 1~4는 기본 4px 그리드와 동일, 5~10은 구 커스텀 스케일.
-     TBD: 신 체계는 "Tailwind 기본 4px 그리드"이므로 5~10 override 제거 후
-     사용처(p-5~p-10) 재조정 필요. 지금은 회귀 방지를 위해 유지. */
+  /* Spacing — steps 1~4 기본 4px 그리드 동일, 5~10 구 커스텀 스케일(회귀 방지 유지) */
   --spacing-1:  4px;
   --spacing-2:  8px;
   --spacing-3:  12px;
@@ -124,19 +143,28 @@
      각 컴포넌트 마이그레이션 완료 후 이 블록 전체를 삭제한다.
      ──────────────────────────────────────────────────────────── */
 
-  /* 브랜드 */
+  /* 브랜드 (구 아이콕 블루 → blue-tech) */
   --color-aircok-blue:       var(--color-brand);        /* deprecated: brand 로 마이그레이션 예정 */
   --color-aircok-blue-dark:  var(--color-brand-hover);  /* deprecated: brand-hover 로 마이그레이션 예정 */
-  --color-aircok-blue-light: var(--color-accent);       /* deprecated: accent 로 마이그레이션 예정 (blue→lime) */
+  --color-aircok-blue-light: var(--color-cyan);         /* deprecated: cyan 로 마이그레이션 예정 (구 lime→cyan) */
+
+  /* 올리브 (blue-tech 에 없음 → 근사 블루로 임시 매핑) */
+  --color-olive:        var(--color-brand);       /* deprecated: brand 밴드로 마이그레이션 예정 */
+  --color-olive-label:  var(--color-brand);       /* deprecated: brand eyebrow 로 마이그레이션 예정 */
+  --color-olive-soft:   var(--color-brand-soft);  /* deprecated: brand-soft 로 마이그레이션 예정 */
+  --color-olive-muted:  var(--color-muted);       /* deprecated: muted 로 마이그레이션 예정 */
+
+  /* 포인트/틴트 (구 lime accent → cyan) */
+  --color-accent:  var(--color-cyan);   /* deprecated: cyan 로 마이그레이션 예정 (구 lime→cyan) */
 
   /* 서피스 */
-  --color-surface-light:           var(--color-surface); /* deprecated: surface 로 마이그레이션 예정 */
-  --color-surface-dark:            var(--color-ink);      /* deprecated: ink 로 마이그레이션 예정 */
-  --color-surface-dark-1:          var(--color-ink);      /* deprecated: ink + opacity 로 마이그레이션 예정 */
-  --color-surface-dark-2:          var(--color-ink);      /* deprecated: ink + opacity 로 마이그레이션 예정 */
-  --color-surface-stat:            var(--color-ink);      /* deprecated: ink 로 마이그레이션 예정 */
-  --color-surface-stat-card:       var(--color-ink);      /* deprecated: ink + opacity 로 마이그레이션 예정 */
-  --color-surface-stat-card-hover: var(--color-ink);      /* deprecated: ink + opacity 로 마이그레이션 예정 */
+  --color-surface-light:           var(--color-surface);  /* deprecated: surface 로 마이그레이션 예정 */
+  --color-surface-dark:            var(--color-navy);      /* deprecated: navy 로 마이그레이션 예정 */
+  --color-surface-dark-1:          var(--color-navy);      /* deprecated: navy + opacity 로 마이그레이션 예정 */
+  --color-surface-dark-2:          var(--color-navy-deep); /* deprecated: navy-deep 로 마이그레이션 예정 */
+  --color-surface-stat:            var(--color-navy);      /* deprecated: navy 로 마이그레이션 예정 */
+  --color-surface-stat-card:       var(--color-navy);      /* deprecated: navy + opacity 로 마이그레이션 예정 */
+  --color-surface-stat-card-hover: var(--color-navy);      /* deprecated: navy + opacity 로 마이그레이션 예정 */
 
   /* 텍스트 */
   --color-heading-dark:   var(--color-ink);           /* deprecated: ink 로 마이그레이션 예정 */
@@ -146,30 +174,28 @@
   --color-body-light:     var(--color-surface-white); /* deprecated: text-white/80 로 마이그레이션 예정 */
 
   /* 링크 / 포커스 */
-  --color-link-on-light: var(--color-brand);   /* deprecated: brand 로 마이그레이션 예정 */
-  --color-link-on-dark:  var(--color-accent);  /* deprecated: accent 로 마이그레이션 예정 */
-  --color-focus:         var(--color-brand);   /* deprecated: brand 로 마이그레이션 예정 */
+  --color-link-on-light: var(--color-brand);       /* deprecated: brand 로 마이그레이션 예정 */
+  --color-link-on-dark:  var(--color-brand-soft);  /* deprecated: brand-soft 로 마이그레이션 예정 */
+  --color-focus:         var(--color-brand);       /* deprecated: brand 로 마이그레이션 예정 */
 
   /* 보더 */
-  --color-border-light:  var(--color-hairline);       /* deprecated: hairline 로 마이그레이션 예정 */
-  --color-border-subtle: var(--color-hairline);       /* deprecated: hairline 로 마이그레이션 예정 */
-  --color-border-dark:   oklch(100% 0 0 / 0.08);      /* deprecated: border-white/12 로 마이그레이션 예정 */
+  --color-border-light:  var(--color-hairline);   /* deprecated: hairline 로 마이그레이션 예정 */
+  --color-border-subtle: var(--color-hairline);   /* deprecated: hairline 로 마이그레이션 예정 */
+  --color-border-dark:   oklch(100% 0 0 / 0.08);  /* deprecated: border-white/8 로 마이그레이션 예정 */
 
-  /* Border Radius (구) */
-  --radius-sm: var(--radius-card);   /* deprecated: rounded-card 로 마이그레이션 예정 */
-  --radius-md: var(--radius-image);  /* deprecated: rounded-image 로 마이그레이션 예정 */
-  --radius-lg: var(--radius-image);  /* deprecated: rounded-image 로 마이그레이션 예정 */
-  --radius-xl: var(--radius-image);  /* deprecated: rounded-image 로 마이그레이션 예정 */
-  /* 주의: rounded-pill 은 구(980px full)→신(28px) 로 의미가 바뀐다.
-     full-round 버튼은 rounded-full 로 마이그레이션 예정. */
+  /* Border Radius (구 표준 스케일 override — 명시 px 로 핀 고정, 회귀 방지) */
+  --radius-sm: 0.25rem;   /* deprecated: 4 · rounded-btn 로 마이그레이션 예정 */
+  --radius-md: 0.5rem;    /* deprecated: 8 · rounded-btn 로 마이그레이션 예정 */
+  --radius-lg: 0.5rem;    /* deprecated: 8 · rounded-image 로 마이그레이션 예정 */
+  --radius-xl: 0.5rem;    /* deprecated: 8 · rounded-card 로 마이그레이션 예정 */
+  /* 주의: rounded-pill 은 28px→999px(full pill) 로 값이 바뀐다. 구 pill 사용처는 자동으로 full 라운드가 된다. */
 
-  /* Shadows (신 체계는 플랫 — 그림자 토큰 없음, 제거 예정) */
-  --shadow-card:    0 4px 24px oklch(0% 0 0 / 0.12);  /* deprecated: 플랫 디자인 전환 시 제거 예정 */
-  --shadow-product: 3px 5px 30px oklch(0% 0 0 / 0.22); /* deprecated: 플랫 디자인 전환 시 제거 예정 */
+  /* Shadows (구) */
+  --shadow-product: 3px 5px 30px oklch(0% 0 0 / 0.22); /* deprecated: shadow-float 로 마이그레이션 예정 */
 
   /* Typography (구 커스텀 크기) */
-  --text-nav:        0.9375rem;   /* 15 · deprecated: text-body-sm 로 마이그레이션 예정 */
-  --text-subheading: 1.3125rem;   /* 21 · deprecated: text-item / text-h3 로 마이그레이션 예정 */
+  --text-nav:        0.9375rem;   /* 15 · deprecated: text-sm 로 마이그레이션 예정 */
+  --text-subheading: 1.3125rem;   /* 21 · deprecated: text-xl / text-subtitle 로 마이그레이션 예정 */
 }
 
 body {
@@ -181,16 +207,16 @@ body {
 
 @layer utilities {
   .content-container {
-    max-width: 1200px;
+    max-width: 1240px;
     margin-inline: auto;
-    padding-inline: 1.25rem; /* px-5 */
+    padding-inline: 2rem; /* 32px */
   }
 }
 
 /* Tailwind v4에는 --duration-* 네임스페이스가 없어 named duration 유틸리티가
    자동 생성되지 않는다. SKILL.md가 규정하는 duration-fast 를 커스텀 유틸리티로 제공. */
 @utility duration-fast {
-  transition-duration: var(--duration-fast, 150ms);
+  transition-duration: var(--duration-fast, 200ms);
 }
 
 /* ── Dual-Row Logo Marquee keyframes ──────────────────────────

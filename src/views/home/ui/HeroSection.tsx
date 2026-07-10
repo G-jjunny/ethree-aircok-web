@@ -1,46 +1,91 @@
 import Link from 'next/link';
+import { Button } from '@/shared/ui';
+import { HeroAqiCard } from './HeroAqiCard';
+import { HeroBackgroundVideo } from './HeroBackgroundVideo';
+import styles from './hero.module.css';
 
-import { SITE } from '@/shared/config';
+const HERO_RADIAL =
+  'radial-gradient(120% 90% at 78% 0%, var(--color-navy-tint), var(--color-navy) 55%, var(--color-navy-deep) 100%)';
 
+const STATS = [
+  { value: '1', unit: '등급', label: 'KCL·KTR 성능인증' },
+  { value: '9', unit: '종', label: '동시 측정 센서' },
+  { value: '2018', unit: '', label: '환경 IT 전문 창립' },
+];
+
+/**
+ * 히어로 (시안 §2). 다크 radial 배경 + 드리프트 글로우, 좌: 카피/CTA/통계,
+ * 우: 실시간 공기질 카드(HeroAqiCard, client).
+ */
 export function HeroSection() {
   return (
-    // bg-surface-stat: 바로 아래 StatSection과 동일 딥 네이비를 공유해 하나의 연속 캔버스로 읽히게 함
-    // Centered Statement: 제품 비주얼 없이 타이포·여백·CTA만으로 첫인상을 만든다 ("여백이 곧 공기")
-    <section className="bg-surface-stat min-h-[calc(100vh-52px)]">
-      {/* min-h-[calc(100vh-52px)]: Nav 높이 52px 제외 — 1회성 레이아웃 수치 */}
-      <div className="content-container flex min-h-[calc(100vh-52px)] items-center">
-        <div className="mx-auto flex max-w-3xl flex-col items-center py-20 text-center">
-          {/* Signature: Air Spine — 브랜드 수직 룰 + 영문 워드마크 eyebrow (중앙 정렬) */}
-          <div className="flex items-center justify-center gap-3">
-            <span aria-hidden="true" className="block h-6 w-0.5 bg-aircok-blue" />
-            <span className="text-aircok-blue-light text-sm font-medium tracking-[0.2em]">
-              {SITE.nameEn}
-            </span>
+    <section className="relative overflow-hidden bg-navy text-white">
+      {/* 배경 영상 (최하단 레이어, 장식). 로드 전/실패 시 section 의 bg-navy 폴백 */}
+      <HeroBackgroundVideo className="absolute inset-0 h-full w-full object-cover" />
+
+      {/* 다크 오버레이 (가독성). 기존 HERO_RADIAL 다크 radial 을 반투명(opacity-75)으로
+          덧대 흰 텍스트 대비를 확보하되 영상이 은은히 비치게 한다 */}
+      <div
+        aria-hidden
+        className="absolute inset-0 opacity-75"
+        style={{ backgroundImage: HERO_RADIAL }}
+      />
+
+      {/* 드리프트 글로우 (장식). 크기는 1회성 장식 치수 — token 없음.
+          DOM 순서상 오버레이 위 · 콘텐츠(z-10) 아래에 배치 */}
+      <div
+        aria-hidden
+        className={`${styles.driftA} pointer-events-none absolute -right-36 -top-20 h-[620px] w-[620px] rounded-full bg-radial from-brand/50 to-transparent blur-2xl`}
+      />
+      <div
+        aria-hidden
+        className={`${styles.driftB} pointer-events-none absolute -bottom-32 right-32 h-[420px] w-[420px] rounded-full bg-radial from-cyan/40 to-transparent blur-2xl`}
+      />
+
+      <div className="content-container relative z-10 grid items-center gap-14 py-24 md:grid-cols-[1.05fr_0.95fr]">
+        {/* 좌: 카피 */}
+        <div>
+          <div className="inline-flex items-center gap-2 rounded-pill border border-brand/40 bg-brand/12 px-3.5 py-1.5 text-eyebrow font-semibold text-brand-soft">
+            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-cyan" />
+            AIoT 실내 공기질 관리 플랫폼
           </div>
 
-          <h1 className="mt-8 font-display text-4xl font-semibold leading-[1.07] tracking-tight text-heading-light [word-break:keep-all] sm:text-5xl md:text-6xl lg:text-7xl">
-            {SITE.tagline}
+          <h1 className="mt-6 text-hero font-extrabold leading-[1.08] tracking-headline">
+            보이지 않는 공기를
+            <br />
+            <span className="text-brand">콕콕</span> 집어 관리하다
           </h1>
 
-          <p className="mt-6 max-w-xl text-subheading leading-[1.65] text-body-light [word-break:keep-all]">
-            {SITE.hero.subtitle}
+          <p className="mt-5 max-w-[500px] text-lead leading-relaxed text-white/68">
+            9종 센서로 실내 공기질을 실시간 측정·진단하고, AIoT 클라우드 플랫폼이 필요한
+            행동요령까지 알려드립니다. 국민 모두가 언제 어디서나 건강한 공기를 마실 수 있는
+            공간을 만듭니다.
           </p>
 
-          <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Link
-              href="/contact"
-              className="inline-flex min-h-[44px] items-center justify-center rounded-md bg-aircok-blue px-5 font-medium text-heading-light transition-colors hover:bg-aircok-blue-dark active:scale-[0.97]"
-            >
-              {SITE.hero.cta.primary}
-            </Link>
-            <Link
-              href="/services"
-              className="inline-flex min-h-[44px] items-center justify-center rounded-pill border border-heading-light px-5 text-heading-light transition-colors hover:bg-overlay-white-10"
-            >
-              {SITE.hero.cta.secondary}
-            </Link>
+          <div className="mt-6 flex flex-wrap gap-3.5">
+            <Button asChild variant="primary" size="md">
+              <Link href="/services">제품 살펴보기 →</Link>
+            </Button>
+            <Button asChild variant="outline" size="md">
+              <Link href="/contact">도입 상담 신청</Link>
+            </Button>
+          </div>
+
+          <div className="mt-11 flex flex-wrap gap-6">
+            {STATS.map((stat) => (
+              <div key={stat.label}>
+                <div className="font-display text-h6 font-extrabold">
+                  {stat.value}
+                  {stat.unit && <span className="text-cyan">{stat.unit}</span>}
+                </div>
+                <div className="mt-0.5 text-sm text-white/55">{stat.label}</div>
+              </div>
+            ))}
           </div>
         </div>
+
+        {/* 우: 실시간 카드 */}
+        <HeroAqiCard />
       </div>
     </section>
   );

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { AppProviders } from "@/app/providers";
-import { pretendard } from "@/shared/fonts";
+import { pretendard, sora } from "@/shared/fonts";
 import { SITE } from "@/shared/config";
 import "./globals.css";
 
@@ -90,7 +90,7 @@ export default function RootLayout({
   return (
     <html
       lang="ko"
-      className={`${pretendard.variable} h-full antialiased`}
+      className={`${pretendard.variable} ${sora.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <script

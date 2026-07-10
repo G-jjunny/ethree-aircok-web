@@ -4,49 +4,49 @@ import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { SITE } from '@/shared/config';
+import { Button } from '@/shared/ui';
 
+/**
+ * 전역 헤더 (시안 §1). 다크 글래스: bg-navy/72 + backdrop-blur, 하단 hairline(white/8).
+ * 데스크톱은 로고(흰색) + nav 링크 + 도입 문의 pill, 모바일은 햄버거 드롭다운.
+ */
 export function Nav() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 bg-nav-bg backdrop-blur-xl backdrop-saturate-180 border-b border-border-light">
-      <div className="max-w-[1200px] mx-auto px-5 h-[52px] flex items-center justify-between">
-        {/* 로고 */}
-        <Link href="/" aria-label={SITE.name}>
+    <header className="sticky top-0 z-50 bg-navy/72 backdrop-blur-xl border-b border-white/8">
+      <div className="content-container flex items-center gap-4 py-4">
+        {/* 로고 (흰색) */}
+        <Link href="/" aria-label={SITE.name} className="flex items-center">
           <Image
-            src="/images/logos/logo.png"
+            src="/images/logos/logo-white.png"
             alt={SITE.name}
-            height={32}
-            width={120}
-            style={{ width: 'auto' }}
+            height={30}
+            width={112}
+            style={{ width: 'auto', height: '30px' }}
             priority
           />
         </Link>
 
-        {/* 데스크탑 네비게이션 (834px 이상) */}
-        <nav className="hidden md:flex items-center gap-6">
+        {/* 데스크톱 네비게이션 */}
+        <nav className="ml-auto hidden md:flex items-center gap-5 text-sm font-medium">
           {SITE.nav.links.map((link) => (
             <Link
               key={link.href}
               href={link.href}
-              className="text-body-dark text-sm hover:text-heading-dark transition-colors"
+              className="text-white/82 hover:text-white transition-colors duration-fast"
             >
               {link.label}
             </Link>
           ))}
         </nav>
 
-        {/* 우측 영역 */}
-        <div className="flex items-center gap-3">
-          {/* CTA 버튼 (항상 표시) */}
-          <Link
-            href="/contact"
-            className="bg-aircok-blue text-heading-light rounded-md px-4 py-2 text-sm font-medium hover:bg-aircok-blue-dark transition-colors"
-          >
-            {SITE.nav.cta}
-          </Link>
+        {/* 우측 CTA + 모바일 토글 */}
+        <div className="ml-auto md:ml-0 flex items-center gap-3">
+          <Button asChild pill variant="primary" size="sm">
+            <Link href="/contact">{SITE.nav.cta}</Link>
+          </Button>
 
-          {/* 햄버거 버튼 (834px 미만) */}
           <button
             type="button"
             className="md:hidden flex flex-col gap-1.5 p-1"
@@ -55,17 +55,17 @@ export function Nav() {
             onClick={() => setMobileOpen((prev) => !prev)}
           >
             <span
-              className={`block w-5 h-0.5 bg-heading-dark transition-transform duration-200 ${
+              className={`block w-5 h-0.5 bg-white transition-transform duration-fast ${
                 mobileOpen ? 'translate-y-2 rotate-45' : ''
               }`}
             />
             <span
-              className={`block w-5 h-0.5 bg-heading-dark transition-opacity duration-200 ${
+              className={`block w-5 h-0.5 bg-white transition-opacity duration-fast ${
                 mobileOpen ? 'opacity-0' : ''
               }`}
             />
             <span
-              className={`block w-5 h-0.5 bg-heading-dark transition-transform duration-200 ${
+              className={`block w-5 h-0.5 bg-white transition-transform duration-fast ${
                 mobileOpen ? '-translate-y-2 -rotate-45' : ''
               }`}
             />
@@ -73,15 +73,15 @@ export function Nav() {
         </div>
       </div>
 
-      {/* 모바일 드롭다운 메뉴 */}
+      {/* 모바일 드롭다운 */}
       {mobileOpen && (
-        <div className="md:hidden bg-nav-bg-mobile backdrop-blur-xl border-t border-border-light">
-          <nav className="max-w-[1200px] mx-auto px-5 py-3 flex flex-col">
+        <div className="md:hidden bg-navy backdrop-blur-xl border-t border-white/8">
+          <nav className="content-container py-3 flex flex-col">
             {SITE.nav.links.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-body-dark text-sm py-3 border-b border-border-subtle last:border-b-0 hover:text-heading-dark transition-colors"
+                className="text-white/82 text-sm py-3 border-b border-white/8 last:border-b-0 hover:text-white transition-colors duration-fast"
                 onClick={() => setMobileOpen(false)}
               >
                 {link.label}

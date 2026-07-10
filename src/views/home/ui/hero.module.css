@@ -1,0 +1,47 @@
+/*
+ * 홈 히어로 장식 애니메이션 (컴포넌트 로컬).
+ * float(실시간 카드 부유) · drift(배경 글로우 이동)은 globals.css 에 정의된
+ * 애니메이션 토큰이 아니므로 여기서 로컬 keyframes 로 처리한다. 색/간격 토큰이
+ * 아닌 순수 모션이며, design 이 필요 시 globals 애니메이션 토큰으로 승격할 수 있다.
+ */
+@keyframes heroFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-14px);
+  }
+}
+
+@keyframes heroDrift {
+  0% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(30px, -24px);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+.float {
+  animation: heroFloat 6s ease-in-out infinite;
+}
+
+.driftA {
+  animation: heroDrift 16s ease-in-out infinite;
+}
+
+.driftB {
+  animation: heroDrift 20s ease-in-out infinite reverse;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .float,
+  .driftA,
+  .driftB {
+    animation: none;
+  }
+}

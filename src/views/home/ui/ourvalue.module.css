@@ -1,0 +1,29 @@
+/*
+ * Our Value 카드 배경 플레이스홀더 (컴포넌트 로컬).
+ * 실 이미지 미확보 상태의 자리표시로, 사선 줄무늬 패턴을 렌더한다.
+ * 색은 전부 globals.css @theme 의 토큰 CSS 변수를 참조한다(하드코딩 없음).
+ * 톤 규약: 라이트·다크 모두 "인접 서피스 토큰 한 단계 차(≈4% L)"로 밀도를 맞춰
+ * 플레이스홀더가 튀지 않고 두 계열이 동일 강도로 읽히게 한다.
+ *   라이트(01·02·04): tint(96% L) / tint-border(92% L)
+ *   다크(03):         navy(18% L) / navy-deep(14% L)
+ * 줄무늬 밴드 폭 14px(밴드) / 28px(주기) 로 라이트·다크 공통.
+ */
+.stripeLight {
+  background-image: repeating-linear-gradient(
+    135deg,
+    var(--color-tint) 0,
+    var(--color-tint) 14px,
+    var(--color-tint-border) 14px,
+    var(--color-tint-border) 28px
+  );
+}
+
+.stripeDark {
+  background-image: repeating-linear-gradient(
+    135deg,
+    var(--color-navy) 0,
+    var(--color-navy) 14px,
+    var(--color-navy-deep) 14px,
+    var(--color-navy-deep) 28px
+  );
+}
