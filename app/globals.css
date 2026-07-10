@@ -1,79 +1,109 @@
 @import "tailwindcss";
 
+/* ════════════════════════════════════════════════════════════════
+   Aircok Design Tokens — 신(新) 체계 (구조 재설정, 이슈 #100)
+   ────────────────────────────────────────────────────────────────
+   ⚠️ 값은 잠정(placeholder)이다. 실제 OKLCH 색상은 시안 확정 후 교체한다.
+      "TBD: 시안 확정 후" 주석이 붙은 값은 전부 임시값.
+   ⚠️ 이 블록은 [신 구조 토큰] + [구 토큰 → 신 토큰 deprecated alias]가
+      공존한다. 구 토큰은 컴포넌트 마이그레이션 완료 후 제거한다.
+   SSOT 문서: docs/design.md · 에이전트 규칙: .claude/skills/design-system/SKILL.md
+   ════════════════════════════════════════════════════════════════ */
 @theme inline {
   /* ── Fonts ─────────────────────────────── */
-  /* Pretendard(self-host, next/font/local)의 CSS 변수를 참조한다. */
+  /* 영문/숫자/eyebrow → font-display, 한글 본문 → font-body(Pretendard self-host).
+     TBD: Manrope 웹폰트 로드 후 --font-display 선두에 반영 (현재는 Pretendard fallback). */
   --font-sans:    var(--font-pretendard), 'SF Pro Text', -apple-system, 'Helvetica Neue', sans-serif;
-  --font-display: var(--font-pretendard), 'SF Pro Display', -apple-system, 'Helvetica Neue', sans-serif;
-  --font-body:    var(--font-pretendard), 'SF Pro Text',    -apple-system, 'Helvetica Neue', sans-serif;
+  --font-display: 'Manrope', var(--font-pretendard), 'SF Pro Display', -apple-system, sans-serif; /* TBD: Manrope 폰트 로드 필요 */
+  --font-body:    var(--font-pretendard), 'SF Pro Text', -apple-system, 'Helvetica Neue', sans-serif;
 
-  /* ── Brand Colors ───────────────────────── */
-  --color-aircok-blue:       #0057ff;
-  --color-aircok-blue-dark:  #0040cc;
-  --color-aircok-blue-light: #3d7fff;
+  /* ── Brand (──brand-hue 파생 아키텍처) ──── */
+  /* --brand-hue 하나로 brand 계열 파생 토큰을 계산한다. TBD: 시안 확정 후 hue/L/C 교체. */
+  --brand-hue:          263;                                   /* TBD: 시안 확정 후 */
+  --color-brand:        oklch(55% 0.24 var(--brand-hue));      /* TBD: 시안 확정 후 · 주요 CTA */
+  --color-brand-hover:  oklch(47% 0.22 var(--brand-hue));      /* TBD: 시안 확정 후 · CTA hover */
+  --color-brand-ink:    oklch(100% 0 0);                       /* brand 위 텍스트(흰색) */
+
+  /* ── Ink / Muted (라이트 배경 텍스트) ───── */
+  --color-ink:       oklch(22% 0.005 270);   /* TBD: 시안 확정 후 · 헤딩·강본문·다크섹션 배경 겸용 */
+  --color-ink-soft:  oklch(40% 0.01 270);    /* TBD: 시안 확정 후 · 보조 본문 */
+  --color-muted:     oklch(56% 0.01 270);    /* TBD: 시안 확정 후 · 메타/날짜/캡션 */
 
   /* ── Surface ────────────────────────────── */
-  --color-surface-white:  #ffffff;
-  --color-surface-light:  #f5f5f7;
-  --color-surface-dark:   #0a0a0a;
-  --color-surface-dark-1: #1a1a1a;
-  --color-surface-dark-2: #242424;
-  --color-surface-stat:   #0b1730;
-  --color-surface-stat-card:       #13213f;
-  --color-surface-stat-card-hover: #1b2c4f;
+  --color-surface:        oklch(97% 0.008 95);   /* TBD: 시안 확정 후 · 페이지 배경(크림) */
+  --color-surface-white:  oklch(100% 0 0);       /* 카드 배경(흰색) */
 
-  /* ── Text ───────────────────────────────── */
-  --color-heading-dark:   #1d1d1f;
-  --color-body-dark:      rgba(0, 0, 0, 0.80);
-  --color-secondary-dark: rgba(0, 0, 0, 0.48);
-  --color-heading-light:  #ffffff;
-  --color-body-light:     rgba(255, 255, 255, 0.86);
+  /* ── Olive (밴드/eyebrow 계열) ──────────── */
+  --color-olive:        oklch(44% 0.06 128);   /* TBD: 시안 확정 후 · 올리브 밴드 배경 */
+  --color-olive-label:  oklch(52% 0.08 128);   /* TBD: 시안 확정 후 · 라이트 위 eyebrow */
+  --color-olive-soft:   oklch(82% 0.04 128);   /* TBD: 시안 확정 후 · 올리브 위 eyebrow */
+  --color-olive-muted:  oklch(64% 0.06 128);   /* TBD: 시안 확정 후 · 카드 번호 */
 
-  /* ── Link / Focus ───────────────────────── */
-  --color-link-on-light: #0057ff;
-  --color-link-on-dark:  #3d7fff;
-  --color-focus:         #0057ff;
+  /* ── Accent (다크 위 포인트) ────────────── */
+  --color-accent:  oklch(87% 0.19 125);   /* TBD: 시안 확정 후 · 다크 배경 위 라임 포인트 */
 
-  /* ── Feedback ───────────────────────────── */
-  --color-success: #34c759;
-  --color-warning: #ff9f0a;
-  --color-error:   #ff3b30;
+  /* ── Tint / Hairline ────────────────────── */
+  --color-tint:      oklch(94% 0.05 128);          /* TBD: 시안 확정 후 · 아이콘 배경(연녹) */
+  --color-hairline:  oklch(22% 0.005 270 / 0.08);  /* 라이트 hairline 보더 */
+
+  /* ── Feedback (상태 — 신 팔레트 외 기능 토큰) ── */
+  --color-success: oklch(72% 0.19 145);   /* TBD: 시안 확정 후 */
+  --color-warning: oklch(78% 0.16 68);    /* TBD: 시안 확정 후 */
+  --color-error:   oklch(64% 0.23 25);    /* TBD: 시안 확정 후 */
+
+  /* ── Typography Scale (네이밍 토큰) ─────── */
+  /* 값은 잠정. 네이밍이 신 체계의 기준이다. */
+  --text-hero:     4rem;        /* 64 */
+  --text-mega:     4.5rem;      /* 72 */
+  --text-h1:       2.375rem;    /* 38 */
+  --text-h2:       2.25rem;     /* 36 */
+  --text-h3:       1.75rem;     /* 28 */
+  --text-logo:     1.625rem;    /* 26 */
+  --text-item:     1.1875rem;   /* 19 */
+  --text-lead:     1.0625rem;   /* 17 */
+  --text-list:     0.96875rem;  /* 15.5 */
+  --text-body-sm:  0.9375rem;   /* 15 */
+  --text-detail:   0.90625rem;  /* 14.5 */
+  --text-meta:     0.84375rem;  /* 13.5 */
+  --text-eyebrow:  0.8125rem;   /* 13 */
+  --text-caption:  0.78125rem;  /* 12.5 */
+  --text-mini:     0.6875rem;   /* 11 */
+
+  /* ── Tracking (letter-spacing) ──────────── */
+  --tracking-headline: -0.01em;
+  --tracking-caption:   0.1em;
+  --tracking-label:     0.14em;
+  --tracking-eyebrow:   0.2em;
+  --tracking-hero:      0.22em;
 
   /* ── Border Radius ──────────────────────── */
-  --radius-sm:   6px;
-  --radius-md:   8px;
-  --radius-lg:   12px;
-  --radius-xl:   16px;
-  --radius-pill: 980px;
+  --radius-card:   0.25rem;   /* 4  · 카드 */
+  --radius-image:  0.5rem;    /* 8  · 이미지 */
+  --radius-pill:   1.75rem;   /* 28 · pill */
+  --radius-full:   9999px;
 
-  /* ── Shadows ────────────────────────────── */
-  --shadow-card:    rgba(0, 0, 0, 0.12) 0px 4px 24px 0px;
-  --shadow-product: rgba(0, 0, 0, 0.22) 3px 5px 30px 0px;
+  /* ── Motion ─────────────────────────────── */
+  --duration-fast: 150ms;
+  --ease-out:      cubic-bezier(0.16, 1, 0.3, 1);
 
-  /* ── Nav / Overlay ──────────────────────── */
-  --color-nav-bg:           rgba(255, 255, 255, 0.80);
-  --color-nav-bg-mobile:    rgba(255, 255, 255, 0.95);
-  --color-overlay-white-10: rgba(255, 255, 255, 0.10);
-  --color-overlay-dark:     rgba(0, 0, 0, 0.80);
-  --color-overlay-dark-60:   rgba(0, 0, 0, 0.60);
+  /* ────────────────────────────────────────────────────────────
+     기능 토큰 (신 팔레트 외 · 마이그레이션 대상 아님, 유지)
+     ──────────────────────────────────────────────────────────── */
 
-  /* ── Border ─────────────────────────────── */
-  --color-border-light:  rgba(0, 0, 0, 0.06);
-  --color-border-subtle: rgba(0, 0, 0, 0.04);
-  --color-border-dark:   rgba(255, 255, 255, 0.08);
+  /* Nav / Overlay */
+  --color-nav-bg:           oklch(100% 0 0 / 0.80);
+  --color-nav-bg-mobile:    oklch(100% 0 0 / 0.95);
+  --color-overlay-white-10: oklch(100% 0 0 / 0.10);
+  --color-overlay-dark:     oklch(0% 0 0 / 0.80);
+  --color-overlay-dark-60:  oklch(0% 0 0 / 0.60);
 
-  /* ── Typography Scale ──────────────────── */
-  /* Tailwind 기본 scale에 없는 디자인 시스템 전용 크기만 정의 */
-  --font-size-nav:        15px;  /* Nav 링크, FAQ Search Input, Category Tab, 관리자 UI 중간 텍스트 */
-  --font-size-subheading: 21px;  /* Sub-heading / Card Title — Feature Strip·Stat Card·모달 제목 등 */
+  /* Aspect Ratios (매거진 레이아웃) */
+  --aspect-featured:  16 / 7;   /* News Featured / Detail hero 와이드 */
+  --aspect-row-thumb: 4 / 3;    /* News 가로형 row 썸네일 */
 
-  /* ── Aspect Ratios (매거진 레이아웃) ────── */
-  /* News Featured Hero / Detail overlay hero 와이드 비율. 목록·상세 공통 사용(3곳+) */
-  --aspect-featured:       16 / 7;
-  /* News Horizontal Row 썸네일 비율 (가로형 리스트 좌측 썸네일) */
-  --aspect-row-thumb:      4 / 3;
-
-  /* ── Spacing (8px base) ─────────────────── */
+  /* Spacing — steps 1~4는 기본 4px 그리드와 동일, 5~10은 구 커스텀 스케일.
+     TBD: 신 체계는 "Tailwind 기본 4px 그리드"이므로 5~10 override 제거 후
+     사용처(p-5~p-10) 재조정 필요. 지금은 회귀 방지를 위해 유지. */
   --spacing-1:  4px;
   --spacing-2:  8px;
   --spacing-3:  12px;
@@ -85,16 +115,66 @@
   --spacing-9:  80px;
   --spacing-10: 120px;
 
-  /* ── Animation (Dual-Row Logo Marquee) ──── */
-  /* duration 40s: 로고 개수·화면폭에 비례해 자연스러운 속도가 되도록
-     일반적인 마퀴 관례(40~60s)의 하단값 채택 — docs/design.md 참조 */
+  /* Animation (Dual-Row Logo Marquee) */
   --animate-marquee-left:  marquee-left 40s linear infinite;
   --animate-marquee-right: marquee-right 40s linear infinite;
+
+  /* ────────────────────────────────────────────────────────────
+     DEPRECATED ALIASES — 구 토큰 → 신 토큰 (빌드 무결성용)
+     각 컴포넌트 마이그레이션 완료 후 이 블록 전체를 삭제한다.
+     ──────────────────────────────────────────────────────────── */
+
+  /* 브랜드 */
+  --color-aircok-blue:       var(--color-brand);        /* deprecated: brand 로 마이그레이션 예정 */
+  --color-aircok-blue-dark:  var(--color-brand-hover);  /* deprecated: brand-hover 로 마이그레이션 예정 */
+  --color-aircok-blue-light: var(--color-accent);       /* deprecated: accent 로 마이그레이션 예정 (blue→lime) */
+
+  /* 서피스 */
+  --color-surface-light:           var(--color-surface); /* deprecated: surface 로 마이그레이션 예정 */
+  --color-surface-dark:            var(--color-ink);      /* deprecated: ink 로 마이그레이션 예정 */
+  --color-surface-dark-1:          var(--color-ink);      /* deprecated: ink + opacity 로 마이그레이션 예정 */
+  --color-surface-dark-2:          var(--color-ink);      /* deprecated: ink + opacity 로 마이그레이션 예정 */
+  --color-surface-stat:            var(--color-ink);      /* deprecated: ink 로 마이그레이션 예정 */
+  --color-surface-stat-card:       var(--color-ink);      /* deprecated: ink + opacity 로 마이그레이션 예정 */
+  --color-surface-stat-card-hover: var(--color-ink);      /* deprecated: ink + opacity 로 마이그레이션 예정 */
+
+  /* 텍스트 */
+  --color-heading-dark:   var(--color-ink);           /* deprecated: ink 로 마이그레이션 예정 */
+  --color-body-dark:      var(--color-ink-soft);      /* deprecated: ink-soft 로 마이그레이션 예정 */
+  --color-secondary-dark: var(--color-muted);         /* deprecated: muted 로 마이그레이션 예정 */
+  --color-heading-light:  var(--color-surface-white); /* deprecated: surface-white / text-white 로 마이그레이션 예정 */
+  --color-body-light:     var(--color-surface-white); /* deprecated: text-white/80 로 마이그레이션 예정 */
+
+  /* 링크 / 포커스 */
+  --color-link-on-light: var(--color-brand);   /* deprecated: brand 로 마이그레이션 예정 */
+  --color-link-on-dark:  var(--color-accent);  /* deprecated: accent 로 마이그레이션 예정 */
+  --color-focus:         var(--color-brand);   /* deprecated: brand 로 마이그레이션 예정 */
+
+  /* 보더 */
+  --color-border-light:  var(--color-hairline);       /* deprecated: hairline 로 마이그레이션 예정 */
+  --color-border-subtle: var(--color-hairline);       /* deprecated: hairline 로 마이그레이션 예정 */
+  --color-border-dark:   oklch(100% 0 0 / 0.08);      /* deprecated: border-white/12 로 마이그레이션 예정 */
+
+  /* Border Radius (구) */
+  --radius-sm: var(--radius-card);   /* deprecated: rounded-card 로 마이그레이션 예정 */
+  --radius-md: var(--radius-image);  /* deprecated: rounded-image 로 마이그레이션 예정 */
+  --radius-lg: var(--radius-image);  /* deprecated: rounded-image 로 마이그레이션 예정 */
+  --radius-xl: var(--radius-image);  /* deprecated: rounded-image 로 마이그레이션 예정 */
+  /* 주의: rounded-pill 은 구(980px full)→신(28px) 로 의미가 바뀐다.
+     full-round 버튼은 rounded-full 로 마이그레이션 예정. */
+
+  /* Shadows (신 체계는 플랫 — 그림자 토큰 없음, 제거 예정) */
+  --shadow-card:    0 4px 24px oklch(0% 0 0 / 0.12);  /* deprecated: 플랫 디자인 전환 시 제거 예정 */
+  --shadow-product: 3px 5px 30px oklch(0% 0 0 / 0.22); /* deprecated: 플랫 디자인 전환 시 제거 예정 */
+
+  /* Typography (구 커스텀 크기) */
+  --text-nav:        0.9375rem;   /* 15 · deprecated: text-body-sm 로 마이그레이션 예정 */
+  --text-subheading: 1.3125rem;   /* 21 · deprecated: text-item / text-h3 로 마이그레이션 예정 */
 }
 
 body {
   font-family: var(--font-body);
-  color: var(--color-heading-dark);
+  color: var(--color-ink);
   word-break: keep-all;
   line-height: 1.65;
 }
@@ -105,6 +185,12 @@ body {
     margin-inline: auto;
     padding-inline: 1.25rem; /* px-5 */
   }
+}
+
+/* Tailwind v4에는 --duration-* 네임스페이스가 없어 named duration 유틸리티가
+   자동 생성되지 않는다. SKILL.md가 규정하는 duration-fast 를 커스텀 유틸리티로 제공. */
+@utility duration-fast {
+  transition-duration: var(--duration-fast, 150ms);
 }
 
 /* ── Dual-Row Logo Marquee keyframes ──────────────────────────
