@@ -14,7 +14,7 @@
   /* 영문/숫자/eyebrow/워드마크 → font-display(Sora), 한글 헤딩·본문 → font-body(Pretendard). */
   /* Sora 는 app/layout 에서 로드 필요 (미로드 시 Pretendard fallback). */
   --font-sans:    var(--font-pretendard), system-ui, 'Helvetica Neue', sans-serif;
-  --font-display: 'Sora', var(--font-pretendard), system-ui, sans-serif;
+  --font-display: var(--font-sora), 'Sora', var(--font-pretendard), system-ui, sans-serif;
   --font-body:    var(--font-pretendard), system-ui, 'Helvetica Neue', sans-serif;
 
   /* ── Brand (--brand-hue 파생 아키텍처) ──── */
