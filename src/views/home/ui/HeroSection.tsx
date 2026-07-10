@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Button } from '@/shared/ui';
 import { HeroAqiCard } from './HeroAqiCard';
+import { HeroBackgroundVideo } from './HeroBackgroundVideo';
 import styles from './hero.module.css';
 
 const HERO_RADIAL =
@@ -18,11 +19,20 @@ const STATS = [
  */
 export function HeroSection() {
   return (
-    <section
-      className="relative overflow-hidden text-white"
-      style={{ backgroundImage: HERO_RADIAL }}
-    >
-      {/* 드리프트 글로우 (장식). 크기는 1회성 장식 치수 — token 없음 */}
+    <section className="relative overflow-hidden bg-navy text-white">
+      {/* 배경 영상 (최하단 레이어, 장식). 로드 전/실패 시 section 의 bg-navy 폴백 */}
+      <HeroBackgroundVideo className="absolute inset-0 h-full w-full object-cover" />
+
+      {/* 다크 오버레이 (가독성). 기존 HERO_RADIAL 다크 radial 을 반투명(opacity-75)으로
+          덧대 흰 텍스트 대비를 확보하되 영상이 은은히 비치게 한다 */}
+      <div
+        aria-hidden
+        className="absolute inset-0 opacity-75"
+        style={{ backgroundImage: HERO_RADIAL }}
+      />
+
+      {/* 드리프트 글로우 (장식). 크기는 1회성 장식 치수 — token 없음.
+          DOM 순서상 오버레이 위 · 콘텐츠(z-10) 아래에 배치 */}
       <div
         aria-hidden
         className={`${styles.driftA} pointer-events-none absolute -right-36 -top-20 h-[620px] w-[620px] rounded-full bg-radial from-brand/50 to-transparent blur-2xl`}
@@ -32,7 +42,7 @@ export function HeroSection() {
         className={`${styles.driftB} pointer-events-none absolute -bottom-32 right-32 h-[420px] w-[420px] rounded-full bg-radial from-cyan/40 to-transparent blur-2xl`}
       />
 
-      <div className="content-container relative grid items-center gap-14 py-24 md:grid-cols-[1.05fr_0.95fr]">
+      <div className="content-container relative z-10 grid items-center gap-14 py-24 md:grid-cols-[1.05fr_0.95fr]">
         {/* 좌: 카피 */}
         <div>
           <div className="inline-flex items-center gap-2 rounded-pill border border-brand/40 bg-brand/12 px-3.5 py-1.5 text-eyebrow font-semibold text-brand-soft">
