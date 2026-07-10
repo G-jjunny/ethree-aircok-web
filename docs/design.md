@@ -147,7 +147,12 @@ AQI 바 그라디언트: `from-aqi-good via-brand via-aqi-warning to-aqi-bad`.
 
 작업 전 `src/shared/ui/index.ts` 확인. 동일 역할 마크업 중복 금지. 반복 패턴 3곳 이상이면 `shared/ui`에 추가 후 `index.ts` export.
 
-**Pre 후보(홈페이지 구현 시 3곳 이상 판단 후 결정)**: `<Button variant="primary|dark|outline|white" size="sm|md">`, `<SectionLabel>`(eyebrow — Sora, tracking .14~.18, 색상 `brand`|`cyan`), 이후 `<StatCard>`·`<AqiCard>`·`<PartnerMarquee>` 등.
+**구현됨 (이슈 #102 Pre)**:
+
+- `<Button variant="primary|dark|outline|white" size="sm|md" pill? asChild?>` — primary=히어로/헤더 CTA(그라디언트 `from-brand to-brand-hover`), dark=라이트 섹션 보조 CTA(`bg-navy`), outline=다크/컬러 배경 위 보조(`border-white/50`), white=CTA 컬러 섹션 흰 버튼(`shadow-soft`). `pill`=헤더 도입문의(rounded-pill), 기본 rounded-btn. `asChild`로 Next `<Link>` CTA 렌더. md=44px 터치타겟, primary만 글로우 그림자(sm=`shadow-brand-sm`/md=`shadow-brand`).
+- `<SectionLabel color="brand|cyan" size="md|sm" as?>` — eyebrow. Sora(`font-display`)·uppercase·600. md=`text-eyebrow tracking-eyebrow-lg`(섹션), sm=`text-mini tracking-eyebrow`(카드). ⚠️ eyebrow 남용 금지: 섹션 3개당 1개 이하.
+
+**후속 Pre 후보(3곳 이상 반복 판단 후)**: `<StatCard>`·`<AqiCard>`·`<PartnerMarquee>` 등.
 
 ---
 
