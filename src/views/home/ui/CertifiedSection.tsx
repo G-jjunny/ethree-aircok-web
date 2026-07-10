@@ -10,7 +10,7 @@ const CERTS = [
  * 인증 트러스트 스트립 (시안 §3). 다크 배경, 상단 hairline(white/6),
  * "CERTIFIED & PROVEN"(Sora) + 인증 5항목을 한 줄로 배치.
  */
-export function CertSection() {
+export function CertifiedSection() {
   return (
     <section className="border-t border-white/6 bg-navy text-white">
       <div className="content-container flex flex-wrap items-center justify-center gap-3.5 py-6">

@@ -46,7 +46,7 @@ const TABS = [
  * WHY SMART AIRCOK / 탭 4종 (시안 §4). 연회색 배경, eyebrow + h2, 탭 바(4) +
  * 활성 패널(좌: 지표, 우: 설명·출처). 탭 상태는 로컬 useState(순수 UI).
  */
-export function WhyMattersSection() {
+export function WhySmartAircokSection() {
   const [active, setActive] = useState(0);
   const stat = SITE.stats[active];
   const tab = TABS[active];

@@ -5,7 +5,7 @@ import { SectionLabel } from '@/shared/ui';
  * ABOUT / 4-step 플로우 (시안 §5). 흰 배경, eyebrow + h2 + 리드 본문 + 4스텝(아이콘 박스 64px).
  * 마지막 스텝은 brand 배경 + 흰 숫자. 스텝 아이콘 뒤로 연속 점선 커넥터 1줄(데스크톱).
  */
-export function AboutStepSection() {
+export function AboutAircokSection() {
   const steps = SITE.methodology.steps;
 
   return (

@@ -9,7 +9,7 @@ const PLATFORM_RADIAL =
  * 플랫폼 / 무료 레포트 (시안 §7). navy radial 다크 배경, 좌: eyebrow(cyan) + h2 +
  * 체크리스트 3 + pill CTA, 우: 일러스트 플레이스홀더 + FREE REPORT 배지.
  */
-export function PlatformSection() {
+export function WhatYouGetSection() {
   const { bullets, title, cta } = SITE.whatYouGet;
 
   return (

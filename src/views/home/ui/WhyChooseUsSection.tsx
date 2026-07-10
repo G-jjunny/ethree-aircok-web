@@ -17,7 +17,7 @@ const VALUE_META = [
  * 데스크톱 3열×2행 그리드: [인트로 텍스트][카드01][카드02] / [카드03][카드04][빈 셀].
  * 카드는 줄무늬 플레이스홀더 + 하단 그라디언트 오버레이 + 흰 텍스트.
  */
-export function OurValueSection() {
+export function WhyChooseUsSection() {
   const features = SITE.whyUs.features;
 
   return (

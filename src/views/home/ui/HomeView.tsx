@@ -1,9 +1,9 @@
 import { HeroSection } from './HeroSection';
-import { CertSection } from './CertSection';
-import { WhyMattersSection } from './WhyMattersSection';
-import { AboutStepSection } from './AboutStepSection';
-import { OurValueSection } from './OurValueSection';
-import { PlatformSection } from './PlatformSection';
+import { CertifiedSection } from './CertifiedSection';
+import { WhySmartAircokSection } from './WhySmartAircokSection';
+import { AboutAircokSection } from './AboutAircokSection';
+import { WhyChooseUsSection } from './WhyChooseUsSection';
+import { WhatYouGetSection } from './WhatYouGetSection';
 import { WordmarkSection } from './WordmarkSection';
 import { ClientsSection } from './ClientsSection';
 
@@ -15,11 +15,11 @@ export function HomeView() {
   return (
     <main>
       <HeroSection />
-      <CertSection />
-      <WhyMattersSection />
-      <AboutStepSection />
-      <OurValueSection />
-      <PlatformSection />
+      <CertifiedSection />
+      <WhySmartAircokSection />
+      <AboutAircokSection />
+      <WhyChooseUsSection />
+      <WhatYouGetSection />
       <WordmarkSection />
       <ClientsSection />
     </main>
