@@ -40,8 +40,8 @@ export function OurValueSection() {
         {/* 3열 × 2행 그리드 */}
         <div className="mt-12 grid grid-cols-1 items-start gap-4 md:grid-cols-3">
           {/* 셀1 — 인트로 텍스트 (이미지 카드 아님) */}
-          {/* self-stretch: 그리드 items-start를 개별 override 해 같은 행 카드 높이만큼 셀을 채우고 justify-center 로 수직 중앙정렬 */}
-          <div className="flex flex-col justify-center self-stretch">
+          {/* 그리드 items-start 를 따라 카드와 같은 상단 라인에서 시작(top 정렬) */}
+          <div className="flex flex-col">
             <h3 className="text-xl font-extrabold leading-snug tracking-headline text-ink">
               보이지 않는 공기질까지 스마트하게 관리하는{' '}
               <span className="text-brand">AIoT 통합 솔루션</span>입니다.
