@@ -1,23 +1,27 @@
-import { Suspense } from 'react';
 import { HeroSection } from './HeroSection';
-import { StatSection } from './StatSection';
-import { MethodologySection } from './MethodologySection';
-import { WhatYouGetSection } from './WhatYouGetSection';
-import { WhyChooseUsSection } from './WhyChooseUsSection';
-import { WhyChooseUsFeatureSection } from './WhyChooseUsFeatureSection';
-import { PartnersSection } from './PartnersSection';
+import { CertSection } from './CertSection';
+import { WhyMattersSection } from './WhyMattersSection';
+import { AboutStepSection } from './AboutStepSection';
+import { OurValueSection } from './OurValueSection';
+import { PlatformSection } from './PlatformSection';
+import { WordmarkSection } from './WordmarkSection';
+import { ClientsSection } from './ClientsSection';
+
+/**
+ * 홈(랜딩) 뷰 — 시안 §2~§9 조합.
+ * Header(§1)/하단 CTA(§10)/Footer(§11)는 app/(main)/layout.tsx 전역 위젯이 담당한다.
+ */
 export function HomeView() {
   return (
     <main>
       <HeroSection />
-      <StatSection />
-      <MethodologySection />
-      <WhatYouGetSection />
-      <WhyChooseUsSection />
-      <WhyChooseUsFeatureSection />
-      <Suspense fallback={<div className="min-h-[320px] bg-surface-light" />}>
-        <PartnersSection />
-      </Suspense>
+      <CertSection />
+      <WhyMattersSection />
+      <AboutStepSection />
+      <OurValueSection />
+      <PlatformSection />
+      <WordmarkSection />
+      <ClientsSection />
     </main>
   );
 }

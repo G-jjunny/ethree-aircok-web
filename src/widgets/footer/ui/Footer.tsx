@@ -21,11 +21,13 @@ async function getCachedSiteInfo(): Promise<SiteInfo> {
   return getSiteInfoServer()
 }
 
+/**
+ * 전역 푸터 (시안 §11). bg-navy-deep, 좌: 로고 + 소개문, 우: 법인 정보.
+ * 하단: hairline(white/8) 위 카피라이트 + 브랜드 슬로건(Sora).
+ * 회사 메타는 site-info API(우선) → SITE 상수(fallback) 순으로 채운다.
+ */
 export async function Footer() {
   // 빌드 타임 프리렌더(백엔드 미기동)에서 fetch가 실행되지 않도록 요청 시점으로 미룬다.
-  // getSiteInfoServer는 'use cache' + cacheTag('site-info')로 캐싱되며, 어드민 사이트 정보
-  // 수정(useUpdateSiteInfoMutation → revalidateSiteInfoCache/updateTag) 시 온디맨드 무효화된다.
-  // connection()은 빌드 안정성을 위한 동적 셸 유지용이고, 데이터 조회 자체는 서버 캐시를 재사용한다.
   await connection()
 
   let siteInfo: SiteInfo | null = null
@@ -49,97 +51,76 @@ export async function Footer() {
   const linkedin = siteInfo?.linkedin?.trim() || undefined
 
   return (
-    <footer>
-      {/* 파트 B: 법인 정보 블록 */}
-      <div className="bg-surface-dark">
-        <div className="content-container py-10">
-          {/* 상단 행: 법인명 + 소셜 링크 */}
-          <div className="flex flex-col sm:flex-row justify-between gap-4 mb-6">
+    <footer className="bg-navy-deep text-white">
+      <div className="content-container py-14">
+        <div className="flex flex-wrap items-start justify-between gap-11">
+          {/* 좌: 로고 + 소개문 */}
+          <div className="max-w-[360px]">
             <Image
               src="/images/logos/logo-white.png"
               alt={companyName}
-              height={28}
-              width={100}
-              style={{ width: 'auto' }}
+              height={34}
+              width={128}
+              style={{ width: 'auto', height: '34px' }}
             />
-            <div className="flex items-center gap-4">
-              {instagram && (
-                <Link
-                  href={instagram}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-body-light text-sm hover:text-heading-light transition-colors"
-                >
-                  Instagram
-                </Link>
-              )}
-              {youtube && (
-                <Link
-                  href={youtube}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-body-light text-sm hover:text-heading-light transition-colors"
-                >
-                  YouTube
-                </Link>
-              )}
-              {linkedin && (
-                <Link
-                  href={linkedin}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-body-light text-sm hover:text-heading-light transition-colors"
-                >
-                  LinkedIn
-                </Link>
-              )}
-            </div>
-          </div>
-
-          {/* 법인 정보 그리드 (2열) */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-8">
-            {/* 좌열: 대표·사업자·통신판매·주소 */}
-            <div className="flex flex-col gap-1.5">
-              <p className="text-body-light text-xs">
-                <span className="opacity-40 mr-2">대표</span>
-                {ceo}
-              </p>
-              <p className="text-body-light text-xs">
-                <span className="opacity-40 mr-2">사업자등록번호</span>
-                {bizNo}
-              </p>
-              <p className="text-body-light text-xs">
-                <span className="opacity-40 mr-2">통신판매업신고번호</span>
-                {mailOrderNo}
-              </p>
-              <p className="text-body-light text-xs">
-                <span className="opacity-40 mr-2">주소</span>
-                {address}
-              </p>
-            </div>
-            {/* 우열: 전화·팩스·이메일 */}
-            <div className="flex flex-col gap-1.5">
-              <p className="text-body-light text-xs">
-                <span className="opacity-40 mr-2">전화</span>
-                {phone}
-              </p>
-              <p className="text-body-light text-xs">
-                <span className="opacity-40 mr-2">팩스</span>
-                {fax}
-              </p>
-              <p className="text-body-light text-xs">
-                <span className="opacity-40 mr-2">이메일</span>
-                {email}
-              </p>
-            </div>
-          </div>
-
-          {/* 저작권 */}
-          <div className="border-t border-border-dark pt-5">
-            <p className="text-body-light opacity-60 text-xs">
-              {SITE.footer.copyright}
+            <p className="mt-4 text-sm leading-relaxed text-white/50">
+              보이지 않는 공기를 콕콕 집어 알려주는 측정·모니터링 기술로 고객에게 건강과
+              안심을 제공합니다.
             </p>
+            {(instagram || youtube || linkedin) && (
+              <div className="mt-5 flex items-center gap-4">
+                {instagram && (
+                  <Link
+                    href={instagram}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-white/55 hover:text-white transition-colors duration-fast"
+                  >
+                    Instagram
+                  </Link>
+                )}
+                {youtube && (
+                  <Link
+                    href={youtube}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-white/55 hover:text-white transition-colors duration-fast"
+                  >
+                    YouTube
+                  </Link>
+                )}
+                {linkedin && (
+                  <Link
+                    href={linkedin}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-white/55 hover:text-white transition-colors duration-fast"
+                  >
+                    LinkedIn
+                  </Link>
+                )}
+              </div>
+            )}
           </div>
+
+          {/* 우: 법인 정보 */}
+          <div className="text-sm leading-loose text-white/55">
+            <div className="mb-1.5 font-bold text-white/85">{companyName}</div>
+            <div>대표 {ceo}</div>
+            <div>사업자등록번호 {bizNo}</div>
+            <div>통신판매업신고 {mailOrderNo}</div>
+            <div>{address}</div>
+            <div>
+              TEL {phone} · FAX {fax}
+            </div>
+            <div>{email}</div>
+          </div>
+        </div>
+
+        {/* 하단: 카피라이트 + 브랜드 슬로건 */}
+        <div className="mt-11 flex flex-wrap items-center justify-between gap-3 border-t border-white/8 pt-6 text-xs text-white/35">
+          <span>{SITE.footer.copyright}</span>
+          <span className="font-display tracking-label">CLEAN AIR · SMART SPACE</span>
         </div>
       </div>
     </footer>

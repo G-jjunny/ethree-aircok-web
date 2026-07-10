@@ -10,7 +10,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
       <Nav />
       {children}
       <GlobalCta />
-      <Suspense fallback={<div className="min-h-[280px] bg-surface-dark" />}>
+      <Suspense fallback={<div className="min-h-[280px] bg-navy-deep" />}>
         <Footer />
       </Suspense>
       <Toaster position="top-center" richColors />
