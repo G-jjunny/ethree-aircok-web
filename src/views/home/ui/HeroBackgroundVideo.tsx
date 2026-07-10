@@ -36,7 +36,7 @@ export function HeroBackgroundVideo({ className }: { className?: string }) {
       muted
       loop
       playsInline
-      preload="auto"
+      preload="metadata"
       className={className}
     >
       <source src="/images/home/hero_bg.mp4" type="video/mp4" />
