@@ -37,6 +37,7 @@ export function HeroBackgroundVideo({ className }: { className?: string }) {
       loop
       playsInline
       preload="metadata"
+      poster="/images/home/hero_bg_poster.jpg"
       className={className}
     >
       <source src="/images/home/hero_bg.mp4" type="video/mp4" />
