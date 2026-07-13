@@ -1,11 +1,21 @@
 import Image from 'next/image'
 import { connection } from 'next/server'
 import { cacheLife, cacheTag } from 'next/cache'
-import { getTeamImageListServer, TEAM_IMAGES_CACHE_TAG, type TeamImage } from '@/entities/team-image'
+import {
+  getTeamImageListServer,
+  TEAM_IMAGES_CACHE_TAG,
+  type TeamImage,
+} from '@/entities/team-image'
+import {
+  getCoreValueListServer,
+  CORE_VALUES_CACHE_TAG,
+  type CoreValue,
+} from '@/entities/core-value'
 import { SITE } from '@/shared/config'
-import { SectionHeader } from '@/shared/ui'
+import { SectionLabel } from '@/shared/ui'
+import { AboutPlaceholder } from './AboutPlaceholder'
 
-/** 팀 이미지 조회를 'use cache'로 캐싱(cacheTag: 'team-images', cacheLife: default). */
+/** 팀 이미지 조회 캐싱(cacheTag: 'team-images'). */
 async function getCachedTeamImages(): Promise<TeamImage[]> {
   'use cache'
   cacheLife('default')
@@ -13,43 +23,28 @@ async function getCachedTeamImages(): Promise<TeamImage[]> {
   return getTeamImageListServer()
 }
 
-/** R2(http)는 그대로, 상대 경로(/uploads)는 동일 출처 rewrite로 서빙되도록 상대 유지. */
+/** 핵심가치(신뢰 카드) 조회 캐싱(cacheTag: 'core-values'). */
+async function getCachedCoreValues(): Promise<CoreValue[]> {
+  'use cache'
+  cacheLife('static')
+  cacheTag(CORE_VALUES_CACHE_TAG)
+  return getCoreValueListServer()
+}
+
+/** R2(http)는 그대로, 상대 경로(/uploads)는 동일 출처 rewrite. */
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001'
 function resolveSrc(src: string): string {
   if (src.startsWith('http')) return src
   return src.startsWith('/') ? src : `${API_BASE}${src}`
 }
 
-/** 데이터 없음/에러 시 표시할 단일 플레이스홀더 카드. */
-function TeamPlaceholder() {
-  return (
-    <div className="flex aspect-video w-full flex-col items-center justify-center gap-4 rounded-xl bg-surface-white p-8 text-center">
-      <span className="flex h-16 w-16 items-center justify-center rounded-pill bg-surface-light">
-        <svg
-          className="h-8 w-8 text-secondary-dark"
-          aria-hidden="true"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          strokeWidth="1.5"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
-          />
-        </svg>
-      </span>
-      <div className="flex flex-col gap-1">
-        <p className="text-subheading font-semibold text-heading-dark [word-break:keep-all]">
-          팀 이미지 준비 중
-        </p>
-        <p className="text-sm text-secondary-dark">곧 업데이트될 예정입니다</p>
-      </div>
-    </div>
-  )
-}
+/** 표시용 신뢰 카드 형태 — API(CoreValue)와 SITE 폴백을 일원화. */
+type TrustCard = { title: string; description: string }
 
+/**
+ * OUR TEAM (시안 §OUR TEAM). 흰 배경, 중앙 헤더 + 팀 사진(와이드) + 신뢰 3카드.
+ * team-image entity → 팀 사진, core-value entity → 신뢰 3카드(둘 다 SITE 폴백 유지).
+ */
 export async function TeamSection() {
   // 빌드 타임 프리렌더(백엔드 미기동)에서 fetch가 실행되지 않도록 요청 시점으로 미룬다.
   await connection()
@@ -61,37 +56,77 @@ export async function TeamSection() {
     images = []
   }
 
+  let coreValues: CoreValue[] = []
+  try {
+    coreValues = await getCachedCoreValues()
+  } catch {
+    coreValues = []
+  }
+
+  const { eyebrow, title, body, photoEyebrow, photoCaption, trustCards } =
+    SITE.about.team
+
   const firstImage = images.length > 0 ? images[0] : null
 
-  return (
-    <section className="bg-surface-light py-24">
-      <div className="content-container flex flex-col gap-14">
-        <SectionHeader
-          label={SITE.about.team.label}
-          title={SITE.about.team.title}
-          body={SITE.about.team.body}
-          theme="light"
-          maxWidth="max-w-[760px]"
-        />
+  // core-value 데이터 우선, 없으면 SITE 폴백(어드민 편집성 + 정적 폴백 유지)
+  const cards: TrustCard[] = (
+    coreValues.length > 0
+      ? coreValues.map((v) => ({ title: v.title, description: v.description }))
+      : trustCards.map((c) => ({ title: c.title, description: c.description }))
+  ).slice(0, 3)
 
-        {/* token 없음: max-w-3xl — 팀 이미지 포컬 너비, 전체 1200px 컨테이너보다 좁은 1회성 레이아웃 수치 */}
-        {firstImage ? (
-          <div className="max-w-3xl mx-auto w-full overflow-hidden rounded-xl">
-            <div className="relative aspect-video w-full overflow-hidden bg-surface-light">
-              <Image
-                src={resolveSrc(firstImage.imageUrl)}
-                alt={SITE.about.team.title}
-                fill
-                sizes="(min-width: 768px) 768px, 100vw"
-                className="object-cover"
-              />
+  return (
+    <section className="bg-surface-white py-24">
+      <div className="content-container flex flex-col gap-12">
+        {/* 중앙 헤더 — token 없음: max-w-[640px] 중앙 정렬 헤더 프로즈 폭(1회성) */}
+        <div className="mx-auto max-w-[640px] text-center">
+          <SectionLabel color="brand">{eyebrow}</SectionLabel>
+          <h2 className="mt-4 text-h5 font-extrabold tracking-headline text-ink">
+            {title}
+          </h2>
+          <p className="mt-4 text-lead-sm leading-relaxed text-muted">{body}</p>
+        </div>
+
+        {/* 팀 사진 (와이드) + 하단 그라디언트 오버레이 + 흰 텍스트 */}
+        <div className="relative aspect-featured w-full overflow-hidden rounded-card-lg">
+          {firstImage ? (
+            <Image
+              src={resolveSrc(firstImage.imageUrl)}
+              alt={title}
+              fill
+              sizes="(min-width: 1240px) 1176px, 100vw"
+              className="object-cover"
+            />
+          ) : (
+            <AboutPlaceholder theme="dark" className="h-full w-full rounded-none" />
+          )}
+          {/* 하단 그라디언트 오버레이 — 흰 텍스트 대비 */}
+          <div className="absolute inset-0 bg-linear-to-t from-navy-deep/80 to-transparent" />
+          <div className="absolute inset-x-0 bottom-0 p-8">
+            <SectionLabel color="cyan" size="sm">
+              {photoEyebrow}
+            </SectionLabel>
+            {/* token 없음: max-w-[520px] 오버레이 캡션 프로즈 폭(1회성) */}
+            <p className="mt-2 max-w-[520px] text-lg font-semibold leading-snug text-white">
+              {photoCaption}
+            </p>
+          </div>
+        </div>
+
+        {/* 신뢰 3카드 */}
+        <div className="grid gap-4 md:grid-cols-3">
+          {cards.map((card) => (
+            <div
+              key={card.title}
+              className="flex flex-col gap-3 rounded-2xl border border-hairline bg-surface p-6"
+            >
+              <h3 className="font-display text-base font-semibold text-brand">
+                {card.title}
+              </h3>
+              <p className="text-sm leading-relaxed text-muted">{card.description}</p>
             </div>
-          </div>
-        ) : (
-          <div className="max-w-3xl mx-auto w-full">
-            <TeamPlaceholder />
-          </div>
-        )}
+          ))}
+        </div>
       </div>
     </section>
   )

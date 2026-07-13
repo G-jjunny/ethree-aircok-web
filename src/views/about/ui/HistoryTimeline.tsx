@@ -164,38 +164,38 @@ export function HistoryTimeline({ timelines }: { timelines: TimelineItem[] }) {
             ref={(el) => { groupRefs.current[groupIdx] = el }}
             className="grid grid-cols-[88px_1fr] gap-6 opacity-0 translate-y-4 transition-all duration-500 ease-out md:grid-cols-[120px_1fr] md:gap-10"
           >
-            {/* 연도 컬럼 (데스크탑 sticky) — 클릭 시 해당 연도 아코디언 토글 */}
-            {/* token 없음: md:top-24 — Nav 높이(52px) + 여유 여백(44px) 합산 1회성 sticky 오프셋 */}
+            {/* 연도 컬럼 (데스크탑 sticky) — 클릭 시 해당 연도 아코디언 토글.
+                top-24(96px) 오프셋 = Nav 높이 + 여백 확보(표준 스페이싱 토큰) */}
             <button
               type="button"
               id={`history-year-header-${group.year}`}
               onClick={() => toggleYear(group.year)}
               aria-expanded={isOpen}
               aria-controls={`history-year-${group.year}`}
-              className="group flex w-full items-start justify-between gap-2 self-start rounded-lg pb-6 text-left cursor-pointer transition-colors hover:bg-surface-light focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:ring-offset-2 md:sticky md:top-24 md:p-2"
+              className="group flex w-full items-start justify-between gap-2 self-start rounded-btn pb-6 text-left cursor-pointer transition-colors hover:bg-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 md:sticky md:top-24 md:p-2"
             >
               <span className="flex flex-col">
-                <span className="text-[28px] font-bold leading-none text-aircok-blue sm:text-[40px]">
+                <span className="font-display text-h6 font-extrabold leading-none text-brand sm:text-h3">
                   {group.year}
                 </span>
-                <span className="mt-1.5 text-xs font-medium text-secondary-dark">
+                <span className="mt-1.5 text-xs font-medium text-muted">
                   {group.eventCount}건
                 </span>
               </span>
               <ChevronDown
                 aria-hidden="true"
-                className={`mt-1 h-5 w-5 shrink-0 text-secondary-dark transition-transform duration-300 ease-in-out group-hover:text-aircok-blue ${isOpen ? 'rotate-180' : 'rotate-0'}`}
+                className={`mt-1 h-5 w-5 shrink-0 text-muted transition-transform duration-300 ease-in-out group-hover:text-brand ${isOpen ? 'rotate-180' : 'rotate-0'}`}
               />
             </button>
             {/* 이벤트 컬럼 + 레일 */}
             <div className="relative pb-6">
               <span
                 aria-hidden="true"
-                className="absolute bottom-0 left-1 top-1.5 w-px bg-border-light"
+                className="absolute bottom-0 left-1 top-1.5 w-px bg-hairline"
               />
               <span
                 aria-hidden="true"
-                className="absolute left-0 top-1 h-2.5 w-2.5 rounded-pill bg-aircok-blue ring-4 ring-surface-white"
+                className="absolute left-0 top-1 h-2.5 w-2.5 rounded-pill bg-brand ring-4 ring-surface"
               />
               {/* 아코디언 콘텐츠 — grid-rows 트릭으로 높이 애니메이션 (max-h 아님) */}
               <div
@@ -209,7 +209,7 @@ export function HistoryTimeline({ timelines }: { timelines: TimelineItem[] }) {
                   <div className="flex flex-col gap-4 pl-8">
                     {group.months.map((monthGroup) => (
                       <div key={monthGroup.monthNum}>
-                        <p className="mb-2 text-sm font-bold text-aircok-blue">
+                        <p className="mb-2 text-sm font-bold text-brand">
                           {monthGroup.monthLabel}
                         </p>
                         <ul className="flex flex-col gap-3">
@@ -221,10 +221,9 @@ export function HistoryTimeline({ timelines }: { timelines: TimelineItem[] }) {
                               {/* token 없음: 이벤트 노드를 레일 중심(pl-8 기준 -27px)에 맞추는 1회성 정렬 오프셋 */}
                               <span
                                 aria-hidden="true"
-                                className="absolute -left-[27px] top-2 h-1.5 w-1.5 rounded-pill bg-border-light"
+                                className="absolute -left-[27px] top-2 h-1.5 w-1.5 rounded-pill bg-hairline"
                               />
-                              {/* token 없음: text-[17px] — Tailwind 기본 scale에 없는 Body(17px) 크기, design.md Body 타이포 규칙 */}
-                              <span className="text-[17px] leading-[1.65] text-body-dark">
+                              <span className="text-lead leading-relaxed text-ink-soft">
                                 {content}
                               </span>
                             </li>

@@ -2,7 +2,7 @@ import Image from 'next/image'
 import { connection } from 'next/server'
 import { cacheLife, cacheTag } from 'next/cache'
 import { SITE } from '@/shared/config'
-import { SectionHeader } from '@/shared/ui'
+import { SectionLabel } from '@/shared/ui'
 import { getPartnerListServer, PARTNERS_CACHE_TAG, type Partner } from '@/entities/partner'
 
 /** 파트너 조회를 'use cache'로 캐싱(cacheTag: 'partners', cacheLife: static). */
@@ -19,6 +19,10 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001'
 /** 정적 그리드 → 2줄 마퀴 전환 기준 개수 */
 const MARQUEE_THRESHOLD = 10
 
+// 마퀴 페이드 마스크(양끝 투명) — 마스킹 기법이므로 inline 처리(색/간격 토큰 아님).
+const MARQUEE_MASK =
+  'linear-gradient(to right, transparent, black 12%, black 88%, transparent)'
+
 /**
  * R2(절대 http URL)는 그대로, 상대 경로(/uploads/...)는 동일 출처 rewrite로 서빙되도록
  * 상대 경로 유지 → next/image가 remotePatterns 없이 최적화한다.
@@ -31,7 +35,7 @@ function resolveLogoSrc(src: string): string {
 /** 이름 텍스트 칩 폴백 (API 실패·빈 목록 공용) */
 function NameChip({ name }: { name: string }) {
   return (
-    <span className="bg-surface-white border border-border-light text-heading-dark rounded-pill px-4 py-2 text-sm">
+    <span className="rounded-pill border border-hairline bg-surface-white px-4 py-2 text-sm text-ink">
       {name}
     </span>
   )
@@ -39,35 +43,33 @@ function NameChip({ name }: { name: string }) {
 
 /**
  * 로고 타일 — 정적 그리드/마퀴 양쪽에서 공유하는 로컬 컴포넌트.
- * 고정폭을 갖지 않고 부모 폭에 맞춰 채운다(`w-full h-20`) — 정적 그리드에서는
- * grid item(`<li>`)의 셀 폭을 그대로 채우고, 마퀴 경로에서는 `LogoMarqueeRow`가
- * `w-40 shrink-0` 래퍼로 고정폭을 부여한다. 자세한 근거는 design.md
- * "Dual-Row Logo Marquee" 패턴의 "타일 고정폭 분리" 항목 참조.
+ * 부모 폭에 맞춰 채운다(`w-full h-20`) — 마퀴 경로에서는 `LogoMarqueeRow`가
+ * `w-40 shrink-0` 래퍼로 고정폭을 부여한다.
  */
 function LogoTile({ partner }: { partner: Partner }) {
   return partner.logoUrl ? (
-    <div className="relative group flex h-20 w-full items-center justify-center overflow-hidden rounded-lg bg-surface-white border border-border-light px-6">
+    <div className="group relative flex h-20 w-full items-center justify-center overflow-hidden rounded-btn border border-hairline bg-surface-white px-6">
       <Image
         src={resolveLogoSrc(partner.logoUrl)}
         alt={partner.name}
         width={128}
         height={56}
         sizes="128px"
-        className="max-h-10 max-w-full w-auto object-contain transition-opacity duration-200 group-hover:opacity-30"
+        className="max-h-10 w-auto max-w-full object-contain transition-opacity duration-fast group-hover:opacity-30"
       />
-      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-        <span className="text-xs font-semibold text-heading-dark text-center px-2 [word-break:keep-all]">
+      <div className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-fast group-hover:opacity-100">
+        <span className="px-2 text-center text-xs font-semibold text-ink">
           {partner.name}
         </span>
       </div>
     </div>
   ) : (
-    <div className="relative group flex h-20 w-full items-center justify-center overflow-hidden rounded-lg bg-surface-white border border-border-light px-6 text-center">
-      <span className="text-sm text-body-dark [word-break:keep-all] transition-opacity duration-200 group-hover:opacity-0">
+    <div className="group relative flex h-20 w-full items-center justify-center overflow-hidden rounded-btn border border-hairline bg-surface-white px-6 text-center">
+      <span className="text-sm text-muted transition-opacity duration-fast group-hover:opacity-0">
         {partner.name}
       </span>
-      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-        <span className="text-xs font-semibold text-heading-dark text-center px-2 [word-break:keep-all]">
+      <div className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-fast group-hover:opacity-100">
+        <span className="px-2 text-center text-xs font-semibold text-ink">
           {partner.name}
         </span>
       </div>
@@ -75,7 +77,7 @@ function LogoTile({ partner }: { partner: Partner }) {
   )
 }
 
-/** 2줄 마퀴 중 한 줄 — 로고 배열을 2배 복제해 무한 루프 (CSS 애니메이션 전용, 클라이언트 상태 없음) */
+/** 2줄 마퀴 중 한 줄 — 로고 배열을 2배 복제해 무한 루프 (CSS 애니메이션 전용) */
 function LogoMarqueeRow({
   partners,
   direction,
@@ -85,7 +87,10 @@ function LogoMarqueeRow({
 }) {
   const doubled = [...partners, ...partners]
   return (
-    <div className="overflow-hidden">
+    <div
+      className="overflow-hidden"
+      style={{ maskImage: MARQUEE_MASK, WebkitMaskImage: MARQUEE_MASK }}
+    >
       <div
         className={`flex w-max gap-4 ${
           direction === 'left' ? 'animate-marquee-left' : 'animate-marquee-right'
@@ -101,6 +106,10 @@ function LogoMarqueeRow({
   )
 }
 
+/**
+ * OUR PARTNERS (시안 §OUR PARTNERS). surface 배경, 중앙 헤더 + 2줄 반대 방향 마퀴.
+ * partner entity 데이터 연동 유지(빈 목록/에러 시 SITE.partners.list 이름 칩 폴백).
+ */
 export async function PartnersSection() {
   // 빌드 타임 프리렌더(백엔드 미기동)에서 fetch가 실행되지 않도록 요청 시점으로 미룬다.
   await connection()
@@ -113,47 +122,35 @@ export async function PartnersSection() {
   }
 
   const partners = apiPartners.filter((p) => p.type === 'partner')
+  const { eyebrow, title } = SITE.about.partners
 
-  // API 실패 또는 빈 목록 -> 기존 SITE.partners.list 이름 칩 폴백
-  if (partners.length === 0) {
-    return (
-      <section className="bg-surface-light border-t border-border-light py-24">
-        <div className="content-container flex flex-col gap-14">
-          <SectionHeader
-            label={SITE.partners.label}
-            title={SITE.partners.heading}
-            body={SITE.partners.body}
-            theme="light"
-          />
-          <div className="flex flex-wrap gap-3">
+  return (
+    <section className="bg-surface py-24">
+      <div className="content-container flex flex-col gap-12">
+        {/* token 없음: max-w-[640px] 중앙 정렬 헤더 프로즈 폭(1회성) */}
+        <div className="mx-auto max-w-[640px] text-center">
+          <SectionLabel color="brand">{eyebrow}</SectionLabel>
+          <h2 className="mt-4 text-h5 font-extrabold tracking-headline text-ink">
+            {title}
+          </h2>
+        </div>
+
+        {partners.length === 0 ? (
+          // API 실패 또는 빈 목록 -> 기존 SITE.partners.list 이름 칩 폴백
+          <div className="flex flex-wrap justify-center gap-3">
             {SITE.partners.list.map((name) => (
               <NameChip key={name} name={name} />
             ))}
           </div>
-        </div>
-      </section>
-    )
-  }
-
-  return (
-    <section className="bg-surface-light border-t border-border-light py-24">
-      <div className="content-container flex flex-col gap-14">
-        <SectionHeader
-          label={SITE.partners.label}
-          title={SITE.partners.heading}
-          body={SITE.partners.body}
-          theme="light"
-        />
-        {/* 로고 월 — 흰 타일 위에 배치, 10개 초과 시 2줄 반대 방향 무한 마퀴 */}
-        {partners.length > MARQUEE_THRESHOLD ? (
+        ) : partners.length > MARQUEE_THRESHOLD ? (
           <div className="flex flex-col gap-4">
             <LogoMarqueeRow
               partners={partners.filter((_, i) => i % 2 === 0)}
-              direction="right"
+              direction="left"
             />
             <LogoMarqueeRow
               partners={partners.filter((_, i) => i % 2 === 1)}
-              direction="left"
+              direction="right"
             />
           </div>
         ) : (
