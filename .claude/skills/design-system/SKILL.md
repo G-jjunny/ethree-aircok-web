@@ -27,9 +27,10 @@ SSOT: `docs/design.md` · 구현: `app/globals.css @theme inline` · 공용 컴�
 
 ### 다크 배경 위 반투명 (하드코딩 아님 — 기본 토큰 + opacity)
 
-- 본문 강/약: `text-white/85` · `text-white/70` · `text-white/60`
+- 본문 강/약: `text-white/85` · `text-white/70` · `text-white/68` · `text-white/62` · `text-white/60` (시안 실측 스텝, opacity 자유값 허용)
 - 저대비 라벨: `text-white/40`
 - divider: `border-white/8` · 아이콘 원: `border-white/20` · outline 버튼: `border-white/50`
+- 다크 위 글래스 카드: 채움 `bg-white/7` · 보더 `border-white/12` (시안 실측 .07/.12)
 - 브랜드 글로우 배지/팁: `bg-brand/12` `border-brand/40`
 
 ### 타이포
