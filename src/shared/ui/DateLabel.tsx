@@ -12,8 +12,8 @@ function formatDate(dateStr: string): string {
 }
 
 /**
- * Aircok Blue 날짜 레이블. NewsCard·NewsHorizontalRow·NewsFeaturedHero·NewsDetailHero 공용.
- * design.md §13.1 계약.
+ * Aircok 날짜 레이블. ISO 문자열을 YYYY.MM.DD 로 표시하는 공용 time 컴포넌트.
+ * theme(light|dark) · emphasis(hero 변형) 옵션 제공.
  */
 export function DateLabel({
   date,

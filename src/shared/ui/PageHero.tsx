@@ -20,7 +20,7 @@ export function PageHero({
   title,
   body,
   titleAs = 'h1',
-  maxWidth = 'max-w-[760px]',
+  maxWidth = 'max-w-reading',
 }: PageHeroProps) {
   return (
     <section className="bg-surface-dark">
