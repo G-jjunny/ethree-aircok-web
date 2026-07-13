@@ -94,10 +94,6 @@ src/
 
 별도의 **NestJS + Prisma + PostgreSQL** 백엔드가 같은 저장소의 `server/`에 위치합니다 (모노레포 방식, 아직 스캐폴딩 전). Next.js 프론트엔드와는 독립적입니다 — 공유 타입 패키지는 없으며, 양측이 각자 타입을 작성하고 `backend-leader`가 문서화한 API 계약(OpenAPI 스펙 등)으로 동기화를 유지합니다.
 
-## 디자인 가이드
-
-`docs/design.md`는 Apple 스타일의 디자인 토큰/일관성 가이드로, `design` 서브에이전트만 참조합니다. 색상 팔레트, 타이포그래피 스케일, 컴포넌트 스타일, 간격, 반응형 규칙을 문서화합니다. 기존에 없는 새 패턴이 필요할 경우, `design.md`를 먼저 업데이트한 후 구현을 진행합니다.
-
 ## 콘텐츠 참조 규칙 (WordPress XML)
 
 `docs/smartaircok.WordPress.2026-06-17.xml`은 기존 홈페이지에서 내보낸 WordPress 내보내기 파일입니다.
@@ -116,72 +112,73 @@ src/
 ### axios 인스턴스
 
 `src/shared/api/axiosInstance.ts` — 모든 API 호출의 단일 진입점.
+
 - baseURL `/api`, timeout 10s, withCredentials (쿠키 자동 전송)
 - 응답 401 → `/console/login` 자동 리다이렉트
 
 ```ts
 // ❌ 금지
-const res = await fetch('/api/news', { credentials: 'include' })
+const res = await fetch("/api/news", { credentials: "include" });
 
 // ✅ 필수
-import { axiosInstance } from '@/shared/api'
-const { data } = await axiosInstance.get('/news')
+import { axiosInstance } from "@/shared/api";
+const { data } = await axiosInstance.get("/news");
 ```
 
 ### 레이어별 역할 분리
 
-| 레이어 | 위치 | 역할 |
-|--------|------|------|
-| **entities/\*/api/** | `queryOptions` + raw API 함수 | GET 데이터 정의. `useQuery`는 직접 사용하지 않음 |
-| **features/\*/api/** | `useMutation` hooks | POST/PATCH/DELETE mutation hooks. `useQuery`가 필요하면 entities의 queryOptions 재사용 |
-| **widgets/views** | `useQuery(options)` 호출 | 데이터 소비만. API 함수/fetch 직접 호출 금지 |
+| 레이어               | 위치                          | 역할                                                                                   |
+| -------------------- | ----------------------------- | -------------------------------------------------------------------------------------- |
+| **entities/\*/api/** | `queryOptions` + raw API 함수 | GET 데이터 정의. `useQuery`는 직접 사용하지 않음                                       |
+| **features/\*/api/** | `useMutation` hooks           | POST/PATCH/DELETE mutation hooks. `useQuery`가 필요하면 entities의 queryOptions 재사용 |
+| **widgets/views**    | `useQuery(options)` 호출      | 데이터 소비만. API 함수/fetch 직접 호출 금지                                           |
 
 ```ts
 // entities/news/api/newsApi.ts — queryOptions 정의
 export const newsListQueryOptions = () =>
   queryOptions({
-    queryKey: ['news'],
+    queryKey: ["news"],
     queryFn: async () => {
-      const { data } = await axiosInstance.get('/news')
-      return data
+      const { data } = await axiosInstance.get("/news");
+      return data;
     },
     staleTime: 1000 * 60 * 5,
-  })
+  });
 
 // features/news-editor/api/useDeleteNewsMutation.ts — mutation hook
 export function useDeleteNewsMutation() {
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (id: number) => axiosInstance.delete(`/news/${id}`),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['news'] }),
-  })
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["news"] }),
+  });
 }
 
 // views/admin-news/ui/NewsList.tsx — 소비만
-const { data } = useQuery(newsListQueryOptions())
-const deleteMutation = useDeleteNewsMutation()
+const { data } = useQuery(newsListQueryOptions());
+const deleteMutation = useDeleteNewsMutation();
 ```
 
 ### 에러 처리 / 공통 메커니즘 (메커니즘은 shared, 도메인 지식은 slice)
 
 API 에러의 **공통 메커니즘**은 `src/shared/api/apiError.ts`에서 단일 관리하고, 도메인별 **메시지·분기**만 각 슬라이스에 둔다. 쿼리키·queryOptions·도메인 메시지를 shared로 모으면 `shared`가 상위 도메인을 알게 되어 **의존성 방향이 역전되므로 금지**한다.
 
-| 항목 | 위치 | 이유 |
-|------|------|------|
-| axios 인스턴스 | `shared/api` | 도메인 무관 단일 진입점 |
-| 베이스 `ApiError`, `parseAxiosMessages`, `authAwareRetry` | `shared/api` | HTTP 상태 기반 공통 판별/재시도 — 도메인 무관 |
-| 도메인 에러 클래스 (`InquiryApiError` 등), 쿼리키, queryOptions, 한글 메시지 | `entities/*/api` | 도메인 정체성. `instanceof`로 슬라이스 분기 |
+| 항목                                                                         | 위치             | 이유                                          |
+| ---------------------------------------------------------------------------- | ---------------- | --------------------------------------------- |
+| axios 인스턴스                                                               | `shared/api`     | 도메인 무관 단일 진입점                       |
+| 베이스 `ApiError`, `parseAxiosMessages`, `authAwareRetry`                    | `shared/api`     | HTTP 상태 기반 공통 판별/재시도 — 도메인 무관 |
+| 도메인 에러 클래스 (`InquiryApiError` 등), 쿼리키, queryOptions, 한글 메시지 | `entities/*/api` | 도메인 정체성. `instanceof`로 슬라이스 분기   |
 
 - 도메인 에러는 베이스 `ApiError`를 **상속**만 한다 (`isAuthError`/`isValidationError`/`isConflict`/`isRateLimited`/`isNotFound`는 베이스 제공):
 
 ```ts
 // ✅ entities/inquiry/api — 상속만, 도메인 특화가 없으면 빈 클래스
-import { ApiError, authAwareRetry, parseAxiosMessages } from '@/shared/api'
+import { ApiError, authAwareRetry, parseAxiosMessages } from "@/shared/api";
 export class InquiryApiError extends ApiError {}
 
 // queryOptions의 retry는 공용 정책 재사용
 export function adminInquiryQueryOptions() {
-  return queryOptions({ /* ... */ retry: authAwareRetry })
+  return queryOptions({ /* ... */ retry: authAwareRetry });
 }
 ```
 
@@ -191,13 +188,14 @@ export function adminInquiryQueryOptions() {
 
 회사명·전화번호·주소·슬로건·SNS 링크 등 반복 사용되는 사이트 메타 정보는 **반드시** `src/shared/config/site.ts`에서 import해 사용한다.
 일반적인 내용의 텍스트를 제외하고, 유지보수에 필요한 정보는 컴포넌트 내부에 직접 문자열로 박는 것은 금지다.
+그 외에 일반적인 텍스트는 예외.
 
 ```ts
 // ❌ 금지
 <p>전화: 02-6952-1947</p>
 <p>스마트 에어콕</p>
 
-// ✅ 필수
+// ✅ 필수, api가 없을 시
 import { SITE } from '@/shared/config/site'
 <p>전화: {SITE.contact.phone}</p>
 <p>{SITE.name}</p>
