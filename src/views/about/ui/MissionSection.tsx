@@ -11,7 +11,7 @@ export function MissionSection() {
 
   return (
     <section className="bg-surface-white py-24">
-      <div className="content-container grid items-center gap-14 md:grid-cols-[0.9fr_1.1fr]">
+      <div className="content-container grid items-start gap-14 md:grid-cols-[0.9fr_1.1fr]">
         <div>
           <SectionLabel color="brand">{eyebrow}</SectionLabel>
           <h2 className="mt-4 text-h5 font-extrabold tracking-headline text-ink">
