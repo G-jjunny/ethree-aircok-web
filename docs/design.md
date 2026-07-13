@@ -87,9 +87,10 @@ AQI 바 그라디언트: `from-aqi-good via-brand via-aqi-warning to-aqi-bad`.
 
 ### 다크 배경 위 반투명 (하드코딩 아님 — 기본 토큰 + opacity)
 
-- 본문 강/약: `text-white/85` · `text-white/70` · `text-white/60`
+- 본문 강/약: `text-white/85` · `text-white/75` · `text-white/70` · `text-white/68` · `text-white/62` · `text-white/60` (시안 실측 스텝 — opacity 자유값 허용, 하드코딩 아님)
 - 저대비 라벨/카피: `text-white/40` · `text-white/28`
 - divider `border-white/8` · 아이콘 원 `border-white/20` · outline 버튼 `border-white/50`
+- 글래스 카드(다크 위 스탯 카드): 채움 `bg-white/7` · 보더 `border-white/12` — 시안 실측값 `.07`/`.12` 유지(About STATS, 홈 실시간 카드 재사용). 문서 SSOT 는 `.07`(= `bg-white/7`) 로 확정.
 - 브랜드 글로우 배경: `bg-brand/12` · `bg-brand/14` (배지·행동요령 팁), 보더 `border-brand/28` · `border-brand/40`
 
 ### 상태 (기능 토큰)
