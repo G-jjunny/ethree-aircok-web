@@ -237,23 +237,69 @@ export const SITE = {
 
   about: {
     hero: {
-      label: "에어콕 소개",
-      headline: "회사 공기가 바뀌면, 당신의 경쟁력이 향상됩니다.",
-      body: "에어콕은 실내 공기질을 측정하고 관리하는 전문 기업입니다. 당신이 거주하는 공간의 눈에 보이지 않는 공기질 정보를 제공하고, 이를 통하여 개선된 공기는 직원들의 건강과 업무 효율성을 향상시킵니다.",
+      eyebrow: "ABOUT AIRCOK",
+      // 브랜드 강조: prefix + highlight("콕콕") + suffix 구조로 저장(상수 관리 규칙 준수)
+      headline: {
+        prefix: "보이지 않는 공기를 ",
+        highlight: "콕콕",
+        suffix: " 집어 관리하는 사람들",
+      },
+      body: "에어콕은 2018년 설립한 AIoT 공기질 관리 전문기업입니다. 측정에서 진단, 개선까지 이어지는 통합 공기질 관리 사이클을 만듭니다.",
     },
-    intro: {
-      label: "스마트 에어콕 소개",
-      title: "실내 공기질 관리 전문 기업",
-      body: "지금까지 수많은 기업, 학교, 관공서 등이 선택하고 사용하는 최고의 실내 공기 관리 솔루션 스마트 에어콕이 드리는 경쟁력입니다.",
+    mission: {
+      eyebrow: "MISSION",
+      title: "공기를 경쟁력으로",
+      body: "에어콕은 공기질 관리가 경쟁력을 향상 시킬 수 있는 환경을 제공합니다. 실내외 공기질 측정·환기 제어 공유 플랫폼, 센서 자동보정 등 다수의 특허 기술을 기반으로 정확하고 신뢰할 수 있는 공기질 데이터를 제공하여 이를 통한 개선된 공기는 건강과 업무효율을 향상시킵니다.",
+    },
+    stats: {
+      eyebrow: "BY THE NUMBERS",
+      title: "공기가 바뀌면 경쟁력이 향상됩니다",
+      body: "측정에서 진단, 개선까지 — 데이터로 증명하는 에어콕의 전문성.",
+      items: [
+        { value: "2018", unit: "", label: "환경 IT 전문기업 창립" },
+        { value: "9", unit: "종", label: "하나의 기기로 동시 측정하는 공기질 지표" },
+        { value: "3", unit: "개 항목", label: "성능인증 1등급을 받은 측정 항목" },
+        { value: "10", unit: "년+", label: "환경 분야에 축적해온 전문성" },
+      ],
+      featured: {
+        eyebrow: "CERTIFIED",
+        value: "1",
+        unit: "등급",
+        body: "KCL·KTR 국가 공인 성능인증 / 미세먼지·CO₂·NO₂ 전 항목 최고 등급",
+      },
     },
     team: {
-      label: "worked by expert",
-      title: "Our Team",
-      body: "우리의 프로세스, 서비스 제공 및 회사 문화는 고객의 성공을 위해 준비되어져 있습니다. 이것이 우리의 가치이자 일의 핵심입니다. 열정적인 팀을 만나보십시오!",
+      eyebrow: "OUR TEAM",
+      title: "공기질을 진심으로 대하는 사람들",
+      body: "환경·IoT·데이터 분야의 전문가들이 한 팀으로 모였습니다. 보이지 않는 공기를 정직한 데이터로 바꾸는 일, 그 책임감으로 매일 측정하고 검증합니다.",
+      photoEyebrow: "AIRCOK TEAM",
+      photoCaption: "정확한 측정, 투명한 데이터, 끝까지 책임지는 사후관리",
+      // 신뢰 3카드 — core-value entity 폴백(어드민 미등록 시 사용)
+      trustCards: [
+        {
+          title: "전문성",
+          description:
+            "10여 년 이상 환경 분야에 몸담은 전문가들이 센서 설계부터 데이터 알고리즘까지 직접 개발합니다.",
+        },
+        {
+          title: "신뢰성",
+          description:
+            "국가 공인 성능인증 1등급과 다수의 특허로, 말이 아닌 데이터와 인증으로 증명합니다.",
+        },
+        {
+          title: "책임감",
+          description:
+            "설치 후에도 클라우드 모니터링과 정기 리포트로 고객의 공기질을 끝까지 함께 관리합니다.",
+        },
+      ],
+    },
+    partners: {
+      eyebrow: "OUR PARTNERS",
+      title: "함께하는 파트너사",
     },
     history: {
-      label: "History",
-      title: "스마트 에어콕의 발자취",
+      eyebrow: "HISTORY",
+      title: "걸어온 길",
       items: [
         {
           year: 2026,
