@@ -11,10 +11,26 @@ async function getCachedMapSetting(): Promise<MapSetting> {
   return getMapSettingServer()
 }
 
+/** 우상단 길찾기(↗) 아이콘 */
+function ArrowUpRightIcon() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M7 17 17 7M7 7h10v10"
+        stroke="currentColor"
+        strokeWidth="2.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  )
+}
+
 /**
- * 공개 문의 페이지의 회사 위치 지도.
+ * 공개 문의 페이지의 회사 위치 지도 카드.
  * 공개 GET으로 어드민이 설정한 주소를 조회하되, 에러 시
  * SITE.contact.address를 fallback으로 사용해 항상 지도가 보이게 한다.
+ * 지도 영역 + 하단 주소 블록 + 길찾기 링크를 한 카드로 구성한다.
  */
 export async function ContactMap() {
   // 빌드 타임 프리렌더(백엔드 미기동)에서 fetch가 실행되지 않도록 요청 시점으로 미룬다.
@@ -32,16 +48,40 @@ export async function ContactMap() {
   const mapSrc = `https://maps.google.com/maps?q=${encodeURIComponent(
     address,
   )}&output=embed`
+  // 길찾기(새 탭) — Google Maps directions
+  const directionsHref = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
+    address,
+  )}`
 
   return (
-    // 지도 — 카드 장식(shadow) 없이 절제: 둥근 모서리 + 얇은 보더만
-    <div className="rounded-xl overflow-hidden border border-border-light aspect-video">
-      <iframe
-        title={`${SITE.name} 본사 위치 지도`}
-        src={mapSrc}
-        loading="lazy"
-        className="w-full h-full border-none"
-      />
+    <div className="overflow-hidden rounded-card border border-hairline bg-surface-white shadow-soft">
+      <div className="aspect-video w-full">
+        <iframe
+          title={`${SITE.name} 본사 위치 지도`}
+          src={mapSrc}
+          loading="lazy"
+          className="h-full w-full border-none"
+        />
+      </div>
+      <div className="flex items-start justify-between gap-4 p-6">
+        <div>
+          <p className="font-display text-mini font-semibold uppercase tracking-eyebrow text-muted">
+            Address
+          </p>
+          <p className="mt-2 text-sm leading-relaxed text-ink-soft [word-break:keep-all]">
+            {address}
+          </p>
+        </div>
+        <a
+          href={directionsHref}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex shrink-0 items-center gap-1.5 rounded-pill border border-hairline px-4 py-2 text-sm font-semibold text-brand transition-colors duration-fast ease-out hover:bg-tint"
+        >
+          길찾기
+          <ArrowUpRightIcon />
+        </a>
+      </div>
     </div>
   )
 }

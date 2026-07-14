@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"></head>
+<body>
+<!--
+  출처: Claude Design 프로젝트 15fc4772-51fe-4117-9810-2659d738aa1b / "contact.dc.html"
+  용도: /contact(문의하기) 재디자인 참조. FAQ를 문의하기 페이지로 통합한 단일 페이지.
+  토큰: 블루-테크(랜딩/뉴스와 공유). 값은 반드시 globals.css @theme 토큰 클래스 사용.
+
+  === 통합/제거 방침 (중요) ===
+  - 기존 분리된 /faq 페이지를 폐지하고 그 내용을 /contact 하단 FAQ 섹션으로 흡수한다.
+  - 재사용: features/inquiry-form(폼+제출 API), entities/faq(카테고리·항목 데이터), ContactMap(map 설정).
+  - 백엔드 계약(문의 제출/FAQ 조회)은 변경하지 않는다. 어드민 FAQ(console/faq, admin-faq, faq-*-editor)는 유지.
+
+  === 페이지 섹션 (위→아래) ===
+  1) PAGE HERO   — 다크 radial + 드리프트 글로우. eyebrow CONTACT(cyan) + h1 46 "문의하기"
+                   + 설명. shared <PageHero> 재사용.
+  2) INFO CARDS  — surface(#f6f8fc) 배경, 4열 grid gap 20. 카드: 흰bg, border hairline, rounded-16,
+                   padding 26/24, soft shadow. 각 카드 = 아이콘칩(44x44 rounded-11 연블루bg + brand 아이콘)
+                   + eyebrow 라벨(11.5 Sora, muted) + 큰 값(19~16 800) + 보조값(muted).
+                   4종: 대표번호(SITE.contact.phone/보조), 주소(SITE.contact.address 분할),
+                   이메일(SITE 이메일), 상담시간("평일 09:00–18:00" / "주말·공휴일 휴무" — 일반텍스트).
+  3) FORM + MAP  — 흰 배경, 2열 grid [1.05fr .95fr] gap 56, items-start.
+       좌(FORM): eyebrow INQUIRY(brand) + h2 "문의 남기기" + 설명(* 필수 안내).
+                 폼은 features/inquiry-form 재사용하되 시안 스타일로 정리.
+                 시안 필드 시각 목표: 이름*·연락처*(2열) / 이메일·회사·시설명(2열) / 문의유형(select) /
+                 문의내용*(textarea) / 개인정보 동의 체크* / "문의 보내기" 그라디언트 버튼.
+                 필드 스타일 .sa-field: padding 13/15, border hairline, rounded-11, focus brand+ring.
+                 성공 상태: 연블루 카드 + 체크 배지 + "문의가 접수되었습니다" + "새 문의 작성" 버튼.
+                 ⚠ 데이터 계약은 기존 inquiry API를 단일 진실원천으로 — 시안의 topic/회사 등 추가 필드는
+                    기존 컬럼/동적필드에 매핑하거나 message로 흡수(백엔드 스키마 변경 없이). 제출 동작 유지.
+       우(MAP): sticky top-96. 카드(border hairline, rounded-18, soft shadow):
+                 지도 영역(ContactMap 재사용 — 어드민 map 설정 주소) + 하단 주소블록 + "길찾기"(↗) 링크.
+  4) FAQ 섹션    — surface 배경, border-top. id=faq. 헤더 좌: eyebrow FAQ(brand) + h2 "자주 묻는 질문" + 설명.
+                   헤더 우: 카테고리 칩(rounded-pill, 활성 brand/흰). 검색은 유지 가능(기존 FaqBrowser 로직 재사용).
+                   아코디언: 2열 grid gap 16/24, items-start. 각 항목 = 흰 카드(border hairline, rounded-14):
+                   토글 버튼(Q 배지 24x24 연블루/ brand + 질문 15.5/700 + chevron 회전) → 펼침 시 답변(muted, pl-60).
+                   ※ 기존 FaqSidebar(좌측 사이드바)는 시안이 상단 칩 방식이라 제거/대체.
+  5) CTA         — brand 그라디언트 밴드(홈/뉴스 공용 GlobalCta 위젯 재사용). 전화 + "문의 남기기"(#form 앵커).
+  6) FOOTER      — 공용 Footer 위젯.
+
+  === 페이지 플레이스홀더 통일 (별도 지시) ===
+  - views/about/ui/AboutPlaceholder.tsx(줄무늬+라벨, light/dark, rounded-card)를 "새 표준"으로 삼아
+    shared/ui 로 승격(예: shared/ui/PagePlaceholder). About 내 사용처(Mission/Stats/Team)는 shared 것으로 교체.
+  - 사이트 내 다른 "이미지/콘텐츠 미확보" 플레이스홀더를 이 표준으로 통일:
+    NewsImage 폴백(SVG 아이콘)·NewsCard stripes 폴백 등 이미지 미확보 자리.
+  - 로딩 스켈레톤 성격(catalog FlipBookPlaceholder)·지도 플레이스홀더는 성격이 달라 통일 대상에서 제외(판단 시 명시).
+  - 중복/구식 플레이스홀더 구현 제거.
+-->
+</body>
+</html>

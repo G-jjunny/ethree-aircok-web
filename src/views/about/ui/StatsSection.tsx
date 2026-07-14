@@ -1,6 +1,5 @@
 import { SITE } from '@/shared/config'
-import { SectionLabel } from '@/shared/ui'
-import { AboutPlaceholder } from './AboutPlaceholder'
+import { SectionLabel, PagePlaceholder } from '@/shared/ui'
 
 // 다크 radial (시안 STATS) — 토큰 var() 참조
 const STATS_RADIAL =
@@ -45,9 +44,10 @@ export function StatsSection() {
                     {stat.label}
                   </p>
                 </div>
-                <AboutPlaceholder
-                  theme="dark"
-                  className="h-16 w-28 shrink-0 rounded-btn"
+                <PagePlaceholder
+                  variant="dark"
+                  rounded="rounded-btn"
+                  className="h-16 w-28 shrink-0"
                 />
               </div>
             ))}
@@ -65,9 +65,10 @@ export function StatsSection() {
             <p className="mt-4 text-sm leading-relaxed text-white/70">
               {featured.body}
             </p>
-            <AboutPlaceholder
-              theme="dark"
-              className="mt-6 aspect-row-thumb w-full rounded-btn"
+            <PagePlaceholder
+              variant="dark"
+              rounded="rounded-btn"
+              className="mt-6 aspect-row-thumb w-full"
               label="성능인증 마크"
             />
           </div>

@@ -12,8 +12,7 @@ import {
   type CoreValue,
 } from '@/entities/core-value'
 import { SITE } from '@/shared/config'
-import { SectionLabel } from '@/shared/ui'
-import { AboutPlaceholder } from './AboutPlaceholder'
+import { SectionLabel, PagePlaceholder } from '@/shared/ui'
 
 /** 팀 이미지 조회 캐싱(cacheTag: 'team-images'). */
 async function getCachedTeamImages(): Promise<TeamImage[]> {
@@ -98,7 +97,11 @@ export async function TeamSection() {
               className="object-cover"
             />
           ) : (
-            <AboutPlaceholder theme="dark" className="h-full w-full rounded-none" />
+            <PagePlaceholder
+              variant="dark"
+              rounded="rounded-none"
+              className="h-full w-full"
+            />
           )}
           {/* 하단 그라디언트 오버레이 — 흰 텍스트 대비 */}
           <div className="absolute inset-0 bg-linear-to-t from-navy-deep/80 to-transparent" />

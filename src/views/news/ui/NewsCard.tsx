@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { NewsImage } from '@/shared/ui';
+import { NewsImage, PagePlaceholder } from '@/shared/ui';
 import type { NewsSummary } from '@/entities/news';
 import { formatNewsDate } from '../lib/formatNewsDate';
 
@@ -11,7 +11,7 @@ interface Props {
 function ExternalArrowIcon() {
   return (
     <svg
-      className="h-[15px] w-[15px]"
+      className="h-4 w-4"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
@@ -67,16 +67,14 @@ function CardThumb({ item }: Props) {
       {item.coverImage ? (
         <NewsImage src={item.coverImage} alt={item.title} ratio="card" />
       ) : (
-        // coverImage 없을 때 시안의 대각선 줄무늬 폴백 (link=회색계 / post=연블루계)
-        <div
-          className={`flex aspect-card items-center justify-center ${
-            isLink ? 'stripes-surface' : 'stripes-tint'
-          }`}
-        >
-          <span className="text-mini font-semibold tracking-eyebrow text-faint uppercase">
-            {isLink ? 'External Link' : 'Aircok News'}
-          </span>
-        </div>
+        // coverImage 없을 때 표준 줄무늬 폴백 (link=회색계 surface / post=연블루계 tint)
+        <PagePlaceholder
+          variant={isLink ? 'surface' : 'tint'}
+          bordered={false}
+          rounded="rounded-none"
+          className="aspect-card w-full"
+          label={isLink ? 'External Link' : 'Aircok News'}
+        />
       )}
 
       {/* 좌상단 타입 배지 */}
@@ -86,7 +84,7 @@ function CardThumb({ item }: Props) {
 
       {/* LINK: 우상단 외부 링크 아이콘 */}
       {isLink && (
-        <div className="absolute right-3 top-3 flex h-[30px] w-[30px] items-center justify-center rounded-full bg-surface-white/90 text-brand shadow-[0_3px_8px_rgba(13,21,38,0.14)]">
+        <div className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-surface-white/90 text-brand shadow-md">
           <ExternalArrowIcon />
         </div>
       )}

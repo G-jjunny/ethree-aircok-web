@@ -1,11 +1,21 @@
+import { Suspense } from 'react'
+import { GlobalCta } from '@/widgets/global-cta'
 import { ContactHeroSection } from './ContactHeroSection'
-import { ContactInquirySection } from './ContactInquirySection'
+import { ContactInfoSection } from './ContactInfoSection'
+import { ContactFormSection } from './ContactFormSection'
+import { ContactFaqSection } from './ContactFaqSection'
 
 export function ContactView() {
   return (
     <main>
       <ContactHeroSection />
-      <ContactInquirySection />
+      <ContactInfoSection />
+      <ContactFormSection />
+      {/* token 없음: min-h-[600px] FAQ 로딩 폴백 예약 높이(1회성 스켈레톤 수치) */}
+      <Suspense fallback={<div className="min-h-[600px] bg-surface" />}>
+        <ContactFaqSection />
+      </Suspense>
+      <GlobalCta />
     </main>
   )
 }

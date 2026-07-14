@@ -10,7 +10,6 @@ const STATIC_PATHS = [
   '/services',
   '/diagnosis',
   '/news',
-  '/faq',
   '/catalog',
   '/contact',
   '/pricing',
