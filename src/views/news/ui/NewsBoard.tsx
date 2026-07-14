@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import type { NewsType } from '@/entities/news';
-import { newsListQueryOptions } from '@/entities/news';
+import { newsListQueryOptions, NEWS_PAGE_SIZE } from '@/entities/news';
 import { useDebouncedValue } from '@/shared/hooks';
 import { NewsCard } from './NewsCard';
 
@@ -16,7 +16,9 @@ const FILTERS: { value: FilterValue; label: string }[] = [
   { value: 'BLOG', label: '게시글' },
 ];
 
-const PAGE_SIZE = 9;
+// 페이지 크기는 entities/news의 단일 출처(NEWS_PAGE_SIZE)를 사용한다.
+// 서버 SSR prefetch(NewsBoardPrefetch)와 동일 값을 써야 queryKey가 일치한다.
+const PAGE_SIZE = NEWS_PAGE_SIZE;
 
 /** 돋보기 아이콘 */
 function SearchIcon() {
@@ -209,7 +211,7 @@ export function NewsBoard() {
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               placeholder="제목·카테고리 검색"
-              className="w-full rounded-pill border border-hairline bg-surface-white py-2.5 pl-11 pr-11 text-sm text-ink placeholder:text-faint focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
+              className="w-full rounded-pill border border-hairline bg-surface-white py-2.5 pl-11 pr-11 text-sm text-ink placeholder:text-faint focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20 [&::-webkit-search-cancel-button]:appearance-none [&::-webkit-search-cancel-button]:hidden"
             />
             {inputValue && (
               <button

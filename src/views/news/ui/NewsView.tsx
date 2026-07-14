@@ -1,15 +1,24 @@
 import { Suspense } from 'react';
 import { PageHero } from '@/shared/ui';
 import { SITE } from '@/shared/config';
-import { NewsBoard } from './NewsBoard';
+import { NewsBoardPrefetch } from './NewsBoardPrefetch';
+
+type SearchParams = { [key: string]: string | string[] | undefined };
 
 /**
  * 뉴스 목록 페이지 셸.
- * PageHero는 정적 셸로 프리렌더되고, URL 쿼리스트링(useSearchParams)을 읽어
- * 서버 페이지네이션·검색·타입 필터를 수행하는 NewsBoard는 <Suspense> 경계로 감싼다.
- * (Next.js 16 cacheComponents/PPR — useSearchParams는 Suspense 경계가 필요)
+ * PageHero는 searchParams를 소비하지 않는 최상위에서 렌더되어 정적 셸로 프리렌더된다.
+ * searchParams(await)를 소비하는 SSR prefetch(NewsBoardPrefetch)만 <Suspense> 경계
+ * 하위 async 컴포넌트로 분리해, 전체 페이지가 dynamic이 되지 않게 한다.
+ * NewsBoardPrefetch는 서버에서 현재 URL 페이지를 prefetch 후 HydrationBoundary로 감싼
+ * NewsBoard('use client' + useSearchParams)를 렌더한다.
+ * (Next.js 16 cacheComponents/PPR — searchParams await·useSearchParams는 Suspense 경계 필요)
  */
-export function NewsView() {
+export function NewsView({
+  searchParams,
+}: {
+  searchParams: Promise<SearchParams>;
+}) {
   return (
     <>
       <PageHero
@@ -20,7 +29,7 @@ export function NewsView() {
       <Suspense
         fallback={<main className="min-h-screen bg-surface-white py-14 md:py-20" />}
       >
-        <NewsBoard />
+        <NewsBoardPrefetch searchParams={searchParams} />
       </Suspense>
     </>
   );
