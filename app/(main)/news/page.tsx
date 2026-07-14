@@ -16,10 +16,14 @@ export const metadata: Metadata = {
   },
 }
 
-export default function NewsPage() {
+export default function NewsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+}) {
   return (
     <Suspense fallback={<div className="min-h-screen bg-surface-white" />}>
-      <NewsView />
+      <NewsView searchParams={searchParams} />
     </Suspense>
   )
 }

@@ -3,7 +3,8 @@
 import axios from 'axios';
 import { queryOptions } from '@tanstack/react-query';
 import { axiosInstance, ApiError, authAwareRetry } from '@/shared/api';
-import type { NewsListResponse } from '../model/types';
+import type { NewsListResponse, NewsType } from '../model/types';
+import { newsKeys, type NewsListParams } from './newsKeys';
 
 // NOTE: 서버 페처(getNewsList/getNewsPost)는 'use cache'(next/cache)를 사용하는 서버 전용
 // 모듈(newsServerFetch)에서만 노출한다. 이 'use client' 모듈에서 재노출하면 next/cache가
@@ -18,21 +19,26 @@ export const adminNewsKeys = {
     [...adminNewsKeys.all, { page, limit }] as const,
 };
 
-export const newsKeys = {
-  all: ['news'] as const,
-  list: (page: number, limit: number) =>
-    [...newsKeys.all, { page, limit }] as const,
-  detail: (id: string) => [...newsKeys.all, id] as const,
-};
-
-export function newsListQueryOptions(page: number = 1, limit: number = 10) {
+export function newsListQueryOptions(params: NewsListParams) {
+  const { page, limit } = params;
   return queryOptions({
-    queryKey: newsKeys.list(page, limit),
+    queryKey: newsKeys.list(params),
     // 클라이언트 소비용 — 공개 목록 GET을 axiosInstance로 호출한다.
     // (서버 컴포넌트는 newsServerFetch의 'use cache' getNewsList를 사용)
     queryFn: async () => {
+      // 계약: 값이 있는 키만 전송한다(백엔드 forbidNonWhitelisted 대응).
+      const requestParams: {
+        page: number;
+        limit: number;
+        search?: string;
+        type?: NewsType;
+      } = { page, limit };
+      const trimmedSearch = params.search?.trim();
+      if (trimmedSearch) requestParams.search = trimmedSearch;
+      if (params.type) requestParams.type = params.type;
+
       const { data } = await axiosInstance.get<NewsListResponse>('/news', {
-        params: { page, limit },
+        params: requestParams,
       });
       return data;
     },

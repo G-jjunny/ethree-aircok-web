@@ -138,9 +138,13 @@ AQI 바 그라디언트: `from-aqi-good via-brand via-aqi-warning to-aqi-bad`.
 
 **모션**: `duration-fast`(200ms, 커스텀 유틸리티) · `ease-out`(`cubic-bezier(0.16,1,0.3,1)`).
 
-**Aspect(매거진 레이아웃, 기능 토큰)**: `aspect-featured`(16/7) · `aspect-row-thumb`(4/3).
+**Aspect(매거진 레이아웃, 기능 토큰)**: `aspect-featured`(16/7) · `aspect-card`(16/10, 뉴스 목록 카드 썸네일) · `aspect-row-thumb`(4/3).
+
+**줄무늬 플레이스홀더(뉴스 coverImage 폴백, 유틸)**: `stripes-surface`(회색계) · `stripes-tint`(연블루계). `-45deg` 대각선 repeating-linear-gradient — 각도·줄 간격은 패턴 정의 자체(하드코딩 아님, marquee `translateX(-50%)` 와 동일 취급).
 
 **content-container**: `max-width:1240px; margin-inline:auto; padding-inline:2rem`.
+
+**reading 칼럼**: `max-w-reading`(=`--container-reading` 47.5rem/760px). 뉴스 상세 article·PageHero 텍스트 칼럼 등 좁은 읽기 폭. content-container 내부에서 `mx-auto max-w-reading` 로 조합.
 
 ---
 

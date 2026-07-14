@@ -1,7 +1,7 @@
 import { cache } from 'react';
 import axios from 'axios';
 import { ApiError } from '@/shared/api';
-import type { NewsPost, NewsListResponse } from '../model/types';
+import type { NewsPost, NewsListResponse, NewsType } from '../model/types';
 
 export class NewsApiError extends ApiError {}
 
@@ -26,11 +26,24 @@ function getApiBaseUrl(): string {
 export async function getNewsList(
   page: number = 1,
   limit: number = 10,
+  search?: string,
+  type?: NewsType,
 ): Promise<NewsListResponse> {
   try {
+    // 계약: 값이 있는 키만 전송한다(백엔드 forbidNonWhitelisted 대응).
+    const params: {
+      page: number;
+      limit: number;
+      search?: string;
+      type?: NewsType;
+    } = { page, limit };
+    const trimmedSearch = search?.trim();
+    if (trimmedSearch) params.search = trimmedSearch;
+    if (type) params.type = type;
+
     const { data } = await axios.get<NewsListResponse>(
       `${getApiBaseUrl()}/news`,
-      { params: { page, limit }, timeout: 10000 },
+      { params, timeout: 10000 },
     );
     return data;
   } catch {

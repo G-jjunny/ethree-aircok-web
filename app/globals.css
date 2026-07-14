@@ -120,7 +120,11 @@
 
   /* Aspect Ratios (매거진 레이아웃) */
   --aspect-featured:  16 / 7;   /* News Featured / Detail hero 와이드 */
+  --aspect-card:      16 / 10;  /* News 목록 카드 썸네일 */
   --aspect-row-thumb: 4 / 3;    /* News 가로형 row 썸네일 */
+
+  /* Container widths — content-container(1240) 외 읽기 좁은 칼럼 */
+  --container-reading: 47.5rem; /* 760 · 뉴스 상세 article / PageHero 텍스트 칼럼 */
 
   /* Spacing — steps 1~4 기본 4px 그리드 동일, 5~10 구 커스텀 스케일(회귀 방지 유지) */
   --spacing-1:  4px;
@@ -211,6 +215,32 @@ body {
     margin-inline: auto;
     padding-inline: 2rem; /* 32px */
   }
+}
+
+/* ── News coverImage 폴백 줄무늬 플레이스홀더 ──────────────────
+   뉴스 카드에서 coverImage 가 없을 때의 대각선 줄무늬 배경.
+   두 톤(회색계 surface / 연블루계 tint)만 토큰 기반으로 제공한다.
+   -45deg 각도·줄 간격(px)은 패턴 정의 자체이므로 하드코딩 수치가 아니다
+   (marquee translateX(-50%) 와 동일 취급). */
+@utility stripes-surface {
+  background-color: var(--color-surface);
+  background-image: repeating-linear-gradient(
+    -45deg,
+    var(--color-hairline) 0,
+    var(--color-hairline) 1px,
+    transparent 1px,
+    transparent 12px
+  );
+}
+@utility stripes-tint {
+  background-color: var(--color-tint);
+  background-image: repeating-linear-gradient(
+    -45deg,
+    var(--color-tint-border) 0,
+    var(--color-tint-border) 1px,
+    transparent 1px,
+    transparent 12px
+  );
 }
 
 /* Tailwind v4에는 --duration-* 네임스페이스가 없어 named duration 유틸리티가

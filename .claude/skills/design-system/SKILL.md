@@ -53,7 +53,12 @@ SSOT: `docs/design.md` · 구현: `app/globals.css @theme inline` · 공용 컴�
 
 ### content-container (강제)
 
-섹션 내부 래퍼는 `content-container`만 사용(max-width 1240 / padding 32). `max-w-* mx-auto px-*` 직접 금지.
+섹션 내부 래퍼는 `content-container`만 사용(max-width 1240 / padding 32). `max-w-* mx-auto px-*` 직접 금지. 좁은 읽기 칼럼(뉴스 상세 article 등)은 `mx-auto max-w-reading`(760px 토큰) 사용, `max-w-[760px]` 금지.
+
+### Aspect / 플레이스홀더 (뉴스)
+
+- Aspect: `aspect-featured`(16/7) `aspect-card`(16/10, 목록 카드 썸네일) `aspect-row-thumb`(4/3). `aspect-[..]` 하드코딩 금지.
+- coverImage 폴백 줄무늬: `stripes-surface`(회색계) / `stripes-tint`(연블루계). 인라인 repeating-linear-gradient 하드코딩 금지.
 
 ## 구 토큰은 쓰지 않는다 (deprecated)
 

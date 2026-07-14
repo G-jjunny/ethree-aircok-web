@@ -73,7 +73,7 @@ export async function NewsDetailView({ params }: Props) {
   };
 
   return (
-    <main className="min-h-screen bg-surface-white">
+    <main className="min-h-screen bg-surface-white py-11 md:py-16">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(newsArticleJsonLd) }}
@@ -82,10 +82,12 @@ export async function NewsDetailView({ params }: Props) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
-      <NewsDetailHeroSection post={post} />
-      {post.content && (
-        <NewsDetailContentSection content={post.content} />
-      )}
+      <article className="content-container">
+        <div className="mx-auto max-w-reading">
+          <NewsDetailHeroSection post={post} />
+          {post.content && <NewsDetailContentSection content={post.content} />}
+        </div>
+      </article>
     </main>
   );
 }

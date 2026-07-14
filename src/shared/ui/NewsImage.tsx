@@ -10,7 +10,7 @@ type NewsImageProps = {
   /** coverImage (nullable). 없으면 placeholder 렌더 */
   src: string | null
   alt: string
-  ratio?: 'video' | 'featured' | 'row-thumb'
+  ratio?: 'video' | 'featured' | 'row-thumb' | 'card'
   theme?: 'light' | 'dark'
   /** 이미지 컨테이너에 추가할 클래스 (object-position·scale·max-h 등) */
   className?: string
@@ -24,6 +24,7 @@ const ASPECT: Record<NonNullable<NewsImageProps['ratio']>, string> = {
   video: 'aspect-video',
   featured: 'aspect-featured',
   'row-thumb': 'aspect-row-thumb',
+  card: 'aspect-card',
 }
 
 /** ratio별 반응형 sizes 기본값(레이아웃상 실제 표시 폭에 근접). */
@@ -31,6 +32,7 @@ const DEFAULT_SIZES: Record<NonNullable<NewsImageProps['ratio']>, string> = {
   featured: '100vw',
   video: '(min-width: 768px) 50vw, 100vw',
   'row-thumb': '(min-width: 640px) 280px, 100vw',
+  card: '(min-width: 1024px) 380px, (min-width: 768px) 50vw, 100vw',
 }
 
 /**

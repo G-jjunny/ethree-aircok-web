@@ -11,6 +11,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { NewsService } from './news.service';
 import { CreateNewsDto } from './dto/create-news.dto';
 import { UpdateNewsDto } from './dto/update-news.dto';
+import { QueryNewsDto } from './dto/query-news.dto';
 import { R2Service } from '../upload/r2.service';
 
 // 뉴스 이미지 업로드 허용 MIME 타입 화이트리스트. 이미지 전용.
@@ -49,11 +50,8 @@ export class NewsController {
   ) {}
 
   @Get()
-  findAll(
-    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
-    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
-  ) {
-    return this.newsService.findAll(page, limit);
+  findAll(@Query() query: QueryNewsDto) {
+    return this.newsService.findAll(query);
   }
 
   @UseGuards(JwtAuthGuard)
