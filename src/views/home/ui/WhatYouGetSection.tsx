@@ -36,7 +36,7 @@ export function WhatYouGetSection() {
           </ul>
           <div className="mt-6">
             <Button asChild pill variant="primary" size="md">
-              <Link href="/health-report">{cta}</Link>
+              <Link href="/diagnosis">{cta}</Link>
             </Button>
           </div>
         </div>

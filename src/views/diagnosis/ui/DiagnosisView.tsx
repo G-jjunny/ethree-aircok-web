@@ -1,16 +1,16 @@
 import { Suspense } from 'react'
+import { PageHero } from '@/widgets/page-hero'
 import { SITE } from '@/shared/config'
-import { SubHeroSection } from './SubHeroSection'
 import { DiagnosisImageSection } from './DiagnosisImageSection'
 import { DiagnosisFormSection } from './DiagnosisFormSection'
 
 export function DiagnosisView() {
   return (
     <main>
-      <SubHeroSection
-        label={SITE.diagnosis.hero.label}
-        title={SITE.pages.diagnosis.title}
-        description={SITE.pages.diagnosis.description}
+      <PageHero
+        eyebrow={SITE.diagnosis.hero.label}
+        headline={{ prefix: SITE.pages.diagnosis.title }}
+        body={SITE.pages.diagnosis.description}
       />
       <Suspense fallback={<div className="min-h-[400px] bg-surface-white" />}>
         <DiagnosisImageSection />
