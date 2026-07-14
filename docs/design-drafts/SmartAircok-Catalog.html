@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"></head>
+<body>
+<!--
+  출처: Claude Design 15fc4772-51fe-4117-9810-2659d738aa1b / "catalog.dc.html"
+  용도: /catalog 재디자인 참조. 기존 PDF/이미지 플립북 뷰어(FlipBookViewer)를 최대한 재사용·커스텀.
+  토큰: 블루-테크(랜딩/뉴스/문의 공유). globals.css @theme 토큰 클래스 사용, 하드코딩 금지.
+
+  === 현재 데이터/구현 사실 (중요) ===
+  - 카탈로그 = 단일 책자. 모델 CatalogImage { id, fileUrl(상대경로 /uploads/..), fileType:'image'|'pdf', order }.
+    ※ title·파일크기·페이지수 메타 없음. 다중 "문서" 개념 없음(단일 책자).
+  - 공개 API: GET /api/catalog (배열 직접 반환). 현재 데이터 비어있음([]) — 빈 상태 처리 필수.
+  - 어드민: console/catalog에서 파일(이미지/PDF) 업로드·정렬·삭제. (백엔드 계약 변경 없음)
+  - CatalogView는 이미 통일 PageHero 위젯 사용. FlipBookViewer(react-pageflip)가 useCatalogPages로
+    만든 pages:string[](이미지/PDF→페이지)를 렌더. 뷰어는 내부에 zoom(휠)/pan/flipNext·flipPrev 보유.
+  - 기존 다운로드 링크는 downloadUrl=null로 비활성(단일 카탈로그 PDF URL이 계약에 없다는 이유).
+    → 실제로는 각 CatalogImage.fileUrl이 다운로드 대상이므로 이걸 연결한다.
+
+  === 섹션 구성 (위→아래) ===
+  1) PAGE HERO — 통일 PageHero 위젯 그대로(eyebrow CATALOG / "카탈로그" / 설명). 변경 최소.
+  2) CATALOG BOOK VIEWER 섹션 (surface #f5f7fb):
+     - (선택) 셀렉터 칩: 시안은 다중 문서(종합/브로슈어/사양서)이나 데이터는 단일 책자 →
+       칩 셀렉터는 생략하거나 단일 라벨만. (다중문서는 백엔드 메타 필요 → 범위 밖)
+     - 뷰어 셸(다크 navy, rounded 22, 큰 shadow, overflow-hidden):
+       · 툴바(다크): 좌 = PDF 아이콘 + 제목("제품 카탈로그"류, SITE) + 서브텍스트.
+         우 = 줌 컨트롤(−/100%/+), 전체화면 버튼, "PDF 다운로드" 버튼(brand).
+       · 북 영역(다크 radial): 좌우 원형 glass prev/next 버튼 + FlipBookViewer(펼침면).
+       · 푸터바(다크): 페이지 인디케이터(예 "4–5") + 진행 슬라이더(brand→cyan) + "/ 총페이지".
+     - 헬퍼 노트: "좌우 화살표로 페이지를 넘기고, 상단 도구모음에서 확대·전체화면·다운로드를 이용하세요."
+     - 다운로드 카드 그리드(3열, 반응형): 관리자 업로드 카탈로그 파일 다운로드.
+  3) CTA + FOOTER: (main) 레이아웃 전역 위젯 재사용 — 뷰에서 중복 렌더 금지.
+
+  === 뷰어 커스텀 방침 (최대한 활용) ===
+  - FlipBookViewer를 버리지 말고 재사용. 내부 zoom/현재페이지/총페이지/flipNext·flipPrev를 상위로 노출
+    (imperative ref 또는 controlled props/callback)해서 시안 툴바(줌 −/+, 전체화면)·푸터(페이지·슬라이더)에 연결.
+  - 전체화면: 뷰어 셸에 Fullscreen API. 줌 −/+: 기존 setZoom 재사용(휠 줌 유지).
+  - 다크 배경/glass 화살표/펼침면 스타일을 시안에 맞게 정리. 모바일은 usePortrait 단면 유지.
+
+  === 다운로드 기능 (신규, UI에 맞게) ===
+  - 대상: 관리자 업로드 카탈로그 파일 = CatalogImage.fileUrl (백엔드 /uploads 동일출처 프록시, <a download>).
+  - 다운로드 카드: 파일 항목별 카드. 아이콘 = fileType별(pdf/image), 라벨 = 제목 메타 없으므로 제네릭
+    ("제품 카탈로그"/"카탈로그 PDF"/순번), 메타줄 = fileType 표기, "다운로드" 링크(→ fileUrl, download 속성).
+    · 일반 케이스(관리자가 PDF 1건 업로드) → 카드 1개(깔끔). PDF 항목을 문서로 우선 취급.
+    · 이미지-only 카탈로그(엣지) → 이미지 파일 다운로드 카드 또는 합리적 폴백(구현 판단).
+  - 툴바 "PDF 다운로드" = 대표(첫 PDF) 파일 다운로드. 다운로드 가능한 파일 없으면 버튼/카드 숨김.
+  - 빈 데이터([]): 뷰어·다운로드 모두 기존 빈 상태("등록된 카탈로그가 없습니다") 톤 유지.
+
+  === 하지 말 것 ===
+  - 백엔드 계약/스키마 변경(title/size 메타 추가 등)은 범위 밖 — 필요 시 후속 이슈로 플래그.
+  - catalog-3d(WebGL 3D 뷰어)는 이번 범위 아님(그대로 유지).
+-->
+</body>
+</html>
