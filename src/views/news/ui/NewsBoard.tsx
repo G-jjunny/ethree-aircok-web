@@ -134,7 +134,7 @@ export function NewsBoard() {
 
   const clearSearch = () => setInputValue('');
 
-  const { data, isPending, isError, isPlaceholderData } = useQuery({
+  const { data, isPending, isError, isSuccess, isPlaceholderData } = useQuery({
     ...newsListQueryOptions({ page, limit: PAGE_SIZE, search: q, type: apiType }),
     placeholderData: keepPreviousData,
   });
@@ -145,6 +145,32 @@ export function NewsBoard() {
   const currentPage = page;
   // 초기 로딩만 로딩 상태로 취급(페이지 전환은 keepPreviousData로 이전 데이터 유지).
   const isInitialLoading = isPending && !isPlaceholderData;
+
+  // 범위 초과 page(수동 URL·오래된 북마크·항목 삭제 후) graceful 처리:
+  // 최신 응답 기준으로 마지막 유효 페이지로 클램프한다.
+  // 무한 리다이렉트 방지 — 실제 최신 응답일 때만(placeholder/로딩 중 제외) 재조정하고,
+  // total>0 && page>totalPages(=진짜 범위 초과)인 경우로 한정한다. 빈 결과(total=0)는 클램프하지 않는다.
+  useEffect(() => {
+    if (!isSuccess || isPlaceholderData) return;
+    if (total > 0 && page > totalPages) {
+      const params = new URLSearchParams(searchParams.toString());
+      if (totalPages <= 1) params.delete('page');
+      else params.set('page', String(totalPages));
+      const queryString = params.toString();
+      router.replace(queryString ? `${pathname}?${queryString}` : pathname, {
+        scroll: false,
+      });
+    }
+  }, [
+    isSuccess,
+    isPlaceholderData,
+    total,
+    page,
+    totalPages,
+    searchParams,
+    pathname,
+    router,
+  ]);
 
   return (
     <main className="min-h-screen bg-surface-white py-14 md:py-20">
