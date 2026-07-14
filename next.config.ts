@@ -76,6 +76,17 @@ const nextConfig: NextConfig = {
     ];
   },
 
+  async redirects() {
+    return [
+      // FAQ 페이지는 문의하기 하단 FAQ 섹션으로 통합됨(이슈 #111). 구 경로는 앵커로 영구 이전.
+      {
+        source: '/faq',
+        destination: '/contact#faq',
+        permanent: true,
+      },
+    ];
+  },
+
   async rewrites() {
     return [
       {

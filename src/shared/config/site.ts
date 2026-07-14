@@ -31,9 +31,7 @@ export const SITE = {
       { label: "공기질 관리 제품군", href: "/services" },
       { label: "진단서비스 신청", href: "/diagnosis" },
       { label: "뉴스", href: "/news" },
-      { label: "FAQ", href: "/faq" },
       { label: "카탈로그", href: "/catalog" },
-      { label: "문의하기", href: "/contact" },
     ],
   },
 
@@ -575,11 +573,9 @@ export const SITE = {
     services: {
       title: "공기질 관리 제품군",
       description: "에어콕의 공기질 관리 제품 라인업을 확인하세요.",
-    },
-    /** @deprecated 프로젝트 페이지는 diagnosis로 이전됨 */
-    projects: {
-      title: "프로젝트",
-      description: "스마트 에어콕이 함께한 도입 사례와 레퍼런스를 확인하세요.",
+      hero: {
+        label: "Products",
+      },
     },
     diagnosis: {
       title: "진단서비스 신청",
@@ -600,10 +596,10 @@ export const SITE = {
       title: "문의하기",
       description:
         "스마트 에어콕에 문의하세요. 전화·이메일·온라인 문의 폼으로 편하게 문의하실 수 있습니다.",
-    },
-    pricing: {
-      title: "가격 안내",
-      description: "스마트 에어콕 서비스 요금 안내입니다.",
+      hero: {
+        label: "Contact",
+        body: "제품 도입·진단 서비스·기술 지원 등 궁금한 점을 편하게 남겨주세요. 영업일 기준 24시간 이내에 답변드립니다.",
+      },
     },
     news: {
       title: "뉴스",
@@ -611,23 +607,6 @@ export const SITE = {
       hero: {
         label: "NEWS",
       },
-    },
-    blog: {
-      title: "블로그",
-      description: "실내 공기질과 건강경영에 관한 전문 칼럼과 아티클입니다.",
-    },
-    qa: {
-      title: "Q&A",
-      description: "고객님의 질문과 스마트 에어콕의 답변을 확인하세요.",
-    },
-    healthReport: {
-      title: "건강경영 레포트",
-      description:
-        "무료 건강경영 레포트로 공기질이 비즈니스에 미치는 영향을 확인하세요.",
-    },
-    freeTrial: {
-      title: "체험 신청",
-      description: "스마트 에어콕 무료 체험을 신청하세요.",
     },
   },
   admin: {

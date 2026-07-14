@@ -140,7 +140,7 @@ AQI 바 그라디언트: `from-aqi-good via-brand via-aqi-warning to-aqi-bad`.
 
 **Aspect(매거진 레이아웃, 기능 토큰)**: `aspect-featured`(16/7) · `aspect-card`(16/10, 뉴스 목록 카드 썸네일) · `aspect-row-thumb`(4/3).
 
-**줄무늬 플레이스홀더(뉴스 coverImage 폴백, 유틸)**: `stripes-surface`(회색계) · `stripes-tint`(연블루계). `-45deg` 대각선 repeating-linear-gradient — 각도·줄 간격은 패턴 정의 자체(하드코딩 아님, marquee `translateX(-50%)` 와 동일 취급).
+**줄무늬 플레이스홀더(이미지 자산 폴백, 유틸)**: `stripes-surface`(회색계) · `stripes-tint`(연블루계) · `stripes-dark`(네이비 섹션 위 흰색 반투명 라인). `-45deg` 대각선 repeating-linear-gradient — 각도·줄 간격은 패턴 정의 자체(하드코딩 아님, marquee `translateX(-50%)` 와 동일 취급). 공용 컴포넌트 `<PagePlaceholder>`가 세 톤을 감싸며, 모든 이미지 자산 미확보 자리(뉴스 coverImage 폴백·About 이미지 자리 등)의 **단일 표준**이다.
 
 **content-container**: `max-width:1240px; margin-inline:auto; padding-inline:2rem`.
 
@@ -156,6 +156,10 @@ AQI 바 그라디언트: `from-aqi-good via-brand via-aqi-warning to-aqi-bad`.
 
 - `<Button variant="primary|dark|outline|white" size="sm|md" pill? asChild?>` — primary=히어로/헤더 CTA(그라디언트 `from-brand to-brand-hover`), dark=라이트 섹션 보조 CTA(`bg-navy`), outline=다크/컬러 배경 위 보조(`border-white/50`), white=CTA 컬러 섹션 흰 버튼(`shadow-soft`). `pill`=헤더 도입문의(rounded-pill), 기본 rounded-btn. `asChild`로 Next `<Link>` CTA 렌더. md=44px 터치타겟, primary만 글로우 그림자(sm=`shadow-brand-sm`/md=`shadow-brand`).
 - `<SectionLabel color="brand|cyan" size="md|sm" as?>` — eyebrow. Sora(`font-display`)·uppercase·600. md=`text-eyebrow tracking-eyebrow-lg`(섹션), sm=`text-mini tracking-eyebrow`(카드). ⚠️ eyebrow 남용 금지: 섹션 3개당 1개 이하.
+
+**구현됨 (이슈 #111 Pre)**:
+
+- `<PagePlaceholder variant="surface|tint|dark" label? rounded? bordered? className? children?>` — 이미지 자산 미확보 자리의 표준 줄무늬 블록. `variant`가 §4 `stripes-*` 유틸(surface=회색계·tint=연블루계·dark=네이비 위 흰 반투명)과 보더(`border-hairline`/`border-tint-border`/`border-white/8`)·라벨 톤(`text-faint`/`text-white/40`)을 함께 전환. 라벨은 `font-display text-mini font-semibold uppercase tracking-eyebrow`(Sora eyebrow) 표준. 라운드는 `rounded` prop(기본 `rounded-card`)으로, 크기·비율은 `className`으로 주입. 뉴스 coverImage 폴백·About 이미지 자리 등 **모든 플레이스홀더의 단일 소스**.
 
 **후속 Pre 후보(3곳 이상 반복 판단 후)**: `<StatCard>`·`<AqiCard>`·`<PartnerMarquee>` 등.
 

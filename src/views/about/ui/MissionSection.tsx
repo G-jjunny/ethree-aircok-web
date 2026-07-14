@@ -1,6 +1,5 @@
 import { SITE } from '@/shared/config'
-import { SectionLabel } from '@/shared/ui'
-import { AboutPlaceholder } from './AboutPlaceholder'
+import { SectionLabel, PagePlaceholder } from '@/shared/ui'
 
 /**
  * MISSION (시안 §MISSION). 흰 배경, 좌 텍스트 / 우 이미지(4/3 플레이스홀더).
@@ -20,8 +19,10 @@ export function MissionSection() {
           <p className="mt-5 text-lead-sm leading-relaxed text-muted">{body}</p>
         </div>
 
-        <AboutPlaceholder
-          className="aspect-row-thumb w-full rounded-card-lg"
+        <PagePlaceholder
+          variant="surface"
+          rounded="rounded-card-lg"
+          className="aspect-row-thumb w-full"
           label="회사 · 팀 이미지 자리"
         />
       </div>

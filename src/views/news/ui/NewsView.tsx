@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import { PageHero } from '@/shared/ui';
+import { PageHero } from '@/widgets/page-hero';
 import { SITE } from '@/shared/config';
 import { NewsBoardPrefetch } from './NewsBoardPrefetch';
 
@@ -22,8 +22,8 @@ export function NewsView({
   return (
     <>
       <PageHero
-        label={SITE.pages.news.hero.label}
-        title={SITE.pages.news.title}
+        eyebrow={SITE.pages.news.hero.label}
+        headline={{ prefix: SITE.pages.news.title }}
         body={SITE.pages.news.description}
       />
       <Suspense

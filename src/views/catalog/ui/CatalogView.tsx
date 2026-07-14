@@ -3,7 +3,7 @@
 import dynamic from 'next/dynamic'
 import { useQuery } from '@tanstack/react-query'
 import { SITE } from '@/shared/config'
-import { PageHero } from '@/shared/ui'
+import { PageHero } from '@/widgets/page-hero'
 import { catalogImageListQueryOptions } from '@/entities/catalog'
 import { useCatalogPages } from './useCatalogPages'
 
@@ -53,8 +53,8 @@ export function CatalogView() {
   return (
     <>
       <PageHero
-        label={SITE.pages.catalog.hero.label}
-        title={SITE.pages.catalog.title}
+        eyebrow={SITE.pages.catalog.hero.label}
+        headline={{ prefix: SITE.pages.catalog.title }}
         body={SITE.pages.catalog.description}
       />
       <main className="min-h-screen bg-surface-white">

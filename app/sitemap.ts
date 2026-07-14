@@ -10,13 +10,8 @@ const STATIC_PATHS = [
   '/services',
   '/diagnosis',
   '/news',
-  '/faq',
   '/catalog',
   '/contact',
-  '/pricing',
-  '/qa',
-  '/health-report',
-  '/free-trial',
 ];
 
 // 라우트별 changeFrequency/priority. 미정의 경로는 기본값을 사용한다.

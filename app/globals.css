@@ -242,6 +242,19 @@ body {
     transparent 12px
   );
 }
+/* 다크(네이비) 섹션 위 줄무늬 폴백 — 배경색은 섹션의 navy가 제공하고,
+   줄무늬 라인만 흰색 반투명으로 얹는다. white opacity 는 design.md §2
+   "다크 배경 위 반투명 = 기본 토큰 + opacity"에 따라 하드코딩이 아니다
+   (각도·줄 간격은 stripes-surface/tint 와 동일한 패턴 정의). */
+@utility stripes-dark {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    oklch(100% 0 0 / 0.08) 0,
+    oklch(100% 0 0 / 0.08) 1px,
+    transparent 1px,
+    transparent 12px
+  );
+}
 
 /* Tailwind v4에는 --duration-* 네임스페이스가 없어 named duration 유틸리티가
    자동 생성되지 않는다. SKILL.md가 규정하는 duration-fast 를 커스텀 유틸리티로 제공. */
