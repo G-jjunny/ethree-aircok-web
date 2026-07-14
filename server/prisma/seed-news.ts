@@ -6,6 +6,8 @@ import pg from 'pg';
 const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
 const prisma = new PrismaClient({ adapter: new PrismaPg(pool) });
 
+const R2_BASE = process.env.R2_PUBLIC_URL ?? 'https://pub-046c2c24be4d444aaa70d8be1a5cd092.r2.dev';
+
 function d(str: string): Date {
   return new Date(str.replace(/\//g, '-'));
 }
@@ -122,11 +124,11 @@ async function seedNews() {
   const allNews = [
     ...BLOG_NEWS.map((item, i) => ({
       ...item,
-      coverImage: `/news/image${i + 1}.png`,
+      coverImage: `${R2_BASE}/news/image${i + 1}.png`,
     })),
     ...LINK_NEWS.map((item, i) => {
       const n = i + 34;
-      return { ...item, coverImage: n === 71 ? '/news/image71.jpeg' : `/news/image${n}.png` };
+      return { ...item, coverImage: n === 71 ? `${R2_BASE}/news/image71.jpeg` : `${R2_BASE}/news/image${n}.png` };
     }),
   ];
   const result = await prisma.newsPost.createMany({ data: allNews });
