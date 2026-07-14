@@ -8,6 +8,6 @@ export {
   adminNewsKeys,
   AdminNewsApiError,
   newsListQueryOptions,
-  newsKeys,
 } from './api/newsApi';
-export type { NewsListParams } from './api/newsApi';
+export { newsKeys } from './api/newsKeys';
+export type { NewsListParams } from './api/newsKeys';
