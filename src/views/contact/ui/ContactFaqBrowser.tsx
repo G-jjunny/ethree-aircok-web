@@ -30,11 +30,11 @@ function FaqCard({
         aria-expanded={isOpen}
         aria-controls={answerId}
         onClick={onToggle}
-        className="flex w-full items-start justify-between gap-3 p-5 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:rounded-2xl cursor-pointer"
+        className="flex w-full items-center justify-between gap-3 px-5 py-4 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:rounded-2xl cursor-pointer"
       >
-        <span className="flex min-w-0 items-start gap-3">
+        <span className="flex min-w-0 items-center gap-3.5">
           <span
-            className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-btn bg-tint text-mini font-bold text-brand tabular-nums"
+            className="flex h-6 w-6 shrink-0 items-center justify-center rounded-btn bg-tint text-mini font-bold text-brand tabular-nums"
             aria-hidden="true"
           >
             {badge}
@@ -44,7 +44,7 @@ function FaqCard({
           </span>
         </span>
         <span
-          className={`mt-0.5 shrink-0 text-muted transition-transform duration-fast ease-out ${
+          className={`shrink-0 text-muted transition-transform duration-fast ease-out ${
             isOpen ? 'rotate-180 text-brand' : ''
           }`}
           aria-hidden="true"
@@ -71,7 +71,8 @@ function FaqCard({
         }`}
       >
         <div className="overflow-hidden">
-          <div className="flex flex-col gap-2.5 px-5 pb-5 pl-14">
+          {/* pl-[3.625rem]=58px: 토글 좌패딩(px-5=20)+배지(w-6=24)+gap-3.5(14) → 질문 텍스트 시작선과 정렬. token 없음: 24+14+20 합산값 */}
+          <div className="flex flex-col gap-2.5 px-5 pb-5 pl-[3.625rem]">
             {paragraphs.map((paragraph, i) => (
               <p
                 key={i}
@@ -200,7 +201,7 @@ export function ContactFaqBrowser({
 
       {/* 2열 아코디언 */}
       {filteredItems.length > 0 ? (
-        <div className="mt-6 grid grid-cols-1 items-start gap-4 md:grid-cols-2">
+        <div className="mt-6 grid grid-cols-1 items-start gap-x-6 gap-y-4 md:grid-cols-2">
           {filteredItems.map((item, idx) => (
             <FaqCard
               key={item.id}

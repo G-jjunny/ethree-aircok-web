@@ -185,7 +185,7 @@ function InquiryFormFields({ fields }: { fields: InquiryField[] }) {
       onSubmit={handleSubmit(onSubmit)}
       noValidate
       aria-label="문의하기 폼"
-      className="grid grid-cols-1 gap-5 sm:grid-cols-2"
+      className="grid grid-cols-1 gap-x-4 gap-y-3 sm:grid-cols-2"
     >
       {fields.map((field) => {
         const fieldId = `inquiry-${field.key}`
@@ -233,7 +233,7 @@ function InquiryFormFields({ fields }: { fields: InquiryField[] }) {
             )}
 
             {/* 에러 텍스트 예약 공간 — 레이아웃 시프트 방지 */}
-            <div className="min-h-5">
+            <div className="min-h-4">
               {fieldError && (
                 <p
                   id={errorId}

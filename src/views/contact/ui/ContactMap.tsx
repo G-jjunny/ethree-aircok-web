@@ -54,7 +54,7 @@ export async function ContactMap() {
   )}`
 
   return (
-    <div className="overflow-hidden rounded-card border border-hairline bg-surface-white shadow-soft">
+    <div className="overflow-hidden rounded-card border border-hairline bg-surface-white shadow-card">
       <div className="aspect-video w-full">
         <iframe
           title={`${SITE.name} 본사 위치 지도`}

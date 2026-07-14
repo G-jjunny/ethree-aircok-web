@@ -120,13 +120,13 @@ export function ContactInfoSection() {
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {cards.map((card) => {
             const cardClass =
-              'flex flex-col rounded-card border border-hairline bg-surface-white p-6 shadow-soft'
+              'flex flex-col rounded-card border border-hairline bg-surface-white p-6 shadow-card'
             if (card.href) {
               return (
                 <a
                   key={card.title}
                   href={card.href}
-                  className={`${cardClass} transition-shadow duration-fast ease-out hover:shadow-float`}
+                  className={`${cardClass} transition-colors duration-fast ease-out hover:border-tint-border`}
                 >
                   <InfoCardBody card={card} />
                 </a>
