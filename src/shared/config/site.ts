@@ -32,7 +32,6 @@ export const SITE = {
       { label: "진단서비스 신청", href: "/diagnosis" },
       { label: "뉴스", href: "/news" },
       { label: "카탈로그", href: "/catalog" },
-      { label: "문의하기", href: "/contact" },
     ],
   },
 
