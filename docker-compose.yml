@@ -1,0 +1,82 @@
+# Aircok 백엔드 풀 도커 스택
+#
+#   docker compose up --build
+#
+# 기동 순서: db(healthy) → migrate(deploy+seed, 1회성) → server(NestJS)
+# 프론트엔드(Next.js)는 도커 대상이 아니며 기존대로 네이티브 `npm run dev` 로 실행한다.
+#
+# 포트: 백엔드 API http://localhost:3001 / Postgres localhost:5434
+#
+# 비밀번호(postgres:jjunny)는 server/.env 의 DATABASE_URL 값과 반드시 일치해야 한다.
+# 단일 커맨드(`docker compose up --build`) 구동을 위해 db 초기화용 POSTGRES_* 값과
+# 컨테이너 네트워크용 DATABASE_URL 오버라이드는 여기에 직접 기입한다.
+# (server/.env 의 DATABASE_URL 은 localhost:5432 기준이라 컨테이너 내부에서 db:5432 로 덮어씀)
+
+services:
+  db:
+    image: postgres:17
+    container_name: aircok-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: jjunny
+      POSTGRES_DB: aircok
+    volumes:
+      - aircok-db-data:/var/lib/postgresql/data
+    ports:
+      - "5434:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d aircok"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  migrate:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+      target: builder
+    container_name: aircok-migrate
+    depends_on:
+      db:
+        condition: service_healthy
+    # ADMIN_SEED_PASSWORD / JWT / R2 등은 server/.env 에서 로드하고
+    # DATABASE_URL 만 컨테이너 네트워크 주소로 오버라이드한다.
+    env_file:
+      - ./server/.env
+    environment:
+      DATABASE_URL: postgresql://postgres:jjunny@db:5432/aircok
+    # migrate deploy 후 seed 4종 실행. 각 seed 는 count/sentinel 가드로 멱등하며,
+    # 모델 간 의존성이 없어 순서는 무관(대표 seed.ts 먼저 실행).
+    command:
+      - sh
+      - -c
+      - >
+        npx prisma migrate deploy &&
+        npm run prisma:seed &&
+        npm run prisma:seed:news &&
+        npm run prisma:seed:core-values &&
+        npm run prisma:seed:timeline
+    restart: "no"
+
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+      target: runtime
+    container_name: aircok-server
+    depends_on:
+      db:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    env_file:
+      - ./server/.env
+    environment:
+      DATABASE_URL: postgresql://postgres:jjunny@db:5432/aircok
+    ports:
+      - "3001:3001"
+    restart: unless-stopped
+
+volumes:
+  aircok-db-data:

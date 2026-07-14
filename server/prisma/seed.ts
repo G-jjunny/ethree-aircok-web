@@ -7,6 +7,8 @@ import * as bcrypt from 'bcrypt';
 const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
 const prisma = new PrismaClient({ adapter: new PrismaPg(pool) });
 
+const R2_BASE = process.env.R2_PUBLIC_URL ?? 'https://pub-046c2c24be4d444aaa70d8be1a5cd092.r2.dev';
+
 async function main() {
   const password = process.env.ADMIN_SEED_PASSWORD;
   if (!password) {
@@ -31,6 +33,7 @@ async function main() {
   await seedMapSetting();
   await seedPartners();
   await seedFaq();
+  await seedTeamImage();
 }
 
 interface FaqSeedItem {
@@ -221,24 +224,24 @@ async function seedFaq() {
   );
 }
 
-const PARTNERS: { name: string; order: number }[] = [
-  { name: '삼성 S1', order: 0 },
-  { name: '환경산업기술원', order: 1 },
-  { name: '대한민국무공수훈자회', order: 2 },
-  { name: '한국환경연구원(KEI)', order: 3 },
-  { name: '고려대학교', order: 4 },
-  { name: '건국대학교', order: 5 },
-  { name: '한국화학융합시험연구원', order: 6 },
-  { name: '평택대학교', order: 7 },
-  { name: 'LG화학 오창공장', order: 8 },
-  { name: '한국표준협회', order: 9 },
-  { name: '인하대학교병원', order: 10 },
-  { name: '현대아산병원', order: 11 },
-  { name: '동대문역사문화공원역', order: 12 },
-  { name: '수유역', order: 13 },
-  { name: '광주광역시', order: 14 },
-  { name: '농촌진흥청', order: 15 },
-  { name: '산림청', order: 16 },
+const PARTNERS: { name: string; order: number; logoUrl: string | null }[] = [
+  { name: '삼성 S1', order: 0, logoUrl: `${R2_BASE}/partners/01544811-ee40-4940-8745-50715c043cf8.png` },
+  { name: '환경산업기술원', order: 1, logoUrl: `${R2_BASE}/partners/77987353-98b9-4871-9f8e-67028622dece.png` },
+  { name: '대한민국무공수훈자회', order: 2, logoUrl: `${R2_BASE}/partners/24cb3362-337d-4959-a88e-c57414d50659.gif` },
+  { name: '한국환경연구원(KEI)', order: 3, logoUrl: `${R2_BASE}/partners/d76090a3-ddf8-42c1-9f72-33525081ba09.png` },
+  { name: '고려대학교', order: 4, logoUrl: `${R2_BASE}/partners/2f199565-c3d0-4499-948a-544a7cc5a898.png` },
+  { name: '건국대학교', order: 5, logoUrl: `${R2_BASE}/partners/2eeb6797-bd0b-4011-871d-e21ac0eb1162.png` },
+  { name: '한국화학융합시험연구원', order: 6, logoUrl: `${R2_BASE}/partners/414b8c18-229d-4359-b482-76c365b0ead6.gif` },
+  { name: '평택대학교', order: 7, logoUrl: `${R2_BASE}/partners/2353aea2-c2ed-42bd-8ccc-a0c6a33fc71d.png` },
+  { name: 'LG화학 오창공장', order: 8, logoUrl: null },
+  { name: '한국표준협회', order: 9, logoUrl: `${R2_BASE}/partners/093ff4bd-1886-4b39-ae5b-03e482841c95.jpg` },
+  { name: '인하대학교병원', order: 10, logoUrl: `${R2_BASE}/partners/3c84816c-9edc-469c-8302-4b3b02bed8a2.png` },
+  { name: '현대아산병원', order: 11, logoUrl: `${R2_BASE}/partners/991891e7-a8a6-46b2-9d8a-d4a2888834d6.png` },
+  { name: '동대문역사문화공원역', order: 12, logoUrl: null },
+  { name: '수유역', order: 13, logoUrl: null },
+  { name: '광주광역시', order: 14, logoUrl: null },
+  { name: '농촌진흥청', order: 15, logoUrl: `${R2_BASE}/partners/ba4329bc-7d05-49c2-acb1-09d4e2398483.png` },
+  { name: '산림청', order: 16, logoUrl: `${R2_BASE}/partners/46c6afd8-bb3d-4397-a6e3-e5c1ca3c752d.png` },
 ];
 
 const SITE_INFO_SEED = {
@@ -326,13 +329,31 @@ async function seedPartners() {
   const result = await prisma.partner.createMany({
     data: PARTNERS.map((p) => ({
       name: p.name,
-      logoUrl: null,
+      logoUrl: p.logoUrl,
       type: 'partner' as const,
       order: p.order,
     })),
   });
 
   console.log(`Partners created: ${result.count}`);
+}
+
+async function seedTeamImage() {
+  const existingCount = await prisma.teamImage.count();
+
+  if (existingCount > 0) {
+    console.log(`TeamImage already seeded (${existingCount} records), skipping.`);
+    return;
+  }
+
+  const created = await prisma.teamImage.create({
+    data: {
+      imageUrl: '/uploads/1782864993002-aircok_team-8.jpg',
+      order: 0,
+    },
+  });
+
+  console.log('TeamImage created:', created.imageUrl);
 }
 
 main()
