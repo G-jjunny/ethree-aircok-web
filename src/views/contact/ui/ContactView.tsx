@@ -1,5 +1,4 @@
 import { Suspense } from 'react'
-import { GlobalCta } from '@/widgets/global-cta'
 import { ContactHeroSection } from './ContactHeroSection'
 import { ContactInfoSection } from './ContactInfoSection'
 import { ContactFormSection } from './ContactFormSection'
@@ -15,7 +14,6 @@ export function ContactView() {
       <Suspense fallback={<div className="min-h-[600px] bg-surface" />}>
         <ContactFaqSection />
       </Suspense>
-      <GlobalCta />
     </main>
   )
 }
