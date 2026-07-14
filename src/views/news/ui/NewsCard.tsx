@@ -11,14 +11,14 @@ interface Props {
 function ExternalArrowIcon() {
   return (
     <svg
-      className="h-4 w-4"
+      className="h-[15px] w-[15px]"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth="2"
+      strokeWidth="2.4"
       aria-hidden="true"
     >
-      <path strokeLinecap="round" strokeLinejoin="round" d="M7 17 17 7M9 7h8v8" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M7 17 17 7M7 7h10v10" />
     </svg>
   );
 }
@@ -86,7 +86,7 @@ function CardThumb({ item }: Props) {
 
       {/* LINK: 우상단 외부 링크 아이콘 */}
       {isLink && (
-        <div className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-surface-white text-brand shadow-soft">
+        <div className="absolute right-3 top-3 flex h-[30px] w-[30px] items-center justify-center rounded-full bg-surface-white/90 text-brand shadow-[0_3px_8px_rgba(13,21,38,0.14)]">
           <ExternalArrowIcon />
         </div>
       )}
