@@ -1,22 +1,44 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateNewsDto } from './dto/create-news.dto';
 import { UpdateNewsDto } from './dto/update-news.dto';
+import { QueryNewsDto } from './dto/query-news.dto';
 import { NewsType } from './dto/news-type.enum';
 
 @Injectable()
 export class NewsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findAll(page: number, limit: number) {
+  async findAll(query: QueryNewsDto) {
+    const { page = 1, limit = 10, search, type } = query;
+
     // limit/page 상한 clamp (오버페칭 방지). take 는 1~100 으로 제한한다.
     const safePage = Math.max(page, 1);
     const take = Math.min(Math.max(limit, 1), 100);
     const skip = (safePage - 1) * take;
 
+    // where 절 동적 구성. 공개 목록이므로 published: true 는 항상 강제.
+    const where: Prisma.NewsPostWhereInput = { published: true };
+
+    // type 필터: 지정되면 AND 로 누적.
+    if (type) {
+      where.type = type;
+    }
+
+    // search 필터: trim 후 non-empty 일 때만 title/description 부분일치(OR).
+    // DTO 에서 이미 trim 되지만 방어적으로 재확인한다.
+    const s = search?.trim();
+    if (s) {
+      where.OR = [
+        { title: { contains: s, mode: 'insensitive' } },
+        { description: { contains: s, mode: 'insensitive' } },
+      ];
+    }
+
     const [data, total] = await this.prisma.$transaction([
       this.prisma.newsPost.findMany({
-        where: { published: true },
+        where,
         skip,
         take,
         orderBy: { date: 'desc' },
@@ -34,7 +56,8 @@ export class NewsService {
           updatedAt: true,
         },
       }),
-      this.prisma.newsPost.count({ where: { published: true } }),
+      // count 에도 동일한 where 를 전달해 total 이 필터 적용 전체 매칭 수가 되도록 한다.
+      this.prisma.newsPost.count({ where }),
     ]);
 
     return { data, total, page: safePage, limit: take };
