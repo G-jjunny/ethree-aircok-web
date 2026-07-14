@@ -9,3 +9,4 @@ export {
   newsListQueryOptions,
   newsKeys,
 } from './api/newsApi';
+export type { NewsListParams } from './api/newsApi';
