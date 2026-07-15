@@ -22,8 +22,11 @@ const eslintConfig = defineConfig([
     "scripts/**",
   ]),
   // FSD architecture boundaries: enforces the layer-direction import rule
-  // and slice public-API (index.ts) entry points described in CLAUDE.md
-  // under "FSD layers (src/)". See https://www.jsboundaries.dev/docs/setup/.
+  // and slice public-API entry points described in CLAUDE.md under
+  // "FSD layers (src/)". Public entry points are index.ts plus an optional
+  // server.ts (server-only additional public entry, e.g. @/entities/news/server
+  // for server-only fetch/cache symbols kept out of the client bundle).
+  // See https://www.jsboundaries.dev/docs/setup/.
   {
     files: ["src/**/*.{ts,tsx}", "app/**/*.{ts,tsx}"],
     plugins: { boundaries },
@@ -74,10 +77,12 @@ const eslintConfig = defineConfig([
             },
             // Public API only: block deep/internal imports into another
             // slice (own-slice internal files are exempt by default).
+            // Two entry points are public: index.ts (client-safe barrel) and
+            // server.ts (server-only additional public entry).
             {
               to: {
                 type: ["views", "widgets", "features", "entities"],
-                internalPath: "!index.ts",
+                internalPath: "!{index,server}.ts",
               },
               disallow: { from: { type: "*" } },
             },

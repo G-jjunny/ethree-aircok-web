@@ -184,6 +184,31 @@ export function adminInquiryQueryOptions() {
 
 - ❌ 각 슬라이스에서 `status`/`isAuthError`/`parseAxiosMessages`/retry 로직을 복붙 재정의 금지 — 베이스에서 import.
 
+## 서버/클라이언트 번들 경계 규칙
+
+서버 전용 코드가 클라이언트 번들로 유출되면 Next.js 16 렌더 워커가 크래시하며, 이를 SSR에서 실제로 호출하는 동적 라우트가 500을 반환한다. 이 회귀는 과거 커밋 `49ed5b1`과 PR #119(뉴스 동적 라우트)에서 반복 발생했으므로, 아래 규칙으로 재발을 차단한다.
+
+**문제 클래스.** 서버 전용 코드(React `cache()`, `next/cache`의 `'use cache'`/`cacheTag`/`cacheLife`, 서버 사이드 axios 페처 등)를 담은 모듈이 슬라이스 배럴 `index.ts`를 통해 클라이언트 컴포넌트 번들로 유출되면, 그 코드를 SSR에서 실제로 호출하는 동적 라우트가 Next.js 16 렌더 워커 크래시(`Jest worker encountered child process exceptions`)로 500이 난다.
+
+**원인 메커니즘.** 클라이언트 컴포넌트가 배럴에서 client-safe 심볼만 import하더라도, 배럴이 서버 전용 모듈을 함께 re-export하면 번들러가 배럴 그래프 전체(→ 서버 모듈)를 클라이언트 번들로 끌어온다. import는 심볼 단위가 아니라 모듈 그래프 단위로 딸려오기 때문이다.
+
+**규칙 (2가지).**
+
+1. 서버 전용 모듈 최상단에 `import 'server-only';`를 선언해 클라이언트 번들 유입을 빌드 에러로 차단한다.
+2. 슬라이스는 두 개의 public 진입점을 갖는다:
+   - `index.ts` — **클라이언트 안전 심볼 전용** 배럴. 클라이언트 컴포넌트는 `@/entities/<slice>`(index)에서 import한다.
+   - `server.ts` — **서버 전용 심볼 전용** 배럴. 서버 컴포넌트는 `@/entities/<slice>/server`에서 import한다.
+   - 서버 전용 심볼(서버 페처, 캐시 태그, `cache()` 래퍼 등)은 절대 `index.ts`에 두지 않는다.
+   - 타입 전용 export(`export type`)는 런타임 번들에 영향이 없으므로 편의상 공용 `index.ts`에 유지해도 된다.
+
+**레퍼런스 구현.** `src/entities/news/`가 이 패턴의 기준 예시다.
+
+- `index.ts` — 클라이언트 안전 심볼(queryOptions, 쿼리키, 타입, `revalidateNewsCache` 등)
+- `server.ts` — 서버 전용 심볼(`getNewsList`/`getNewsPost`, `NEWS_CACHE_TAG`/`newsPostCacheTag`)
+- `api/newsServerFetch.ts` — 최상단 `import 'server-only';` 선언
+
+**린트.** `eslint.config.mjs`의 FSD boundaries는 `index.ts`와 `server.ts` 두 진입점을 모두 슬라이스 public API로 허용한다(`internalPath: "!{index,server}.ts"`). 내부 파일 deep import는 여전히 금지된다.
+
 ## 상수 관리 규칙 (하드코딩 금지)
 
 회사명·전화번호·주소·슬로건·SNS 링크 등 반복 사용되는 사이트 메타 정보는 **반드시** `src/shared/config/site.ts`에서 import해 사용한다.
