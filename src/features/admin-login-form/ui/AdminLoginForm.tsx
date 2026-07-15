@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useMutation } from '@tanstack/react-query';
 import { adminLogin, useAdminAuthStore } from '@/entities/admin-auth';
 import { SITE } from '@/shared/config/site';
+import { Button } from '@/shared/ui';
 import { isAxiosError } from 'axios';
 
 const schema = z.object({
@@ -14,6 +15,12 @@ const schema = z.object({
 });
 
 type FormValues = z.infer<typeof schema>;
+
+// 입력 공통 스타일 — 정상/에러 상태만 분기(border + focus ring)
+const INPUT_BASE =
+  'w-full min-h-11 rounded-btn border bg-surface px-4 py-3 text-sm text-ink placeholder:text-faint transition-shadow focus:outline-none focus:ring-2 focus:border-transparent';
+const INPUT_NORMAL = 'border-hairline focus:ring-brand';
+const INPUT_ERROR = 'border-error focus:ring-error';
 
 export function AdminLoginForm() {
   const router = useRouter();
@@ -54,7 +61,7 @@ export function AdminLoginForm() {
     <form onSubmit={handleSubmit(onSubmit)} noValidate className="flex flex-col gap-5">
       {/* username 입력 그룹 */}
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="username" className="text-[14px] font-medium text-heading-dark">
+        <label htmlFor="username" className="text-sm font-medium text-ink">
           아이디
         </label>
         <input
@@ -63,14 +70,10 @@ export function AdminLoginForm() {
           autoComplete="username"
           placeholder="아이디를 입력하세요"
           {...register('username')}
-          className={`w-full bg-surface-light rounded-md px-4 py-3 text-[15px] text-heading-dark placeholder:text-secondary-dark focus:outline-none focus:ring-2 focus:border-transparent transition-shadow min-h-[44px] border ${
-            errors.username
-              ? 'border-error focus:ring-error'
-              : 'border-border-light focus:ring-aircok-blue'
-          }`}
+          className={`${INPUT_BASE} ${errors.username ? INPUT_ERROR : INPUT_NORMAL}`}
         />
         {errors.username && (
-          <p role="alert" className="text-[13px] text-error leading-[1.33] mt-1">
+          <p role="alert" className="mt-1 text-xs leading-snug text-error">
             {errors.username.message}
           </p>
         )}
@@ -78,7 +81,7 @@ export function AdminLoginForm() {
 
       {/* password 입력 그룹 */}
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="password" className="text-[14px] font-medium text-heading-dark">
+        <label htmlFor="password" className="text-sm font-medium text-ink">
           비밀번호
         </label>
         <input
@@ -87,14 +90,10 @@ export function AdminLoginForm() {
           autoComplete="current-password"
           placeholder="비밀번호를 입력하세요"
           {...register('password')}
-          className={`w-full bg-surface-light rounded-md px-4 py-3 text-[15px] text-heading-dark placeholder:text-secondary-dark focus:outline-none focus:ring-2 focus:border-transparent transition-shadow min-h-[44px] border ${
-            errors.password
-              ? 'border-error focus:ring-error'
-              : 'border-border-light focus:ring-aircok-blue'
-          }`}
+          className={`${INPUT_BASE} ${errors.password ? INPUT_ERROR : INPUT_NORMAL}`}
         />
         {errors.password && (
-          <p role="alert" className="text-[13px] text-error leading-[1.33] mt-1">
+          <p role="alert" className="mt-1 text-xs leading-snug text-error">
             {errors.password.message}
           </p>
         )}
@@ -102,23 +101,21 @@ export function AdminLoginForm() {
 
       {/* 폼 레벨 에러 */}
       {hasRootError && (
-        <p role="alert" className="text-[13px] text-error leading-[1.33] -mt-1">
+        <p role="alert" className="-mt-1 text-xs leading-snug text-error">
           {errors.root?.message}
         </p>
       )}
 
-      {/* 제출 버튼 */}
-      <button
+      {/* 제출 버튼 — 공용 primary CTA(그라디언트) 재사용 */}
+      <Button
         type="submit"
+        variant="primary"
+        size="md"
         disabled={isPending}
-        className={`w-full bg-aircok-blue text-heading-light text-[17px] font-medium rounded-md py-3 min-h-[44px] transition-colors focus:outline-none ${
-          isPending
-            ? 'opacity-60 cursor-not-allowed'
-            : 'hover:bg-aircok-blue-dark active:scale-[0.97] focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:ring-offset-2'
-        }`}
+        className="mt-1 w-full"
       >
         {isPending ? '로그인 중...' : '로그인'}
-      </button>
+      </Button>
     </form>
   );
 }
