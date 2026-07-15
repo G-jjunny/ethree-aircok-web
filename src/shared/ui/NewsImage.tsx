@@ -13,6 +13,14 @@ type NewsImageProps = {
   alt: string
   ratio?: 'video' | 'featured' | 'row-thumb' | 'card'
   theme?: 'light' | 'dark'
+  /**
+   * 표시 모드.
+   * - `'crop'`(기본): `ratio`별 고정비율 컨테이너 + object-cover/contain 크롭. 목록 카드·썸네일용.
+   * - `'natural'`: 원본 비율을 그대로 유지하는 인트린식 렌더(크롭 없음). 뉴스 상세 히어로 전용.
+   *   세로 포스터/가로 배너 등 비율이 제각각인 커버 이미지를 잘림 없이 전체 노출한다.
+   *   `natural` 모드에서는 `ratio`가 무시된다.
+   */
+  fit?: 'crop' | 'natural'
   /** 이미지 컨테이너에 추가할 클래스 (object-position·scale·max-h 등) */
   className?: string
   /** LCP 후보(뉴스 목록 featured 히어로·상세 히어로)일 때만 true. 기본 lazy. */
@@ -46,12 +54,25 @@ function resolveSrc(src: string): string {
   return src.startsWith('/') ? src : `${API_BASE}${src}`
 }
 
+/** natural 모드 nominal 치수 — 운영 DB 커버 실측(세로 포스터 720x960 = 3:4).
+ * next/image intrinsic 요건 충족 + 초기 CLS 최소화용 placeholder 값일 뿐,
+ * 실제 렌더는 w-full/h-auto(style width:100%/height:auto)로 원본 비율을 따른다. */
+const NATURAL_NOMINAL = { width: 720, height: 960 } as const
+
 /**
- * 뉴스 커버 이미지 + 폴백 placeholder. 이미지 있으면 next/image(fill), 없으면 §4 Image Placeholder.
- * fill 컨테이너에 ratio별 aspect를 부여해 CLS를 방지한다.
- * ratio별 object-fit 분기: video/featured는 object-cover(의도된 크롭 art-direction),
- * row-thumb은 object-contain + 테마별 레터박스 배경(원본 비율 전체 보존).
- * design.md §4 "News Horizontal Row" 결정 근거 / §13.3 계약.
+ * 뉴스 커버 이미지 + 폴백 placeholder.
+ *
+ * - `fit="crop"`(기본): 이미지 있으면 next/image(fill), 없으면 §4 Image Placeholder.
+ *   fill 컨테이너에 ratio별 aspect를 부여해 CLS를 방지한다.
+ *   ratio별 object-fit 분기: video/featured는 object-cover(의도된 크롭 art-direction),
+ *   row-thumb은 object-contain + 테마별 레터박스 배경(원본 비율 전체 보존).
+ *   design.md §4 "News Horizontal Row" 결정 근거 / §13.3 계약.
+ * - `fit="natural"`(뉴스 상세 히어로 전용): 고정비율 크롭 컨테이너를 쓰지 않고
+ *   원본 비율 그대로 인트린식 렌더. 비율을 강제하지 않으므로 세로/가로 어떤 커버든
+ *   잘림 없이 전체가 보인다. 세로 포스터가 화면을 다 먹지 않도록 reading 칼럼 폭
+ *   (`max-w-reading` = 760px 토큰)으로 가운데 정렬 제한한다. overflow-x 발생 없음.
+ *
+ * 순수 UI(서버/클라 양쪽 안전) — 'use client'/서버 전용 import 없음.
  */
 export function NewsImage({
   src,
@@ -61,7 +82,38 @@ export function NewsImage({
   className = '',
   priority = false,
   sizes,
+  fit = 'crop',
 }: NewsImageProps) {
+  // ── 상세 히어로 전용: 원본 비율 인트린식(크롭 없음) ──
+  // ratio/aspect 컨테이너를 쓰지 않고 이미지 자체를 반응형 인트린식으로 렌더한다.
+  if (fit === 'natural') {
+    if (src) {
+      return (
+        <Image
+          src={resolveSrc(src)}
+          alt={alt}
+          width={NATURAL_NOMINAL.width}
+          height={NATURAL_NOMINAL.height}
+          sizes={sizes ?? '(min-width: 800px) 760px, 100vw'}
+          priority={priority}
+          // style: next/image 기본 치수 스타일보다 우선 적용해 원본 비율(height:auto)을 보장.
+          style={{ width: '100%', height: 'auto' }}
+          className={`mx-auto block h-auto w-full max-w-reading rounded-image ${className}`.trim()}
+        />
+      )
+    }
+    // 이미지 미확보 폴백 — 원본 비율을 알 수 없으므로 카드 비율 placeholder를
+    // 동일한 reading 칼럼 폭으로 가운데 정렬해 레이아웃을 유지한다.
+    return (
+      <PagePlaceholder
+        variant={theme === 'dark' ? 'dark' : 'surface'}
+        rounded="rounded-image"
+        className={`mx-auto aspect-card w-full max-w-reading ${className}`.trim()}
+        label="Aircok News"
+      />
+    )
+  }
+
   const aspect = ASPECT[ratio]
 
   if (src) {

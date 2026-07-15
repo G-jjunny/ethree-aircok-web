@@ -60,8 +60,8 @@ export function NewsDetailHeroSection({ post }: Props) {
       </div>
 
       {/* 대표 이미지 */}
-      <div className="mt-7 overflow-hidden rounded-card">
-        <NewsImage src={post.coverImage} alt={post.title} ratio="video" priority />
+      <div className="mt-7">
+        <NewsImage src={post.coverImage} alt={post.title} fit="natural" priority />
       </div>
     </header>
   );
