@@ -196,7 +196,7 @@ export function CatalogViewerSection({ pages, images }: CatalogViewerSectionProp
             type="range"
             min={1}
             max={sliderMax}
-            value={hasPages ? state.currentStartPage : 1}
+            value={hasPages ? (Number.isFinite(state.currentStartPage) ? state.currentStartPage : 1) : 1}
             disabled={!hasPages}
             onChange={(e) => viewerRef.current?.goToPage(Number(e.target.value))}
             aria-label={V.title}
