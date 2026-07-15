@@ -56,7 +56,8 @@ services:
         npm run prisma:seed &&
         npm run prisma:seed:news &&
         npm run prisma:seed:core-values &&
-        npm run prisma:seed:timeline
+        npm run prisma:seed:timeline &&
+        npm run prisma:seed:media
     restart: "no"
 
   server:
