@@ -142,6 +142,8 @@ AQI 바 그라디언트: `from-aqi-good via-brand via-aqi-warning to-aqi-bad`.
 
 **줄무늬 플레이스홀더(이미지 자산 폴백, 유틸)**: `stripes-surface`(회색계) · `stripes-tint`(연블루계) · `stripes-dark`(네이비 섹션 위 흰색 반투명 라인). `-45deg` 대각선 repeating-linear-gradient — 각도·줄 간격은 패턴 정의 자체(하드코딩 아님, marquee `translateX(-50%)` 와 동일 취급). 공용 컴포넌트 `<PagePlaceholder>`가 세 톤을 감싸며, 모든 이미지 자산 미확보 자리(뉴스 coverImage 폴백·About 이미지 자리 등)의 **단일 표준**이다.
 
+**Catalog 진행 슬라이더(기능 유틸)**: `catalog-range` — 카탈로그 뷰어 다크 푸터의 `<input type="range">` 페이지 진행 바. 트랙은 `--color-brand`→`--color-cyan` 그라디언트, 썸은 다크 위 대비를 위한 흰 원(`surface-white` + `cyan` 2px 링 + `shadow-brand-sm`). webkit(`::-webkit-slider-runnable-track`/`-thumb`)·moz(`::-moz-range-track`/`-thumb`) 양쪽 커버, focus-visible 링 포함. 트랙 6px·썸 16px 형상값과 수직 정렬 오프셋은 컨트롤 형상 정의(하드코딩 색 아님). `input`에는 `catalog-range appearance-none bg-transparent` 조합으로 적용.
+
 **content-container**: `max-width:1240px; margin-inline:auto; padding-inline:2rem`.
 
 **reading 칼럼**: `max-w-reading`(=`--container-reading` 47.5rem/760px). 뉴스 상세 article·PageHero 텍스트 칼럼 등 좁은 읽기 폭. content-container 내부에서 `mx-auto max-w-reading` 로 조합.

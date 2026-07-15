@@ -190,8 +190,8 @@ export function CatalogViewerSection({ pages, images }: CatalogViewerSectionProp
             disabled={!hasPages}
             onChange={(e) => viewerRef.current?.goToPage(Number(e.target.value))}
             aria-label={V.title}
-            // token 없음: brand→cyan 트랙 그라디언트는 accent-color 단색만 적용(의사요소 트랙은 Polish 대상)
-            className="h-1.5 flex-1 cursor-pointer appearance-none rounded-pill bg-white/12 accent-brand disabled:cursor-not-allowed disabled:opacity-40"
+            // 트랙 brand→cyan 그라디언트 + 대비 썸: globals.css `catalog-range` 유틸(webkit/moz 의사요소)에서 토큰 var 로 정의
+            className="catalog-range h-4 flex-1 cursor-pointer appearance-none bg-transparent disabled:cursor-not-allowed disabled:opacity-40"
           />
           <span className="whitespace-nowrap text-sm text-white/60 tabular-nums">
             / 총 {state.totalPages}페이지
