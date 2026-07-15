@@ -3,8 +3,8 @@ import {
   getNewsPost,
   NEWS_CACHE_TAG,
   newsPostCacheTag,
-  type NewsPost,
-} from '@/entities/news';
+} from '@/entities/news/server';
+import type { NewsPost } from '@/entities/news';
 import { SITE } from '@/shared/config';
 import { NewsDetailHeroSection } from './NewsDetailHeroSection';
 import { NewsDetailContentSection } from './NewsDetailContentSection';

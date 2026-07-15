@@ -1,14 +1,10 @@
+import 'server-only';
 import { cache } from 'react';
 import axios from 'axios';
 import { ApiError } from '@/shared/api';
 import type { NewsPost, NewsListResponse, NewsType } from '../model/types';
 
 export class NewsApiError extends ApiError {}
-
-/** 뉴스 목록 캐시 태그. 뉴스 create/update/delete 뮤테이션 후 updateTag로 무효화한다. */
-export const NEWS_CACHE_TAG = 'news';
-/** 뉴스 상세 캐시 태그 팩토리. `news-${id}` 단위로 상세 캐시를 무효화한다. */
-export const newsPostCacheTag = (id: string) => `news-${id}`;
 
 function getApiBaseUrl(): string {
   if (typeof window === 'undefined') {

@@ -3,12 +3,8 @@ import {
   HydrationBoundary,
   QueryClient,
 } from '@tanstack/react-query';
-import {
-  getNewsList,
-  newsKeys,
-  NEWS_PAGE_SIZE,
-  type NewsType,
-} from '@/entities/news';
+import { getNewsList } from '@/entities/news/server';
+import { newsKeys, NEWS_PAGE_SIZE, type NewsType } from '@/entities/news';
 import { NewsBoard } from './NewsBoard';
 
 type SearchParams = { [key: string]: string | string[] | undefined };

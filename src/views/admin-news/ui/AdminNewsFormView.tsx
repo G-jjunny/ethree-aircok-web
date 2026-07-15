@@ -1,4 +1,4 @@
-import { getNewsPost } from '@/entities/news';
+import { getNewsPost } from '@/entities/news/server';
 import { AdminPageHeader } from '@/shared/ui';
 import { AdminNewsFormWrapper } from './AdminNewsFormWrapper';
 

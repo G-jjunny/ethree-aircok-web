@@ -1,7 +1,7 @@
 'use server';
 
 import { updateTag } from 'next/cache';
-import { NEWS_CACHE_TAG, newsPostCacheTag } from './newsServerFetch';
+import { NEWS_CACHE_TAG, newsPostCacheTag } from './newsCacheTags';
 
 /**
  * 뉴스 캐시를 온디맨드 무효화한다.
