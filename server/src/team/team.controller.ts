@@ -17,6 +17,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { join } from 'path';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { decodeAndSanitizeUploadFilename } from '../common/utils/upload-filename.util';
 import { TeamService } from './team.service';
 import { CreateTeamImageDto } from './dto/create-team-image.dto';
 import { UpdateTeamImageDto } from './dto/update-team-image.dto';
@@ -37,7 +38,8 @@ const multerOptions = {
       file: Express.Multer.File,
       cb: (error: Error | null, filename: string) => void,
     ) => {
-      cb(null, `${Date.now()}-${file.originalname}`);
+      const safe = decodeAndSanitizeUploadFilename(file.originalname);
+      cb(null, `${Date.now()}-${safe}`);
     },
   }),
   // 허용 목록 외 mimetype 은 거부한다.
