@@ -587,6 +587,30 @@ export const SITE = {
       hero: {
         label: "Product Catalog",
       },
+      viewer: {
+        title: "제품 카탈로그",
+        subtitle: "PDF · 이미지 플립북",
+        helperNote:
+          "좌우 화살표로 페이지를 넘기고, 상단 도구모음에서 확대·전체화면·다운로드를 이용하세요.",
+        // 툴바/화살표/줌 접근성 라벨
+        prevLabel: "이전 페이지",
+        nextLabel: "다음 페이지",
+        zoomInLabel: "확대",
+        zoomOutLabel: "축소",
+        resetZoomLabel: "원래 크기",
+        fullscreenLabel: "전체화면",
+        exitFullscreenLabel: "전체화면 종료",
+        // 툴바 대표 PDF 다운로드 버튼
+        downloadPdfCta: "PDF 다운로드",
+        // 다운로드 섹션
+        downloadsTitle: "다운로드",
+        downloadsDescription: "관리자가 등록한 카탈로그 파일을 내려받으세요.",
+        downloadPdfLabel: "카탈로그 PDF",
+        downloadImageLabel: "카탈로그 이미지",
+        downloadCta: "다운로드",
+        fileTypePdf: "PDF",
+        fileTypeImage: "이미지",
+      },
     },
     faq: {
       title: "FAQ",
