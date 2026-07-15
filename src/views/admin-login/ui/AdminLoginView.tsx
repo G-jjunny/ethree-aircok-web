@@ -3,22 +3,23 @@ import { AdminLoginForm } from '@/features/admin-login-form';
 
 export function AdminLoginView() {
   return (
-    <main className="min-h-screen bg-surface-light flex items-center justify-center px-5 py-12">
-      {/* max-w-[420px]: 로그인 카드 전용 너비. 토큰 없음 — design.md §15.4에 사유 문서화 */}
-      <div className="bg-surface-white rounded-xl shadow-card w-full max-w-[420px] overflow-hidden flex flex-col">
-        {/* 카드 상단 헤더 — §15.4 Login Page */}
-        <div className="bg-aircok-blue px-8 py-8 flex flex-col items-center gap-2">
-          <p className="text-heading-light text-[22px] font-display font-semibold leading-snug">
-            {SITE.name}
+    <main className="min-h-screen bg-surface flex items-center justify-center px-5 py-12">
+      {/* max-w-[420px]: 단일 인증 카드 전용 너비. 표준 content(1240)/reading(760)보다 좁은 1회성 수치 — token 없음: 로그인 전용 예외 폭(design.md §5 예외 규칙에 따라 사유 주석 유지) */}
+      <div className="w-full max-w-[420px] flex flex-col gap-8 rounded-card-lg border border-hairline bg-surface-white px-8 py-10 shadow-card">
+        {/* 브랜드 헤더 — 워드마크(Sora) + 한글 타이틀(Pretendard) */}
+        <header className="flex flex-col items-center gap-2 text-center">
+          <p className="font-display text-sm font-bold uppercase tracking-eyebrow-lg text-brand">
+            {SITE.nameEn}
           </p>
-          <p className="text-heading-light/70 text-[15px]">
+          <h1 className="font-body text-2xl font-extrabold tracking-headline text-ink">
             관리자 로그인
+          </h1>
+          <p className="font-body text-sm text-muted">
+            {SITE.name} 콘솔 계정으로 로그인하세요
           </p>
-        </div>
-        {/* 폼 영역 */}
-        <div className="px-8 py-8">
-          <AdminLoginForm />
-        </div>
+        </header>
+
+        <AdminLoginForm />
       </div>
     </main>
   );
