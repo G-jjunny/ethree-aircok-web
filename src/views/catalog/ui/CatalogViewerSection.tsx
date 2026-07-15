@@ -40,8 +40,10 @@ export function CatalogViewerSection({ pages, images }: CatalogViewerSectionProp
   const viewerRef = useRef<FlipBookViewerHandle | null>(null)
 
   const [state, setState] = useState<FlipBookViewerState>({
-    currentPage: 0,
+    currentStartPage: 0,
+    currentEndPage: 0,
     totalPages: 0,
+    orientation: 'landscape',
     zoom: 1,
   })
   const [isFullscreen, setIsFullscreen] = useState(false)
@@ -80,7 +82,14 @@ export function CatalogViewerSection({ pages, images }: CatalogViewerSectionProp
 
   const zoomPercent = Math.round(state.zoom * 100)
   const hasPages = state.totalPages > 0
-  const sliderMax = Math.max(0, state.totalPages - 1)
+  // 슬라이더/인디케이터는 1-based 콘텐츠 페이지 기준(min 1 … max 총 페이지 수).
+  const sliderMax = Math.max(1, state.totalPages)
+  // 현재 보고 있는 콘텐츠 페이지 표기: 양면 스프레드면 범위("4–5"), 단면이면 단일("4").
+  const pageLabel = !hasPages
+    ? '–'
+    : state.currentStartPage === state.currentEndPage
+      ? String(state.currentStartPage)
+      : `${state.currentStartPage}–${state.currentEndPage}`
 
   return (
     <section className="flex flex-col gap-4">
@@ -179,14 +188,15 @@ export function CatalogViewerSection({ pages, images }: CatalogViewerSectionProp
 
         {/* 푸터바: 페이지 인디케이터 + 진행 슬라이더 + 총 페이지 */}
         <div className="flex items-center gap-4 border-t border-white/8 px-5 py-4">
-          <span className="font-display text-sm text-white/85 tabular-nums">
-            {hasPages ? state.currentPage + 1 : '–'}
+          {/* min-w-12(48px): 표기값(–/1/4–5/10–11)이 바뀌어도 span 폭 고정 → 옆 flex-1 슬라이더 밀림 방지. text-center 로 라벨 정렬 안정화. */}
+          <span className="min-w-12 text-center font-display text-sm text-white/85 tabular-nums">
+            {pageLabel}
           </span>
           <input
             type="range"
-            min={0}
+            min={1}
             max={sliderMax}
-            value={state.currentPage}
+            value={hasPages ? state.currentStartPage : 1}
             disabled={!hasPages}
             onChange={(e) => viewerRef.current?.goToPage(Number(e.target.value))}
             aria-label={V.title}
