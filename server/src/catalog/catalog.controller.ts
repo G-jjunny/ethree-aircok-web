@@ -18,6 +18,7 @@ import { diskStorage } from 'multer';
 import { join } from 'path';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CacheControlInterceptor } from '../common/interceptors/http-cache.interceptor';
+import { decodeAndSanitizeUploadFilename } from '../common/utils/upload-filename.util';
 import { CatalogService } from './catalog.service';
 import { CreateCatalogImageDto } from './dto/create-catalog-image.dto';
 import { UpdateCatalogImageDto } from './dto/update-catalog-image.dto';
@@ -36,7 +37,8 @@ const multerOptions = {
   storage: diskStorage({
     destination: join(__dirname, '..', '..', '..', 'public', 'uploads'),
     filename: (_req: Express.Request, file: Express.Multer.File, cb: (error: Error | null, filename: string) => void) => {
-      cb(null, `${Date.now()}-${file.originalname}`);
+      const safe = decodeAndSanitizeUploadFilename(file.originalname);
+      cb(null, `${Date.now()}-${safe}`);
     },
   }),
   // 허용 목록 외 mimetype 은 거부한다.
