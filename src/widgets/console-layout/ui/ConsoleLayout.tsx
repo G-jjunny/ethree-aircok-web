@@ -129,21 +129,44 @@ export function ConsoleLayout({ children }: Props) {
           aria-label="콘솔 내비게이션"
           className="flex flex-col gap-1 p-3 flex-1 overflow-y-auto"
         >
-          {SITE.admin.nav.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              aria-current={isNavActive(item.href) ? 'page' : undefined}
-              onClick={() => setDrawerOpen(false)}
-              className={
-                isNavActive(item.href)
-                  ? 'flex items-center gap-3 rounded-md px-3 py-2.5 min-h-[44px] text-sm font-body font-semibold bg-aircok-blue text-heading-light transition-colors'
-                  : 'flex items-center gap-3 rounded-md px-3 py-2.5 min-h-[44px] text-sm font-body text-secondary-dark hover:bg-surface-light hover:text-heading-dark transition-colors'
-              }
-            >
-              {item.label}
-            </Link>
-          ))}
+          {SITE.admin.nav.map((group, groupIndex) => {
+            // 라벨 없는 그룹(기본 메뉴)은 헤딩 없이 항목만 렌더한다.
+            const headingId = group.label
+              ? `console-nav-group-${groupIndex}`
+              : undefined;
+            return (
+              <div
+                key={group.label ?? 'default'}
+                role="group"
+                aria-labelledby={headingId}
+                className="flex flex-col gap-1"
+              >
+                {group.label && (
+                  <h2
+                    id={headingId}
+                    className="px-3 pt-4 pb-1 text-eyebrow font-body font-semibold uppercase tracking-eyebrow text-muted"
+                  >
+                    {group.label}
+                  </h2>
+                )}
+                {group.items.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    aria-current={isNavActive(item.href) ? 'page' : undefined}
+                    onClick={() => setDrawerOpen(false)}
+                    className={
+                      isNavActive(item.href)
+                        ? 'flex items-center gap-3 rounded-md px-3 py-2.5 min-h-[44px] text-sm font-body font-semibold bg-aircok-blue text-heading-light transition-colors'
+                        : 'flex items-center gap-3 rounded-md px-3 py-2.5 min-h-[44px] text-sm font-body text-secondary-dark hover:bg-surface-light hover:text-heading-dark transition-colors'
+                    }
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+              </div>
+            );
+          })}
         </nav>
         <div className="mt-auto border-t border-border-light p-3 flex flex-col gap-2 shrink-0">
           {user && (

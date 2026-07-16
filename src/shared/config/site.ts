@@ -4,6 +4,15 @@ export const SITE = {
   legalName: "(주)에어콕",
   url: "https://smartaircok.com",
 
+  /**
+   * 주방·조리실 공기질 개선 서브브랜드(에어셰프).
+   * `/services` 주방 탭에서 워드마크·eyebrow·본문에 반복 노출되므로 상수로 관리한다.
+   */
+  airChef: {
+    name: "에어셰프",
+    nameEn: "AIR CHEF",
+  },
+
   tagline:
     "스마트 에어콕은 실내 공기질 관리로 근무자의 생산성 향상과 기업 가치를 향상시킵니다.",
   description:
@@ -574,7 +583,9 @@ export const SITE = {
       title: "공기질 관리 제품군",
       description: "에어콕의 공기질 관리 제품 라인업을 확인하세요.",
       hero: {
-        label: "Products",
+        label: "PRODUCTS",
+        headline: "제품군",
+        body: "공간의 성격에 맞춘 두 가지 공기질 솔루션. 실내 전반의 공기질을 관리하는 스마트 에어콕과, 주방·조리실 특화 에어셰프 시스템을 소개합니다.",
       },
     },
     diagnosis: {
@@ -637,16 +648,36 @@ export const SITE = {
     basePath: "/console",
     loginPath: "/console/login",
     homePath: "/",
+    /**
+     * 콘솔 사이드바 내비게이션(그룹 구조).
+     * 각 그룹의 `label`이 null이면 그룹 헤딩 없이 항목만 렌더한다(기본 메뉴).
+     * 항목 라벨/경로는 이 상수가 단일 출처다 — 컴포넌트에 문자열을 박지 않는다.
+     */
     nav: [
-      { label: "대시보드", href: "/console" },
-      { label: "소개 페이지 관리", href: "/console/about" },
-      { label: "서비스 이미지 관리", href: "/console/services-images" },
-      { label: "진단서비스 신청 관리", href: "/console/diagnosis-images" },
-      { label: "뉴스 관리", href: "/console/news" },
-      { label: "FAQ 관리", href: "/console/faq" },
-      { label: "카탈로그 관리", href: "/console/catalog" },
-      { label: "문의 관리", href: "/console/inquiries" },
-      { label: "사이트 설정", href: "/console/site-info" },
+      {
+        label: null,
+        items: [
+          { label: "대시보드", href: "/console" },
+          { label: "소개 페이지 관리", href: "/console/about" },
+          { label: "진단서비스 신청 관리", href: "/console/diagnosis-images" },
+          { label: "뉴스 관리", href: "/console/news" },
+          { label: "FAQ 관리", href: "/console/faq" },
+          { label: "카탈로그 관리", href: "/console/catalog" },
+          { label: "문의 관리", href: "/console/inquiries" },
+          { label: "사이트 설정", href: "/console/site-info" },
+        ],
+      },
+      {
+        label: "실내 공기질 관리 시스템",
+        items: [
+          { label: "공기질 측정기", href: "/console/air-devices" },
+          { label: "이미지 관리", href: "/console/indoor-images" },
+        ],
+      },
+      {
+        label: "주방 조리실 관리 시스템",
+        items: [{ label: "이미지 관리", href: "/console/kitchen-images" }],
+      },
     ],
     inquiryTabs: [
       { key: "list", label: "문의 내역" },
