@@ -523,6 +523,8 @@ model AirDeviceItem {
 /// - BRAND_BG_INDOOR / BRAND_BG_KITCHEN: 브랜드 섹션 배경 이미지(실내 / 주방).
 /// - MONITORING_DASHBOARD / MONITORING_STATS / MONITORING_DEVICES / MONITORING_DID: 모니터링 섹션 이미지.
 /// - DIAGNOSIS_VISIT / DIAGNOSIS_ANALYSIS / DIAGNOSIS_REPORT / DIAGNOSIS_PROPOSAL: 진단 서비스 섹션 이미지.
+/// - KITCHEN_BLACKBOX_PRODUCT / KITCHEN_BLACKBOX_DID / KITCHEN_AIRSHIELD_TECH: 주방 섹션 이미지
+///   (블랙박스 제품 사진 / 조리실 오염 현황 DID / 에어쉴드 특허 급기 기술).
 enum ProductImageSlot {
   BRAND_BG_INDOOR
   BRAND_BG_KITCHEN
@@ -534,6 +536,9 @@ enum ProductImageSlot {
   DIAGNOSIS_ANALYSIS
   DIAGNOSIS_REPORT
   DIAGNOSIS_PROPOSAL
+  KITCHEN_BLACKBOX_PRODUCT
+  KITCHEN_BLACKBOX_DID
+  KITCHEN_AIRSHIELD_TECH
 }
 
 /// `/services` 페이지 섹션 이미지 (슬롯 단위 고정 배치) (#services 1단계).
