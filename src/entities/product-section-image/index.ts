@@ -18,5 +18,7 @@ export {
   ProductSectionImageApiError,
   getProductSectionImageList,
   productSectionImageListQueryOptions,
+  getAdminProductSectionImageList,
+  adminProductSectionImageListQueryOptions,
 } from './api/productSectionImageApi';
 export { revalidateProductSectionImagesCache } from './api/revalidateProductSectionImages';

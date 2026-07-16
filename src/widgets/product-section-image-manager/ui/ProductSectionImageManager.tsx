@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import {
-  productSectionImageListQueryOptions,
+  adminProductSectionImageListQueryOptions,
   toSlotImageMap,
 } from '@/entities/product-section-image'
 import type { ProductImageSlot } from '@/entities/product-section-image'
@@ -35,8 +35,12 @@ export interface ProductSectionImageManagerProps {
  * `/services` 섹션 이미지의 슬롯 고정 관리 블록.
  *
  * 슬롯 목록/라벨만 바꿔 여러 어드민 화면(실내·주방)에서 재사용한다.
- * 데이터는 슬롯 전체를 한 번에 내려주는 공개 목록 엔드포인트 하나이므로,
+ * 데이터는 슬롯 전체를 한 번에 내려주는 어드민 목록 엔드포인트(GET /product-images/admin) 하나이므로,
  * 한 페이지에 이 위젯이 여러 개 있어도 TanStack Query 캐시가 요청을 합쳐준다.
+ *
+ * 공개 GET(/product-images)이 아니라 어드민 GET을 쓰는 이유: 공개 응답은
+ * `Cache-Control: public, max-age=60`이라 삭제 성공(204) 후 재요청해도 브라우저 HTTP 캐시가
+ * 낡은 목록을 돌려줘 삭제된 이미지가 계속 보였다. 어드민 GET은 no-store다.
  *
  * 이 모델에는 order 컬럼이 없다(슬롯 = 고정 자리) — 따라서 DnD 정렬을 제공하지 않는다.
  */
@@ -46,7 +50,7 @@ export function ProductSectionImageManager({
   slots,
 }: ProductSectionImageManagerProps) {
   const { data: images = [], isLoading } = useQuery(
-    productSectionImageListQueryOptions(),
+    adminProductSectionImageListQueryOptions(),
   )
   const [deletingSlot, setDeletingSlot] = useState<ProductImageSlot | null>(null)
   const deleteMutation = useDeleteProductSectionImageMutation()

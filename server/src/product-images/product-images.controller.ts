@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Header,
   HttpCode,
   HttpStatus,
   Param,
@@ -63,6 +64,25 @@ export class ProductImagesController {
   }
 
   /**
+   * GET /api/product-images/admin — JWT 인증 필요. 어드민 전용, 무캐시.
+   *
+   * 응답 스키마는 공개 GET 과 완전히 동일하다(필터 차이 없음). 별도 엔드포인트를 두는 목적은
+   * **HTTP 캐시 회피**다: 공개 GET 은 CacheControlInterceptor(60) 로 60초 캐시되므로
+   * 어드민이 업로드/삭제 직후 목록을 다시 불러오면 갱신 전 응답을 볼 수 있다.
+   * 여기서는 CacheControlInterceptor 대신 @Header 로 무캐시를 명시해 항상 최신 상태를 보장한다.
+   *
+   * 주의: 반드시 PUT/DELETE /:slot 보다 먼저 선언해야 한다.
+   * 그렇지 않으면 NestJS 라우터가 'admin' 을 :slot 으로 매칭한다.
+   */
+  @UseGuards(JwtAuthGuard)
+  @Get('admin')
+  @Header('Cache-Control', 'no-store, no-cache, must-revalidate')
+  @Header('Pragma', 'no-cache')
+  findAllAdmin() {
+    return this.productImagesService.findAllAdmin();
+  }
+
+  /**
    * PUT /api/product-images/:slot — JWT 인증 필요.
    * multipart(필드명 file) 업로드 → R2(folder: product-sections) → slot 기준 upsert.
    * :slot 은 ProductImageSlot enum 값만 허용하며, 위반 시 ParseEnumPipe 가 400 을 반환한다.
@@ -81,7 +101,10 @@ export class ProductImagesController {
     return this.productImagesService.upsert(slot, url);
   }
 
-  /** DELETE /api/product-images/:slot — JWT 인증 필요. 204 No Content. 미등록 슬롯은 404. */
+  /**
+   * DELETE /api/product-images/:slot — JWT 인증 필요. 204 No Content.
+   * 미등록 슬롯이어도 204 — 멱등하다(PUT upsert 와 대칭). 상세 근거는 서비스 remove() 주석 참고.
+   */
   @UseGuards(JwtAuthGuard)
   @Delete(':slot')
   @HttpCode(HttpStatus.NO_CONTENT)

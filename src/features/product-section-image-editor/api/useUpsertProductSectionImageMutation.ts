@@ -42,6 +42,7 @@ export function useUpsertProductSectionImageMutation() {
       return data;
     },
     onSuccess: () => {
+      // prefix 부분 일치로 어드민(.admin) 캐시까지 함께 무효화된다.
       queryClient.invalidateQueries({ queryKey: productSectionImageKeys.all });
       void revalidateProductSectionImagesCache();
     },
