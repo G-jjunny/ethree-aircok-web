@@ -157,6 +157,15 @@
   --animate-marquee-left:  marquee-left 40s linear infinite;
   --animate-marquee-right: marquee-right 40s linear infinite;
 
+  /* Animation (장식 orb 부유 · 탭 패널 진입 페이드)
+     drift  = 다크 섹션의 aria-hidden 글로우 orb 앰비언트 부유(/services 브랜드 스트립·에어쉴드).
+              지속시간·이징 키워드는 marquee(40s linear) 와 동일하게 토큰 값에 인라인한다.
+     panel-fade = 탭 패널 진입. hidden(display:none) → 표시 전환 시 브라우저가 애니메이션을
+              재시작하므로 클라이언트 상태 추가 없이 탭 전환마다 재생된다. fill-mode 를 두지
+              않아 재생 후 자연 상태로 복귀한다(잔류 transform 이 만드는 containing block 회피). */
+  --animate-drift:      drift 18s ease-in-out infinite;
+  --animate-panel-fade: panel-fade 400ms var(--ease-out);
+
   /* ────────────────────────────────────────────────────────────
      DEPRECATED ALIASES — 구 토큰 → 신 토큰 (빌드 무결성용)
      각 컴포넌트 마이그레이션 완료 후 이 블록 전체를 삭제한다.
@@ -355,9 +364,52 @@ body {
   to   { transform: translateX(0); }
 }
 
+/* ── 장식 orb 드리프트 keyframes ──────────────────────────────
+   다크 섹션 위 blur 처리된 aria-hidden 글로우 orb 의 앰비언트 부유.
+   translate(30px,-24px) 진폭은 orb(h-130/w-130 = 520px)가 blur-xl 상태에서
+   경계를 드러내지 않고 움직이는 범위로, marquee 의 translateX(-50%) 와 동일하게
+   패턴 정의 자체다(색·간격 토큰이 아님).
+   ⚠️ src/views/home/ui/hero.module.css 의 로컬 heroDrift 가 동일 진폭의 중복 정의다.
+   홈 히어로는 16s/20s+reverse 2종 변주를 써서 단일 --animate-drift(18s)로 표현되지
+   않아 이번 범위(/services)에서는 통합하지 않았다. 후속 정리 대상. */
+@keyframes drift {
+  0%,
+  100% { transform: translate(0, 0); }
+  50%  { transform: translate(30px, -24px); }
+}
+
+/* ── 탭 패널 진입 페이드 keyframes ─────────────────────────────
+   translateY(10px) 는 "아래에서 올라오며 나타난다"는 진입 방향 정의 자체다.
+   transform/opacity 만 사용하므로 레이아웃 시프트(CLS)를 유발하지 않는다. */
+@keyframes panel-fade {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── prefers-reduced-motion ───────────────────────────────────
+   1) 무한 루프·진입 애니메이션은 완전히 끈다(animation:none). hero.module.css 의
+      .float/.driftA/.driftB 와 동일한 프로젝트 관행이다. fill-mode 가 없으므로
+      끈 상태 = 자연 상태(orb 는 제자리, 패널은 그대로 표시)라 잔상이 남지 않는다.
+   2) 그 외 모든 트랜지션·애니메이션(카드 리프트/그림자, 탭·캐러셀 호버 등)은 즉시
+      완료시킨다. `none` 이 아니라 0.01ms 를 쓰는 이유는 transitionend/animationend 가
+      계속 발생해 이벤트 의존 로직이 깨지지 않는 표준 리듀스드모션 리셋이기 때문이다.
+      결과적으로 hover:-translate-y-1 같은 상태 변화는 "이동 애니메이션"이 제거되고
+      포인터 직접 제어 하의 정적 상태 변화만 남는다(hover:bg-* 와 동일 범주).
+   ──────────────────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   .animate-marquee-left,
-  .animate-marquee-right {
+  .animate-marquee-right,
+  .animate-drift,
+  .animate-panel-fade {
     animation: none;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

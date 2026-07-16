@@ -163,6 +163,43 @@ AQI 바 그라디언트: `from-aqi-good via-brand via-aqi-warning to-aqi-bad`.
 
 **모션**: `duration-fast`(200ms, 커스텀 유틸리티) · `ease-out`(`cubic-bezier(0.16,1,0.3,1)`).
 
+### 애니메이션 토큰 (`--animate-*` + `@keyframes`)
+
+| 클래스 | 정의 | 용도 |
+| --- | --- | --- |
+| `animate-marquee-left` / `-right` | `marquee-* 40s linear infinite` | 파트너 로고 2줄 무한 스크롤(`<LogoMarquee>`) |
+| `animate-drift` | `drift 18s ease-in-out infinite` | 다크 섹션 장식 orb 앰비언트 부유 |
+| `animate-panel-fade` | `panel-fade 400ms var(--ease-out)` | 탭 패널 진입 페이드 |
+
+- 지속시간·이징 키워드는 `--animate-*` 토큰 **값에 인라인**한다(별도 `--duration-*` 토큰을 만들지 않는다 — marquee `40s linear` 선례).
+- `drift` 진폭 `translate(30px,-24px)`·`panel-fade` 의 `translateY(10px)` 는 marquee 의 `translateX(-50%)` 와 같은 **패턴/방향 정의 자체**이므로 하드코딩 수치가 아니다.
+- **`animate-drift` 대상은 `aria-hidden` 장식 orb 한정.** blur 처리된 글로우에만 쓰고 콘텐츠에는 쓰지 않는다.
+- **`animate-panel-fade` 는 fill-mode 를 두지 않는다.** 재생 후 자연 상태로 복귀시켜 잔류 `transform` 이 만드는 containing block(내부 fixed/sticky 오작동)을 피한다. `hidden`(display:none) → 표시 전환 시 브라우저가 애니메이션을 재시작하므로 클라이언트 상태·`key` 추가 없이 전환마다 재생된다.
+- ⚠️ `src/views/home/ui/hero.module.css` 의 로컬 `heroDrift`(16s / 20s reverse 2종)는 동일 진폭의 **중복 정의**다. 단일 `animate-drift`(18s)로 표현되지 않아 통합하지 않았다 — 후속 정리 대상.
+
+### 카드 호버 표준
+
+반복되는 className 레시피이며 마크업 구조가 제각각(`li`·`div`·grid item)이라 **공용 컴포넌트로 만들지 않는다**. 아래 레시피를 그대로 인라인한다(`NewsCard`·`LightStatCard`·`DarkStatCard` 선례).
+
+| 대상 | 레시피 |
+| --- | --- |
+| 라이트 섹션 카드 | `transition-all duration-fast ease-out hover:-translate-y-1 hover:shadow-card` |
+| 라이트 섹션 그리드 카드 · 스크린 목업 | `… hover:-translate-y-1 hover:shadow-float` (+ 보더가 있으면 계열 보더 강조) |
+| 다크 섹션 카드 | `… hover:-translate-y-1` + **보더/배경 강조** (그림자는 다크 위에서 읽히지 않는다) |
+
+- 계열 보더 강조: 실내=`hover:border-tint-border` · 주방=`hover:border-chef-tint-border`(라이트) / `hover:border-chef-soft/40`(다크). **계열 분리 원칙 §2 를 호버에도 적용**한다.
+- 리프트는 `transform` 이라 레이아웃 시프트(CLS)가 없다. `top`/`height` 등으로 대체 금지.
+- **호버에 정보를 싣지 않는다.** 터치·키보드 사용자가 접근할 수 없으므로 어포던스(클릭 가능함의 힌트) 이상을 담지 않는다. 인터랙티브 요소는 `focus-visible:ring-brand` 를 함께 제공한다.
+
+### `prefers-reduced-motion` (필수)
+
+`globals.css` 하단 블록이 **전역으로** 처리하므로 개별 컴포넌트에서 다시 분기하지 않는다.
+
+1. 무한 루프·진입 애니메이션(`animate-marquee-*`·`animate-drift`·`animate-panel-fade`)은 `animation: none` 으로 **완전히** 끈다. fill-mode 가 없어 끈 상태 = 자연 상태다(orb 제자리 · 패널 그대로 표시).
+2. 그 외 모든 트랜지션·애니메이션은 `*`/`::before`/`::after` 리셋으로 즉시 완료시킨다(`animation-duration`/`transition-duration: 0.01ms !important`, `animation-iteration-count: 1`). `none` 이 아니라 `0.01ms` 인 이유는 `transitionend`/`animationend` 가 계속 발생해 이벤트 의존 로직을 깨지 않는 표준 리셋이기 때문이다.
+
+결과적으로 `hover:-translate-y-1` 같은 호버 상태 변화는 **이동 애니메이션이 제거되고** 포인터 직접 제어 하의 정적 상태 변화만 남는다(`hover:bg-*` 와 동일 범주 — WCAG 2.3.3 은 상호작용으로 촉발되는 *모션 애니메이션*이 대상). **신규 모션은 이 블록이 자동으로 커버하므로 컴포넌트에 별도 대응을 추가하지 않는다.**
+
 **Aspect(매거진 레이아웃, 기능 토큰)**: `aspect-featured`(16/7) · `aspect-card`(16/10, 뉴스 목록 카드 썸네일) · `aspect-row-thumb`(4/3).
 
 **줄무늬 플레이스홀더(이미지 자산 폴백, 유틸)**: `stripes-surface`(회색계) · `stripes-tint`(연블루계) · `stripes-chef`(연청록계 — AIR CHEF 주방 섹션) · `stripes-dark`(네이비 섹션 위 흰색 반투명 라인). `-45deg` 대각선 repeating-linear-gradient — 각도·줄 간격은 패턴 정의 자체(하드코딩 아님, marquee `translateX(-50%)` 와 동일 취급). 공용 컴포넌트 `<PagePlaceholder>`가 이 유틸들을 5종 `variant`(surface·tint·dark·chef·chef-dark)로 감싸며, 모든 이미지 자산 미확보 자리(뉴스 coverImage 폴백·About 이미지 자리·`/services` 슬롯 폴백 등)의 **단일 표준**이다. `chef-dark`는 별도 유틸 없이 `stripes-dark`를 재사용한다 — 흰색 반투명 라인은 계열 중립이고 배경색은 섹션의 `bg-chef-dark`가 제공하기 때문이다.
@@ -246,6 +283,6 @@ AQI 바 그라디언트: `from-aqi-good via-brand via-aqi-warning to-aqi-bad`.
 | `text-nav` (15) | `text-sm` |
 | `text-subheading` (21) | `text-xl` / `text-subtitle` |
 
-**유지(기능 토큰, 마이그레이션 대상 아님)**: `nav-bg*`, `overlay-*`, `aspect-featured`, `aspect-row-thumb`, `animate-marquee-*`, `success/warning/error`, `shadow-card`.
+**유지(기능 토큰, 마이그레이션 대상 아님)**: `nav-bg*`, `overlay-*`, `aspect-featured`, `aspect-row-thumb`, `animate-marquee-*`, `animate-drift`, `animate-panel-fade`, `success/warning/error`, `shadow-card`.
 
 > 구 올리브/크림/라임 방향 컴포넌트 명세는 이전 문서에서 이미 제거됐다. Blue-Tech 컴포넌트 명세(Hero·AQI Card·Trust Strip·Tabs·4-Step·Our Value·Platform·Wordmark·Clients·CTA·Footer)는 홈페이지/About 마이그레이션과 함께 재문서화한다. 그 전까지는 위 대응표로 구 토큰 사용처를 신 토큰으로 옮긴다.

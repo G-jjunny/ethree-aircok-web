@@ -64,6 +64,19 @@ SSOT: `docs/design.md` · 구현: `app/globals.css @theme inline` · 공용 컴�
 - 스페이싱: Tailwind 기본 4px 그리드. 섹션 수직 `py-24`(96)/`py-20`(80)/`py-28`(112)
 - 그림자: `shadow-brand-sm` `shadow-brand` `shadow-soft` `shadow-float` `shadow-card`(관리자)
 - 모션: `duration-fast`(200ms) `ease-out`
+- 애니메이션: `animate-marquee-left/right`(로고 마퀴) · `animate-drift`(다크 섹션 `aria-hidden` 장식 orb 부유) · `animate-panel-fade`(탭 패널 진입). 신규 keyframes 는 `--animate-*` 토큰 + `@keyframes` 로 globals.css 에 정의하고 design.md 에 문서화한다(지속시간·이징은 토큰 값에 인라인).
+
+### 카드 호버 표준 (className 레시피 — 공용 컴포넌트 아님)
+
+- 라이트 섹션 카드: `transition-all duration-fast ease-out hover:-translate-y-1 hover:shadow-card`
+- 라이트 그리드 카드/스크린 목업: 위 + `hover:shadow-float` (보더 있으면 계열 보더 강조)
+- 다크 섹션 카드: 리프트 + **보더/배경 강조** (그림자는 다크 위에서 안 읽힌다)
+- 계열 보더: 실내 `hover:border-tint-border` · 주방 `hover:border-chef-tint-border`(라이트) / `hover:border-chef-soft/40`(다크) — 계열 분리 원칙을 호버에도 적용
+- 리프트는 `transform` 만(CLS 금지). **호버에 정보를 싣지 않는다** — 어포던스까지만. 인터랙티브 요소는 `focus-visible:ring-brand` 동반.
+
+### prefers-reduced-motion
+
+globals.css 하단 블록이 **전역 처리**한다(무한/진입 애니메이션은 `animation:none`, 그 외는 0.01ms 리셋). **컴포넌트에서 다시 분기하지 말 것** — 신규 모션은 자동 커버된다.
 
 ### content-container (강제)
 
