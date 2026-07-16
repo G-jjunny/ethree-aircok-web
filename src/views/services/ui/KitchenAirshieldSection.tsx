@@ -54,20 +54,15 @@ const FEATURES: { icon: LucideIcon; title: string; body: string }[] = [
 /** 티어 카드의 4개 스펙 항목 — 3티어 공통 순서. */
 type TierSpec = { label: string; value: string }
 
-/**
- * 공간 규모별 3티어. `featured` 는 PREMIUM 강조 톤(청록 틴트) 여부 —
- * BASIC/LIGHT 는 중립 톤이라 한 카드에서만 true 다.
- */
+/** 공간 규모별 3티어 — 카드 톤은 3개 공통이라 티어별 강조 플래그를 두지 않는다. */
 const TIERS: {
   badge: string
   name: string
-  featured: boolean
   specs: TierSpec[]
 }[] = [
   {
     badge: 'PREMIUM',
     name: '에어셰프 프리미엄',
-    featured: true,
     specs: [
       { label: '규모', value: '300㎡ 이상 규모 식당시설' },
       { label: '주요 타겟', value: '학교, 대형 급식시설' },
@@ -78,7 +73,6 @@ const TIERS: {
   {
     badge: 'BASIC',
     name: '에어셰프 베이직',
-    featured: false,
     specs: [
       { label: '규모', value: '100㎡ 이상 규모 식당시설' },
       { label: '주요 타겟', value: '중소형 급식시설, 중대형식당' },
@@ -89,7 +83,6 @@ const TIERS: {
   {
     badge: 'LIGHT',
     name: '에어셰프 라이트',
-    featured: false,
     specs: [
       { label: '규모', value: '소형 식당시설' },
       { label: '주요 타겟', value: '소형식당' },
@@ -100,26 +93,20 @@ const TIERS: {
 ]
 
 /**
- * 티어 강조/중립 톤 매핑 — 구조는 공유하고 색상만 교체한다(ProcessFlow 의 TONE 규약과 동일).
+ * 티어 카드 톤 — 3개 카드 공통. 기본은 중립(흰 반투명), 호버 시 chef 틴트로 전환한다.
  *
- * `card` 의 호버 강조도 톤별로 분기한다: featured 는 이미 chef 틴트를 깔고 있어 같은 계열을
- * 한 단계 밝히고(chef/12 → chef/25), neutral 은 중립 흰 반투명을 한 단계 밝힌다
- * (white/4 → white/8, 보더 white/10 → white/16 — 배지에 쓰인 스텝 재사용).
- * 전부 design.md §2 "기본 토큰 + opacity" 범위라 신규 토큰이 아니다.
+ * 톤 차이가 카드 배경/보더뿐 아니라 badge·specLabel·specValue 색까지 걸쳐 있어,
+ * 카드(`group`) 호버 시 자식 요소도 함께 전환되도록 `group-hover:` 로 묶는다
+ * (WhyChooseUsSection 의 group + transition-colors group-hover:* 관행과 동일).
+ * 기본 중립값은 배지에 쓰인 white 반투명 스텝을, 호버 chef 값은 기존 featured 톤을 그대로
+ * 재사용한다 — 전부 design.md §2 "기본 토큰 + opacity" 범위라 신규 토큰이 아니다.
  */
 const TIER_TONE = {
-  featured: {
-    card: 'bg-chef/12 border-chef-soft/35 hover:bg-chef/25',
-    badge: 'bg-chef-soft/20 border-chef-soft/40 text-chef-soft',
-    specLabel: 'text-chef-soft',
-    specValue: 'text-white',
-  },
-  neutral: {
-    card: 'bg-white/4 border-white/10 hover:bg-white/8 hover:border-white/16',
-    badge: 'bg-white/8 border-white/16 text-white/75',
-    specLabel: 'text-white/50',
-    specValue: 'text-white/90',
-  },
+  card: 'bg-white/4 border-white/10 hover:bg-chef/12 hover:border-chef-soft/35',
+  badge:
+    'bg-white/8 border-white/16 text-white/75 group-hover:bg-chef-soft/20 group-hover:border-chef-soft/40 group-hover:text-chef-soft',
+  specLabel: 'text-white/50 group-hover:text-chef-soft',
+  specValue: 'text-white/90 group-hover:text-white',
 }
 
 /**
@@ -211,33 +198,36 @@ export async function KitchenAirshieldSection() {
           <h3 className="mt-2 text-xl font-extrabold text-white">{COPY.scaleTitle}</h3>
 
           <ul className="mt-6.5 grid gap-4 md:grid-cols-3">
-            {TIERS.map((tier) => {
-              const t = tier.featured ? TIER_TONE.featured : TIER_TONE.neutral
-              return (
-                <li
-                  key={tier.badge}
-                  className={`rounded-image border px-5 py-6.5 transition-all duration-fast ease-out hover:-translate-y-1 ${t.card}`}
+            {TIERS.map((tier) => (
+              <li
+                key={tier.badge}
+                className={`group rounded-image border px-5 py-6.5 transition-all duration-fast ease-out hover:-translate-y-1 ${TIER_TONE.card}`}
+              >
+                <span
+                  className={`inline-flex rounded-pill border px-3 py-1.5 font-display text-mini font-bold tracking-label-sm transition-colors duration-fast ease-out ${TIER_TONE.badge}`}
                 >
-                  <span
-                    className={`inline-flex rounded-pill border px-3 py-1.5 font-display text-mini font-bold tracking-label-sm ${t.badge}`}
-                  >
-                    {tier.badge}
-                  </span>
-                  <div className="mt-3 text-lg font-extrabold text-white">{tier.name}</div>
+                  {tier.badge}
+                </span>
+                <div className="mt-3 text-lg font-extrabold text-white">{tier.name}</div>
 
-                  <dl className="mt-5 flex flex-col gap-4">
-                    {tier.specs.map((spec) => (
-                      <div key={spec.label}>
-                        <dt className={`text-mini font-bold ${t.specLabel}`}>{spec.label}</dt>
-                        <dd className={`mt-1 text-sm leading-snug ${t.specValue}`}>
-                          {spec.value}
-                        </dd>
-                      </div>
-                    ))}
-                  </dl>
-                </li>
-              )
-            })}
+                <dl className="mt-5 flex flex-col gap-4">
+                  {tier.specs.map((spec) => (
+                    <div key={spec.label}>
+                      <dt
+                        className={`text-mini font-bold transition-colors duration-fast ease-out ${TIER_TONE.specLabel}`}
+                      >
+                        {spec.label}
+                      </dt>
+                      <dd
+                        className={`mt-1 text-sm leading-snug transition-colors duration-fast ease-out ${TIER_TONE.specValue}`}
+                      >
+                        {spec.value}
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
+              </li>
+            ))}
           </ul>
         </div>
       </div>
