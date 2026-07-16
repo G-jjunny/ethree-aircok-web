@@ -47,7 +47,7 @@ services:
       - ./server/.env
     environment:
       DATABASE_URL: postgresql://postgres:jjunny@db:5432/aircok
-    # migrate deploy 후 seed 4종 실행. 각 seed 는 count/sentinel 가드로 멱등하며,
+    # migrate deploy 후 seed 6종 실행. 각 seed 는 count/sentinel 가드로 멱등하며,
     # 모델 간 의존성이 없어 순서는 무관(대표 seed.ts 먼저 실행).
     command:
       - sh
@@ -58,7 +58,8 @@ services:
         npm run prisma:seed:news &&
         npm run prisma:seed:core-values &&
         npm run prisma:seed:timeline &&
-        npm run prisma:seed:media
+        npm run prisma:seed:media &&
+        npm run prisma:seed:air-devices
     restart: "no"
 
   server:
