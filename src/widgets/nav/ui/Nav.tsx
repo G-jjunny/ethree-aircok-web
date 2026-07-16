@@ -18,12 +18,17 @@ export function Nav() {
       <div className="content-container flex items-center gap-4 py-4">
         {/* 로고 (흰색) */}
         <Link href="/" aria-label={SITE.name} className="flex items-center">
+          {/* width/height 는 에셋 고유 크기(200x71) — 두 값이 고유비와 일치해야 next/image
+              종횡비 경고가 발생하지 않는다. 표시 크기는 CSS 로만 제어한다.
+              h-7.5 = 30px (기본 4px 그리드 파생: 7.5 × 4). ⚠️ globals.css 의 구 커스텀
+              스케일(--spacing-5~10, 7=48px)은 정수 스텝만 덮으므로 7.5 는 오염되지 않고,
+              해당 블록 제거 후에도 30px 로 유지된다. */}
           <Image
             src="/images/logos/logo-white.png"
             alt={SITE.name}
-            height={30}
-            width={112}
-            style={{ width: 'auto', height: '30px' }}
+            width={200}
+            height={71}
+            className="h-7.5 w-auto"
             priority
           />
         </Link>

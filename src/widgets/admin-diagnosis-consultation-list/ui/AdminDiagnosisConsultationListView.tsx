@@ -12,6 +12,7 @@ import {
   type DiagnosisConsultationStatus,
   type UpdateDiagnosisConsultationBody,
 } from '@/entities/diagnosis-consultation'
+import { Button } from '@/shared/ui'
 
 function formatDateTime(iso: string): string {
   const d = new Date(iso)
@@ -86,14 +87,16 @@ export function AdminDiagnosisConsultationListView() {
         <p className="text-error font-body text-nav leading-[1.43] [word-break:keep-all]">
           신청 목록을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.
         </p>
-        <button
-          type="button"
+        {/* min-h-11(44px) 은 Button size="sm" 에 없는 터치 타겟 보정 — 기존 min-h-[44px] 승계 */}
+        <Button
+          variant="secondary"
+          size="sm"
           onClick={() => refetch()}
           disabled={isRefetching}
-          className="inline-flex items-center justify-center bg-surface-light text-heading-dark text-sm font-medium rounded-md px-4 py-2 min-h-[44px] hover:bg-border-light active:scale-[0.97] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed"
+          className="min-h-11"
         >
           {isRefetching ? '다시 시도 중...' : '다시 시도'}
-        </button>
+        </Button>
       </div>
     )
   }
@@ -323,14 +326,16 @@ function ConsultationDetailPanel({
                 상담 상세 정보를 불러오지 못했습니다. 덮어쓰기 방지를 위해 저장이
                 비활성화되었습니다.
               </p>
-              <button
-                type="button"
+              {/* min-h-11(44px) 은 Button size="sm" 에 없는 터치 타겟 보정 — 기존 min-h-[44px] 승계 */}
+              <Button
+                variant="secondary"
+                size="sm"
                 onClick={() => refetchDetail()}
                 disabled={isDetailRefetching}
-                className="inline-flex items-center justify-center bg-surface-light text-heading-dark text-sm font-medium rounded-md px-4 py-2 min-h-[44px] hover:bg-border-light active:scale-[0.97] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed"
+                className="min-h-11"
               >
                 {isDetailRefetching ? '다시 시도 중...' : '다시 시도'}
-              </button>
+              </Button>
             </div>
           ) : (
             <>
