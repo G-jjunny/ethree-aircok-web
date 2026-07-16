@@ -29,6 +29,21 @@
   --color-cyan:        oklch(71% 0.12 213);   /* #12b5cf · 시안 포인트 */
   --color-cyan-hover:  oklch(60% 0.10 213);   /* #0c8fa5 · 시안 딥 variant */
 
+  /* ── AIR CHEF (주방·조리실 서브브랜드 · --chef-hue 파생) ──
+     에어셰프(AIR CHEF) = 주방/조리실 공기질 개선 제품 계열 전용 청록.
+     /services 주방 탭에서만 사용한다. 실내 공기질(스마트 에어콕) 섹션은
+     brand/cyan/navy 를 그대로 쓴다 — 두 계열을 섞지 않는다.
+     brand 계열과 동일한 구조로 미러링: hue 1개 파생 + on-dark soft +
+     tint/tint-border + dark 섹션 배경. */
+  --chef-hue:                181;                                 /* #0f9d8c 실측 hue ≈ 181 */
+  --color-chef:              oklch(63% 0.11 var(--chef-hue));     /* #0f9d8c · AIR CHEF 주색(eyebrow/STEP 라벨/수치/활성 탭) */
+  --color-chef-hover:        oklch(53% 0.09 var(--chef-hue));     /* #0a7d70 · hover/그라디언트 끝/배지 텍스트 */
+  --color-chef-soft:         oklch(80% 0.11 var(--chef-hue));     /* #5fd6c6 · chef-dark 위 eyebrow/아이콘(brand-soft 대응) */
+  --color-chef-tint:         oklch(98% 0.013 var(--chef-hue));    /* #eefaf8 · 연청록 카드/배지 배경(#e7f7f4 포함) */
+  --color-chef-tint-border:  oklch(91% 0.044 var(--chef-hue));    /* #c3ece5 · 연청록 보더(#b3e6dd 포함) */
+  --color-chef-dark:         oklch(22% 0.033 var(--chef-hue));    /* #04201d · 주방 다크 섹션 배경(#08221f 포함) */
+  --color-chef-dark-tint:    oklch(32% 0.05 var(--chef-hue));     /* #0c3a34 · 에어쉴드 radial 상단 딥그린 */
+
   /* ── Ink / 뉴트럴 (라이트 배경 텍스트) ──── */
   --color-ink:       oklch(20% 0.037 var(--brand-hue));   /* #0d1526 · 헤딩·강본문 */
   --color-ink-soft:  oklch(43% 0.027 var(--brand-hue));   /* #48505f · 카드 본문 */
@@ -142,6 +157,15 @@
   --animate-marquee-left:  marquee-left 40s linear infinite;
   --animate-marquee-right: marquee-right 40s linear infinite;
 
+  /* Animation (장식 orb 부유 · 탭 패널 진입 페이드)
+     drift  = 다크 섹션의 aria-hidden 글로우 orb 앰비언트 부유(/services 브랜드 스트립·에어쉴드).
+              지속시간·이징 키워드는 marquee(40s linear) 와 동일하게 토큰 값에 인라인한다.
+     panel-fade = 탭 패널 진입. hidden(display:none) → 표시 전환 시 브라우저가 애니메이션을
+              재시작하므로 클라이언트 상태 추가 없이 탭 전환마다 재생된다. fill-mode 를 두지
+              않아 재생 후 자연 상태로 복귀한다(잔류 transform 이 만드는 containing block 회피). */
+  --animate-drift:      drift 18s ease-in-out infinite;
+  --animate-panel-fade: panel-fade 400ms var(--ease-out);
+
   /* ────────────────────────────────────────────────────────────
      DEPRECATED ALIASES — 구 토큰 → 신 토큰 (빌드 무결성용)
      각 컴포넌트 마이그레이션 완료 후 이 블록 전체를 삭제한다.
@@ -242,6 +266,19 @@ body {
     transparent 12px
   );
 }
+/* AIR CHEF(주방) 계열 줄무늬 폴백 — stripes-tint 의 청록 대응.
+   /services 주방 탭의 진단 서비스 카드 썸네일·블랙박스 제품 사진 자리 등
+   AIR CHEF 섹션 내 이미지 미확보 자리에 사용한다. */
+@utility stripes-chef {
+  background-color: var(--color-chef-tint);
+  background-image: repeating-linear-gradient(
+    -45deg,
+    var(--color-chef-tint-border) 0,
+    var(--color-chef-tint-border) 1px,
+    transparent 1px,
+    transparent 12px
+  );
+}
 /* 다크(네이비) 섹션 위 줄무늬 폴백 — 배경색은 섹션의 navy가 제공하고,
    줄무늬 라인만 흰색 반투명으로 얹는다. white opacity 는 design.md §2
    "다크 배경 위 반투명 = 기본 토큰 + opacity"에 따라 하드코딩이 아니다
@@ -327,9 +364,52 @@ body {
   to   { transform: translateX(0); }
 }
 
+/* ── 장식 orb 드리프트 keyframes ──────────────────────────────
+   다크 섹션 위 blur 처리된 aria-hidden 글로우 orb 의 앰비언트 부유.
+   translate(30px,-24px) 진폭은 orb(h-130/w-130 = 520px)가 blur-xl 상태에서
+   경계를 드러내지 않고 움직이는 범위로, marquee 의 translateX(-50%) 와 동일하게
+   패턴 정의 자체다(색·간격 토큰이 아님).
+   ⚠️ src/views/home/ui/hero.module.css 의 로컬 heroDrift 가 동일 진폭의 중복 정의다.
+   홈 히어로는 16s/20s+reverse 2종 변주를 써서 단일 --animate-drift(18s)로 표현되지
+   않아 이번 범위(/services)에서는 통합하지 않았다. 후속 정리 대상. */
+@keyframes drift {
+  0%,
+  100% { transform: translate(0, 0); }
+  50%  { transform: translate(30px, -24px); }
+}
+
+/* ── 탭 패널 진입 페이드 keyframes ─────────────────────────────
+   translateY(10px) 는 "아래에서 올라오며 나타난다"는 진입 방향 정의 자체다.
+   transform/opacity 만 사용하므로 레이아웃 시프트(CLS)를 유발하지 않는다. */
+@keyframes panel-fade {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── prefers-reduced-motion ───────────────────────────────────
+   1) 무한 루프·진입 애니메이션은 완전히 끈다(animation:none). hero.module.css 의
+      .float/.driftA/.driftB 와 동일한 프로젝트 관행이다. fill-mode 가 없으므로
+      끈 상태 = 자연 상태(orb 는 제자리, 패널은 그대로 표시)라 잔상이 남지 않는다.
+   2) 그 외 모든 트랜지션·애니메이션(카드 리프트/그림자, 탭·캐러셀 호버 등)은 즉시
+      완료시킨다. `none` 이 아니라 0.01ms 를 쓰는 이유는 transitionend/animationend 가
+      계속 발생해 이벤트 의존 로직이 깨지지 않는 표준 리듀스드모션 리셋이기 때문이다.
+      결과적으로 hover:-translate-y-1 같은 상태 변화는 "이동 애니메이션"이 제거되고
+      포인터 직접 제어 하의 정적 상태 변화만 남는다(hover:bg-* 와 동일 범주).
+   ──────────────────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   .animate-marquee-left,
-  .animate-marquee-right {
+  .animate-marquee-right,
+  .animate-drift,
+  .animate-panel-fade {
     animation: none;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

@@ -372,31 +372,6 @@ model CoreValue {
   @@index([order])
 }
 
-/// 공기질 관리 제품군(서비스) 소개 이미지 (#83).
-///
-/// 운용 방식:
-/// - 가변 이미지 목록이다(추가/삭제/드래그앤드롭 정렬/교체). 캡션/제목 없이 이미지 URL + 표시 순서만 보관한다.
-/// - 공개 목록(GET /api/service-images)은 order 오름차순, 동률 시 createdAt 보조 정렬로 노출한다.
-/// - 이미지 업로드는 2단계다: POST /api/service-images/uploads (multipart, 필드명 file)로 R2(folder: services)에
-///   업로드해 공개 URL을 받은 뒤, POST /api/service-images (body { imageUrl, order? })로 레코드를 생성한다.
-/// - 이미지 교체/순서 단건 수정은 PATCH /api/service-images/:id (body { imageUrl?, order? })로 처리한다.
-/// - 어드민은 드래그앤드롭으로 순서를 일괄 변경한다(PATCH /api/service-images/reorder, body { items: [{ id, order }] }).
-///   reorder 는 트랜잭션 갱신 후 갱신된 전체 배열을 반환한다(partners 패턴).
-///
-/// 컬럼 정책:
-/// - id: cuid (String). 기존 모델 패턴 통일.
-/// - imageUrl: R2 업로드 후 받은 공개 이미지 URL. NOT NULL.
-/// - order: 표시 순서(오름차순). 기본값 0. order 미지정 생성 시 맨 뒤(마지막 order + 1)에 자동 채번한다.
-model ServiceImage {
-  id        String   @id @default(cuid())
-  imageUrl  String
-  order     Int      @default(0)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([order])
-}
-
 /// 진단 서비스 신청 소개 이미지 (#83).
 ///
 /// 운용 방식:
@@ -444,4 +419,155 @@ model DiagnosisConsultation {
   updatedAt        DateTime  @updatedAt
 
   @@index([status, createdAt(sort: Desc)])
+}
+
+/// 공기질 측정기 모델(제품군) (#services 1단계).
+///
+/// 운용 방식:
+/// - `/services` 페이지 측정기 섹션에 노출되는 개별 측정기 모델(예: "SA-IL2 / SA-IEW", "SA-LCD")을
+///   어드민이 CRUD + 순서변경 가능한 DB 콘텐츠로 관리한다. 이전 정적 하드코딩 배열을 대체한다.
+/// - 공개 목록(GET /api/air-devices)은 published=true 인 레코드만 order 오름차순,
+///   동률 시 createdAt 오름차순(보조) 정렬로 노출한다. 중첩 items 도 order 오름차순으로 include 한다.
+/// - 어드민 목록(GET /api/air-devices/admin)은 미공개(published=false) 포함 전체를 반환한다.
+///   라우트 등록 순서 주의: 'admin' 은 반드시 GET /:id 보다 먼저 선언한다(현재 :id 단건 GET 은 없으나 컨벤션 유지).
+/// - 어드민은 드래그앤드롭으로 순서를 일괄 변경한다(PATCH /api/air-devices/reorder, body { items: [{ id, order }] }).
+///   reorder 는 트랜잭션 갱신 후 갱신된 어드민 전체 배열을 반환한다(partners 패턴 + published 포함).
+/// - 제품 사진은 POST /api/air-devices/:id/image (multipart, 필드명 file) 로 R2(folder: air-devices)에
+///   업로드하며, 업로드 후 해당 레코드의 imageUrl 을 갱신한다(partners 로고 패턴).
+///
+/// 컬럼 정책:
+/// - id: cuid (String). 기존 모델 패턴 통일.
+/// - name: 모델명(예: "SA-IL2 / SA-IEW"). NOT NULL.
+/// - subtitle: 모델 부제(예: "조달청 혁신제품 선정 모델"). NOT NULL.
+/// - badge: 카드에 노출되는 짧은 뱃지 문구(예: "조달청 혁신제품"). NOT NULL.
+/// - imageUrl: R2 업로드 후 받은 공개 이미지 절대 URL. nullable — 사진 미등록 모델을 허용한다.
+/// - size/weight/power/comm/storage/operatingTemp: 스펙 표에 그대로 출력되는 표시용 문자열이다.
+///   단위 파싱/정렬 요구가 없으므로 수치형이 아닌 String 으로 보관한다(예: "180 × 130 × 30 mm").
+///   모두 NOT NULL — 스펙 표의 행이 비지 않도록 생성 시 필수 입력을 강제한다.
+/// - order: 표시 순서(오름차순). 기본값 0. order 미지정 생성 시 맨 뒤(마지막 order + 1)에 자동 채번한다.
+/// - published: 공개 여부. 기본값 true — 어드민이 등록 즉시 노출되는 것이 기존 콘텐츠 모델 운용과 맞는다.
+///   (NewsPost 의 default(false) 와 다른 이유: 뉴스는 초안 작성 후 발행하는 워크플로가 있으나
+///   측정기 카드는 초안 개념이 없고 등록=노출이 기본이다.)
+/// - items: 측정 항목(AirDeviceItem) 1:N. 부모 삭제 시 Cascade 로 함께 삭제된다.
+model AirDevice {
+  id            String          @id @default(cuid())
+  /// 모델명(예: "SA-IL2 / SA-IEW").
+  name          String
+  /// 모델 부제(예: "조달청 혁신제품 선정 모델").
+  subtitle      String
+  /// 카드 뱃지 문구(예: "조달청 혁신제품").
+  badge         String
+  /// 제품 사진 R2 절대 URL. nullable(사진 미등록 허용).
+  imageUrl      String?
+  /// 크기 표시 문자열(예: "180 × 130 × 30 mm").
+  size          String
+  /// 무게 표시 문자열(예: "270 g (LTE 포함 300 g)").
+  weight        String
+  /// 전원 표시 문자열(예: "12V / 200mA").
+  power         String
+  /// 통신 방식 표시 문자열(예: "LTE / Ethernet / Wi-Fi 중 선택").
+  comm          String
+  /// 저장 방식 표시 문자열(예: "micro SD · 최장 3년").
+  storage       String
+  /// 동작 온도 표시 문자열(예: "-10℃ ~ 60℃").
+  operatingTemp String
+  /// 표시 순서(오름차순). 기본값 0.
+  order         Int             @default(0)
+  /// 공개 여부. 기본값 true.
+  published     Boolean         @default(true)
+  /// 측정 항목 목록. 부모 삭제 시 Cascade.
+  items         AirDeviceItem[]
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  @@index([published, order])
+}
+
+/// 공기질 측정기 모델의 측정 항목 (#services 1단계).
+///
+/// 운용 방식:
+/// - AirDevice 에 종속된 값 객체 성격의 자식 레코드다(예: { code: "PM2.5", label: "초미세먼지" }).
+///   독립 엔드포인트를 두지 않으며, 항상 부모 AirDevice 의 생성/수정 요청에 중첩되어 관리된다.
+/// - PATCH /api/air-devices/:id 에 items 가 전달되면 **전체 교체(replace-all)** 한다:
+///   해당 deviceId 의 기존 items 를 deleteMany 로 전부 삭제한 뒤 전달된 배열을 재생성하며,
+///   두 연산을 단일 트랜잭션으로 묶는다. items 미전달 시 기존 항목을 그대로 유지하고,
+///   items: [] 전달 시 전부 삭제한다(빈 배열은 "모두 지움"의 명시적 의사표시로 해석).
+///   → replace-all 이므로 자식 id 는 수정 때마다 재발급된다. 프론트는 item.id 를 영속 키로 신뢰하면 안 된다.
+/// - 조회 시 order 오름차순으로 include 된다.
+///
+/// 컬럼 정책:
+/// - id: cuid (String). replace-all 정책상 수정 시마다 새로 발급된다(위 참고).
+/// - deviceId: AirDevice 외래키. 부모 삭제 시 Cascade 로 함께 삭제된다(고아 레코드 방지).
+/// - code: 측정 항목 코드(예: "PM2.5", "CO₂"). 표시용 문자열이며 enum 화하지 않는다 —
+///   측정 항목이 제품군 확장에 따라 늘어나므로 스키마 마이그레이션 없이 추가 가능해야 한다.
+/// - label: 측정 항목 한글명(예: "초미세먼지").
+/// - order: 부모 내 표시 순서(오름차순). 기본값 0.
+model AirDeviceItem {
+  id       String    @id @default(cuid())
+  deviceId String
+  device   AirDevice @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  /// 측정 항목 코드(예: "PM2.5", "CO₂").
+  code     String
+  /// 측정 항목 한글명(예: "초미세먼지").
+  label    String
+  /// 부모 내 표시 순서(오름차순). 기본값 0.
+  order    Int       @default(0)
+
+  @@index([deviceId, order])
+}
+
+/// `/services` 페이지 섹션별 고정 이미지 슬롯 (#services 1단계).
+///
+/// 슬롯은 페이지 레이아웃상 위치가 고정된 이미지 자리다. 프론트 디자인과 1:1 대응하므로
+/// 슬롯 추가/제거는 반드시 프론트 변경과 함께 마이그레이션으로 처리한다.
+/// - MONITORING_DASHBOARD / MONITORING_STATS / MONITORING_DEVICES / MONITORING_DID: 모니터링 섹션 이미지.
+/// - DIAGNOSIS_VISIT / DIAGNOSIS_ANALYSIS / DIAGNOSIS_REPORT / DIAGNOSIS_PROPOSAL: 진단 서비스 섹션 이미지.
+/// - KITCHEN_BLACKBOX_PRODUCT / KITCHEN_BLACKBOX_DID / KITCHEN_AIRSHIELD_TECH: 주방 섹션 이미지
+///   (블랙박스 제품 사진 / 조리실 오염 현황 DID / 에어쉴드 특허 급기 기술).
+enum ProductImageSlot {
+  MONITORING_DASHBOARD
+  MONITORING_STATS
+  MONITORING_DEVICES
+  MONITORING_DID
+  DIAGNOSIS_VISIT
+  DIAGNOSIS_ANALYSIS
+  DIAGNOSIS_REPORT
+  DIAGNOSIS_PROPOSAL
+  KITCHEN_BLACKBOX_PRODUCT
+  KITCHEN_BLACKBOX_DID
+  KITCHEN_AIRSHIELD_TECH
+}
+
+/// `/services` 페이지 섹션 이미지 (슬롯 단위 고정 배치) (#services 1단계).
+///
+/// 운용 방식 (슬롯 유니크 upsert):
+/// - DiagnosisImage 같은 "가변 목록 + 드래그앤드롭 정렬" 모델과 달리,
+///   이 모델은 **슬롯당 최대 1장**인 고정 배치 이미지를 보관한다. 따라서 order 컬럼도,
+///   reorder 엔드포인트도 두지 않는다(순서는 프론트 레이아웃이 결정한다).
+/// - slot 에 @unique 를 걸어 슬롯당 1행을 DB 레벨에서 강제한다.
+/// - PUT /api/product-images/:slot (multipart, 필드명 file): R2(folder: product-sections)에 업로드 후
+///   slot 기준 upsert 한다. 이미 있으면 imageUrl 교체, 없으면 생성 → 멱등한 PUT 시맨틱.
+/// - DELETE /api/product-images/:slot: 해당 슬롯 행을 삭제한다(204). 삭제 시 프론트는 폴백을 렌더한다.
+///   미등록 슬롯이어도 404 가 아니라 204 다 — 멱등하다. :slot 은 리소스 id 가 아니라 enum 으로 고정된
+///   슬롯 주소이므로 존재/부재가 갈리는 것은 "그 슬롯에 이미지가 있는가"뿐이고,
+///   PUT upsert 의 멱등성과 대칭을 이룬다(목표 상태인 빈 슬롯이 이미 달성된 재요청은 실패가 아니다).
+/// - GET /api/product-images: 등록된 슬롯 행 전체를 배열로 반환한다(미등록 슬롯은 응답에 없음).
+///   공개 엔드포인트이며 60초 HTTP 캐시(CacheControlInterceptor)가 걸린다.
+/// - GET /api/product-images/admin: 어드민 전용(JWT), 무캐시(no-store). 응답 스키마는 공개 GET 과 동일하다.
+///   필터 차이는 없고, 어드민이 업로드/삭제 직후 캐시된 구 응답을 보는 것을 막기 위한 분리다.
+/// - :slot 은 ProductImageSlot enum 값만 허용하며, 위반 시 ParseEnumPipe 가 400 을 반환한다.
+///
+/// 컬럼 정책:
+/// - id: cuid (String). 기존 모델 패턴 통일. 단, 이 모델의 실질 조회 키는 slot 이다.
+/// - slot: ProductImageSlot enum. @unique — 슬롯당 1행 보장(upsert 의 where 키).
+/// - imageUrl: R2 업로드 후 받은 공개 이미지 절대 URL. NOT NULL —
+///   이미지 없는 슬롯은 행 자체를 두지 않는다(빈 문자열 행을 허용하지 않음).
+model ProductSectionImage {
+  id        String           @id @default(cuid())
+  /// 이미지가 배치될 고정 슬롯. 슬롯당 1행(@unique).
+  slot      ProductImageSlot @unique
+  /// R2 업로드 후 받은 공개 이미지 절대 URL. NOT NULL.
+  imageUrl  String
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
 }

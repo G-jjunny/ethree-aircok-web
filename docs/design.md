@@ -16,6 +16,8 @@
 
 **Blue-Tech 방향**: 밝은 배경(흰색 / 연회색 `surface`)과 다크 네이비 섹션(`navy`~`navy-deep`)이 교차한다. 프라이머리 블루 `brand` + 포인트 시안 `cyan`. 플랫하되 블루/블랙 글로우 그림자, pill·라운드 카드, 실시간 데이터 카드 UI가 특징. 디스플레이는 **Sora**(영문/숫자/eyebrow), 본문은 **Pretendard**(한글).
 
+**서브브랜드 — AIR CHEF(에어셰프)**: 주방·조리실 공기질 개선 제품 계열. Blue-Tech 의 청록 대응 계열(`chef`, §2)로, 딥그린 다크 섹션 + 연청록 카드가 특징. 시스템 골격(타이포·라운드·스페이싱·그림자)은 Blue-Tech 와 100% 공유하고 **색상 계열만 분기**한다.
+
 ---
 
 ## 1. 사용 규칙 (필수)
@@ -43,6 +45,27 @@
 | `cyan-hover` | `text-cyan-hover` | `oklch(60% 0.10 213)` | `#0c8fa5` | 시안 딥 variant |
 
 `--brand-hue: 263` 하나로 blue 계열이 함께 이동한다. CTA 그라디언트는 `from-brand to-brand-hover`.
+
+### AIR CHEF · 주방 계열 (`--chef-hue: 181` 파생)
+
+**에어셰프(AIR CHEF)** 는 **주방·조리실 공기질 개선 제품 브랜드 계열**이다. 청록(teal)으로 실내 공기질(스마트 에어콕, blue) 계열과 구분한다. `--brand-hue` 와 동일한 파생 구조를 미러링한다.
+
+> ⚠️ **계열 분리 원칙.** chef 계열은 **`/services` 주방(AIR CHEF) 탭 내부에서만** 사용한다. 실내 공기질(스마트 에어콕) 섹션·공용 CTA·헤더/푸터는 `brand`/`cyan`/`navy` 를 그대로 쓴다. 두 계열을 한 섹션에서 섞지 않는다.
+
+| 토큰 | 클래스 예 | 값 | 원본 hex | 용도 |
+| --- | --- | --- | --- | --- |
+| `chef` | `text-chef` `bg-chef` | `oklch(63% 0.11 181)` | `#0f9d8c` | AIR CHEF 주색 — eyebrow·STEP 라벨·수치 강조·활성 탭 보더 |
+| `chef-hover` | `hover:bg-chef-hover` | `oklch(53% 0.09 181)` | `#0a7d70` | hover / 그라디언트 끝 / 배지 텍스트 |
+| `chef-soft` | `text-chef-soft` | `oklch(80% 0.11 181)` | `#5fd6c6` | **`chef-dark` 위** eyebrow·아이콘·라벨 (`brand-soft` 대응) |
+| `chef-tint` | `bg-chef-tint` | `oklch(98% 0.013 181)` | `#eefaf8` | 연청록 카드·배지 배경 (`#e7f7f4` 포함) |
+| `chef-tint-border` | `border-chef-tint-border` | `oklch(91% 0.044 181)` | `#c3ece5` | 연청록 보더 (`#b3e6dd` 포함) |
+| `chef-dark` | `bg-chef-dark` | `oklch(22% 0.033 181)` | `#04201d` | 주방 다크 섹션 배경 (`#08221f` 포함 — 지각적 동일) |
+| `chef-dark-tint` | `bg-chef-dark-tint` | `oklch(32% 0.05 181)` | `#0c3a34` | 에어쉴드 radial 상단 딥그린 (`navy-tint` 대응) |
+
+- **대비 규칙**: `chef-dark` 위에서는 `chef` 가 아니라 **`chef-soft`** 를 쓴다(`chef`는 딥그린 위 대비 부족). 라이트 배경 위 강조는 `chef`, 그 위 텍스트는 흰색(`text-white`).
+- **그라디언트**: 아이콘 박스·프로그레스 바 `from-chef to-chef-hover`. 에어쉴드 배경 `radial-gradient(110% 120% at 85% 0%, var(--color-chef-dark-tint), var(--color-chef-dark) 62%)`.
+- **글로우/반투명**: `bg-chef/12` · `bg-chef/25` · `bg-chef/42` (radial 글로우), 보더 `border-chef-soft/35` · `border-chef-soft/40` — §2 "기본 토큰 + opacity" 규칙에 따라 하드코딩 아님.
+- `chef-ink`(=white)는 **정의하지 않는다** — 기존 `text-white`/`brand-ink` 로 충분(추가 최소 원칙).
 
 ### 텍스트 (라이트 배경)
 
@@ -132,15 +155,54 @@ AQI 바 그라디언트: `from-aqi-good via-brand via-aqi-warning to-aqi-bad`.
 **라운드**: `rounded-btn`(12) · `rounded-image`(18) · `rounded-card`(20) · `rounded-card-lg`(22) · `rounded-pill`(999) · `rounded-full`(9999). 16/14 는 기본 `rounded-2xl`(16)·`rounded-btn` 근사 재사용.
 
 **스페이싱**: Tailwind 기본 4px 그리드. 섹션 수직 패딩 `py-24`(96, 기본) / `py-20`(80) / `py-28`(112).
-> ⚠️ `globals.css`에 구 커스텀 스케일 `--spacing-5~10`(5=24, 6=32 …)이 회귀 방지를 위해 남아 있다(`p-5`~`p-10` 사용처 재조정 후 제거 대상). 신규 작업은 순수 기본 그리드를 쓴다.
+> ⚠️ `globals.css`에 구 커스텀 스케일 `--spacing-5~10`(5=24, 6=32, 7=48, 8=64, 9=80, **10=120**)이 회귀 방지를 위해 남아 있다(`p-5`~`p-10` 사용처 재조정 후 제거 대상). 신규 작업은 순수 기본 그리드를 쓴다.
+>
+> ⚠️ **정수 스텝 5~10 은 4px 그리드가 아니다.** `h-10`은 40px이 **아니라 120px**이다. 이 블록이 덮는 것은 **정수 스텝뿐**이므로, 정의되지 않은 스텝(`11`·`7.5`·`8.5`·`130` 등)은 기본 `--spacing`(0.25rem) 파생으로 정상 계산된다(`min-h-11`=44px, `h-7.5`=30px). 5~10 구간의 4px 그리드 값이 필요하면 소수/미정의 스텝을 쓰거나(예: 30px=`h-7.5`), 그마저 정수와 충돌하면(예: **40px**) 블록 제거 전까지 토큰이 없다 — 이 경우 `{/* token 없음: 이유 */}` 주석 + `unresolvedIssues` 기재.
 
 **그림자 (블루/블랙 글로우)**: `shadow-brand-sm`(헤더 pill) · `shadow-brand`(히어로/플랫폼 CTA) · `shadow-soft`(CTA 흰 버튼) · `shadow-float`(히어로 플로팅 카드) · `shadow-card`(관리자 패널 카드).
 
 **모션**: `duration-fast`(200ms, 커스텀 유틸리티) · `ease-out`(`cubic-bezier(0.16,1,0.3,1)`).
 
+### 애니메이션 토큰 (`--animate-*` + `@keyframes`)
+
+| 클래스 | 정의 | 용도 |
+| --- | --- | --- |
+| `animate-marquee-left` / `-right` | `marquee-* 40s linear infinite` | 파트너 로고 2줄 무한 스크롤(`<LogoMarquee>`) |
+| `animate-drift` | `drift 18s ease-in-out infinite` | 다크 섹션 장식 orb 앰비언트 부유 |
+| `animate-panel-fade` | `panel-fade 400ms var(--ease-out)` | 탭 패널 진입 페이드 |
+
+- 지속시간·이징 키워드는 `--animate-*` 토큰 **값에 인라인**한다(별도 `--duration-*` 토큰을 만들지 않는다 — marquee `40s linear` 선례).
+- `drift` 진폭 `translate(30px,-24px)`·`panel-fade` 의 `translateY(10px)` 는 marquee 의 `translateX(-50%)` 와 같은 **패턴/방향 정의 자체**이므로 하드코딩 수치가 아니다.
+- **`animate-drift` 대상은 `aria-hidden` 장식 orb 한정.** blur 처리된 글로우에만 쓰고 콘텐츠에는 쓰지 않는다.
+- **`animate-panel-fade` 는 fill-mode 를 두지 않는다.** 재생 후 자연 상태로 복귀시켜 잔류 `transform` 이 만드는 containing block(내부 fixed/sticky 오작동)을 피한다. `hidden`(display:none) → 표시 전환 시 브라우저가 애니메이션을 재시작하므로 클라이언트 상태·`key` 추가 없이 전환마다 재생된다.
+- ⚠️ `src/views/home/ui/hero.module.css` 의 로컬 `heroDrift`(16s / 20s reverse 2종)는 동일 진폭의 **중복 정의**다. 단일 `animate-drift`(18s)로 표현되지 않아 통합하지 않았다 — 후속 정리 대상.
+
+### 카드 호버 표준
+
+반복되는 className 레시피이며 마크업 구조가 제각각(`li`·`div`·grid item)이라 **공용 컴포넌트로 만들지 않는다**. 아래 레시피를 그대로 인라인한다(`NewsCard`·`LightStatCard`·`DarkStatCard` 선례).
+
+| 대상 | 레시피 |
+| --- | --- |
+| 라이트 섹션 카드 | `transition-all duration-fast ease-out hover:-translate-y-1 hover:shadow-card` |
+| 라이트 섹션 그리드 카드 · 스크린 목업 | `… hover:-translate-y-1 hover:shadow-float` (+ 보더가 있으면 계열 보더 강조) |
+| 다크 섹션 카드 | `… hover:-translate-y-1` + **보더/배경 강조** (그림자는 다크 위에서 읽히지 않는다) |
+
+- 계열 보더 강조: 실내=`hover:border-tint-border` · 주방=`hover:border-chef-tint-border`(라이트) / `hover:border-chef-soft/40`(다크). **계열 분리 원칙 §2 를 호버에도 적용**한다.
+- 리프트는 `transform` 이라 레이아웃 시프트(CLS)가 없다. `top`/`height` 등으로 대체 금지.
+- **호버에 정보를 싣지 않는다.** 터치·키보드 사용자가 접근할 수 없으므로 어포던스(클릭 가능함의 힌트) 이상을 담지 않는다. 인터랙티브 요소는 `focus-visible:ring-brand` 를 함께 제공한다.
+
+### `prefers-reduced-motion` (필수)
+
+`globals.css` 하단 블록이 **전역으로** 처리하므로 개별 컴포넌트에서 다시 분기하지 않는다.
+
+1. 무한 루프·진입 애니메이션(`animate-marquee-*`·`animate-drift`·`animate-panel-fade`)은 `animation: none` 으로 **완전히** 끈다. fill-mode 가 없어 끈 상태 = 자연 상태다(orb 제자리 · 패널 그대로 표시).
+2. 그 외 모든 트랜지션·애니메이션은 `*`/`::before`/`::after` 리셋으로 즉시 완료시킨다(`animation-duration`/`transition-duration: 0.01ms !important`, `animation-iteration-count: 1`). `none` 이 아니라 `0.01ms` 인 이유는 `transitionend`/`animationend` 가 계속 발생해 이벤트 의존 로직을 깨지 않는 표준 리셋이기 때문이다.
+
+결과적으로 `hover:-translate-y-1` 같은 호버 상태 변화는 **이동 애니메이션이 제거되고** 포인터 직접 제어 하의 정적 상태 변화만 남는다(`hover:bg-*` 와 동일 범주 — WCAG 2.3.3 은 상호작용으로 촉발되는 *모션 애니메이션*이 대상). **신규 모션은 이 블록이 자동으로 커버하므로 컴포넌트에 별도 대응을 추가하지 않는다.**
+
 **Aspect(매거진 레이아웃, 기능 토큰)**: `aspect-featured`(16/7) · `aspect-card`(16/10, 뉴스 목록 카드 썸네일) · `aspect-row-thumb`(4/3).
 
-**줄무늬 플레이스홀더(이미지 자산 폴백, 유틸)**: `stripes-surface`(회색계) · `stripes-tint`(연블루계) · `stripes-dark`(네이비 섹션 위 흰색 반투명 라인). `-45deg` 대각선 repeating-linear-gradient — 각도·줄 간격은 패턴 정의 자체(하드코딩 아님, marquee `translateX(-50%)` 와 동일 취급). 공용 컴포넌트 `<PagePlaceholder>`가 세 톤을 감싸며, 모든 이미지 자산 미확보 자리(뉴스 coverImage 폴백·About 이미지 자리 등)의 **단일 표준**이다.
+**줄무늬 플레이스홀더(이미지 자산 폴백, 유틸)**: `stripes-surface`(회색계) · `stripes-tint`(연블루계) · `stripes-chef`(연청록계 — AIR CHEF 주방 섹션) · `stripes-dark`(네이비 섹션 위 흰색 반투명 라인). `-45deg` 대각선 repeating-linear-gradient — 각도·줄 간격은 패턴 정의 자체(하드코딩 아님, marquee `translateX(-50%)` 와 동일 취급). 공용 컴포넌트 `<PagePlaceholder>`가 이 유틸들을 5종 `variant`(surface·tint·dark·chef·chef-dark)로 감싸며, 모든 이미지 자산 미확보 자리(뉴스 coverImage 폴백·About 이미지 자리·`/services` 슬롯 폴백 등)의 **단일 표준**이다. `chef-dark`는 별도 유틸 없이 `stripes-dark`를 재사용한다 — 흰색 반투명 라인은 계열 중립이고 배경색은 섹션의 `bg-chef-dark`가 제공하기 때문이다.
 
 **Catalog 진행 슬라이더(기능 유틸)**: `catalog-range` — 카탈로그 뷰어 다크 푸터의 `<input type="range">` 페이지 진행 바. 트랙은 `--color-brand`→`--color-cyan` 그라디언트, 썸은 다크 위 대비를 위한 흰 원(`surface-white` + `cyan` 2px 링 + `shadow-brand-sm`). webkit(`::-webkit-slider-runnable-track`/`-thumb`)·moz(`::-moz-range-track`/`-thumb`) 양쪽 커버, focus-visible 링 포함. 트랙 6px·썸 16px 형상값과 수직 정렬 오프셋은 컨트롤 형상 정의(하드코딩 색 아님). `input`에는 `catalog-range appearance-none bg-transparent` 조합으로 적용.
 
@@ -156,12 +218,33 @@ AQI 바 그라디언트: `from-aqi-good via-brand via-aqi-warning to-aqi-bad`.
 
 **구현됨 (이슈 #102 Pre)**:
 
-- `<Button variant="primary|dark|outline|white" size="sm|md" pill? asChild?>` — primary=히어로/헤더 CTA(그라디언트 `from-brand to-brand-hover`), dark=라이트 섹션 보조 CTA(`bg-navy`), outline=다크/컬러 배경 위 보조(`border-white/50`), white=CTA 컬러 섹션 흰 버튼(`shadow-soft`). `pill`=헤더 도입문의(rounded-pill), 기본 rounded-btn. `asChild`로 Next `<Link>` CTA 렌더. md=44px 터치타겟, primary만 글로우 그림자(sm=`shadow-brand-sm`/md=`shadow-brand`).
+- `<Button variant="primary|dark|outline|white|secondary|destructive" size="sm|md" pill? asChild?>` — primary=히어로/헤더 CTA(그라디언트 `from-brand to-brand-hover`), dark=라이트 섹션 보조 CTA(`bg-navy`), outline=다크/컬러 배경 위 보조(`border-white/50`), white=CTA 컬러 섹션 흰 버튼(`shadow-soft`). `pill`=헤더 도입문의(rounded-pill), 기본 rounded-btn. `asChild`로 Next `<Link>` CTA 렌더. md=44px 터치타겟, primary만 글로우 그림자(sm=`shadow-brand-sm`/md=`shadow-brand`).
+
+**Button variant 추가 (이슈 #122)** — 관리자 화면의 중립/파괴적 버튼용. `ConfirmDialog` 의 취소·삭제 버튼 톤을 승계하되 §6 대응표의 **신 토큰**으로 정의했다(구 토큰 alias 와 색상값 자체는 동일).
+
+  | `variant` | 정의 | 용도 |
+  | --- | --- | --- |
+  | `secondary` | `bg-surface text-ink hover:bg-hairline focus-visible:ring-brand` | 라이트 배경 위 중립 보조 — 에러 상태 "다시 시도", 취소 |
+  | `destructive` | `bg-error text-white hover:opacity-90 focus-visible:ring-error` | 삭제 등 파괴적 액션 |
+
+  - 글로우 그림자는 `primary` 전용이라는 기존 규칙이 그대로 적용된다(secondary/destructive 는 그림자 없음).
+  - 관리자 에러 상태의 "다시 시도" 버튼은 `<Button variant="secondary" size="sm" className="min-h-11">` 조합을 표준으로 한다 — `size="sm"` 에는 `min-h` 가 없어 44px 터치 타겟을 `min-h-11` 로 보정한다.
+  - ⚠️ `ConfirmDialog` 는 자체 버튼 마크업(`text-[15px]`·`min-h-[44px]`)을 유지한다. `Button` 의 `SIZE` 스케일과 값이 달라 치환 시 시각 회귀가 발생하므로, 별도 사이즈 정리 작업에서 통합한다.
 - `<SectionLabel color="brand|cyan" size="md|sm" as?>` — eyebrow. Sora(`font-display`)·uppercase·600. md=`text-eyebrow tracking-eyebrow-lg`(섹션), sm=`text-mini tracking-eyebrow`(카드). ⚠️ eyebrow 남용 금지: 섹션 3개당 1개 이하.
 
 **구현됨 (이슈 #111 Pre)**:
 
-- `<PagePlaceholder variant="surface|tint|dark" label? rounded? bordered? className? children?>` — 이미지 자산 미확보 자리의 표준 줄무늬 블록. `variant`가 §4 `stripes-*` 유틸(surface=회색계·tint=연블루계·dark=네이비 위 흰 반투명)과 보더(`border-hairline`/`border-tint-border`/`border-white/8`)·라벨 톤(`text-faint`/`text-white/40`)을 함께 전환. 라벨은 `font-display text-mini font-semibold uppercase tracking-eyebrow`(Sora eyebrow) 표준. 라운드는 `rounded` prop(기본 `rounded-card`)으로, 크기·비율은 `className`으로 주입. 뉴스 coverImage 폴백·About 이미지 자리 등 **모든 플레이스홀더의 단일 소스**.
+- `<PagePlaceholder variant="surface|tint|dark|chef|chef-dark" label? rounded? bordered? className? children?>` — 이미지 자산 미확보 자리의 표준 줄무늬 블록. `variant`가 §4 `stripes-*` 유틸과 보더·라벨 톤을 함께 전환한다. 라벨은 `font-display text-mini font-semibold uppercase tracking-eyebrow`(Sora eyebrow) 표준. 라운드는 `rounded` prop(기본 `rounded-card`)으로, 크기·비율은 `className`으로 주입. 뉴스 coverImage 폴백·About 이미지 자리·`/services` 슬롯 폴백 등 **모든 플레이스홀더의 단일 소스**.
+
+  | `variant` | 줄무늬 유틸 | 보더 | 라벨 톤 | 사용처 |
+  | --- | --- | --- | --- | --- |
+  | `surface` (기본) | `stripes-surface` | `border-hairline` | `text-faint` | 라이트 섹션(회색계) |
+  | `tint` | `stripes-tint` | `border-tint-border` | `text-faint` | 라이트 섹션(연블루계) |
+  | `dark` | `stripes-dark` | `border-white/8` | `text-white/40` | `bg-navy` 다크 섹션 |
+  | `chef` | `stripes-chef` | `border-chef-tint-border` | `text-faint` | AIR CHEF 라이트 카드 |
+  | `chef-dark` | `stripes-dark` (재사용) | `border-chef-soft/35` | `text-chef-soft/60` | `bg-chef-dark` 주방 다크 섹션 |
+
+  ⚠️ **`chef-dark` 가 `dark` 와 별도로 존재하는 이유**: §2 대비 규칙(`chef-dark` 위 라벨은 `chef` 가 아니라 `chef-soft`)을 지키기 위함이다. 주방 다크 섹션에 `dark` 를 쓰면 eyebrow 가 흰색으로 렌더되어 규칙 위반이다. 라이트 계열(`surface`/`tint`/`chef`)의 라벨 톤이 `text-faint` 로 통일된 것은 의도적이다 — 플레이스홀더 라벨은 실제 콘텐츠처럼 보이지 않게 저채도 뉴트럴로 억제한다(`chef-dark` 의 `/60` 도 `dark` 의 `white/40` 과 지각 밝기를 맞춘 값). 풀블리드 배경 슬롯은 `bordered={false}`.
 
 **후속 Pre 후보(3곳 이상 반복 판단 후)**: `<StatCard>`·`<AqiCard>`·`<PartnerMarquee>` 등.
 
@@ -200,6 +283,6 @@ AQI 바 그라디언트: `from-aqi-good via-brand via-aqi-warning to-aqi-bad`.
 | `text-nav` (15) | `text-sm` |
 | `text-subheading` (21) | `text-xl` / `text-subtitle` |
 
-**유지(기능 토큰, 마이그레이션 대상 아님)**: `nav-bg*`, `overlay-*`, `aspect-featured`, `aspect-row-thumb`, `animate-marquee-*`, `success/warning/error`, `shadow-card`.
+**유지(기능 토큰, 마이그레이션 대상 아님)**: `nav-bg*`, `overlay-*`, `aspect-featured`, `aspect-row-thumb`, `animate-marquee-*`, `animate-drift`, `animate-panel-fade`, `success/warning/error`, `shadow-card`.
 
 > 구 올리브/크림/라임 방향 컴포넌트 명세는 이전 문서에서 이미 제거됐다. Blue-Tech 컴포넌트 명세(Hero·AQI Card·Trust Strip·Tabs·4-Step·Our Value·Platform·Wordmark·Clients·CTA·Footer)는 홈페이지/About 마이그레이션과 함께 재문서화한다. 그 전까지는 위 대응표로 구 토큰 사용처를 신 토큰으로 옮긴다.

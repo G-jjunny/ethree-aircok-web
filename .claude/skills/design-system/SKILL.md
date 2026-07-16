@@ -25,6 +25,20 @@ SSOT: `docs/design.md` · 구현: `app/globals.css @theme inline` · 공용 컴�
 - 라이트 hairline 보더: `border-hairline`
 - AQI 상태: `text-aqi-good` / `text-aqi-normal` / `text-aqi-warning` / `text-aqi-bad`
 
+### AIR CHEF · 주방 계열 (`--chef-hue: 181` 파생)
+
+> ⚠️ **계열 분리 원칙.** chef 계열은 **`/services` 주방(AIR CHEF) 탭 내부에서만** 쓴다. 실내 공기질(스마트 에어콕) 섹션·공용 CTA·헤더/푸터는 `brand`/`cyan`/`navy` 를 그대로 쓴다. **두 계열을 한 섹션에서 섞지 않는다.**
+>
+> ⚠️ **대비 규칙.** `chef-dark` 위에는 **`chef` 금지 → `chef-soft` 필수** (`chef`는 딥그린 위 대비 부족). 라이트 배경 위 강조만 `chef`, 그 위 텍스트는 `text-white`.
+
+- 주색(라이트 배경 eyebrow·STEP 라벨·수치 강조·활성 탭 보더): `text-chef` / `bg-chef`
+- hover / 그라디언트 끝 / 배지 텍스트: `hover:bg-chef-hover` · `text-chef-hover` (아이콘 박스·프로그레스 바 `from-chef to-chef-hover`)
+- **다크(`bg-chef-dark`) 위** eyebrow·아이콘·라벨: `text-chef-soft` (`brand-soft` 대응)
+- 연청록 카드/배지 배경: `bg-chef-tint` + `border-chef-tint-border`
+- 주방 다크 섹션 배경: `bg-chef-dark` · radial 상단 딥그린: `bg-chef-dark-tint` (`navy-tint` 대응)
+- 반투명(기본 토큰 + opacity, 하드코딩 아님): 글로우 `bg-chef/12` `bg-chef/25` `bg-chef/42` · 보더 `border-chef-soft/35` `border-chef-soft/40`
+- `chef-ink`는 **없다** — chef 위 텍스트는 `text-white` 사용(추가 최소 원칙).
+
 ### 다크 배경 위 반투명 (하드코딩 아님 — 기본 토큰 + opacity)
 
 - 본문 강/약: `text-white/85` · `text-white/70` · `text-white/68` · `text-white/62` · `text-white/60` (시안 실측 스텝, opacity 자유값 허용)
@@ -50,15 +64,30 @@ SSOT: `docs/design.md` · 구현: `app/globals.css @theme inline` · 공용 컴�
 - 스페이싱: Tailwind 기본 4px 그리드. 섹션 수직 `py-24`(96)/`py-20`(80)/`py-28`(112)
 - 그림자: `shadow-brand-sm` `shadow-brand` `shadow-soft` `shadow-float` `shadow-card`(관리자)
 - 모션: `duration-fast`(200ms) `ease-out`
+- 애니메이션: `animate-marquee-left/right`(로고 마퀴) · `animate-drift`(다크 섹션 `aria-hidden` 장식 orb 부유) · `animate-panel-fade`(탭 패널 진입). 신규 keyframes 는 `--animate-*` 토큰 + `@keyframes` 로 globals.css 에 정의하고 design.md 에 문서화한다(지속시간·이징은 토큰 값에 인라인).
+
+### 카드 호버 표준 (className 레시피 — 공용 컴포넌트 아님)
+
+- 라이트 섹션 카드: `transition-all duration-fast ease-out hover:-translate-y-1 hover:shadow-card`
+- 라이트 그리드 카드/스크린 목업: 위 + `hover:shadow-float` (보더 있으면 계열 보더 강조)
+- 다크 섹션 카드: 리프트 + **보더/배경 강조** (그림자는 다크 위에서 안 읽힌다)
+- 계열 보더: 실내 `hover:border-tint-border` · 주방 `hover:border-chef-tint-border`(라이트) / `hover:border-chef-soft/40`(다크) — 계열 분리 원칙을 호버에도 적용
+- 리프트는 `transform` 만(CLS 금지). **호버에 정보를 싣지 않는다** — 어포던스까지만. 인터랙티브 요소는 `focus-visible:ring-brand` 동반.
+
+### prefers-reduced-motion
+
+globals.css 하단 블록이 **전역 처리**한다(무한/진입 애니메이션은 `animation:none`, 그 외는 0.01ms 리셋). **컴포넌트에서 다시 분기하지 말 것** — 신규 모션은 자동 커버된다.
 
 ### content-container (강제)
 
 섹션 내부 래퍼는 `content-container`만 사용(max-width 1240 / padding 32). `max-w-* mx-auto px-*` 직접 금지. 좁은 읽기 칼럼(뉴스 상세 article 등)은 `mx-auto max-w-reading`(760px 토큰) 사용, `max-w-[760px]` 금지.
 
-### Aspect / 플레이스홀더 (뉴스)
+### Aspect / 플레이스홀더
 
 - Aspect: `aspect-featured`(16/7) `aspect-card`(16/10, 목록 카드 썸네일) `aspect-row-thumb`(4/3). `aspect-[..]` 하드코딩 금지.
-- coverImage 폴백 줄무늬: `stripes-surface`(회색계) / `stripes-tint`(연블루계). 인라인 repeating-linear-gradient 하드코딩 금지.
+- 줄무늬 유틸: `stripes-surface`(회색계) / `stripes-tint`(연블루계) / `stripes-chef`(연청록계 — AIR CHEF 주방) / `stripes-dark`(다크 섹션 위 흰 반투명 라인). 인라인 repeating-linear-gradient 하드코딩 금지.
+- **이미지 자산 미확보 자리는 유틸 직접 조합 대신 `<PagePlaceholder>` 단일 소스를 쓴다.**
+  `variant="surface|tint|dark|chef|chef-dark"` — 주방 라이트 카드=`chef`, `bg-chef-dark` 섹션 위=`chef-dark`(eyebrow 를 `chef-soft` 로 렌더해 위 대비 규칙을 지킨다. 주방 다크 섹션에 `dark` 를 쓰면 라벨이 흰색이 되어 규칙 위반).
 
 ## 구 토큰은 쓰지 않는다 (deprecated)
 

@@ -15,6 +15,7 @@
     "prisma:seed:timeline": "ts-node --project tsconfig.json prisma/seed-timeline.ts",
     "prisma:seed:media": "ts-node --project tsconfig.json prisma/seed-media-images.ts",
     "prisma:seed:core-values": "ts-node --project tsconfig.json prisma/seed-core-values.ts",
+    "prisma:seed:air-devices": "ts-node --project tsconfig.json prisma/seed-air-devices.ts",
     "prisma:seed:news": "ts-node --project tsconfig.json prisma/seed-news.ts",
     "prisma:update:news-images": "ts-node --project tsconfig.json prisma/update-news-images.ts",
     "migrate:images-to-r2": "ts-node -r tsconfig-paths/register prisma/migrate-images-to-r2.ts",

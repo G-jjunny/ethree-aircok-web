@@ -7,7 +7,7 @@ import {
   adminNewsQueryOptions,
   AdminNewsApiError,
 } from '@/entities/news';
-import { AdminPageHeader } from '@/shared/ui';
+import { AdminPageHeader, Button } from '@/shared/ui';
 import { NewsFilterSection } from './NewsFilterSection';
 import { NewsTableSection } from './NewsTableSection';
 
@@ -76,14 +76,16 @@ export function AdminNewsListView() {
             <p className="text-error font-body text-[15px] leading-[1.43] [word-break:keep-all]">
               뉴스 목록을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.
             </p>
-            <button
-              type="button"
+            {/* min-h-11(44px) 은 Button size="sm" 에 없는 터치 타겟 보정 — 기존 min-h-[44px] 승계 */}
+            <Button
+              variant="secondary"
+              size="sm"
               onClick={() => refetch()}
               disabled={isRefetching}
-              className="inline-flex items-center justify-center bg-surface-light text-heading-dark text-sm font-medium rounded-md px-4 py-2 min-h-[44px] hover:bg-border-light active:scale-[0.97] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:bg-surface-light disabled:active:scale-100"
+              className="min-h-11"
             >
               {isRefetching ? '다시 시도 중...' : '다시 시도'}
-            </button>
+            </Button>
           </div>
         ) : (
           <>

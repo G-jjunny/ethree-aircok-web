@@ -1,11 +1,15 @@
 import { Children, cloneElement, isValidElement } from 'react'
 import type { ButtonHTMLAttributes, ReactElement, ReactNode } from 'react'
 
-type ButtonVariant = 'primary' | 'dark' | 'outline' | 'white'
+type ButtonVariant = 'primary' | 'dark' | 'outline' | 'white' | 'secondary' | 'destructive'
 type ButtonSize = 'sm' | 'md'
 
 export type ButtonProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'className'> & {
-  /** 시각 스타일. 시안 매핑: primary=히어로/헤더 CTA, dark=라이트 섹션 보조 CTA, outline=다크/컬러 배경 위 보조, white=CTA 컬러 섹션의 흰 버튼 */
+  /**
+   * 시각 스타일. 시안 매핑: primary=히어로/헤더 CTA, dark=라이트 섹션 보조 CTA,
+   * outline=다크/컬러 배경 위 보조, white=CTA 컬러 섹션의 흰 버튼,
+   * secondary=라이트 배경 위 중립 보조(다시 시도/취소), destructive=파괴적 액션(삭제).
+   */
   variant?: ButtonVariant
   /** sm=헤더/인라인(작음, 데스크톱용) · md=단독 CTA(44px 터치 타겟) */
   size?: ButtonSize
@@ -36,6 +40,13 @@ const VARIANT: Record<ButtonVariant, string> = {
     'font-semibold border border-white/50 text-white hover:bg-white/10 focus-visible:ring-white focus-visible:ring-offset-transparent',
   white:
     'font-bold bg-surface-white text-brand shadow-soft hover:bg-white/90 focus-visible:ring-white focus-visible:ring-offset-brand',
+  // secondary/destructive 는 ConfirmDialog 의 취소/삭제 버튼 톤을 그대로 승계하되
+  // 구 토큰(surface-light/heading-dark/border-light/aircok-blue/heading-light)이 아닌
+  // design.md §6 대응표의 신 토큰으로 옮겨 정의한다(색상값 자체는 alias 라 동일).
+  secondary:
+    'font-semibold bg-surface text-ink hover:bg-hairline focus-visible:ring-brand',
+  destructive:
+    'font-semibold bg-error text-white hover:opacity-90 focus-visible:ring-error',
 }
 
 // 가로 패딩은 클린 그리드 스텝(px-5/px-6)만 사용 — globals 의 --spacing-5~10 임시 오염을

@@ -56,12 +56,17 @@ export async function Footer() {
         <div className="flex flex-wrap items-start justify-between gap-11">
           {/* 좌: 로고 + 소개문 */}
           <div className="max-w-[360px]">
+            {/* width/height 는 에셋 고유 크기(200x71) — 두 값이 고유비와 일치해야 next/image
+                종횡비 경고가 발생하지 않는다. 표시 크기는 CSS 로만 제어한다.
+                h-8.5 = 34px (기본 4px 그리드 파생: 8.5 × 4). ⚠️ globals.css 의 구 커스텀
+                스케일(--spacing-5~10, 8=64px)은 정수 스텝만 덮으므로 8.5 는 오염되지 않고,
+                해당 블록 제거 후에도 34px 로 유지된다. */}
             <Image
               src="/images/logos/logo-white.png"
               alt={companyName}
-              height={34}
-              width={128}
-              style={{ width: 'auto', height: '34px' }}
+              width={200}
+              height={71}
+              className="h-8.5 w-auto"
             />
             <p className="mt-4 text-sm leading-relaxed text-white/50">
               보이지 않는 공기를 콕콕 집어 알려주는 측정·모니터링 기술로 고객에게 건강과

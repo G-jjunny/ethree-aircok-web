@@ -9,20 +9,15 @@ const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
 const prisma = new PrismaClient({ adapter: new PrismaPg(pool) });
 
 /**
- * seed-data/media-images.json(실DB 덤프)을 읽어 ServiceImage / DiagnosisImage /
- * CatalogImage 3종을 시드한다. JSON 파일은 절대 수정하지 않고 읽기만 한다.
+ * seed-data/media-images.json(실DB 덤프)을 읽어 DiagnosisImage / CatalogImage
+ * 2종을 시드한다. JSON 파일은 절대 수정하지 않고 읽기만 한다.
  *
- * - service/diagnosis 의 imageUrl 은 R2 절대 URL(외부 참조)이라 로컬 파일 의존성이 없다.
+ * - diagnosis 의 imageUrl 은 R2 절대 URL(외부 참조)이라 로컬 파일 의존성이 없다.
  * - catalog 의 fileUrl 은 로컬 `/uploads/...pdf` 경로를 참조하며, 실제 PDF 파일은
  *   server/public/uploads(gitignore 대상)에 있어야 표시된다. 완전 신규 클론(빈 uploads)
  *   에서는 이 행은 시드되지만 실제 파일이 없어 카탈로그 PDF가 깨질 수 있다.
  *   PDF를 tracked asset으로 커밋하는 것은 이 작업 범위 밖이다.
  */
-interface ServiceImageSeed {
-  imageUrl: string;
-  order: number;
-}
-
 interface DiagnosisImageSeed {
   imageUrl: string;
   order: number;
@@ -35,7 +30,6 @@ interface CatalogImageSeed {
 }
 
 interface MediaImagesSeed {
-  serviceImages: ServiceImageSeed[];
   diagnosisImages: DiagnosisImageSeed[];
   catalogImages: CatalogImageSeed[];
 }
@@ -50,22 +44,6 @@ function toCatalogFileType(raw: string): CatalogFileType {
 }
 
 async function main() {
-  // ServiceImage — 테이블별 독립 멱등 처리
-  const serviceCount = await prisma.serviceImage.count();
-  if (serviceCount > 0) {
-    console.log(
-      `ServiceImage already seeded (${serviceCount} records), skipping.`,
-    );
-  } else {
-    const result = await prisma.serviceImage.createMany({
-      data: seed.serviceImages.map((item) => ({
-        imageUrl: item.imageUrl,
-        order: item.order,
-      })),
-    });
-    console.log(`ServiceImage seeded: ${result.count} records inserted.`);
-  }
-
   // DiagnosisImage — 테이블별 독립 멱등 처리
   const diagnosisCount = await prisma.diagnosisImage.count();
   if (diagnosisCount > 0) {
