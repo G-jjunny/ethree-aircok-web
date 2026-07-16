@@ -29,15 +29,6 @@ const DIAGNOSIS_SLOTS: readonly ProductSectionImageSlotConfig[] = [
   },
 ]
 
-/** 브랜드 배경 섹션의 고정 슬롯(주방 계열). */
-const BRAND_SLOTS: readonly ProductSectionImageSlotConfig[] = [
-  {
-    slot: 'BRAND_BG_KITCHEN',
-    label: `${SITE.airChef.name} 브랜드 배경`,
-    description: '주방·조리실 브랜드 섹션의 배경 이미지',
-  },
-]
-
 /** 안심 블랙박스(측정기) 섹션의 고정 슬롯. 배열 순서 = 화면 렌더 순서. */
 const BLACKBOX_SLOTS: readonly ProductSectionImageSlotConfig[] = [
   {
@@ -74,11 +65,6 @@ export function AdminKitchenImagesView() {
       />
       {/* 섹션 배치 순서는 `/services` 주방 탭의 실제 렌더 순서를 따른다. */}
       <div className="p-6 lg:p-8 flex flex-col gap-6">
-        <ProductSectionImageManager
-          title="브랜드 배경 이미지"
-          description="브랜드 섹션의 배경으로 사용됩니다."
-          slots={BRAND_SLOTS}
-        />
         <ProductSectionImageManager
           title="공기질 진단 서비스 이미지"
           description="진단 서비스 프로세스 각 단계에 노출되는 이미지입니다."

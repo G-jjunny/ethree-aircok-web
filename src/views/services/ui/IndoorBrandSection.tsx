@@ -1,10 +1,19 @@
 import Image from 'next/image'
-import { connection } from 'next/server'
-import { getProductSectionImageListServer } from '@/entities/product-section-image/server'
-import { getSlotImage, type ProductSectionImage } from '@/entities/product-section-image'
 import { SITE } from '@/shared/config'
 import { SectionLabel } from '@/shared/ui'
-import { SlotImage } from './SlotImage'
+
+/**
+ * 브랜드 스트립 배경 — design.md §2 navy 계열 radial(navy-tint → navy). 토큰 var() 참조.
+ *
+ * 배경 이미지와 무관한 순수 장식이다. 이미지 스크림(구 오버레이) 제거 후 py-24 다크 섹션이
+ * 완전 평면으로 남는 것을 막는다 — 코드베이스의 모든 풀하이트 다크 섹션(PageHero·About STATS·
+ * KitchenAirshield)은 radial 배경을 갖고, 평면 bg-navy 는 얇은 스트립(CertifiedSection py-6)
+ * 전용이다. 좌상단 앵커(20% 0%)는 홈 WhatYouGetSection 과 동일 지오메트리이며,
+ * 아래 INDOOR_GLOW 의 좌상단 코너를 상쇄가 아니라 보강하도록 맞춘 것이다
+ * (KitchenAirshield 가 radial·글로우를 같은 코너에 겹치는 것과 동일 규약).
+ */
+const INDOOR_BG =
+  'radial-gradient(120% 100% at 20% 0%, var(--color-navy-tint), var(--color-navy) 60%)'
 
 /** 좌상단 브랜드 글로우 — 토큰 var() + color-mix 파생(하드코딩 아님, PageHero radial 과 동일 관행). */
 const INDOOR_GLOW =
@@ -17,39 +26,15 @@ const COPY = {
 }
 
 /**
- * [실내] 브랜드 스트립 — BRAND_BG_INDOOR 슬롯을 풀블리드 배경으로 깔고 그 위에 로고·타이틀·리드를 얹는다.
- * 슬롯 미등록(현재 기본 상태)이면 dark 줄무늬 폴백이 같은 자리를 채운다.
+ * [실내] 브랜드 스트립 — navy 배경 위에 로고·타이틀·리드를 얹는 정적 섹션.
+ * 데이터 의존이 없어 동기 컴포넌트이며 정적 셸에 프리렌더된다(PPR).
  */
-export async function IndoorBrandSection() {
-  // 빌드 타임 프리렌더(백엔드 미기동)에서 fetch가 실행되지 않도록 요청 시점으로 미룬다.
-  await connection()
-
-  let images: ProductSectionImage[] = []
-  try {
-    images = await getProductSectionImageListServer()
-  } catch {
-    images = []
-  }
-
-  const bg = getSlotImage(images, 'BRAND_BG_INDOOR')
-
+export function IndoorBrandSection() {
   return (
-    <section className="relative overflow-hidden bg-navy">
-      <SlotImage
-        src={bg}
-        alt=""
-        label="BRAND BG"
-        variant="dark"
-        bordered={false}
-        rounded="rounded-none"
-        className="absolute inset-0 h-full w-full"
-        sizes="100vw"
-      />
-      {/* 배경 이미지 위 텍스트 대비 확보용 오버레이 */}
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 bg-linear-to-b from-navy-deep/62 via-navy/72 to-navy-tint/86"
-      />
+    <section
+      className="relative overflow-hidden bg-navy"
+      style={{ backgroundImage: INDOOR_BG }}
+    >
       <div
         aria-hidden="true"
         className="absolute -left-35 -top-25 h-130 w-130 rounded-full blur-xl"

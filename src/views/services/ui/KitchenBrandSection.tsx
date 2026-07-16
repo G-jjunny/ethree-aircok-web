@@ -1,9 +1,16 @@
-import { connection } from 'next/server'
-import { getProductSectionImageListServer } from '@/entities/product-section-image/server'
-import { getSlotImage, type ProductSectionImage } from '@/entities/product-section-image'
 import { SITE } from '@/shared/config'
 import { ChefLabel } from './ChefLabel'
-import { SlotImage } from './SlotImage'
+
+/**
+ * 브랜드 스트립 배경 — design.md §2 chef 계열 radial(chef-dark-tint → chef-dark 62%). 토큰 var() 참조.
+ *
+ * 배경 이미지와 무관한 순수 장식이다. 스톱 구성은 design.md §2 에 명시된 에어쉴드 recipe 그대로이고,
+ * 지오메트리(120% 100% at 20% 0%)만 IndoorBrandSection 과 일치시켰다 — 두 브랜드 스트립은 각 탭의
+ * 동일 역할 섹션이므로 골격을 공유하고 색상 계열만 분기한다(design.md §0). 좌상단 앵커는 아래
+ * KITCHEN_GLOW 의 코너를 보강한다(KitchenAirshield 의 radial·글로우 동일 코너 규약).
+ */
+const KITCHEN_BG =
+  'radial-gradient(120% 100% at 20% 0%, var(--color-chef-dark-tint), var(--color-chef-dark) 62%)'
 
 /** 좌상단 chef 글로우 — 토큰 var() + color-mix 파생(design Pre 승인: chef/42 반투명). */
 const KITCHEN_GLOW =
@@ -15,42 +22,17 @@ const COPY = {
 }
 
 /**
- * [주방] 브랜드 스트립 — BRAND_BG_KITCHEN 슬롯을 풀블리드 배경으로 깔고 AIR CHEF 워드마크를 얹는다.
+ * [주방] 브랜드 스트립 — chef-dark 배경 위에 AIR CHEF 워드마크를 얹는 정적 섹션.
+ * 데이터 의존이 없어 동기 컴포넌트이며 정적 셸에 프리렌더된다(PPR).
  *
- * 대비 규칙(design.md §2): `bg-chef-dark` 섹션이므로 eyebrow 는 chef 가 아니라 chef-soft,
- * 배경 슬롯 폴백은 dark 가 아니라 chef-dark variant 를 쓴다(chef-dark 는 자체 배경색이 없어
- * 부모 섹션의 `bg-chef-dark` 가 배경을 제공한다).
+ * 대비 규칙(design.md §2): `bg-chef-dark` 섹션이므로 eyebrow 는 chef 가 아니라 chef-soft 를 쓴다.
  */
-export async function KitchenBrandSection() {
-  // 빌드 타임 프리렌더(백엔드 미기동)에서 fetch가 실행되지 않도록 요청 시점으로 미룬다.
-  await connection()
-
-  let images: ProductSectionImage[] = []
-  try {
-    images = await getProductSectionImageListServer()
-  } catch {
-    images = []
-  }
-
-  const bg = getSlotImage(images, 'BRAND_BG_KITCHEN')
-
+export function KitchenBrandSection() {
   return (
-    <section className="relative overflow-hidden bg-chef-dark">
-      <SlotImage
-        src={bg}
-        alt=""
-        label="BRAND BG"
-        variant="chef-dark"
-        bordered={false}
-        rounded="rounded-none"
-        className="absolute inset-0 h-full w-full"
-        sizes="100vw"
-      />
-      {/* 배경 이미지 위 텍스트 대비 확보용 오버레이 */}
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 bg-linear-to-b from-chef-dark/60 via-chef-dark/72 to-chef-dark/88"
-      />
+    <section
+      className="relative overflow-hidden bg-chef-dark"
+      style={{ backgroundImage: KITCHEN_BG }}
+    >
       <div
         aria-hidden="true"
         className="absolute -left-35 -top-25 h-130 w-130 rounded-full blur-xl"

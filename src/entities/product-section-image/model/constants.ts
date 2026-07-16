@@ -8,10 +8,6 @@
  * 슬롯 추가/제거는 반드시 백엔드 마이그레이션과 함께 처리한다.
  */
 export const PRODUCT_IMAGE_SLOTS = [
-  /** 브랜드 섹션 배경 이미지 — 실내. */
-  'BRAND_BG_INDOOR',
-  /** 브랜드 섹션 배경 이미지 — 주방. */
-  'BRAND_BG_KITCHEN',
   /** 모니터링 섹션 — 대시보드. */
   'MONITORING_DASHBOARD',
   /** 모니터링 섹션 — 통계. */
