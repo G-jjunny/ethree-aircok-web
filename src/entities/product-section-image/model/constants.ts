@@ -28,4 +28,10 @@ export const PRODUCT_IMAGE_SLOTS = [
   'DIAGNOSIS_REPORT',
   /** 진단 서비스 섹션 — 제안. */
   'DIAGNOSIS_PROPOSAL',
+  /** 블랙박스 섹션 — 제품 사진. */
+  'KITCHEN_BLACKBOX_PRODUCT',
+  /** 블랙박스 섹션 — 조리실 오염 현황 DID. */
+  'KITCHEN_BLACKBOX_DID',
+  /** 에어쉴드 섹션 — 특허 급기 기술. */
+  'KITCHEN_AIRSHIELD_TECH',
 ] as const;

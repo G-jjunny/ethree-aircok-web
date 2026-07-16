@@ -1,3 +1,4 @@
+import { Fragment } from 'react'
 import { connection } from 'next/server'
 import { getProductSectionImageListServer } from '@/entities/product-section-image/server'
 import {
@@ -12,7 +13,11 @@ import { SlotImage } from './SlotImage'
 const COPY = {
   eyebrow: 'DIAGNOSIS SERVICE',
   title: '공기질 진단 서비스',
-  body: '전문 인력이 현장을 방문해 조리실 공기질을 측정하고, 개선 방향을 담은 진단 리포트를 제공합니다.',
+  /** 시안 줄바꿈 기준 2줄. 렌더 시 <br /> 로 이어붙인다(home 섹션들과 동일한 JSX 줄바꿈 규약). */
+  body: [
+    '전문 인력이 현장을 방문해 조리실 공기질을 측정 및 설비를 점검하고(5-7일)',
+    '해당 공간의 오욤도와 설비에 대한 진단서를 발급합니다.',
+  ],
 }
 
 /** 4카드 정적 콘텐츠. 이미지만 슬롯(API)에서 온다. */
@@ -84,7 +89,12 @@ export async function KitchenDiagnosisSection() {
         </h2>
         {/* token 없음: max-w-[640px] 섹션 리드 프로즈 폭(1회성) */}
         <p className="mt-3 max-w-[640px] text-lead-sm leading-relaxed text-muted">
-          {COPY.body}
+          {COPY.body.map((line, i) => (
+            <Fragment key={line}>
+              {i > 0 && <br />}
+              {line}
+            </Fragment>
+          ))}
         </p>
 
         <ul className="mt-11 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
