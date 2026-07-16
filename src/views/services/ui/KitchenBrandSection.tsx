@@ -33,9 +33,10 @@ export function KitchenBrandSection() {
       className="relative overflow-hidden bg-chef-dark"
       style={{ backgroundImage: KITCHEN_BG }}
     >
+      {/* animate-drift — IndoorBrandSection 과 동일 규약(골격 공유, 계열색만 분기). */}
       <div
         aria-hidden="true"
-        className="absolute -left-35 -top-25 h-130 w-130 rounded-full blur-xl"
+        className="absolute -left-35 -top-25 h-130 w-130 animate-drift rounded-full blur-xl"
         style={{ backgroundImage: KITCHEN_GLOW }}
       />
 

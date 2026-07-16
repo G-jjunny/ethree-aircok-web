@@ -112,7 +112,9 @@ function BlockVisual({
   // DID — 현장 디스플레이를 형상화한 네이비 프레임(크롬 없음)
   if (block.chrome === null) {
     return (
-      <div className="overflow-hidden rounded-card bg-navy p-4 shadow-card">
+      // 스크린 목업 호버(design.md §4): 리프트 + shadow-float — "화면이 지면에서 떠오른다".
+      // 보더가 없는 프레임이라 보더 강조는 생략하고 그림자만 승격한다.
+      <div className="overflow-hidden rounded-card bg-navy p-4 shadow-card transition-all duration-fast ease-out hover:-translate-y-1 hover:shadow-float">
         <SlotImage
           src={src}
           alt={block.title}
@@ -135,7 +137,8 @@ function BlockVisual({
   }
 
   return (
-    <div className="overflow-hidden rounded-image border border-hairline shadow-card">
+    // 스크린 목업 호버 — DID 프레임과 동일 레시피. 보더가 있으므로 brand 계열(tint-border)로 함께 강조한다.
+    <div className="overflow-hidden rounded-image border border-hairline shadow-card transition-all duration-fast ease-out hover:-translate-y-1 hover:border-tint-border hover:shadow-float">
       <div className="flex items-center gap-2 bg-navy px-4 py-3">
         <ChromeDots />
         <span className="ml-3 font-display text-mini tracking-label-sm text-white/50">

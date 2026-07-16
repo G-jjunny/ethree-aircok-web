@@ -97,11 +97,14 @@ export async function KitchenDiagnosisSection() {
           ))}
         </p>
 
+        {/* 카드 호버 표준(design.md §4) — NewsCard 와 동일한 이미지 상단형 그리드 카드라
+            동일 레시피(리프트 + shadow-float)를 쓴다. 보더는 chef 계열로 강조해
+            AIR CHEF 탭 안에서 계열 정체성을 유지한다(계열 분리 원칙). */}
         <ul className="mt-11 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {CARDS.map((card) => (
             <li
               key={card.slot}
-              className="overflow-hidden rounded-image border border-hairline bg-surface-white shadow-card"
+              className="overflow-hidden rounded-image border border-hairline bg-surface-white shadow-card transition-all duration-fast ease-out hover:-translate-y-1 hover:border-chef-tint-border hover:shadow-float"
             >
               <SlotImage
                 src={slotImages[card.slot]}

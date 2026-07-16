@@ -56,8 +56,10 @@ export function ProcessFlow({ steps, tone }: { steps: FlowStep[]; tone: FlowTone
     <div className="mt-11 grid items-stretch gap-4 lg:grid-cols-[1fr_auto_1fr_auto_1fr] lg:gap-0">
       {steps.map((s, i) => (
         <div key={s.step} className="contents">
+          {/* 카드 호버 표준(design.md §4): 리프트 + 그림자. NewsCard/LightStatCard 와 동일 레시피.
+              계열 중립 그림자(shadow-card)라 tone 분기가 필요 없다 — TONE 은 색상 전용으로 유지. */}
           <div
-            className={`flex flex-col gap-4 rounded-image p-6 ${
+            className={`flex flex-col gap-4 rounded-image p-6 transition-all duration-fast ease-out hover:-translate-y-1 hover:shadow-card ${
               i === steps.length - 1 ? t.lastCard : t.card
             }`}
           >

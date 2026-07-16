@@ -62,8 +62,9 @@ export async function KitchenBlackboxSection() {
 
         {/* 시안 데스크톱 비율 .9fr 1.1fr — 모바일은 1컬럼 스택. */}
         <div className="mt-11 grid items-stretch gap-11 lg:grid-cols-[0.9fr_1.1fr]">
-          {/* 좌: 제품 카드 */}
-          <div className="flex flex-col rounded-card-lg border border-hairline bg-surface p-6">
+          {/* 좌: 제품 카드 — 카드 호버 표준(리프트 + 그림자 + chef 계열 보더 강조).
+              큰 패널이라 shadow-float 는 과해 shadow-card 로 억제한다. */}
+          <div className="flex flex-col rounded-card-lg border border-hairline bg-surface p-6 transition-all duration-fast ease-out hover:-translate-y-1 hover:border-chef-tint-border hover:shadow-card">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <ChefLabel size="sm">MODEL</ChefLabel>
@@ -97,8 +98,9 @@ export async function KitchenBlackboxSection() {
             </div>
           </div>
 
-          {/* 우: 조리실 오염 현황 DID — 다크 크롬바 + 화면 슬롯 */}
-          <div className="flex flex-col overflow-hidden rounded-image border border-hairline shadow-card">
+          {/* 우: 조리실 오염 현황 DID — 다크 크롬바 + 화면 슬롯.
+              IndoorCloud 의 스크린 목업과 동일 레시피(계열색만 chef 로 분기). */}
+          <div className="flex flex-col overflow-hidden rounded-image border border-hairline shadow-card transition-all duration-fast ease-out hover:-translate-y-1 hover:border-chef-tint-border hover:shadow-float">
             <div className="flex items-center gap-2 bg-navy px-4.5 py-3">
               <span className="size-2.5 rounded-full bg-aqi-good" />
               <span className="font-display text-mini text-white/60">{COPY.didTitle}</span>

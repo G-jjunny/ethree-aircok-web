@@ -99,16 +99,23 @@ const TIERS: {
   },
 ]
 
-/** 티어 강조/중립 톤 매핑 — 구조는 공유하고 색상만 교체한다(ProcessFlow 의 TONE 규약과 동일). */
+/**
+ * 티어 강조/중립 톤 매핑 — 구조는 공유하고 색상만 교체한다(ProcessFlow 의 TONE 규약과 동일).
+ *
+ * `card` 의 호버 강조도 톤별로 분기한다: featured 는 이미 chef 틴트를 깔고 있어 같은 계열을
+ * 한 단계 밝히고(chef/12 → chef/25), neutral 은 중립 흰 반투명을 한 단계 밝힌다
+ * (white/4 → white/8, 보더 white/10 → white/16 — 배지에 쓰인 스텝 재사용).
+ * 전부 design.md §2 "기본 토큰 + opacity" 범위라 신규 토큰이 아니다.
+ */
 const TIER_TONE = {
   featured: {
-    card: 'bg-chef/12 border-chef-soft/35',
+    card: 'bg-chef/12 border-chef-soft/35 hover:bg-chef/25',
     badge: 'bg-chef-soft/20 border-chef-soft/40 text-chef-soft',
     specLabel: 'text-chef-soft',
     specValue: 'text-white',
   },
   neutral: {
-    card: 'bg-white/4 border-white/10',
+    card: 'bg-white/4 border-white/10 hover:bg-white/8 hover:border-white/16',
     badge: 'bg-white/8 border-white/16 text-white/75',
     specLabel: 'text-white/50',
     specValue: 'text-white/90',
@@ -140,9 +147,10 @@ export async function KitchenAirshieldSection() {
       className="relative overflow-hidden bg-chef-dark py-24"
       style={{ backgroundImage: AIRSHIELD_BG }}
     >
+      {/* animate-drift — 브랜드 스트립 orb 와 동일 규약. */}
       <div
         aria-hidden="true"
-        className="absolute -right-30 -top-20 h-130 w-130 rounded-full blur-xl"
+        className="absolute -right-30 -top-20 h-130 w-130 animate-drift rounded-full blur-xl"
         style={{ backgroundImage: AIRSHIELD_GLOW }}
       />
 
@@ -173,12 +181,15 @@ export async function KitchenAirshieldSection() {
             sizes="(min-width: 1024px) 580px, 100vw"
           />
 
-          {/* 우: 기능 카드 3종 세로 스택 */}
+          {/* 우: 기능 카드 3종 세로 스택.
+              카드 호버는 리프트 + 보더 강조 — 그림자가 chef-dark 위에서 읽히지 않기 때문이다
+              (DarkStatCard 가 그림자 대신 bg 를 밝히는 것과 동일 취지).
+              보더는 chef-soft — chef-dark 위 대비 규칙(design.md §2) 준수. */}
           <ul className="flex flex-col gap-4">
             {FEATURES.map(({ icon: Icon, title, body }) => (
               <li
                 key={title}
-                className="flex flex-1 items-start gap-4.5 rounded-image border border-white/14 bg-linear-160 from-white/8 to-white/2 px-6.5 py-5"
+                className="flex flex-1 items-start gap-4.5 rounded-image border border-white/14 bg-linear-160 from-white/8 to-white/2 px-6.5 py-5 transition-all duration-fast ease-out hover:-translate-y-1 hover:border-chef-soft/40"
               >
                 <span className="flex size-11.5 shrink-0 items-center justify-center rounded-btn border border-chef-soft/40 bg-chef/25 text-chef-soft">
                   <Icon className="size-5.5" />
@@ -203,7 +214,10 @@ export async function KitchenAirshieldSection() {
             {TIERS.map((tier) => {
               const t = tier.featured ? TIER_TONE.featured : TIER_TONE.neutral
               return (
-                <li key={tier.badge} className={`rounded-image border px-5 py-6.5 ${t.card}`}>
+                <li
+                  key={tier.badge}
+                  className={`rounded-image border px-5 py-6.5 transition-all duration-fast ease-out hover:-translate-y-1 ${t.card}`}
+                >
                   <span
                     className={`inline-flex rounded-pill border px-3 py-1.5 font-display text-mini font-bold tracking-label-sm ${t.badge}`}
                   >

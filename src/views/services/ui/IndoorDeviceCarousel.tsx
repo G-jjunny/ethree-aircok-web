@@ -74,6 +74,11 @@ export function IndoorDeviceCarousel({ devices }: { devices: AirDevice[] }) {
         <div className="relative z-10 flex min-h-75 items-center justify-center gap-6">
           {devices.map((device, i) => {
             const isActive = i === activeIndex
+            // 비활성 카드는 hover 시 살짝 커지며(scale-90→95) 밝아져(opacity-62→100)
+            // 클릭 가능함을 알린다 — 정보가 아니라 어포던스이므로 터치·키보드 사용자가
+            // 놓치는 내용이 없다(선택 상태는 aria-pressed·라벨 색이 이미 전달).
+            // focus-visible 링은 dots·prev/next 와 동일한 ring-brand 패턴으로 맞췄다
+            // (기존에 카드 버튼만 포커스 표시가 없던 접근성 갭).
             return (
               <button
                 type="button"
@@ -81,8 +86,8 @@ export function IndoorDeviceCarousel({ devices }: { devices: AirDevice[] }) {
                 onClick={() => setActive(i)}
                 aria-label={`${device.name} 선택`}
                 aria-pressed={isActive}
-                className={`flex flex-none cursor-pointer flex-col items-center gap-3.5 transition-transform duration-fast ease-out ${
-                  isActive ? 'scale-100' : 'scale-90'
+                className={`group flex flex-none cursor-pointer flex-col items-center gap-3.5 rounded-card transition-transform duration-fast ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 ${
+                  isActive ? 'scale-100' : 'scale-90 hover:scale-95'
                 }`}
               >
                 <SlotImage
@@ -94,7 +99,7 @@ export function IndoorDeviceCarousel({ devices }: { devices: AirDevice[] }) {
                   className={`aspect-card max-w-full bg-surface-white transition-all duration-fast ease-out ${
                     isActive
                       ? 'w-90 border border-hairline shadow-brand'
-                      : 'w-55 border border-hairline opacity-62 shadow-card'
+                      : 'w-55 border border-hairline opacity-62 shadow-card group-hover:opacity-100'
                   }`}
                   sizes="(min-width: 768px) 360px, 60vw"
                 />

@@ -126,8 +126,10 @@ export function ServicesTabs({
                     : 'border-transparent text-faint hover:text-ink'
                 }`}
               >
+                {/* 활성/비활성 감광은 원래 즉시 점프했다 — 하단 보더·라벨 색이 함께
+                    페이드되도록 opacity 도 transition 에 태운다(계열색 자체는 불변). */}
                 <span
-                  className={`font-display text-mini font-bold uppercase tracking-eyebrow ${t.enColor} ${
+                  className={`font-display text-mini font-bold uppercase tracking-eyebrow transition-opacity duration-fast ease-out ${t.enColor} ${
                     isActive ? 'opacity-100' : 'opacity-50'
                   }`}
                 >
@@ -149,7 +151,11 @@ export function ServicesTabs({
           /* 패널 자체를 Tab 키 스톱으로 — 탭바에서 Tab 한 번에 패널 본문으로 진입한다. */
           tabIndex={0}
           hidden={tab !== t.key}
-          className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand"
+          /* animate-panel-fade — 탭 전환 진입 페이드(위로 10px + opacity).
+             비활성 패널은 hidden(display:none) 이라 애니메이션이 정지하고, 표시로 돌아올 때
+             브라우저가 재시작시킨다. 즉 상태·키 추가 없이 전환마다 재생된다.
+             transform/opacity 만 쓰므로 CLS 없음. reduced-motion 에서는 globals.css 가 끈다. */
+          className="animate-panel-fade focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand"
         >
           {t.key === 'indoor' ? indoor : kitchen}
         </div>

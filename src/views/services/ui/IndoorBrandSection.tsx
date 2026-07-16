@@ -35,9 +35,11 @@ export function IndoorBrandSection() {
       className="relative overflow-hidden bg-navy"
       style={{ backgroundImage: INDOOR_BG }}
     >
+      {/* animate-drift — 앰비언트 부유. 순수 장식(aria-hidden)이라 정보를 싣지 않고,
+          overflow-hidden 섹션 안에서 transform 만 움직이므로 레이아웃에 영향이 없다. */}
       <div
         aria-hidden="true"
-        className="absolute -left-35 -top-25 h-130 w-130 rounded-full blur-xl"
+        className="absolute -left-35 -top-25 h-130 w-130 animate-drift rounded-full blur-xl"
         style={{ backgroundImage: INDOOR_GLOW }}
       />
 
