@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { ArrowRightIcon } from './icons'
+import { ArrowRight } from 'lucide-react'
 
 /**
  * 3스텝 프로세스 플로우(시안 IndoorFlow / KitchenFlow 공통 골격).
@@ -82,7 +82,7 @@ export function ProcessFlow({ steps, tone }: { steps: FlowStep[]; tone: FlowTone
           {/* 스텝 사이 장식 화살표 — 마지막 스텝 뒤에는 없다. 모바일에선 숨긴다. */}
           {i < steps.length - 1 && (
             <div className={`hidden items-center justify-center px-2 lg:flex ${t.arrow}`}>
-              <ArrowRightIcon className="h-8.5 w-8.5" />
+              <ArrowRight className="h-8.5 w-8.5" />
             </div>
           )}
         </div>

@@ -2,6 +2,7 @@
 
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
+import { GripVertical } from 'lucide-react'
 import type { AirDevice } from '@/entities/air-device'
 import { AIR_DEVICE_SPEC_FIELDS } from '../model/airDeviceFields'
 import { AirDeviceImageField } from './AirDeviceImageField'
@@ -61,14 +62,7 @@ export function SortableAirDeviceCard({
           {...attributes}
           {...listeners}
         >
-          <svg className="w-4 h-4" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-            <path
-              d="M5 3.5h.01M9 3.5h.01M5 7h.01M9 7h.01M5 10.5h.01M9 10.5h.01"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-            />
-          </svg>
+          <GripVertical className="w-4 h-4" aria-hidden="true" />
         </button>
       </div>
 

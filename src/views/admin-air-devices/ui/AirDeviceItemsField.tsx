@@ -2,6 +2,7 @@
 
 import { useFieldArray } from 'react-hook-form'
 import type { Control, FieldErrors, UseFormRegister } from 'react-hook-form'
+import { ArrowDown, ArrowUp, X } from 'lucide-react'
 import type { AirDeviceFormValues } from '@/features/air-device-editor'
 
 interface AirDeviceItemsFieldProps {
@@ -111,20 +112,7 @@ export function AirDeviceItemsField({
                     aria-label={`${index + 1}번 항목 위로 이동`}
                     className={iconButtonClass}
                   >
-                    <svg
-                      className="w-4 h-4"
-                      viewBox="0 0 16 16"
-                      fill="none"
-                      aria-hidden="true"
-                    >
-                      <path
-                        d="M8 12.5v-9M4 7.5l4-4 4 4"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
+                    <ArrowUp className="w-4 h-4" aria-hidden="true" />
                   </button>
                   <button
                     type="button"
@@ -133,20 +121,7 @@ export function AirDeviceItemsField({
                     aria-label={`${index + 1}번 항목 아래로 이동`}
                     className={iconButtonClass}
                   >
-                    <svg
-                      className="w-4 h-4"
-                      viewBox="0 0 16 16"
-                      fill="none"
-                      aria-hidden="true"
-                    >
-                      <path
-                        d="M8 3.5v9M4 8.5l4 4 4-4"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
+                    <ArrowDown className="w-4 h-4" aria-hidden="true" />
                   </button>
                   <button
                     type="button"
@@ -155,19 +130,7 @@ export function AirDeviceItemsField({
                     aria-label={`${index + 1}번 항목 삭제`}
                     className="inline-flex items-center justify-center w-11 h-11 shrink-0 rounded-btn text-error hover:bg-surface transition-colors disabled:opacity-30 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-error focus-visible:ring-offset-2"
                   >
-                    <svg
-                      className="w-4 h-4"
-                      viewBox="0 0 16 16"
-                      fill="none"
-                      aria-hidden="true"
-                    >
-                      <path
-                        d="M4 4l8 8M12 4l-8 8"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                      />
-                    </svg>
+                    <X className="w-4 h-4" aria-hidden="true" />
                   </button>
                 </div>
               </li>

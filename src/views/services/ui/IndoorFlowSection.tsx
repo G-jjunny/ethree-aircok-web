@@ -1,6 +1,6 @@
+import { ChartNoAxesColumn, Database, Monitor } from 'lucide-react'
 import { SectionLabel } from '@/shared/ui'
 import { ProcessFlow, type FlowStep } from './ProcessFlow'
-import { DatabaseIcon, MeasureIcon, MonitorIcon } from './icons'
 
 const COPY = {
   eyebrow: 'SYSTEM ARCHITECTURE',
@@ -13,19 +13,19 @@ const STEPS: FlowStep[] = [
     step: 'STEP 01',
     title: '측정',
     body: '공기질 측정기가 미세먼지·CO₂·VOCs 등 12종 지표를 실시간 감지합니다.',
-    icon: <MeasureIcon className="h-full w-full" />,
+    icon: <ChartNoAxesColumn className="h-full w-full" />,
   },
   {
     step: 'STEP 02',
     title: '저장 · 분석',
     body: '수집 데이터를 클라우드에 저장하고 알고리즘으로 추이·이상치를 분석합니다.',
-    icon: <DatabaseIcon className="h-full w-full" />,
+    icon: <Database className="h-full w-full" />,
   },
   {
     step: 'STEP 03',
     title: '모니터링 · 관리',
     body: '웹·모바일 대시보드로 실시간 확인하고 환기·정화 설비를 제어합니다.',
-    icon: <MonitorIcon className="h-full w-full" />,
+    icon: <Monitor className="h-full w-full" />,
   },
 ]
 

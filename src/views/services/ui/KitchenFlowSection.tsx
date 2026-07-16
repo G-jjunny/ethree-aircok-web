@@ -1,7 +1,7 @@
+import { Activity, Search, Sparkles } from 'lucide-react'
 import { SITE } from '@/shared/config'
 import { ChefLabel } from './ChefLabel'
 import { ProcessFlow, type FlowStep } from './ProcessFlow'
-import { PulseIcon, SearchIcon, SparkleIcon } from './icons'
 
 const COPY = {
   eyebrow: 'PROCESS',
@@ -13,19 +13,19 @@ const STEPS: FlowStep[] = [
     step: 'STEP 01',
     title: '진단',
     body: '현장 공기질을 측정·분석하여 유증기·미세먼지 발생 원인을 진단합니다.',
-    icon: <SearchIcon className="h-full w-full" />,
+    icon: <Search className="h-full w-full" />,
   },
   {
     step: 'STEP 02',
     title: '개선',
     body: '에어쉴드 급기장치로 청정 공기를 공급하고 오염 공기를 배출·정화합니다.',
-    icon: <SparkleIcon className="h-full w-full" />,
+    icon: <Sparkles className="h-full w-full" />,
   },
   {
     step: 'STEP 03',
     title: '관리',
     body: '블랙박스로 실시간 모니터링하고 정기 진단 보고서로 지속 관리합니다.',
-    icon: <PulseIcon className="h-full w-full" />,
+    icon: <Activity className="h-full w-full" />,
   },
 ]
 

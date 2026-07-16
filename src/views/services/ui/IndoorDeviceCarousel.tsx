@@ -1,9 +1,9 @@
 'use client'
 
 import { useState } from 'react'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 import type { AirDevice } from '@/entities/air-device'
 import { SlotImage } from './SlotImage'
-import { ChevronLeftIcon, ChevronRightIcon } from './icons'
 
 /** 제품 아래 브랜드 글로우 — 토큰 var() + color-mix 파생(하드코딩 아님). */
 const CAROUSEL_GLOW =
@@ -57,7 +57,7 @@ export function IndoorDeviceCarousel({ devices }: { devices: AirDevice[] }) {
               aria-label="이전 제품"
               className="absolute left-5 top-1/2 z-20 flex h-11.5 w-11.5 -translate-y-1/2 items-center justify-center rounded-full border border-hairline bg-surface-white/92 text-brand shadow-card transition-colors duration-fast hover:bg-surface-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
             >
-              <ChevronLeftIcon className="h-5 w-5" />
+              <ChevronLeft className="h-5 w-5" />
             </button>
             <button
               type="button"
@@ -65,7 +65,7 @@ export function IndoorDeviceCarousel({ devices }: { devices: AirDevice[] }) {
               aria-label="다음 제품"
               className="absolute right-5 top-1/2 z-20 flex h-11.5 w-11.5 -translate-y-1/2 items-center justify-center rounded-full border border-hairline bg-surface-white/92 text-brand shadow-card transition-colors duration-fast hover:bg-surface-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
             >
-              <ChevronRightIcon className="h-5 w-5" />
+              <ChevronRight className="h-5 w-5" />
             </button>
           </>
         )}

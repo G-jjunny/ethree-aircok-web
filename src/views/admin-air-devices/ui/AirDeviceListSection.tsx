@@ -17,6 +17,7 @@ import {
   sortableKeyboardCoordinates,
 } from '@dnd-kit/sortable'
 import { toast } from 'sonner'
+import { Monitor } from 'lucide-react'
 import type { AirDevice } from '@/entities/air-device'
 import {
   useDeleteAirDeviceMutation,
@@ -115,35 +116,7 @@ export function AirDeviceListSection({
   if (items.length === 0) {
     return (
       <div className="bg-surface-white rounded-card border border-hairline px-6 py-16 flex flex-col items-center justify-center text-center gap-3">
-        <svg
-          className="w-12 h-12 text-faint"
-          viewBox="0 0 24 24"
-          fill="none"
-          aria-hidden="true"
-        >
-          <rect
-            x="3"
-            y="4"
-            width="18"
-            height="14"
-            rx="2"
-            stroke="currentColor"
-            strokeWidth="1.5"
-          />
-          <path
-            d="M7 20h10M12 18v2"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-          />
-          <path
-            d="M7 12l3-3 2.5 2.5L15 8l2 2"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
+        <Monitor className="w-12 h-12 text-faint" aria-hidden="true" />
         <p className="text-sm text-muted [word-break:keep-all]">
           등록된 공기질 측정기가 없습니다.
         </p>
