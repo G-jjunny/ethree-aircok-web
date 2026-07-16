@@ -372,31 +372,6 @@ model CoreValue {
   @@index([order])
 }
 
-/// 공기질 관리 제품군(서비스) 소개 이미지 (#83).
-///
-/// 운용 방식:
-/// - 가변 이미지 목록이다(추가/삭제/드래그앤드롭 정렬/교체). 캡션/제목 없이 이미지 URL + 표시 순서만 보관한다.
-/// - 공개 목록(GET /api/service-images)은 order 오름차순, 동률 시 createdAt 보조 정렬로 노출한다.
-/// - 이미지 업로드는 2단계다: POST /api/service-images/uploads (multipart, 필드명 file)로 R2(folder: services)에
-///   업로드해 공개 URL을 받은 뒤, POST /api/service-images (body { imageUrl, order? })로 레코드를 생성한다.
-/// - 이미지 교체/순서 단건 수정은 PATCH /api/service-images/:id (body { imageUrl?, order? })로 처리한다.
-/// - 어드민은 드래그앤드롭으로 순서를 일괄 변경한다(PATCH /api/service-images/reorder, body { items: [{ id, order }] }).
-///   reorder 는 트랜잭션 갱신 후 갱신된 전체 배열을 반환한다(partners 패턴).
-///
-/// 컬럼 정책:
-/// - id: cuid (String). 기존 모델 패턴 통일.
-/// - imageUrl: R2 업로드 후 받은 공개 이미지 URL. NOT NULL.
-/// - order: 표시 순서(오름차순). 기본값 0. order 미지정 생성 시 맨 뒤(마지막 order + 1)에 자동 채번한다.
-model ServiceImage {
-  id        String   @id @default(cuid())
-  imageUrl  String
-  order     Int      @default(0)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([order])
-}
-
 /// 진단 서비스 신청 소개 이미지 (#83).
 ///
 /// 운용 방식:

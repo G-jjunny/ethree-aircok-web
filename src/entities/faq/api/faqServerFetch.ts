@@ -13,7 +13,7 @@ export const FAQ_CACHE_TAG = 'faq'
 
 /**
  * 서버/클라이언트 환경에 따라 API baseURL을 반환한다.
- * 서버 컴포넌트에서는 NestJS를 직접 가리키는 절대 URL을 사용한다(news/service-image 패턴).
+ * 서버 컴포넌트에서는 NestJS를 직접 가리키는 절대 URL을 사용한다(news 패턴).
  */
 function getApiBaseUrl(): string {
   if (typeof window === 'undefined') {
