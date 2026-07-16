@@ -31,7 +31,7 @@ docker compose up --build
 시크릿은 `server/.env` 에서 로드합니다(이미지에 포함되지 않음). 최소 필요 키:
 
 ```
-DATABASE_URL=postgresql://postgres:jjunny@localhost:5432/aircok
+DATABASE_URL=postgresql://postgres:jjunny@localhost:5434/aircok
 ADMIN_SEED_PASSWORD=...
 JWT_SECRET=...
 CLOUDFLARE_ACCOUNT_ID=...
@@ -55,12 +55,19 @@ R2_PUBLIC_DEV_URL=...
 npm run dev   # Next.js dev (localhost:3000)
 ```
 
-## 로컬 네이티브 개발(도커 없이 백엔드)
+## 로컬 네이티브 개발(백엔드만 네이티브, DB는 도커)
+
+백엔드 프로세스만 네이티브로 실행하고, DB는 이 경로에서도 도커 컨테이너를 사용합니다.
 
 ```bash
+docker compose up -d db   # DB는 도커 컨테이너로만 실행 (호스트 5434)
 npm ci
 npx prisma migrate deploy
 npm run prisma:seed && npm run prisma:seed:news \
   && npm run prisma:seed:core-values && npm run prisma:seed:timeline
 npm run start:dev
 ```
+
+> 이 경로에서는 compose 의 오버라이드가 적용되지 않고 `server/.env` 의
+> `DATABASE_URL`(= `localhost:5434`)이 그대로 사용됩니다. 호스트에서 prisma CLI /
+> `npx prisma studio` 를 쓸 때도 기준 포트는 **5434** 입니다.

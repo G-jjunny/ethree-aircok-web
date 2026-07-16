@@ -10,7 +10,8 @@
 # 비밀번호(postgres:jjunny)는 server/.env 의 DATABASE_URL 값과 반드시 일치해야 한다.
 # 단일 커맨드(`docker compose up --build`) 구동을 위해 db 초기화용 POSTGRES_* 값과
 # 컨테이너 네트워크용 DATABASE_URL 오버라이드는 여기에 직접 기입한다.
-# (server/.env 의 DATABASE_URL 은 localhost:5432 기준이라 컨테이너 내부에서 db:5432 로 덮어씀)
+# (server/.env 의 DATABASE_URL 은 호스트 기준 localhost:5434 — prisma CLI/studio 등 호스트 도구용이며,
+#  컨테이너 내부에서는 도달 불가하므로 아래 migrate/server 에서 db:5432 로 오버라이드한다)
 
 services:
   db:
