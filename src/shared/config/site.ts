@@ -234,7 +234,7 @@ export const SITE = {
   },
 
   footer: {
-    copyright: `© ${new Date().getFullYear()} 스마트에어콕. All rights reserved.`,
+    copyrightSuffix: "스마트에어콕. All rights reserved.",
     ceo: "조흔우",
     bizNo: "689-87-00920",
     mailOrderNo: "2020-서울성동-02120",
