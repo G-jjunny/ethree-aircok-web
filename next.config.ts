@@ -6,6 +6,10 @@ const nextConfig: NextConfig = {
   // Enables 'use cache' directive, cacheLife/cacheTag, and Partial Prerendering (PPR) by default.
   cacheComponents: true,
 
+  // Tailscale IP(모바일)에서 dev 서버 접속 시 dev 전용 에셋(JS 청크 등)의
+  // cross-origin 요청을 허용한다. 값은 protocol/port 없는 hostname 문자열 배열.
+  allowedDevOrigins: ['100.73.143.53'],
+
   // 응답 헤더에서 프레임워크 노출 제거(정보 최소화).
   poweredByHeader: false,
 
