@@ -10,11 +10,12 @@ import { SiteInfoModule } from './site-info/site-info.module';
 import { PartnersModule } from './partners/partners.module';
 import { TeamModule } from './team/team.module';
 import { TimelineModule } from './timeline/timeline.module';
-import { DiagnosisImageModule } from './diagnosis-image/diagnosis-image.module';
 import { DiagnosisConsultationModule } from './diagnosis-consultation/diagnosis-consultation.module';
 import { CoreValuesModule } from './core-values/core-values.module';
 import { AirDevicesModule } from './air-devices/air-devices.module';
 import { ProductImagesModule } from './product-images/product-images.module';
+import { ServiceReviewsModule } from './service-reviews/service-reviews.module';
+import { CertificationsModule } from './certifications/certifications.module';
 
 @Module({
   imports: [
@@ -34,11 +35,12 @@ import { ProductImagesModule } from './product-images/product-images.module';
     PartnersModule,
     TeamModule,
     TimelineModule,
-    DiagnosisImageModule,
     DiagnosisConsultationModule,
     CoreValuesModule,
     AirDevicesModule,
     ProductImagesModule,
+    ServiceReviewsModule,
+    CertificationsModule,
   ],
 })
 export class AppModule {}
