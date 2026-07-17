@@ -30,6 +30,9 @@ export async function Footer() {
   // 빌드 타임 프리렌더(백엔드 미기동)에서 fetch가 실행되지 않도록 요청 시점으로 미룬다.
   await connection()
 
+  // connection() 이후이므로 요청 시점 동적 렌더 — cacheComponents 프리렌더의 new Date() 금지에 안전.
+  const year = new Date().getFullYear()
+
   let siteInfo: SiteInfo | null = null
   try {
     siteInfo = await getCachedSiteInfo()
@@ -124,7 +127,7 @@ export async function Footer() {
 
         {/* 하단: 카피라이트 + 브랜드 슬로건 */}
         <div className="mt-11 flex flex-wrap items-center justify-between gap-3 border-t border-white/8 pt-6 text-xs text-white/35">
-          <span>{SITE.footer.copyright}</span>
+          <span>© {year} {SITE.footer.copyrightSuffix}</span>
           <span className="font-display tracking-label">CLEAN AIR · SMART SPACE</span>
         </div>
       </div>
