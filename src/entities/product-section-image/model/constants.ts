@@ -30,4 +30,12 @@ export const PRODUCT_IMAGE_SLOTS = [
   'KITCHEN_BLACKBOX_DID',
   /** 에어쉴드 섹션 — 특허 급기 기술. */
   'KITCHEN_AIRSHIELD_TECH',
+  /** 진단 페이지 구성 섹션 — 실내공기질 측정기. */
+  'DIAGNOSIS_COMPOSE_DEVICE',
+  /** 진단 페이지 구성 섹션 — 공기오염 모니터링 서비스. */
+  'DIAGNOSIS_COMPOSE_MONITOR',
+  /** 진단 페이지 전후 비교 섹션 — 관리 전(BEFORE). */
+  'DIAGNOSIS_COMPARE_BEFORE',
+  /** 진단 페이지 전후 비교 섹션 — 관리 후(AFTER). */
+  'DIAGNOSIS_COMPARE_AFTER',
 ] as const;

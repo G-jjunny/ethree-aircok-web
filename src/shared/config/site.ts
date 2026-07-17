@@ -678,6 +678,14 @@ export const SITE = {
         label: "주방 조리실 관리 시스템",
         items: [{ label: "이미지 관리", href: "/console/kitchen-images" }],
       },
+      {
+        label: "진단서비스 관리",
+        items: [
+          { label: "서비스 신청 이유", href: "/console/service-reviews" },
+          { label: "특허·인증서", href: "/console/certifications" },
+          { label: "구성·비교 이미지", href: "/console/diagnosis-section-images" },
+        ],
+      },
     ],
     inquiryTabs: [
       { key: "list", label: "문의 내역" },
