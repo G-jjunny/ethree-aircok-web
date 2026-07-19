@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { HeroSection } from './HeroSection';
 import { CertifiedSection } from './CertifiedSection';
 import { WhySmartAircokSection } from './WhySmartAircokSection';
@@ -21,7 +22,9 @@ export function HomeView() {
       <WhyChooseUsSection />
       <WhatYouGetSection />
       <WordmarkSection />
-      <ClientsSection />
+      <Suspense fallback={<div className="min-h-[500px] bg-surface" />}>
+        <ClientsSection />
+      </Suspense>
     </main>
   );
 }
