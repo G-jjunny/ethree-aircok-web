@@ -1,5 +1,25 @@
 import type { ReactNode } from 'react'
+import { connection } from 'next/server'
+import { cacheLife, cacheTag } from 'next/cache'
 import { SITE } from '@/shared/config'
+import { getSiteInfoServer, SITE_INFO_CACHE_TAG, type SiteInfo } from '@/entities/site-info'
+
+// Footer와 동일한 폴백 헬퍼 — API가 빈 문자열/공백을 반환해도 SITE 상수로 폴백한다.
+function pick(apiValue: string | null | undefined, fallback: string): string {
+  return apiValue?.trim() ? apiValue : fallback
+}
+
+/**
+ * 사이트 정보 조회를 'use cache'로 캐싱한다(cacheTag: 'site-info', cacheLife: static).
+ * Footer와 동일 패턴 — 'use cache'는 서버 전용이므로 entity 페처가 아닌 서버 뷰에서 래핑한다.
+ * 어드민 수정 시 revalidateSiteInfoCache(updateTag)로 무효화된다.
+ */
+async function getCachedSiteInfo(): Promise<SiteInfo> {
+  'use cache'
+  cacheLife('static')
+  cacheTag(SITE_INFO_CACHE_TAG)
+  return getSiteInfoServer()
+}
 
 /* 연락처 아이콘 — 이 섹션 로컬 전용(공용 분리 대상 아님). currentColor 상속 */
 function PhoneIcon() {
@@ -57,40 +77,6 @@ type InfoCard = {
   href?: string
 }
 
-// 연락처 안내 4카드 — 이 페이지 전용 로컬 데이터. 값은 SITE에서 import(하드코딩 금지),
-// 상담시간·안내 문구는 일반 텍스트로 허용.
-const cards: InfoCard[] = [
-  {
-    icon: <PhoneIcon />,
-    label: 'CALL',
-    title: '대표번호',
-    value: SITE.contact.phone,
-    sub: '전화 상담 환영',
-    href: `tel:${SITE.contact.phone}`,
-  },
-  {
-    icon: <PinIcon />,
-    label: 'VISIT',
-    title: '오시는 길',
-    value: SITE.contact.address,
-  },
-  {
-    icon: <MailIcon />,
-    label: 'EMAIL',
-    title: '이메일',
-    value: SITE.contact.email,
-    sub: '24시간 접수',
-    href: `mailto:${SITE.contact.email}`,
-  },
-  {
-    icon: <ClockIcon />,
-    label: 'HOURS',
-    title: '상담시간',
-    value: '평일 09:00–18:00',
-    sub: '주말·공휴일 휴무',
-  },
-]
-
 function InfoCardBody({ card }: { card: InfoCard }) {
   return (
     <>
@@ -111,9 +97,58 @@ function InfoCardBody({ card }: { card: InfoCard }) {
 
 /**
  * INFO CARDS (시안 §INFO CARDS). surface 배경, 4열 아이콘 카드.
- * 대표번호/오시는 길/이메일/상담시간 — 값은 SITE에서 import.
+ * 대표번호/오시는 길/이메일 값은 site-info API(우선) → SITE 상수(fallback) 순으로 채운다.
+ * 상담시간 카드는 백엔드 무관 안내 문구이므로 그대로 유지한다.
  */
-export function ContactInfoSection() {
+export async function ContactInfoSection() {
+  // 빌드 타임 프리렌더(백엔드 미기동)에서 fetch가 실행되지 않도록 요청 시점으로 미룬다(Footer 패턴).
+  await connection()
+
+  let siteInfo: SiteInfo | null = null
+  try {
+    siteInfo = await getCachedSiteInfo()
+  } catch {
+    siteInfo = null
+  }
+
+  const phone = pick(siteInfo?.phone, SITE.contact.phone)
+  const address = pick(siteInfo?.address, SITE.contact.address)
+  const email = pick(siteInfo?.email, SITE.contact.email)
+
+  // 연락처 안내 4카드 — 이 페이지 전용 로컬 데이터. 값은 site-info/SITE에서 주입(하드코딩 금지),
+  // 상담시간·안내 문구는 일반 텍스트로 허용.
+  const cards: InfoCard[] = [
+    {
+      icon: <PhoneIcon />,
+      label: 'CALL',
+      title: '대표번호',
+      value: phone,
+      sub: '전화 상담 환영',
+      href: `tel:${phone}`,
+    },
+    {
+      icon: <PinIcon />,
+      label: 'VISIT',
+      title: '오시는 길',
+      value: address,
+    },
+    {
+      icon: <MailIcon />,
+      label: 'EMAIL',
+      title: '이메일',
+      value: email,
+      sub: '24시간 접수',
+      href: `mailto:${email}`,
+    },
+    {
+      icon: <ClockIcon />,
+      label: 'HOURS',
+      title: '상담시간',
+      value: '평일 09:00–18:00',
+      sub: '주말·공휴일 휴무',
+    },
+  ]
+
   return (
     <section className="bg-surface">
       <div className="content-container py-16 md:py-20">
