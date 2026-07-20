@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { PagePlaceholder } from '@/shared/ui'
+import { HeroBackgroundVideo, PagePlaceholder } from '@/shared/ui'
 
 // 다크 radial (Blue-Tech 표준 Page Hero) — 토큰 var() 참조, 하드코딩 아님
 const HERO_RADIAL =
@@ -33,11 +33,22 @@ const STATS = [
  */
 export function ServiceHeroSection() {
   return (
-    <section
-      className="relative overflow-hidden bg-navy text-white"
-      style={{ backgroundImage: HERO_RADIAL }}
-    >
-      <div className="content-container grid items-center gap-14 py-24 lg:grid-cols-[1.05fr_0.95fr]">
+    <section className="relative overflow-hidden bg-navy text-white">
+      {/* 배경 영상 (최하단 레이어, 장식). 로드 전/실패 시 section 의 bg-navy 폴백 */}
+      <HeroBackgroundVideo className="absolute inset-0 h-full w-full object-cover" />
+
+      {/* 다크 오버레이 (가독성). HERO_RADIAL 다크 radial(navy 토큰) 을 반투명으로 덧대
+          흰 텍스트 대비를 확보하되 영상이 은은히 비치게 한다. 홈 히어로(opacity-75)와 달리
+          진단 히어로는 영상 위를 덮는 드리프트 글로우가 없어 영상 노출량이 커, 스크림을
+          한 단계 강화(opacity-85)해 좌측 카피 흰 텍스트 대비 마진을 보상한다.
+          opacity 유틸은 design.md §2 자유값 허용(하드코딩 아님) */}
+      <div
+        aria-hidden
+        className="absolute inset-0 opacity-85"
+        style={{ backgroundImage: HERO_RADIAL }}
+      />
+
+      <div className="content-container relative z-10 grid items-center gap-14 py-24 lg:grid-cols-[1.05fr_0.95fr]">
         {/* 카피 컬럼 */}
         <div>
           <p className="font-display text-eyebrow font-semibold uppercase tracking-eyebrow-lg text-cyan">

@@ -37,6 +37,63 @@ function ReviewAvatar({ review }: { review: ServiceReview }) {
 }
 
 /**
+ * 마퀴 트랙에 실리는 고정 폭 후기 카드 — 기존 그리드 카드 마크업 재사용.
+ * 폭: 모바일 w-80(320) → sm 이상 w-88(352). LogoMarquee 의 w-40 대응(인용문 폭 확보 위해 확대).
+ * flex-col + h-full 로 같은 행 카드 높이를 맞추고, 인용문은 line-clamp-3 로 캡, footer 는 mt-auto 로 하단 고정.
+ */
+function ReviewCard({ review }: { review: ServiceReview }) {
+  return (
+    <div className="flex h-full w-80 shrink-0 flex-col rounded-card border border-hairline bg-surface-white p-7.5 sm:w-88">
+      <Quote className="size-7.5 text-hairline" aria-hidden />
+      <p className="mt-4 text-sm leading-loose text-ink line-clamp-3">
+        {review.quote}
+      </p>
+      <div className="mt-auto flex items-center gap-3.5 border-t border-hairline pt-5.5">
+        <ReviewAvatar review={review} />
+        <div>
+          <div className="text-base font-extrabold text-ink">{review.role}</div>
+          <div className="text-mini text-muted">{review.age}</div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/**
+ * 후기 마퀴 한 줄 — 목록을 2배 복제해 -50% 이동으로 끊김 없이 순환(CSS 애니메이션 전용).
+ * 복제본(뒤쪽 절반)은 aria-hidden 처리해 스크린리더가 각 후기를 한 번만 읽게 한다.
+ * hover 정지는 트랙 직접 hover(CSS-only), reduced-motion 정지는 globals.css 전역 처리.
+ */
+function ReviewMarqueeRow({
+  reviews,
+  direction,
+}: {
+  reviews: ServiceReview[]
+  direction: 'left' | 'right'
+}) {
+  const doubled = [...reviews, ...reviews]
+  return (
+    <div className="overflow-hidden">
+      <div
+        className={`flex w-max items-stretch gap-4 ${
+          direction === 'left' ? 'animate-marquee-left' : 'animate-marquee-right'
+        } hover:[animation-play-state:paused]`}
+      >
+        {doubled.map((review, i) => (
+          <div
+            key={`${review.id}-${i}`}
+            className="h-full"
+            aria-hidden={i >= reviews.length || undefined}
+          >
+            <ReviewCard review={review} />
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+/**
  * 진단 서비스 후기(신청 사유) — **async 서버 컴포넌트**(데이터).
  *
  * service-review 엔티티 서버 페처로 조회. 헤더는 항상 렌더하고, 목록이 비면 "준비 중" 폴백을
@@ -67,27 +124,26 @@ export async function ServiceReviewsSection() {
         </div>
 
         {reviews.length > 0 ? (
-          <div className="mt-13 grid grid-cols-1 gap-5.5 sm:grid-cols-2 lg:grid-cols-3">
-            {reviews.map((review) => (
-              <div
-                key={review.id}
-                className="rounded-card border border-hairline bg-surface-white px-7.5 py-8.5"
-              >
-                <Quote className="size-7.5 text-hairline" aria-hidden />
-                <p className="mt-4 text-sm leading-loose text-ink">
-                  {review.quote}
-                </p>
-                <div className="mt-6.5 flex items-center gap-3.5 border-t border-hairline pt-5.5">
-                  <ReviewAvatar review={review} />
-                  <div>
-                    <div className="text-base font-extrabold text-ink">
-                      {review.role}
-                    </div>
-                    <div className="text-mini text-muted">{review.age}</div>
-                  </div>
-                </div>
-              </div>
-            ))}
+          <div role="group" aria-label={COPY.title} className="relative mt-13">
+            <div className="flex flex-col gap-4">
+              <ReviewMarqueeRow
+                reviews={reviews.filter((_, i) => i % 2 === 0)}
+                direction="left"
+              />
+              <ReviewMarqueeRow
+                reviews={reviews.filter((_, i) => i % 2 === 1)}
+                direction="right"
+              />
+            </div>
+            {/* 양끝 페이드 — 섹션 배경(bg-surface)으로 자연스럽게 사라진다. pointer-events-none 으로 트랙 hover 정지 유지. */}
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-y-0 left-0 w-16 bg-linear-to-r from-surface to-transparent"
+            />
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-y-0 right-0 w-16 bg-linear-to-l from-surface to-transparent"
+            />
           </div>
         ) : (
           <div className="mt-13 flex flex-col items-center gap-2 rounded-card border border-hairline bg-surface-white px-7.5 py-16 text-center">
