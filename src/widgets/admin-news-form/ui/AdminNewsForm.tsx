@@ -120,7 +120,6 @@ export function AdminNewsForm({ initialData, onSuccess }: Props) {
       published: values.published,
       type: values.type,
       ...(values.location ? { location: values.location } : {}),
-      ...(values.coverImage ? { coverImage: values.coverImage } : {}),
     };
 
     const payload =
@@ -130,9 +129,18 @@ export function AdminNewsForm({ initialData, onSuccess }: Props) {
 
     try {
       if (initialData) {
-        await updateMutation.mutateAsync({ id: initialData.id, ...payload });
+        // 수정 경로: coverImage를 항상 전송(빈 문자열이면 백엔드가 null 처리 → 제거 반영)
+        await updateMutation.mutateAsync({
+          id: initialData.id,
+          ...payload,
+          coverImage: values.coverImage ?? '',
+        });
       } else {
-        await createMutation.mutateAsync(payload);
+        // 생성 경로: 커버 이미지가 있을 때만 포함(기존 동작 유지)
+        await createMutation.mutateAsync({
+          ...payload,
+          ...(values.coverImage ? { coverImage: values.coverImage } : {}),
+        });
       }
       toast.success(
         initialData ? '뉴스가 수정되었습니다' : '뉴스가 등록되었습니다',
@@ -247,13 +255,27 @@ export function AdminNewsForm({ initialData, onSuccess }: Props) {
             className="w-48 h-28 object-cover rounded-md border border-border-light"
           />
         )}
-        <button
-          type="button"
-          onClick={() => coverImageInputRef.current?.click()}
-          className="px-4 py-2 rounded-md border border-border-light text-body-dark text-sm hover:bg-surface-light transition-colors w-fit"
-        >
-          이미지 선택
-        </button>
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={() => coverImageInputRef.current?.click()}
+            className="px-4 py-2 rounded-md border border-border-light text-body-dark text-sm hover:bg-surface-light transition-colors w-fit"
+          >
+            이미지 선택
+          </button>
+          {coverImageValue && (
+            <button
+              type="button"
+              onClick={() => {
+                setValue('coverImage', '', { shouldDirty: true });
+                if (coverImageInputRef.current) coverImageInputRef.current.value = '';
+              }}
+              className="px-4 py-2 rounded-md border border-error text-error text-sm hover:bg-error/10 transition-colors w-fit"
+            >
+              이미지 제거
+            </button>
+          )}
+        </div>
         <input
           ref={coverImageInputRef}
           type="file"
