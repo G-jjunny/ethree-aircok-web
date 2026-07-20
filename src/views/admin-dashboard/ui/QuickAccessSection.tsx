@@ -27,16 +27,16 @@ export function QuickAccessSection() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className="group bg-surface-white rounded-card border border-hairline p-6 flex flex-col gap-4 hover:border-brand/40 hover:shadow-card transition-all"
+                  className="group bg-surface-white rounded-card border border-hairline p-6 flex flex-col gap-4 transition-all duration-fast ease-out hover:border-brand/40 hover:shadow-card focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
                 >
-                  <div className="inline-flex items-center justify-center w-11 h-11 rounded-image bg-brand/10 text-brand">
+                  <div className="inline-flex items-center justify-center w-12 h-12 rounded-image bg-brand/10 text-brand">
                     {meta?.icon}
                   </div>
                   <div className="flex flex-col gap-1">
                     <span className="text-base font-display font-semibold text-ink group-hover:text-brand transition-colors">
                       {item.label}
                     </span>
-                    <span className="text-sm text-muted leading-[1.5]">
+                    <span className="text-sm text-muted leading-normal">
                       {meta?.description}
                     </span>
                   </div>

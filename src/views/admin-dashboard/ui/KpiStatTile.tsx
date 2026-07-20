@@ -55,7 +55,7 @@ export function KpiStatTile({
     <Link
       href={href}
       className={[
-        "group rounded-card border p-6 flex items-center gap-4 transition-all hover:shadow-card",
+        "group rounded-card border p-6 flex items-center gap-4 transition-all duration-fast ease-out hover:shadow-card focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2",
         hasNew
           ? t.active
           : `bg-surface-white border-hairline ${t.idleHover}`,
@@ -75,13 +75,13 @@ export function KpiStatTile({
 
         {isLoading ? (
           <span
-            className="my-1 inline-block w-14 h-8 rounded-btn bg-hairline animate-pulse"
+            className="my-0.5 inline-block w-16 h-11 rounded-btn bg-hairline animate-pulse"
             aria-hidden="true"
           />
         ) : (
           <span
             className={[
-              "text-h3 font-display font-bold leading-none",
+              "text-stat font-display font-extrabold leading-none",
               hasNew ? t.number : "text-ink",
             ].join(" ")}
           >
