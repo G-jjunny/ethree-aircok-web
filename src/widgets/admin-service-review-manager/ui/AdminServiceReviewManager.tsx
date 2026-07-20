@@ -4,19 +4,23 @@ import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { adminServiceReviewListQueryOptions } from '@/entities/service-review'
 import type { ServiceReview } from '@/entities/service-review'
-import { AdminPageHeader, Button } from '@/shared/ui'
+import { Button } from '@/shared/ui'
 import { ServiceReviewListSection } from './ServiceReviewListSection'
 import { ServiceReviewFormModal } from './ServiceReviewFormModal'
 
 type FormState = { mode: 'create' } | { mode: 'edit'; id: string }
 
 /**
- * 진단 후기(신청 이유) 관리 어드민 뷰(섹션 조합 역할).
+ * 진단 후기(신청 이유) 관리 위젯.
  *
  * 목록은 어드민 엔드포인트라 미공개 후기까지 포함한다.
  * 생성 부분 실패(레코드 생성 O · 아바타 업로드 X) 시 수정 모달로 전환해 재시도를 유도한다.
+ *
+ * 통합 콘솔 `/console/diagnosis`의 "신청 이유" 탭에서 소비된다.
+ * 페이지 헤더는 뷰(AdminDiagnosisView)가 단일 관리하므로 이 위젯은 헤더 없이
+ * 리스트 상단 액션 행(등록 버튼)만 렌더한다.
  */
-export function AdminServiceReviewsView() {
+export function AdminServiceReviewManager() {
   const { data: reviews = [], isLoading } = useQuery(
     adminServiceReviewListQueryOptions(),
   )
@@ -63,22 +67,17 @@ export function AdminServiceReviewsView() {
 
   return (
     <div>
-      <AdminPageHeader
-        title="서비스 신청 이유 관리"
-        description="진단서비스 페이지의 고객 신청 이유(후기)를 등록·수정·정렬합니다."
-      >
+      <div className="mb-4 flex justify-end">
         <Button size="sm" onClick={openCreate}>
           신청 이유 등록
         </Button>
-      </AdminPageHeader>
-
-      <div className="p-6 lg:p-8">
-        <ServiceReviewListSection
-          reviews={reviews}
-          isLoading={isLoading}
-          onEdit={openEdit}
-        />
       </div>
+
+      <ServiceReviewListSection
+        reviews={reviews}
+        isLoading={isLoading}
+        onEdit={openEdit}
+      />
 
       {formState?.mode === 'create' && (
         <ServiceReviewFormModal

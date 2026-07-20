@@ -659,7 +659,7 @@ export const SITE = {
         items: [
           { label: "대시보드", href: "/console" },
           { label: "소개 페이지 관리", href: "/console/about" },
-          { label: "진단서비스 신청 관리", href: "/console/diagnosis-images" },
+          { label: "진단서비스 관리", href: "/console/diagnosis" },
           { label: "뉴스 관리", href: "/console/news" },
           { label: "FAQ 관리", href: "/console/faq" },
           { label: "카탈로그 관리", href: "/console/catalog" },
@@ -678,19 +678,17 @@ export const SITE = {
         label: "주방 조리실 관리 시스템",
         items: [{ label: "이미지 관리", href: "/console/kitchen-images" }],
       },
-      {
-        label: "진단서비스 관리",
-        items: [
-          { label: "서비스 신청 이유", href: "/console/service-reviews" },
-          { label: "특허·인증서", href: "/console/certifications" },
-          { label: "구성·비교 이미지", href: "/console/diagnosis-section-images" },
-        ],
-      },
     ],
     inquiryTabs: [
       { key: "list", label: "문의 내역" },
       { key: "form", label: "폼 설정" },
       { key: "mail", label: "이메일 설정" },
+    ],
+    diagnosisTabs: [
+      { key: "applications", label: "신청 내역" },
+      { key: "reasons", label: "신청 이유" },
+      { key: "certifications", label: "특허·인증서" },
+      { key: "section-images", label: "구성·비교 이미지" },
     ],
   },
 } as const;
