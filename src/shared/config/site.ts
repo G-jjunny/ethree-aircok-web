@@ -670,8 +670,7 @@ export const SITE = {
       {
         label: "실내 공기질 관리 시스템",
         items: [
-          { label: "공기질 측정기", href: "/console/air-devices" },
-          { label: "이미지 관리", href: "/console/indoor-images" },
+          { label: "실내 공기질 시스템", href: "/console/indoor" },
         ],
       },
       {
@@ -689,6 +688,20 @@ export const SITE = {
       { key: "reasons", label: "신청 이유" },
       { key: "certifications", label: "특허·인증서" },
       { key: "section-images", label: "구성·비교 이미지" },
+    ],
+    indoorTabs: [
+      { key: "devices", label: "측정기" },
+      { key: "images", label: "이미지" },
+    ],
+    aboutTabs: [
+      { key: "team", label: "팀 이미지" },
+      { key: "values", label: "핵심가치" },
+      { key: "timeline", label: "연혁" },
+    ],
+    siteInfoTabs: [
+      { key: "company", label: "회사정보" },
+      { key: "partners", label: "파트너사" },
+      { key: "map", label: "지도" },
     ],
   },
 } as const;
