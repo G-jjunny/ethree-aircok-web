@@ -1,7 +1,6 @@
 import Link from 'next/link';
-import { Button } from '@/shared/ui';
+import { Button, HeroBackgroundVideo } from '@/shared/ui';
 import { HeroAqiCard } from './HeroAqiCard';
-import { HeroBackgroundVideo } from './HeroBackgroundVideo';
 import styles from './hero.module.css';
 
 const HERO_RADIAL =
