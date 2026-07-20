@@ -95,13 +95,7 @@ export function NewsEditorToolbar({ editor }: Props) {
 
       <Divider />
 
-      {/* 제목 */}
-      <ToolbarButton
-        active={editor.isActive('heading', { level: 1 })}
-        onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-      >
-        H1
-      </ToolbarButton>
+      {/* 제목 (H1은 기사 제목이 페이지 h1이므로 제외, H2/H3만 제공) */}
       <ToolbarButton
         active={editor.isActive('heading', { level: 2 })}
         onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
