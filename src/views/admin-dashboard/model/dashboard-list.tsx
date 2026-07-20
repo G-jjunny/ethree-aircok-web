@@ -1,7 +1,20 @@
-export const DASHBOARD_CARDS = [
-  {
-    href: "/console/about",
-    title: "소개 페이지 관리",
+import type { ReactNode } from "react";
+
+/**
+ * 대시보드 빠른접근 카드의 도메인 특화 메타(아이콘·설명).
+ *
+ * 그룹 구조/순서·라벨·경로의 단일 출처는 `SITE.admin.nav`다.
+ * 여기서는 각 콘솔 경로(href)에 대응하는 대시보드 전용 icon/description만 관리하며,
+ * 렌더 시 nav를 순회하며 item.href로 이 매핑을 조회한다.
+ * nav의 모든 항목 href(대시보드 null 그룹 제외)를 빠짐없이 커버해야 한다.
+ */
+export interface DashboardCardMeta {
+  description: string;
+  icon: ReactNode;
+}
+
+export const DASHBOARD_CARD_META: Record<string, DashboardCardMeta> = {
+  "/console/about": {
     description: "소개(About) 페이지의 팀 이미지와 회사 연혁을 관리합니다.",
     icon: (
       <svg
@@ -20,9 +33,7 @@ export const DASHBOARD_CARDS = [
       </svg>
     ),
   },
-  {
-    href: "/console/news",
-    title: "뉴스 관리",
+  "/console/news": {
     description: "뉴스 페이지의 뉴스 기사를 작성·수정·삭제합니다.",
     icon: (
       <svg
@@ -41,9 +52,7 @@ export const DASHBOARD_CARDS = [
       </svg>
     ),
   },
-  {
-    href: "/console/faq",
-    title: "FAQ 관리",
+  "/console/faq": {
     description: "FAQ 페이지의 자주 묻는 질문을 카테고리별로 관리합니다.",
     icon: (
       <svg
@@ -62,9 +71,7 @@ export const DASHBOARD_CARDS = [
       </svg>
     ),
   },
-  {
-    href: "/console/catalog",
-    title: "카탈로그 관리",
+  "/console/catalog": {
     description: "카탈로그 페이지의 제품 카탈로그 이미지를 관리합니다.",
     icon: (
       <svg
@@ -83,20 +90,27 @@ export const DASHBOARD_CARDS = [
       </svg>
     ),
   },
-  {
-    href: "/console/diagnosis",
-    title: "진단서비스 관리",
+  "/console/diagnosis": {
     description:
       "진단서비스 신청 내역·신청 이유·특허/인증서·구성 이미지를 한곳에서 관리합니다.",
     icon: (
-      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 15.75l-2.489-2.489m0 0a3.375 3.375 0 10-4.773-4.773 3.375 3.375 0 004.774 4.774zM21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      <svg
+        className="w-6 h-6"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        aria-hidden="true"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M15.75 15.75l-2.489-2.489m0 0a3.375 3.375 0 10-4.773-4.773 3.375 3.375 0 004.774 4.774zM21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+        />
       </svg>
     ),
   },
-  {
-    href: "/console/inquiries",
-    title: "문의 관리",
+  "/console/inquiries": {
     description: "문의하기 페이지의 접수된 문의와 폼·이메일 설정을 관리합니다.",
     icon: (
       <svg
@@ -115,9 +129,7 @@ export const DASHBOARD_CARDS = [
       </svg>
     ),
   },
-  {
-    href: "/console/indoor",
-    title: "실내 공기질 시스템",
+  "/console/indoor": {
     description:
       "실내 공기질 관리 시스템의 측정기 모델과 섹션 이미지를 한곳에서 관리합니다.",
     icon: (
@@ -137,11 +149,8 @@ export const DASHBOARD_CARDS = [
       </svg>
     ),
   },
-  {
-    href: "/console/kitchen",
-    title: "주방 조리실 시스템",
-    description:
-      "주방 조리실 관리 시스템 섹션의 고정 자리 이미지를 관리합니다.",
+  "/console/kitchen": {
+    description: "주방 조리실 관리 시스템 섹션의 고정 자리 이미지를 관리합니다.",
     icon: (
       <svg
         className="w-6 h-6"
@@ -164,9 +173,7 @@ export const DASHBOARD_CARDS = [
       </svg>
     ),
   },
-  {
-    href: "/console/site-info",
-    title: "사이트 설정",
+  "/console/site-info": {
     description: "회사 기본 정보, 파트너사 목록, 지도 설정을 관리합니다.",
     icon: (
       <svg
@@ -190,4 +197,4 @@ export const DASHBOARD_CARDS = [
       </svg>
     ),
   },
-];
+};

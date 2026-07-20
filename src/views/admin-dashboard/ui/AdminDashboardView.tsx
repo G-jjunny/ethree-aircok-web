@@ -1,11 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import { AdminPageHeader } from "@/shared/ui";
-import { NewInquiryAlertCard } from "./NewInquiryAlertCard";
-import { NewDiagnosisConsultationAlertCard } from "./NewDiagnosisConsultationAlertCard";
+import { KpiSummarySection } from "./KpiSummarySection";
+import { QuickAccessSection } from "./QuickAccessSection";
 import { SiteInfoSummaryPanel } from "./SiteInfoSummaryPanel";
-import { DASHBOARD_CARDS } from "../model/dashboard-list";
 
 export function AdminDashboardView() {
   return (
@@ -15,35 +13,12 @@ export function AdminDashboardView() {
         description="콘텐츠를 관리하고 사이트를 운영하세요"
       />
 
-      <div className="p-6 lg:p-8 flex flex-col gap-6">
-        {/* 알림 카드 */}
-        <div className="flex flex-col gap-3">
-          <NewInquiryAlertCard />
-          <NewDiagnosisConsultationAlertCard />
-        </div>
+      <div className="p-6 lg:p-8 flex flex-col gap-8">
+        {/* 상단 KPI 요약행 */}
+        <KpiSummarySection />
 
-        {/* 6개 카드 그리드 */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {DASHBOARD_CARDS.map((card) => (
-            <Link
-              key={card.href}
-              href={card.href}
-              className="group bg-surface-white rounded-card border border-hairline p-6 flex flex-col gap-4 hover:border-brand/40 hover:shadow-card transition-all"
-            >
-              <div className="inline-flex items-center justify-center w-11 h-11 rounded-image bg-brand/10 text-brand">
-                {card.icon}
-              </div>
-              <div className="flex flex-col gap-1">
-                <span className="text-base font-display font-semibold text-ink group-hover:text-brand transition-colors">
-                  {card.title}
-                </span>
-                <span className="text-sm text-muted leading-[1.5]">
-                  {card.description}
-                </span>
-              </div>
-            </Link>
-          ))}
-        </div>
+        {/* 그룹화 빠른접근 카드 */}
+        <QuickAccessSection />
 
         {/* 회사 기본 정보 패널 */}
         <SiteInfoSummaryPanel />
