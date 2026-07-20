@@ -1,8 +1,15 @@
 'use client';
 
 import Link from 'next/link';
+import { useQuery } from '@tanstack/react-query';
 import { AdminCard } from '@/shared/ui';
 import { SITE } from '@/shared/config/site';
+import { siteInfoQueryOptions } from '@/entities/site-info';
+
+// Footer와 동일한 폴백 헬퍼 — API가 빈 문자열/공백을 반환해도 SITE 상수로 폴백한다.
+function pick(apiValue: string | null | undefined, fallback: string): string {
+  return apiValue?.trim() ? apiValue : fallback;
+}
 
 interface InfoRowProps {
   label: string;
@@ -19,6 +26,9 @@ function InfoRow({ label, value }: InfoRowProps) {
 }
 
 export function SiteInfoSummaryPanel() {
+  // site-info API 우선, 로딩/에러 시 SITE 상수로 폴백해 패널이 항상 렌더되도록 한다.
+  const { data: siteInfo } = useQuery(siteInfoQueryOptions());
+
   return (
     <AdminCard
       title="회사 기본 정보"
@@ -46,10 +56,10 @@ export function SiteInfoSummaryPanel() {
       }
     >
       <dl className="flex flex-col gap-3">
-        <InfoRow label="회사명" value={SITE.name} />
-        <InfoRow label="전화번호" value={SITE.contact.phone} />
-        <InfoRow label="이메일" value={SITE.contact.email} />
-        <InfoRow label="주소" value={SITE.contact.address} />
+        <InfoRow label="회사명" value={pick(siteInfo?.companyName, SITE.name)} />
+        <InfoRow label="전화번호" value={pick(siteInfo?.phone, SITE.contact.phone)} />
+        <InfoRow label="이메일" value={pick(siteInfo?.email, SITE.contact.email)} />
+        <InfoRow label="주소" value={pick(siteInfo?.address, SITE.contact.address)} />
       </dl>
     </AdminCard>
   );

@@ -9,7 +9,9 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     <>
       <Nav />
       {children}
-      <GlobalCta />
+      <Suspense fallback={<div className="min-h-[280px] bg-brand" />}>
+        <GlobalCta />
+      </Suspense>
       <Suspense fallback={<div className="min-h-[280px] bg-navy-deep" />}>
         <Footer />
       </Suspense>
