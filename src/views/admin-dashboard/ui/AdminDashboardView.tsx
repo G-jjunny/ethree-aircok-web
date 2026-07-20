@@ -28,16 +28,16 @@ export function AdminDashboardView() {
             <Link
               key={card.href}
               href={card.href}
-              className="group bg-surface-white rounded-xl border border-border-light p-6 flex flex-col gap-4 hover:border-aircok-blue/40 hover:shadow-card transition-all"
+              className="group bg-surface-white rounded-card border border-hairline p-6 flex flex-col gap-4 hover:border-brand/40 hover:shadow-card transition-all"
             >
-              <div className="inline-flex items-center justify-center w-11 h-11 rounded-lg bg-aircok-blue/10 text-aircok-blue">
+              <div className="inline-flex items-center justify-center w-11 h-11 rounded-image bg-brand/10 text-brand">
                 {card.icon}
               </div>
               <div className="flex flex-col gap-1">
-                <span className="text-base font-display font-semibold text-heading-dark group-hover:text-aircok-blue transition-colors">
+                <span className="text-base font-display font-semibold text-ink group-hover:text-brand transition-colors">
                   {card.title}
                 </span>
-                <span className="text-sm text-secondary-dark leading-[1.5]">
+                <span className="text-sm text-muted leading-[1.5]">
                   {card.description}
                 </span>
               </div>

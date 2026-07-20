@@ -1,101 +1,31 @@
 'use client';
 
-import { useCallback, useRef } from 'react';
-import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { AdminInquiryListView } from '@/widgets/admin-inquiry-list';
 import { AdminInquiryFormBuilderView } from '@/widgets/admin-inquiry-form-builder';
 import { AdminMailSettingView } from '@/widgets/admin-mail-setting';
-import { AdminPageHeader } from '@/shared/ui';
+import { AdminPageHeader, AdminTabs, useAdminActiveTab } from '@/shared/ui';
 import { SITE } from '@/shared/config/site';
 
-type TabKey = (typeof SITE.admin.inquiryTabs)[number]['key'];
-
-const TABS = SITE.admin.inquiryTabs;
-const TAB_KEYS = TABS.map((t) => t.key);
-const DEFAULT_TAB: TabKey = TABS[0].key;
-
-function isTabKey(value: string | null): value is TabKey {
-  return value !== null && (TAB_KEYS as readonly string[]).includes(value);
-}
-
+/**
+ * 문의 통합 관리 뷰(`/console/inquiries`).
+ *
+ * 문의 내역·폼 설정·이메일 설정을 단일 탭 페이지로 통합한다.
+ * 활성 탭은 URL `?tab=<key>` 기반이며, 활성 탭 콘텐츠만 마운트한다(진단 통합 패턴과 동일).
+ */
 export function AdminInquiryTabsView() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const tabRefs = useRef<Record<string, HTMLButtonElement | null>>({});
-
-  const rawTab = searchParams.get('tab');
-  const activeTab: TabKey = isTabKey(rawTab) ? rawTab : DEFAULT_TAB;
-
-  const setActiveTab = useCallback(
-    (key: TabKey) => {
-      const params = new URLSearchParams(searchParams.toString());
-      params.set('tab', key);
-      router.replace(`${pathname}?${params.toString()}`, { scroll: false });
-    },
-    [router, pathname, searchParams],
-  );
-
-  const handleKeyDown = (e: React.KeyboardEvent, index: number) => {
-    let nextIndex: number | null = null;
-    if (e.key === 'ArrowRight') {
-      nextIndex = (index + 1) % TABS.length;
-    } else if (e.key === 'ArrowLeft') {
-      nextIndex = (index - 1 + TABS.length) % TABS.length;
-    } else if (e.key === 'Home') {
-      nextIndex = 0;
-    } else if (e.key === 'End') {
-      nextIndex = TABS.length - 1;
-    }
-    if (nextIndex !== null) {
-      e.preventDefault();
-      const nextKey = TABS[nextIndex].key;
-      setActiveTab(nextKey);
-      tabRefs.current[nextKey]?.focus();
-    }
-  };
+  // SITE.admin.inquiryTabs는 `as const`(readonly)라 AdminTabItem[]에 그대로 못 넘긴다 — mutable 복사.
+  const tabs = [...SITE.admin.inquiryTabs];
+  const activeTab = useAdminActiveTab(tabs, 'list');
 
   return (
     <div>
-      <AdminPageHeader title="문의 관리" description="문의하기 페이지의 접수된 문의를 관리하고 폼·이메일 설정을 합니다." />
+      <AdminPageHeader
+        title="문의 관리"
+        description="문의하기 페이지의 접수된 문의를 관리하고 폼·이메일 설정을 합니다."
+      />
 
-      {/* 탭 바 */}
-      <div className="bg-surface-white px-6 lg:px-8">
-        <div
-          role="tablist"
-          aria-label="문의 관리 탭"
-          className="flex items-center gap-1 border-b border-border-light overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
-        >
-          {TABS.map((tab, index) => {
-            const active = tab.key === activeTab;
-            return (
-              <button
-                key={tab.key}
-                ref={(el) => {
-                  tabRefs.current[tab.key] = el;
-                }}
-                type="button"
-                role="tab"
-                id={`tab-${tab.key}`}
-                aria-selected={active}
-                aria-controls={`panel-${tab.key}`}
-                tabIndex={active ? 0 : -1}
-                onClick={() => setActiveTab(tab.key)}
-                onKeyDown={(e) => handleKeyDown(e, index)}
-                className={
-                  active
-                    ? 'shrink-0 -mb-px border-b-2 border-aircok-blue px-4 py-3 min-h-[44px] text-sm font-body font-semibold text-aircok-blue transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:ring-offset-2 rounded-t-md'
-                    : 'shrink-0 -mb-px border-b-2 border-transparent px-4 py-3 min-h-[44px] text-sm font-body text-secondary-dark hover:text-heading-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:ring-offset-2 rounded-t-md'
-                }
-              >
-                {tab.label}
-              </button>
-            );
-          })}
-        </div>
-      </div>
+      <AdminTabs tabs={tabs} label="문의 관리 탭" />
 
-      {/* 탭 콘텐츠 영역 */}
       <div className="p-6 lg:p-8">
         <div
           role="tabpanel"

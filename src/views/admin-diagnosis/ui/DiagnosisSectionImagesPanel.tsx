@@ -1,6 +1,5 @@
 'use client'
 
-import { AdminPageHeader } from '@/shared/ui'
 import { ProductSectionImageManager } from '@/widgets/product-section-image-manager'
 import type { ProductSectionImageSlotConfig } from '@/widgets/product-section-image-manager'
 
@@ -33,28 +32,26 @@ const COMPARE_SLOTS: readonly ProductSectionImageSlotConfig[] = [
 ]
 
 /**
- * 진단서비스 구성·비교 이미지 관리 뷰.
+ * 진단서비스 구성·비교 이미지 관리 패널.
  * 슬롯 고정 모델이라 순서 개념이 없다 — 섹션별 슬롯 구성만 위젯에 주입한다.
+ *
+ * 통합 콘솔 `/console/diagnosis`의 "구성·비교 이미지" 탭 콘텐츠.
+ * product-section-image-manager 위젯을 조합하는 view 레이어 로컬 패널이다
+ * (widget→widget import를 피하기 위해 뷰 슬라이스 내부에 둔다).
  */
-export function AdminDiagnosisSectionImagesView() {
+export function DiagnosisSectionImagesPanel() {
   return (
-    <div>
-      <AdminPageHeader
-        title="진단 구성·비교 이미지 관리"
-        description="진단서비스 페이지의 에어콕 구성 이미지와 도입 전후 비교 이미지를 등록·교체·삭제합니다."
+    <div className="flex flex-col gap-6">
+      <ProductSectionImageManager
+        title="에어콕 구성 이미지"
+        description="진단서비스 구성 섹션에 노출되는 이미지입니다."
+        slots={COMPOSE_SLOTS}
       />
-      <div className="p-6 lg:p-8 flex flex-col gap-6">
-        <ProductSectionImageManager
-          title="에어콕 구성 이미지"
-          description="진단서비스 구성 섹션에 노출되는 이미지입니다."
-          slots={COMPOSE_SLOTS}
-        />
-        <ProductSectionImageManager
-          title="도입 전후 비교 이미지"
-          description="진단서비스 전후 비교 섹션에 노출되는 이미지입니다."
-          slots={COMPARE_SLOTS}
-        />
-      </div>
+      <ProductSectionImageManager
+        title="도입 전후 비교 이미지"
+        description="진단서비스 전후 비교 섹션에 노출되는 이미지입니다."
+        slots={COMPARE_SLOTS}
+      />
     </div>
   )
 }

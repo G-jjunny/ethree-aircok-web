@@ -56,7 +56,7 @@ const AIRSHIELD_SLOTS: readonly ProductSectionImageSlotConfig[] = [
  * 주방 조리실 관리 시스템 이미지 관리 뷰.
  * 슬롯 고정 모델이라 순서 개념이 없다 — 섹션별 슬롯 구성만 위젯에 주입한다.
  */
-export function AdminKitchenImagesView() {
+export function AdminKitchenView() {
   return (
     <div>
       <AdminPageHeader

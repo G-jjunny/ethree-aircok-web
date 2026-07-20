@@ -1,6 +1,5 @@
 'use client'
 
-import { AdminPageHeader } from '@/shared/ui'
 import { ProductSectionImageManager } from '@/widgets/product-section-image-manager'
 import type { ProductSectionImageSlotConfig } from '@/widgets/product-section-image-manager'
 
@@ -29,23 +28,20 @@ const MONITORING_SLOTS: readonly ProductSectionImageSlotConfig[] = [
 ]
 
 /**
- * 실내 공기질 관리 시스템 이미지 관리 뷰.
+ * 실내 공기질 관리 시스템 이미지 관리 패널.
  * 슬롯 고정 모델이라 순서 개념이 없다 — 섹션별 슬롯 구성만 위젯에 주입한다.
+ *
+ * 통합 콘솔 `/console/indoor`의 "이미지" 탭 콘텐츠.
+ * product-section-image-manager 위젯을 조합하는 view 레이어 로컬 패널이다.
  */
-export function AdminIndoorImagesView() {
+export function IndoorImagesPanel() {
   return (
-    <div>
-      <AdminPageHeader
-        title="실내 공기질 이미지 관리"
-        description="실내 공기질 관리 시스템 섹션에 노출되는 고정 자리 이미지를 등록·교체·삭제합니다."
+    <div className="flex flex-col gap-6">
+      <ProductSectionImageManager
+        title="클라우드 모니터링 이미지"
+        description="모니터링 섹션의 화면 예시 이미지입니다."
+        slots={MONITORING_SLOTS}
       />
-      <div className="p-6 lg:p-8 flex flex-col gap-6">
-        <ProductSectionImageManager
-          title="클라우드 모니터링 이미지"
-          description="모니터링 섹션의 화면 예시 이미지입니다."
-          slots={MONITORING_SLOTS}
-        />
-      </div>
     </div>
   )
 }

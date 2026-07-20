@@ -117,13 +117,13 @@ export function CatalogImageGridSection({
 
   if (isLoading) {
     return (
-      <div className="bg-surface-white rounded-xl border border-border-light p-6">
+      <div className="bg-surface-white rounded-card border border-hairline p-6">
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
           {[1, 2, 3, 4].map((i) => (
             // token 없음: aspect-[3/4] — 카탈로그 책자 페이지(세로형) 비율, 카탈로그 전용 1회성 수치
             <div
               key={i}
-              className="aspect-[3/4] rounded-lg bg-surface-light animate-pulse"
+              className="aspect-[3/4] rounded-image bg-surface animate-pulse"
             />
           ))}
         </div>
@@ -133,9 +133,9 @@ export function CatalogImageGridSection({
 
   if (items.length === 0) {
     return (
-      <div className="bg-surface-white rounded-xl border border-border-light px-6 py-16 flex flex-col items-center justify-center text-center gap-3">
+      <div className="bg-surface-white rounded-card border border-hairline px-6 py-16 flex flex-col items-center justify-center text-center gap-3">
         <svg
-          className="w-10 h-10 text-secondary-dark"
+          className="w-10 h-10 text-muted"
           viewBox="0 0 24 24"
           fill="none"
           aria-hidden="true"
@@ -158,10 +158,10 @@ export function CatalogImageGridSection({
           />
           <circle cx="8.5" cy="14.5" r="1.5" fill="currentColor" />
         </svg>
-        <p className="text-nav text-secondary-dark [word-break:keep-all]">
+        <p className="text-sm text-muted [word-break:keep-all]">
           등록된 카탈로그 이미지가 없습니다.
         </p>
-        <p className="text-xs text-secondary-dark [word-break:keep-all]">
+        <p className="text-xs text-muted [word-break:keep-all]">
           위 업로드 영역에서 이미지를 추가하세요.
         </p>
       </div>
@@ -169,12 +169,12 @@ export function CatalogImageGridSection({
   }
 
   return (
-    <section className="bg-surface-white rounded-xl border border-border-light p-6 flex flex-col gap-4">
-      <div className="flex items-center justify-between border-b border-border-light pb-4">
-        <h2 className="text-nav font-semibold text-heading-dark">
+    <section className="bg-surface-white rounded-card border border-hairline p-6 flex flex-col gap-4">
+      <div className="flex items-center justify-between border-b border-hairline pb-4">
+        <h2 className="text-sm font-semibold text-ink">
           카탈로그 이미지 ({items.length})
         </h2>
-        <p className="text-xs text-secondary-dark">드래그하여 순서를 변경하세요</p>
+        <p className="text-xs text-muted">드래그하여 순서를 변경하세요</p>
       </div>
 
       <DndContext

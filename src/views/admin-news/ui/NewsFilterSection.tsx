@@ -25,7 +25,7 @@ export function NewsFilterSection({
         value={search}
         onChange={(e) => onSearchChange(e.target.value)}
         placeholder="제목으로 검색..."
-        className="border border-border-light rounded-md px-3 py-2 text-body-dark text-sm font-body focus:outline-none focus:ring-2 focus:ring-aircok-blue w-56"
+        className="border border-hairline rounded-btn px-3 py-2 text-ink-soft text-sm font-body focus:outline-none focus:ring-2 focus:ring-brand w-56"
       />
 
       {/* 발행상태 필터 */}
@@ -34,7 +34,7 @@ export function NewsFilterSection({
         onChange={(e) =>
           onPublishedFilterChange(e.target.value as 'all' | 'published' | 'unpublished')
         }
-        className="border border-border-light rounded-md px-3 py-2 text-body-dark text-sm font-body focus:outline-none focus:ring-2 focus:ring-aircok-blue bg-surface-white"
+        className="border border-hairline rounded-btn px-3 py-2 text-ink-soft text-sm font-body focus:outline-none focus:ring-2 focus:ring-brand bg-surface-white"
       >
         <option value="all">전체 상태</option>
         <option value="published">발행됨</option>
@@ -47,7 +47,7 @@ export function NewsFilterSection({
         onChange={(e) =>
           onTypeFilterChange(e.target.value as 'all' | 'BLOG' | 'LINK')
         }
-        className="border border-border-light rounded-md px-3 py-2 text-body-dark text-sm font-body focus:outline-none focus:ring-2 focus:ring-aircok-blue bg-surface-white"
+        className="border border-hairline rounded-btn px-3 py-2 text-ink-soft text-sm font-body focus:outline-none focus:ring-2 focus:ring-brand bg-surface-white"
       >
         <option value="all">전체 타입</option>
         <option value="BLOG">블로그형</option>

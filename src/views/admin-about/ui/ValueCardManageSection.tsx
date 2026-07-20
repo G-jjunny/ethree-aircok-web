@@ -51,18 +51,18 @@ export function ValueCardManageSection() {
   }
 
   return (
-    <section className="bg-surface-white rounded-xl border border-border-light p-6">
+    <section className="bg-surface-white rounded-card border border-hairline p-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div className="flex flex-col gap-0.5 min-w-0">
-          <h2 className="text-nav font-display font-semibold text-heading-dark">핵심가치</h2>
-          <p className="text-xs text-secondary-dark [word-break:keep-all]">
+          <h2 className="text-sm font-display font-semibold text-ink">핵심가치</h2>
+          <p className="text-xs text-muted [word-break:keep-all]">
             소개 페이지에 노출할 핵심가치 카드를 등록·수정·삭제합니다.
           </p>
         </div>
         <button
           type="button"
           onClick={() => setIsAddModalOpen(true)}
-          className="inline-flex items-center justify-center shrink-0 bg-aircok-blue text-heading-light text-sm font-medium rounded-md px-4 py-2 min-h-[44px] hover:bg-aircok-blue-dark active:scale-[0.97] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:ring-offset-2"
+          className="inline-flex items-center justify-center shrink-0 bg-brand text-white text-sm font-medium rounded-btn px-4 py-2 min-h-11 hover:bg-brand-hover active:scale-[0.97] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
         >
           핵심가치 추가
         </button>
@@ -72,22 +72,22 @@ export function ValueCardManageSection() {
         /* 로딩 스켈레톤 — 목록 항목 형태 */
         <div className="flex flex-col gap-3">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-[72px] rounded-md bg-surface-light animate-pulse" />
+            <div key={i} className="h-[72px] rounded-btn bg-surface animate-pulse" />
           ))}
         </div>
       ) : sortedValues.length === 0 ? (
-        <p className="text-secondary-dark text-sm py-6 text-center">등록된 핵심가치가 없습니다.</p>
+        <p className="text-muted text-sm py-6 text-center">등록된 핵심가치가 없습니다.</p>
       ) : (
         <ul className="flex flex-col gap-3">
           {sortedValues.map((value, index) => (
             <li
               key={value.id}
-              className="flex items-center gap-3 p-3 rounded-md border border-border-light bg-surface-light"
+              className="flex items-center gap-3 p-3 rounded-btn border border-hairline bg-surface"
             >
               {/* 제목 + 설명 */}
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-heading-dark truncate">{value.title}</p>
-                <p className="text-xs text-secondary-dark truncate">{value.description}</p>
+                <p className="text-sm font-medium text-ink truncate">{value.title}</p>
+                <p className="text-xs text-muted truncate">{value.description}</p>
               </div>
 
               {/* 액션 버튼들 */}
@@ -97,7 +97,7 @@ export function ValueCardManageSection() {
                   type="button"
                   onClick={() => handleMoveUp(index)}
                   disabled={index === 0 || reorderMutation.isPending}
-                  className="p-1.5 rounded-md text-body-dark hover:bg-surface-light disabled:opacity-30 disabled:cursor-not-allowed transition-colors text-xs"
+                  className="p-1.5 rounded-btn text-ink-soft hover:bg-surface disabled:opacity-30 disabled:cursor-not-allowed transition-colors text-xs"
                   aria-label="위로 이동"
                 >
                   ▲
@@ -106,7 +106,7 @@ export function ValueCardManageSection() {
                   type="button"
                   onClick={() => handleMoveDown(index)}
                   disabled={index === sortedValues.length - 1 || reorderMutation.isPending}
-                  className="p-1.5 rounded-md text-body-dark hover:bg-surface-light disabled:opacity-30 disabled:cursor-not-allowed transition-colors text-xs"
+                  className="p-1.5 rounded-btn text-ink-soft hover:bg-surface disabled:opacity-30 disabled:cursor-not-allowed transition-colors text-xs"
                   aria-label="아래로 이동"
                 >
                   ▼
@@ -116,7 +116,7 @@ export function ValueCardManageSection() {
                 <button
                   type="button"
                   onClick={() => setEditingItem(value)}
-                  className="px-2.5 py-1 rounded-md text-xs font-medium text-body-dark bg-surface-white border border-border-light hover:bg-surface-light transition-colors"
+                  className="px-2.5 py-1 rounded-btn text-xs font-medium text-ink-soft bg-surface-white border border-hairline hover:bg-surface transition-colors"
                 >
                   수정
                 </button>
@@ -125,7 +125,7 @@ export function ValueCardManageSection() {
                 <button
                   type="button"
                   onClick={() => setDeletingId(value.id)}
-                  className="px-2.5 py-1 rounded-md text-xs font-medium text-error bg-surface-white border border-border-light hover:bg-surface-light transition-colors"
+                  className="px-2.5 py-1 rounded-btn text-xs font-medium text-error bg-surface-white border border-hairline hover:bg-surface transition-colors"
                 >
                   삭제
                 </button>

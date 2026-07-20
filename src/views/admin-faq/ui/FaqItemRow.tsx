@@ -17,21 +17,21 @@ interface FaqItemRowProps {
 export function FaqItemRow({ item, onEdit, onDelete }: FaqItemRowProps) {
   return (
     <div className="flex items-start gap-3 px-4 py-3 bg-surface-white">
-      <p className="flex-1 min-w-0 text-sm text-body-dark leading-[1.47] [word-break:keep-all]">
+      <p className="flex-1 min-w-0 text-sm text-ink-soft leading-[1.47] [word-break:keep-all]">
         {item.question}
       </p>
       <div className="flex items-center gap-1.5 shrink-0">
         <button
           type="button"
           onClick={() => onEdit(item)}
-          className="px-2.5 py-1 rounded-md text-xs font-medium text-body-dark bg-surface-white border border-border-light hover:bg-surface-light transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:ring-inset"
+          className="px-2.5 py-1 rounded-btn text-xs font-medium text-ink-soft bg-surface-white border border-hairline hover:bg-surface transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-inset"
         >
           수정
         </button>
         <button
           type="button"
           onClick={() => onDelete(item.id)}
-          className="px-2.5 py-1 rounded-md text-xs font-medium text-error bg-surface-white border border-border-light hover:bg-surface-light transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:ring-inset"
+          className="px-2.5 py-1 rounded-btn text-xs font-medium text-error bg-surface-white border border-hairline hover:bg-surface transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-inset"
         >
           삭제
         </button>

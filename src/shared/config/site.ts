@@ -656,41 +656,60 @@ export const SITE = {
     nav: [
       {
         label: null,
+        items: [{ label: "대시보드", href: "/console" }],
+      },
+      {
+        label: "콘텐츠 관리",
         items: [
-          { label: "대시보드", href: "/console" },
           { label: "소개 페이지 관리", href: "/console/about" },
-          { label: "진단서비스 신청 관리", href: "/console/diagnosis-images" },
           { label: "뉴스 관리", href: "/console/news" },
           { label: "FAQ 관리", href: "/console/faq" },
           { label: "카탈로그 관리", href: "/console/catalog" },
+        ],
+      },
+      {
+        label: "서비스 관리",
+        items: [
+          { label: "진단서비스 관리", href: "/console/diagnosis" },
           { label: "문의 관리", href: "/console/inquiries" },
-          { label: "사이트 설정", href: "/console/site-info" },
         ],
       },
       {
-        label: "실내 공기질 관리 시스템",
+        label: "제품 시스템",
         items: [
-          { label: "공기질 측정기", href: "/console/air-devices" },
-          { label: "이미지 관리", href: "/console/indoor-images" },
+          { label: "실내 공기질 시스템", href: "/console/indoor" },
+          { label: "주방 조리실 시스템", href: "/console/kitchen" },
         ],
       },
       {
-        label: "주방 조리실 관리 시스템",
-        items: [{ label: "이미지 관리", href: "/console/kitchen-images" }],
-      },
-      {
-        label: "진단서비스 관리",
-        items: [
-          { label: "서비스 신청 이유", href: "/console/service-reviews" },
-          { label: "특허·인증서", href: "/console/certifications" },
-          { label: "구성·비교 이미지", href: "/console/diagnosis-section-images" },
-        ],
+        label: "설정",
+        items: [{ label: "사이트 설정", href: "/console/site-info" }],
       },
     ],
     inquiryTabs: [
       { key: "list", label: "문의 내역" },
       { key: "form", label: "폼 설정" },
       { key: "mail", label: "이메일 설정" },
+    ],
+    diagnosisTabs: [
+      { key: "applications", label: "신청 내역" },
+      { key: "reasons", label: "신청 이유" },
+      { key: "certifications", label: "특허·인증서" },
+      { key: "section-images", label: "구성·비교 이미지" },
+    ],
+    indoorTabs: [
+      { key: "devices", label: "측정기" },
+      { key: "images", label: "이미지" },
+    ],
+    aboutTabs: [
+      { key: "team", label: "팀 이미지" },
+      { key: "values", label: "핵심가치" },
+      { key: "timeline", label: "연혁" },
+    ],
+    siteInfoTabs: [
+      { key: "company", label: "회사정보" },
+      { key: "partners", label: "파트너사" },
+      { key: "map", label: "지도" },
     ],
   },
 } as const;

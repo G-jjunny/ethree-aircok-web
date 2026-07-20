@@ -45,12 +45,12 @@ export function TeamImageGridSection({
 
   if (isLoading) {
     return (
-      <div className="bg-surface-white rounded-xl border border-border-light p-6">
+      <div className="bg-surface-white rounded-card border border-hairline p-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {[1, 2, 3].map((i) => (
             <div
               key={i}
-              className="aspect-square rounded-lg bg-surface-light animate-pulse"
+              className="aspect-square rounded-image bg-surface animate-pulse"
             />
           ))}
         </div>
@@ -60,9 +60,9 @@ export function TeamImageGridSection({
 
   if (images.length === 0) {
     return (
-      <div className="bg-surface-white rounded-xl border border-border-light px-6 py-16 flex flex-col items-center justify-center text-center gap-3">
+      <div className="bg-surface-white rounded-card border border-hairline px-6 py-16 flex flex-col items-center justify-center text-center gap-3">
         <svg
-          className="w-10 h-10 text-secondary-dark"
+          className="w-10 h-10 text-muted"
           viewBox="0 0 24 24"
           fill="none"
           aria-hidden="true"
@@ -85,10 +85,10 @@ export function TeamImageGridSection({
           />
           <circle cx="8.5" cy="14.5" r="1.5" fill="currentColor" />
         </svg>
-        <p className="text-nav text-secondary-dark [word-break:keep-all]">
+        <p className="text-sm text-muted [word-break:keep-all]">
           등록된 팀 이미지가 없습니다.
         </p>
-        <p className="text-xs text-secondary-dark [word-break:keep-all]">
+        <p className="text-xs text-muted [word-break:keep-all]">
           위 업로드 영역에서 이미지를 추가하세요.
         </p>
       </div>
@@ -96,9 +96,9 @@ export function TeamImageGridSection({
   }
 
   return (
-    <section className="bg-surface-white rounded-xl border border-border-light p-6 flex flex-col gap-4">
-      <div className="border-b border-border-light pb-4">
-        <h2 className="text-nav font-semibold text-heading-dark">
+    <section className="bg-surface-white rounded-card border border-hairline p-6 flex flex-col gap-4">
+      <div className="border-b border-hairline pb-4">
+        <h2 className="text-sm font-semibold text-ink">
           팀 이미지 ({images.length})
         </h2>
       </div>
@@ -107,9 +107,9 @@ export function TeamImageGridSection({
         {images.map((image, index) => (
           <div
             key={image.id}
-            className="relative flex flex-col gap-2 rounded-lg border border-border-light bg-surface-white p-3"
+            className="relative flex flex-col gap-2 rounded-image border border-hairline bg-surface-white p-3"
           >
-            <div className="relative w-full aspect-square overflow-hidden rounded-md bg-surface-light">
+            <div className="relative w-full aspect-square overflow-hidden rounded-btn bg-surface">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={resolveSrc(image.imageUrl)}
@@ -121,7 +121,7 @@ export function TeamImageGridSection({
             <button
               type="button"
               onClick={() => setDeletingId(image.id)}
-              className="inline-flex items-center justify-center rounded-md border border-error/30 bg-transparent px-3 py-2 min-h-[44px] text-xs font-medium text-error hover:bg-surface-light active:scale-[0.97] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-error focus-visible:ring-offset-2"
+              className="inline-flex items-center justify-center rounded-btn border border-error/30 bg-transparent px-3 py-2 min-h-11 text-xs font-medium text-error hover:bg-surface active:scale-[0.97] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-error focus-visible:ring-offset-2"
             >
               삭제
             </button>

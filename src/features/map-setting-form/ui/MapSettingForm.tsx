@@ -119,7 +119,7 @@ export function MapSettingForm({ initialData }: Props) {
 
       {/* 회사 주소 */}
       <div className="flex flex-col gap-1">
-        <label className="text-body-dark text-sm font-body font-medium">
+        <label className="text-ink-soft text-sm font-body font-medium">
           회사 주소 <span className="text-error">*</span>
         </label>
         <div className="flex gap-2">
@@ -127,14 +127,14 @@ export function MapSettingForm({ initialData }: Props) {
             type="text"
             readOnly
             {...register('address')}
-            className="flex-1 border border-border-light bg-surface-light rounded-md px-3 py-2 text-body-dark text-sm font-body cursor-default focus:outline-none"
+            className="flex-1 border border-hairline bg-surface rounded-btn px-3 py-2 text-ink-soft text-sm font-body cursor-default focus:outline-none"
             placeholder="주소 검색 버튼으로 입력하세요"
           />
           <button
             type="button"
             onClick={handleSearchAddress}
             disabled={!isPostcodeReady}
-            className="shrink-0 px-4 py-2 bg-aircok-blue text-heading-light text-sm font-body rounded-md hover:bg-aircok-blue-dark transition-colors disabled:opacity-50"
+            className="shrink-0 px-4 py-2 bg-brand text-white text-sm font-body rounded-btn hover:bg-brand-hover transition-colors disabled:opacity-50"
           >
             {isPostcodeReady ? '주소 검색' : '로딩 중...'}
           </button>
@@ -146,11 +146,11 @@ export function MapSettingForm({ initialData }: Props) {
 
       {/* 라이브 지도 미리보기 */}
       <div className="flex flex-col gap-2">
-        <p className="text-body-dark text-sm font-body font-medium">
+        <p className="text-ink-soft text-sm font-body font-medium">
           미리보기
         </p>
         {previewSrc ? (
-          <div className="rounded-xl overflow-hidden border border-border-light aspect-video">
+          <div className="rounded-card overflow-hidden border border-hairline aspect-video">
             <iframe
               title="지도 주소 미리보기"
               src={previewSrc}
@@ -159,8 +159,8 @@ export function MapSettingForm({ initialData }: Props) {
             />
           </div>
         ) : (
-          <div className="flex items-center justify-center rounded-xl border border-border-light aspect-video">
-            <p className="text-secondary-dark text-sm font-body [word-break:keep-all]">
+          <div className="flex items-center justify-center rounded-card border border-hairline aspect-video">
+            <p className="text-muted text-sm font-body [word-break:keep-all]">
               주소를 입력하면 지도 미리보기가 표시됩니다.
             </p>
           </div>
@@ -172,7 +172,7 @@ export function MapSettingForm({ initialData }: Props) {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="px-6 py-2 bg-aircok-blue text-heading-light text-sm font-body rounded-md hover:bg-aircok-blue-dark transition-colors disabled:opacity-50"
+          className="px-6 py-2 bg-brand text-white text-sm font-body rounded-btn hover:bg-brand-hover transition-colors disabled:opacity-50"
         >
           {isSubmitting ? '저장 중...' : '설정 저장'}
         </button>

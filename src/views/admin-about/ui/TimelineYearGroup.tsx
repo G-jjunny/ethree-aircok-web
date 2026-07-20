@@ -35,18 +35,18 @@ export function TimelineYearGroup({
   const panelId = `timeline-year-panel-${year}`
 
   return (
-    <div className="rounded-lg border border-border-light overflow-hidden">
+    <div className="rounded-image border border-hairline overflow-hidden">
       {/* 그룹 헤더 (아코디언 토글) */}
       <button
         type="button"
         onClick={onToggle}
         aria-expanded={isOpen}
         aria-controls={panelId}
-        className="w-full flex items-center gap-3 px-4 py-3.5 text-left hover:bg-surface-light transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:ring-inset"
+        className="w-full flex items-center gap-3 px-4 py-3.5 text-left hover:bg-surface transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-inset"
       >
         {/* 토글 chevron — 펼침 rotate-0(아래), 접힘 -rotate-90(우측) */}
         <svg
-          className={`shrink-0 w-5 h-5 text-secondary-dark transition-transform duration-200 ${
+          className={`shrink-0 w-5 h-5 text-muted transition-transform duration-200 ${
             isOpen ? 'rotate-0' : '-rotate-90'
           }`}
           aria-hidden="true"
@@ -58,11 +58,11 @@ export function TimelineYearGroup({
           <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
         </svg>
         {/* 연도 numeral — 시그니처 (공개 History 블루 numeral의 관리용 절제 변형) */}
-        <span className="text-[21px] font-display font-bold text-aircok-blue tabular-nums leading-none">
+        <span className="text-xl font-display font-bold text-brand tabular-nums leading-none">
           {year}
         </span>
         {/* N건 배지 */}
-        <span className="text-[12px] text-secondary-dark bg-surface-light rounded-pill px-2 py-0.5 ml-auto tabular-nums">
+        <span className="text-xs text-muted bg-surface rounded-pill px-2 py-0.5 ml-auto tabular-nums">
           {items.length}건
         </span>
       </button>
@@ -75,7 +75,7 @@ export function TimelineYearGroup({
         }`}
       >
         <div className="overflow-hidden">
-          <div className="flex flex-col divide-y divide-border-light border-t border-border-light">
+          <div className="flex flex-col divide-y divide-hairline border-t border-hairline">
             {items.map((item) => (
               <TimelineRow
                 key={item.id}

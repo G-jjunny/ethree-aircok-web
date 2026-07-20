@@ -132,7 +132,7 @@ export function SiteInfoFormSection() {
 
   const renderField = ({ name, label, type }: Field) => (
     <div key={name} className="flex flex-col gap-1">
-      <label htmlFor={name} className="text-sm font-medium text-heading-dark">
+      <label htmlFor={name} className="text-sm font-medium text-ink">
         {label}
       </label>
       <input
@@ -141,8 +141,8 @@ export function SiteInfoFormSection() {
         {...register(name)}
         className={
           errors[name]
-            ? 'w-full bg-surface-light border border-error rounded-md px-4 py-3 text-nav text-heading-dark placeholder:text-secondary-dark focus:outline-none focus:ring-2 focus:ring-error focus:border-transparent transition-shadow min-h-[44px]'
-            : 'w-full bg-surface-light border border-border-light rounded-md px-4 py-3 text-nav text-heading-dark placeholder:text-secondary-dark focus:outline-none focus:ring-2 focus:ring-aircok-blue focus:border-transparent transition-shadow min-h-[44px]'
+            ? 'w-full bg-surface border border-error rounded-btn px-4 py-3 text-sm text-ink placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-error focus:border-transparent transition-shadow min-h-11'
+            : 'w-full bg-surface border border-hairline rounded-btn px-4 py-3 text-sm text-ink placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent transition-shadow min-h-11'
         }
         placeholder={label}
       />
@@ -153,13 +153,13 @@ export function SiteInfoFormSection() {
   )
 
   return (
-    <section className="bg-surface-white rounded-xl border border-border-light p-6">
-      <h2 className="text-nav font-display font-semibold text-heading-dark mb-6">기본 정보</h2>
+    <section className="bg-surface-white rounded-card border border-hairline p-6">
+      <h2 className="text-sm font-display font-semibold text-ink mb-6">기본 정보</h2>
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">{baseFields.map(renderField)}</div>
         <div className="flex flex-col gap-1.5 mt-2">
-          <h3 className="text-nav font-semibold text-heading-dark">SNS 링크</h3>
-          <p className="text-sm text-secondary-dark leading-[1.43] [word-break:keep-all]">
+          <h3 className="text-sm font-semibold text-ink">SNS 링크</h3>
+          <p className="text-sm text-muted leading-[1.43] [word-break:keep-all]">
             링크를 비워두면 공개 사이트 푸터에 해당 SNS 링크가 표시되지 않습니다.
           </p>
         </div>
@@ -168,7 +168,7 @@ export function SiteInfoFormSection() {
           <button
             type="submit"
             disabled={mutation.isPending}
-            className="bg-aircok-blue text-heading-light rounded-md px-6 py-2.5 min-h-[44px] text-nav font-medium disabled:opacity-60 disabled:cursor-not-allowed hover:bg-aircok-blue-dark active:scale-[0.97] transition-colors"
+            className="bg-brand text-white rounded-btn px-6 py-2.5 min-h-11 text-sm font-medium disabled:opacity-60 disabled:cursor-not-allowed hover:bg-brand-hover active:scale-[0.97] transition-colors"
           >
             {mutation.isPending ? '저장 중...' : '저장'}
           </button>
