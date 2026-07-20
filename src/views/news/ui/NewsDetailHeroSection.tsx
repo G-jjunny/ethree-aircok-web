@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { NewsImage } from '@/shared/ui';
 import type { NewsPost } from '@/entities/news';
 import { formatNewsDate } from '../lib/formatNewsDate';
 
@@ -25,8 +24,8 @@ function BackIcon() {
 
 /**
  * 뉴스 상세 헤더.
- * 목록으로 버튼 → 타입 배지 → 제목 → 메타(날짜) → 대표 이미지 순으로 렌더한다.
- * coverImage가 없으면 NewsImage가 폴백 플레이스홀더를 표시한다.
+ * 목록으로 버튼 → 타입 배지 → 제목 → 메타(날짜) 순으로 렌더한다.
+ * 커버 이미지는 본문(content) 내부에 포함되므로 헤더에서 별도로 렌더하지 않는다.
  */
 export function NewsDetailHeroSection({ post }: Props) {
   const badgeLabel = post.type === 'LINK' ? '외부 링크' : '게시글';
@@ -57,11 +56,6 @@ export function NewsDetailHeroSection({ post }: Props) {
       {/* 메타 */}
       <div className="mt-4 border-b border-hairline pb-6 text-sm text-muted">
         <time dateTime={post.date}>{formatNewsDate(post.date)}</time>
-      </div>
-
-      {/* 대표 이미지 */}
-      <div className="mt-7">
-        <NewsImage src={post.coverImage} alt={post.title} fit="natural" priority />
       </div>
     </header>
   );
