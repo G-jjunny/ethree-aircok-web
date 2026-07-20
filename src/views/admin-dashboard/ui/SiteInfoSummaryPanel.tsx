@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { AdminCard } from '@/shared/ui';
 import { SITE } from '@/shared/config/site';
 
 interface InfoRowProps {
@@ -11,20 +12,20 @@ interface InfoRowProps {
 function InfoRow({ label, value }: InfoRowProps) {
   return (
     <div className="flex flex-col gap-0.5 sm:flex-row sm:items-center sm:gap-4">
-      <dt className="text-xs font-medium text-secondary-dark w-20 flex-shrink-0">{label}</dt>
-      <dd className="text-sm text-heading-dark break-all">{value}</dd>
+      <dt className="text-xs font-medium text-muted w-20 flex-shrink-0">{label}</dt>
+      <dd className="text-sm text-ink break-all">{value}</dd>
     </div>
   );
 }
 
 export function SiteInfoSummaryPanel() {
   return (
-    <div className="bg-surface-white rounded-xl border border-border-light p-6">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-base font-display font-semibold text-heading-dark">회사 기본 정보</h2>
+    <AdminCard
+      title="회사 기본 정보"
+      actions={
         <Link
           href="/console/site-info"
-          className="inline-flex items-center gap-1.5 text-sm font-medium text-aircok-blue hover:text-aircok-blue/80 transition-colors"
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-brand hover:text-brand-hover transition-colors"
         >
           <svg
             className="w-4 h-4"
@@ -42,14 +43,14 @@ export function SiteInfoSummaryPanel() {
           </svg>
           수정
         </Link>
-      </div>
-
+      }
+    >
       <dl className="flex flex-col gap-3">
         <InfoRow label="회사명" value={SITE.name} />
         <InfoRow label="전화번호" value={SITE.contact.phone} />
         <InfoRow label="이메일" value={SITE.contact.email} />
         <InfoRow label="주소" value={SITE.contact.address} />
       </dl>
-    </div>
+    </AdminCard>
   );
 }

@@ -75,7 +75,7 @@ export function FieldRow({ field, prev, next }: Props) {
   }
 
   return (
-    <li className="flex flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3 hover:bg-surface-light transition-colors">
+    <li className="flex flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3 hover:bg-surface transition-colors">
       {/* 순서 변경 */}
       <div className="flex items-center gap-1">
         <button
@@ -83,7 +83,7 @@ export function FieldRow({ field, prev, next }: Props) {
           onClick={() => prev && swapOrder(prev)}
           disabled={!prev || reordering}
           aria-label="위로 이동"
-          className="px-2 py-1 text-sm text-secondary-dark rounded-md hover:bg-border-light transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+          className="px-2 py-1 text-sm text-muted rounded-btn hover:bg-hairline transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
         >
           ↑
         </button>
@@ -92,20 +92,20 @@ export function FieldRow({ field, prev, next }: Props) {
           onClick={() => next && swapOrder(next)}
           disabled={!next || reordering}
           aria-label="아래로 이동"
-          className="px-2 py-1 text-sm text-secondary-dark rounded-md hover:bg-border-light transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+          className="px-2 py-1 text-sm text-muted rounded-btn hover:bg-hairline transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
         >
           ↓
         </button>
       </div>
 
       <div className="flex-1 min-w-0 flex flex-wrap items-center gap-x-3 gap-y-1">
-        <span className="text-body-dark text-sm font-body font-medium">
+        <span className="text-ink-soft text-sm font-body font-medium">
           {field.label}
         </span>
-        <code className="text-secondary-dark text-xs font-body rounded-md bg-surface-light px-2 py-0.5">
+        <code className="text-muted text-xs font-body rounded-btn bg-surface px-2 py-0.5">
           {field.key}
         </code>
-        <span className="text-secondary-dark text-xs font-body">
+        <span className="text-muted text-xs font-body">
           {TYPE_LABELS[field.type]}
         </span>
         {field.required && (
@@ -117,7 +117,7 @@ export function FieldRow({ field, prev, next }: Props) {
         <button
           type="button"
           onClick={() => setEditing(true)}
-          className="text-aircok-blue text-sm hover:opacity-70 transition-opacity"
+          className="text-brand text-sm hover:opacity-70 transition-opacity"
         >
           수정
         </button>

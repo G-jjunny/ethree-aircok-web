@@ -81,11 +81,11 @@ export function MailSettingForm({ initialData, fields }: Props) {
       className="flex flex-col gap-6 max-w-3xl"
     >
       {/* 치환 변수 안내 */}
-      <div className="flex flex-col gap-2 rounded-md border border-border-light bg-surface-light px-4 py-3">
-        <p className="text-body-dark text-sm font-body font-medium">
+      <div className="flex flex-col gap-2 rounded-btn border border-hairline bg-surface px-4 py-3">
+        <p className="text-ink-soft text-sm font-body font-medium">
           사용 가능한 치환 변수
         </p>
-        <p className="text-secondary-dark text-xs font-body [word-break:keep-all]">
+        <p className="text-muted text-xs font-body [word-break:keep-all]">
           제목·본문 템플릿에 아래 변수를 입력하면 문의 접수 시 실제 값으로
           치환됩니다.
         </p>
@@ -93,9 +93,9 @@ export function MailSettingForm({ initialData, fields }: Props) {
           {dynamicVariables.map((v) => (
             <li
               key={v.token}
-              className="text-secondary-dark text-xs font-body rounded-md border border-border-light bg-surface-white px-2 py-1"
+              className="text-muted text-xs font-body rounded-btn border border-hairline bg-surface-white px-2 py-1"
             >
-              <code className="text-body-dark">{v.token}</code>
+              <code className="text-ink-soft">{v.token}</code>
               <span className="ml-1">{v.label}</span>
             </li>
           ))}
@@ -104,13 +104,13 @@ export function MailSettingForm({ initialData, fields }: Props) {
 
       {/* 수신 이메일 */}
       <div className="flex flex-col gap-1">
-        <label className="text-body-dark text-sm font-body font-medium">
+        <label className="text-ink-soft text-sm font-body font-medium">
           수신 이메일 <span className="text-error">*</span>
         </label>
         <input
           type="email"
           {...register('recipientEmail')}
-          className="border border-border-light rounded-md px-3 py-2 text-body-dark text-sm font-body focus:outline-none focus:ring-1 focus:ring-aircok-blue"
+          className="border border-hairline rounded-btn px-3 py-2 text-ink-soft text-sm font-body focus:outline-none focus:ring-1 focus:ring-brand"
           placeholder="알림을 받을 이메일 주소"
         />
         {errors.recipientEmail && (
@@ -120,13 +120,13 @@ export function MailSettingForm({ initialData, fields }: Props) {
 
       {/* 제목 템플릿 */}
       <div className="flex flex-col gap-1">
-        <label className="text-body-dark text-sm font-body font-medium">
+        <label className="text-ink-soft text-sm font-body font-medium">
           제목 템플릿 <span className="text-error">*</span>
         </label>
         <input
           type="text"
           {...register('subjectTemplate')}
-          className="border border-border-light rounded-md px-3 py-2 text-body-dark text-sm font-body focus:outline-none focus:ring-1 focus:ring-aircok-blue"
+          className="border border-hairline rounded-btn px-3 py-2 text-ink-soft text-sm font-body focus:outline-none focus:ring-1 focus:ring-brand"
           placeholder="[문의 접수] {{company}} {{name}}님"
         />
         {errors.subjectTemplate && (
@@ -136,13 +136,13 @@ export function MailSettingForm({ initialData, fields }: Props) {
 
       {/* 본문 템플릿 */}
       <div className="flex flex-col gap-1">
-        <label className="text-body-dark text-sm font-body font-medium">
+        <label className="text-ink-soft text-sm font-body font-medium">
           본문 템플릿 <span className="text-error">*</span>
         </label>
         <textarea
           {...register('bodyTemplate')}
           rows={8}
-          className="border border-border-light rounded-md px-3 py-2 text-body-dark text-sm font-body focus:outline-none focus:ring-1 focus:ring-aircok-blue resize-none"
+          className="border border-hairline rounded-btn px-3 py-2 text-ink-soft text-sm font-body focus:outline-none focus:ring-1 focus:ring-brand resize-none"
           placeholder={
             '회사: {{company}}\n담당자: {{name}}\n전화: {{phone}}\n이메일: {{email}}\n\n{{message}}'
           }
@@ -157,7 +157,7 @@ export function MailSettingForm({ initialData, fields }: Props) {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="px-6 py-2 bg-aircok-blue text-heading-light text-sm font-body rounded-md hover:bg-aircok-blue-dark transition-colors disabled:opacity-50"
+          className="px-6 py-2 bg-brand text-white text-sm font-body rounded-btn hover:bg-brand-dark transition-colors disabled:opacity-50"
         >
           {isSubmitting ? '저장 중...' : '설정 저장'}
         </button>

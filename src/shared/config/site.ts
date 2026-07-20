@@ -656,26 +656,34 @@ export const SITE = {
     nav: [
       {
         label: null,
+        items: [{ label: "대시보드", href: "/console" }],
+      },
+      {
+        label: "콘텐츠 관리",
         items: [
-          { label: "대시보드", href: "/console" },
           { label: "소개 페이지 관리", href: "/console/about" },
-          { label: "진단서비스 관리", href: "/console/diagnosis" },
           { label: "뉴스 관리", href: "/console/news" },
           { label: "FAQ 관리", href: "/console/faq" },
           { label: "카탈로그 관리", href: "/console/catalog" },
-          { label: "문의 관리", href: "/console/inquiries" },
-          { label: "사이트 설정", href: "/console/site-info" },
         ],
       },
       {
-        label: "실내 공기질 관리 시스템",
+        label: "서비스 관리",
+        items: [
+          { label: "진단서비스 관리", href: "/console/diagnosis" },
+          { label: "문의 관리", href: "/console/inquiries" },
+        ],
+      },
+      {
+        label: "제품 시스템",
         items: [
           { label: "실내 공기질 시스템", href: "/console/indoor" },
+          { label: "주방 조리실 시스템", href: "/console/kitchen" },
         ],
       },
       {
-        label: "주방 조리실 관리 시스템",
-        items: [{ label: "이미지 관리", href: "/console/kitchen-images" }],
+        label: "설정",
+        items: [{ label: "사이트 설정", href: "/console/site-info" }],
       },
     ],
     inquiryTabs: [

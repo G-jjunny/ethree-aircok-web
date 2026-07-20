@@ -98,12 +98,12 @@ export function InquiryFieldForm({ field, onSuccess, onCancel }: Props) {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="flex flex-col gap-4 rounded-md border border-border-light bg-surface-light px-4 py-4"
+      className="flex flex-col gap-4 rounded-btn border border-hairline bg-surface px-4 py-4"
     >
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {/* 키 (생성 시에만 입력 가능) */}
         <div className="flex flex-col gap-1">
-          <label className="text-body-dark text-sm font-body font-medium">
+          <label className="text-ink-soft text-sm font-body font-medium">
             키(key) <span className="text-error">*</span>
           </label>
           <input
@@ -111,10 +111,10 @@ export function InquiryFieldForm({ field, onSuccess, onCancel }: Props) {
             {...register('key')}
             disabled={isEdit}
             placeholder="company"
-            className="border border-border-light rounded-md px-3 py-2 text-body-dark text-sm font-body focus:outline-none focus:ring-1 focus:ring-aircok-blue disabled:opacity-60 disabled:cursor-not-allowed"
+            className="border border-hairline rounded-btn px-3 py-2 text-ink-soft text-sm font-body focus:outline-none focus:ring-1 focus:ring-brand disabled:opacity-60 disabled:cursor-not-allowed"
           />
           {isEdit ? (
-            <p className="text-secondary-dark text-xs font-body">
+            <p className="text-muted text-xs font-body">
               키는 생성 후 변경할 수 없습니다.
             </p>
           ) : (
@@ -126,14 +126,14 @@ export function InquiryFieldForm({ field, onSuccess, onCancel }: Props) {
 
         {/* 라벨 */}
         <div className="flex flex-col gap-1">
-          <label className="text-body-dark text-sm font-body font-medium">
+          <label className="text-ink-soft text-sm font-body font-medium">
             라벨(label) <span className="text-error">*</span>
           </label>
           <input
             type="text"
             {...register('label')}
             placeholder="회사/기관명"
-            className="border border-border-light rounded-md px-3 py-2 text-body-dark text-sm font-body focus:outline-none focus:ring-1 focus:ring-aircok-blue"
+            className="border border-hairline rounded-btn px-3 py-2 text-ink-soft text-sm font-body focus:outline-none focus:ring-1 focus:ring-brand"
           />
           {errors.label && (
             <p className="text-error text-xs">{errors.label.message}</p>
@@ -142,12 +142,12 @@ export function InquiryFieldForm({ field, onSuccess, onCancel }: Props) {
 
         {/* 타입 */}
         <div className="flex flex-col gap-1">
-          <label className="text-body-dark text-sm font-body font-medium">
+          <label className="text-ink-soft text-sm font-body font-medium">
             타입(type) <span className="text-error">*</span>
           </label>
           <select
             {...register('type')}
-            className="border border-border-light rounded-md px-3 py-2 text-body-dark text-sm font-body bg-surface-white focus:outline-none focus:ring-1 focus:ring-aircok-blue"
+            className="border border-hairline rounded-btn px-3 py-2 text-ink-soft text-sm font-body bg-surface-white focus:outline-none focus:ring-1 focus:ring-brand"
           >
             {INQUIRY_FIELD_TYPES.map((t) => (
               <option key={t} value={t}>
@@ -162,14 +162,14 @@ export function InquiryFieldForm({ field, onSuccess, onCancel }: Props) {
 
         {/* 플레이스홀더 */}
         <div className="flex flex-col gap-1">
-          <label className="text-body-dark text-sm font-body font-medium">
+          <label className="text-ink-soft text-sm font-body font-medium">
             플레이스홀더(placeholder)
           </label>
           <input
             type="text"
             {...register('placeholder')}
             placeholder={SITE.legalName}
-            className="border border-border-light rounded-md px-3 py-2 text-body-dark text-sm font-body focus:outline-none focus:ring-1 focus:ring-aircok-blue"
+            className="border border-hairline rounded-btn px-3 py-2 text-ink-soft text-sm font-body focus:outline-none focus:ring-1 focus:ring-brand"
           />
           {errors.placeholder && (
             <p className="text-error text-xs">{errors.placeholder.message}</p>
@@ -178,11 +178,11 @@ export function InquiryFieldForm({ field, onSuccess, onCancel }: Props) {
       </div>
 
       {/* 필수 여부 */}
-      <label className="flex items-center gap-2 text-body-dark text-sm font-body">
+      <label className="flex items-center gap-2 text-ink-soft text-sm font-body">
         <input
           type="checkbox"
           {...register('required')}
-          className="rounded border-border-light text-aircok-blue focus:ring-1 focus:ring-aircok-blue"
+          className="rounded border-hairline text-brand focus:ring-1 focus:ring-brand"
         />
         필수 입력 항목
       </label>
@@ -192,7 +192,7 @@ export function InquiryFieldForm({ field, onSuccess, onCancel }: Props) {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="px-6 py-2 bg-aircok-blue text-heading-light text-sm font-body rounded-md hover:bg-aircok-blue-dark transition-colors disabled:opacity-50"
+          className="px-6 py-2 bg-brand text-white text-sm font-body rounded-btn hover:bg-brand-hover transition-colors disabled:opacity-50"
         >
           {isSubmitting ? '저장 중...' : isEdit ? '수정 저장' : '필드 추가'}
         </button>
@@ -201,7 +201,7 @@ export function InquiryFieldForm({ field, onSuccess, onCancel }: Props) {
             type="button"
             onClick={onCancel}
             disabled={isSubmitting}
-            className="px-6 py-2 bg-surface-white text-body-dark text-sm font-body rounded-md border border-border-light hover:bg-border-light transition-colors disabled:opacity-50"
+            className="px-6 py-2 bg-surface-white text-ink-soft text-sm font-body rounded-btn border border-hairline hover:bg-hairline transition-colors disabled:opacity-50"
           >
             취소
           </button>

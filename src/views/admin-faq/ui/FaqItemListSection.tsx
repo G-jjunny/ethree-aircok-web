@@ -38,9 +38,9 @@ export function FaqItemListSection({
 
   if (!selectedCategoryId) {
     return (
-      <div className="flex flex-col items-center justify-center text-center gap-4 rounded-xl border border-border-light bg-surface-white px-6 py-16">
+      <div className="flex flex-col items-center justify-center text-center gap-4 rounded-card border border-hairline bg-surface-white px-6 py-16">
         <svg
-          className="w-10 h-10 text-secondary-dark"
+          className="w-10 h-10 text-muted"
           viewBox="0 0 24 24"
           fill="none"
           aria-hidden="true"
@@ -53,10 +53,10 @@ export function FaqItemListSection({
             strokeLinejoin="round"
           />
         </svg>
-        <p className="text-nav text-secondary-dark [word-break:keep-all]">
+        <p className="text-sm text-muted [word-break:keep-all]">
           카테고리를 선택해 주세요
         </p>
-        <p className="text-xs text-secondary-dark [word-break:keep-all]">
+        <p className="text-xs text-muted [word-break:keep-all]">
           왼쪽에서 카테고리를 선택하면 FAQ 항목을 관리할 수 있습니다.
         </p>
       </div>
@@ -64,15 +64,15 @@ export function FaqItemListSection({
   }
 
   return (
-    <div className="bg-surface-white rounded-xl border border-border-light p-4 flex flex-col gap-3">
-      <div className="flex items-center justify-between border-b border-border-light pb-3 mb-3">
-        <h2 className="text-nav font-semibold text-heading-dark truncate">
+    <div className="bg-surface-white rounded-card border border-hairline p-4 flex flex-col gap-3">
+      <div className="flex items-center justify-between border-b border-hairline pb-3 mb-3">
+        <h2 className="text-sm font-semibold text-ink truncate">
           {selectedCategoryName ?? '항목 목록'}
         </h2>
         <button
           type="button"
           onClick={() => setShowCreateModal(true)}
-          className="inline-flex items-center justify-center bg-aircok-blue text-heading-light text-sm font-medium rounded-md px-4 py-2 min-h-[44px] hover:bg-aircok-blue-dark active:scale-[0.97] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:ring-offset-2 shrink-0 ml-2"
+          className="inline-flex items-center justify-center bg-brand text-white text-sm font-medium rounded-btn px-4 py-2 min-h-11 hover:bg-brand-hover active:scale-[0.97] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 shrink-0 ml-2"
         >
           <svg
             className="w-4 h-4 mr-1.5"
@@ -96,16 +96,16 @@ export function FaqItemListSection({
           {[1, 2, 3, 4].map((i) => (
             <div
               key={i}
-              className="h-[44px] rounded-md bg-surface-light animate-pulse"
+              className="h-[44px] rounded-btn bg-surface animate-pulse"
             />
           ))}
         </div>
       ) : items.length === 0 ? (
-        <div className="flex flex-col items-center justify-center text-center gap-4 rounded-xl border border-border-light bg-surface-white px-6 py-16">
-          <p className="text-nav text-secondary-dark [word-break:keep-all]">
+        <div className="flex flex-col items-center justify-center text-center gap-4 rounded-card border border-hairline bg-surface-white px-6 py-16">
+          <p className="text-sm text-muted [word-break:keep-all]">
             FAQ 항목이 없습니다.
           </p>
-          <p className="text-xs text-secondary-dark [word-break:keep-all]">
+          <p className="text-xs text-muted [word-break:keep-all]">
             추가 버튼을 눌러 FAQ 항목을 만드세요.
           </p>
         </div>
@@ -114,7 +114,7 @@ export function FaqItemListSection({
           {items.map((item) => (
             <div
               key={item.id}
-              className="flex items-center justify-between w-full rounded-md px-3 py-2.5 min-h-[44px] text-sm font-body text-heading-dark transition-colors hover:bg-surface-light"
+              className="flex items-center justify-between w-full rounded-btn px-3 py-2.5 min-h-11 text-sm font-body text-ink transition-colors hover:bg-surface"
             >
               <span className="truncate">{item.question}</span>
               <span className="flex items-center gap-1 shrink-0 ml-2">
@@ -122,7 +122,7 @@ export function FaqItemListSection({
                   type="button"
                   aria-label="FAQ 항목 수정"
                   onClick={() => setEditingItem(item)}
-                  className="inline-flex items-center justify-center w-7 h-7 rounded text-secondary-dark hover:text-heading-dark hover:bg-surface-light transition-colors shrink-0"
+                  className="inline-flex items-center justify-center w-7 h-7 rounded text-muted hover:text-ink hover:bg-surface transition-colors shrink-0"
                 >
                   {/* pencil icon */}
                   <svg
@@ -144,7 +144,7 @@ export function FaqItemListSection({
                   type="button"
                   aria-label="FAQ 항목 삭제"
                   onClick={() => setDeletingItemId(item.id)}
-                  className="inline-flex items-center justify-center w-7 h-7 rounded text-secondary-dark hover:text-error hover:bg-surface-light transition-colors shrink-0"
+                  className="inline-flex items-center justify-center w-7 h-7 rounded text-muted hover:text-error hover:bg-surface transition-colors shrink-0"
                 >
                   {/* trash2 icon */}
                   <svg

@@ -89,17 +89,17 @@ export function SortableImageCard({
     <div
       ref={setNodeRef}
       style={style}
-      className="relative flex flex-col gap-2 rounded-lg border border-border-light bg-surface-white p-3"
+      className="relative flex flex-col gap-2 rounded-image border border-hairline bg-surface-white p-3"
     >
       <div className="flex items-center justify-between">
-        <span className="text-xs font-medium text-secondary-dark tabular-nums">
+        <span className="text-xs font-medium text-muted tabular-nums">
           {index + 1}
         </span>
         {/* 드래그 핸들 */}
         <button
           type="button"
           aria-label="순서 변경 드래그"
-          className="inline-flex items-center justify-center w-7 h-7 rounded-md text-secondary-dark hover:text-heading-dark hover:bg-surface-light transition-colors cursor-grab active:cursor-grabbing touch-none"
+          className="inline-flex items-center justify-center w-7 h-7 rounded-btn text-muted hover:text-ink hover:bg-surface transition-colors cursor-grab active:cursor-grabbing touch-none"
           {...attributes}
           {...listeners}
         >
@@ -115,10 +115,10 @@ export function SortableImageCard({
       </div>
 
       {/* token 없음: aspect-[3/4] — 카탈로그 책자 페이지(세로형) 비율, 카탈로그 전용 1회성 수치 */}
-      <div className="relative w-full aspect-[3/4] overflow-hidden rounded-md bg-surface-light">
+      <div className="relative w-full aspect-[3/4] overflow-hidden rounded-btn bg-surface">
         {isPdf && !pdfThumb ? (
           // PDF 첫 페이지 렌더 전/실패 시 PDF 표시 플레이스홀더
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-secondary-dark">
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-muted">
             <svg
               className="w-8 h-8"
               viewBox="0 0 24 24"
@@ -149,7 +149,7 @@ export function SortableImageCard({
               className="absolute inset-0 w-full h-full object-contain"
             />
             {isPdf && (
-              <span className="absolute left-1.5 top-1.5 rounded-sm bg-overlay-dark-60 px-1.5 py-0.5 text-xs font-semibold text-heading-light">
+              <span className="absolute left-1.5 top-1.5 rounded-btn bg-overlay-dark-60 px-1.5 py-0.5 text-xs font-semibold text-white">
                 PDF
               </span>
             )}
@@ -157,7 +157,7 @@ export function SortableImageCard({
         )}
         {isReplacing && (
           <div className="absolute inset-0 flex items-center justify-center bg-overlay-dark-60">
-            <span className="text-xs text-heading-light">교체 중...</span>
+            <span className="text-xs text-white">교체 중...</span>
           </div>
         )}
       </div>
@@ -167,14 +167,14 @@ export function SortableImageCard({
           type="button"
           onClick={() => fileInputRef.current?.click()}
           disabled={isReplacing}
-          className="flex-1 inline-flex items-center justify-center rounded-md border border-border-light bg-transparent px-3 py-2 min-h-[44px] text-xs font-medium text-heading-dark hover:bg-surface-light active:scale-[0.97] transition-colors disabled:opacity-40 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:ring-offset-2"
+          className="flex-1 inline-flex items-center justify-center rounded-btn border border-hairline bg-transparent px-3 py-2 min-h-11 text-xs font-medium text-ink hover:bg-surface active:scale-[0.97] transition-colors disabled:opacity-40 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
         >
           교체
         </button>
         <button
           type="button"
           onClick={() => onDelete(image.id)}
-          className="flex-1 inline-flex items-center justify-center rounded-md border border-error/30 bg-transparent px-3 py-2 min-h-[44px] text-xs font-medium text-error hover:bg-surface-light active:scale-[0.97] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-error focus-visible:ring-offset-2"
+          className="flex-1 inline-flex items-center justify-center rounded-btn border border-error/30 bg-transparent px-3 py-2 min-h-11 text-xs font-medium text-error hover:bg-surface active:scale-[0.97] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-error focus-visible:ring-offset-2"
         >
           삭제
         </button>

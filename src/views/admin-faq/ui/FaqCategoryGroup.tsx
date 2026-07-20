@@ -37,7 +37,7 @@ export function FaqCategoryGroup({
   const panelId = `faq-category-panel-${category.id}`
 
   return (
-    <div className="rounded-lg border border-border-light overflow-hidden">
+    <div className="rounded-image border border-hairline overflow-hidden">
       {/* 그룹 헤더 (아코디언 토글 + FAQ 추가 버튼) */}
       <div className="flex items-center">
         <button
@@ -45,11 +45,11 @@ export function FaqCategoryGroup({
           onClick={onToggle}
           aria-expanded={isOpen}
           aria-controls={panelId}
-          className="flex-1 flex items-center gap-3 px-4 py-3.5 text-left hover:bg-surface-light transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:ring-inset"
+          className="flex-1 flex items-center gap-3 px-4 py-3.5 text-left hover:bg-surface transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-inset"
         >
           {/* 토글 chevron — 펼침 rotate-0(아래), 접힘 -rotate-90(우측) */}
           <svg
-            className={`shrink-0 w-5 h-5 text-secondary-dark transition-transform duration-200 ${
+            className={`shrink-0 w-5 h-5 text-muted transition-transform duration-200 ${
               isOpen ? 'rotate-0' : '-rotate-90'
             }`}
             aria-hidden="true"
@@ -61,11 +61,11 @@ export function FaqCategoryGroup({
             <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
           </svg>
           {/* 카테고리명 — 연도 numeral 대신 일반 텍스트 스타일 */}
-          <span className="text-[17px] font-display font-semibold text-heading-dark">
+          <span className="text-lead font-display font-semibold text-ink">
             {category.name}
           </span>
           {/* N건 배지 */}
-          <span className="text-[12px] text-secondary-dark bg-surface-light rounded-pill px-2 py-0.5 ml-auto tabular-nums">
+          <span className="text-xs text-muted bg-surface rounded-pill px-2 py-0.5 ml-auto tabular-nums">
             {items.length}건
           </span>
         </button>
@@ -75,7 +75,7 @@ export function FaqCategoryGroup({
           type="button"
           onClick={() => onAddItem(category.id)}
           aria-label={`${category.name} 카테고리에 FAQ 추가`}
-          className="shrink-0 mx-3 inline-flex items-center justify-center gap-1 bg-aircok-blue text-heading-light text-xs font-medium rounded-md px-3 py-1.5 hover:bg-aircok-blue-dark active:scale-[0.97] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:ring-offset-2"
+          className="shrink-0 mx-3 inline-flex items-center justify-center gap-1 bg-brand text-white text-xs font-medium rounded-btn px-3 py-1.5 hover:bg-brand-hover active:scale-[0.97] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
         >
           <svg className="w-3 h-3" viewBox="0 0 16 16" fill="none" aria-hidden="true">
             <path
@@ -97,9 +97,9 @@ export function FaqCategoryGroup({
         }`}
       >
         <div className="overflow-hidden">
-          <div className="flex flex-col divide-y divide-border-light border-t border-border-light">
+          <div className="flex flex-col divide-y divide-hairline border-t border-hairline">
             {items.length === 0 ? (
-              <p className="text-secondary-dark text-sm py-4 px-4 text-center">
+              <p className="text-muted text-sm py-4 px-4 text-center">
                 이 카테고리에 FAQ 항목이 없습니다.
               </p>
             ) : (

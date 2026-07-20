@@ -15,16 +15,16 @@ export function NewDiagnosisConsultationAlertCard() {
     <Link
       href="/console/diagnosis-images"
       className={[
-        'group rounded-xl border p-5 flex items-center gap-4 transition-all',
+        'group rounded-card border p-5 flex items-center gap-4 transition-all',
         hasNew
           ? 'bg-warning/5 border-warning/40 hover:bg-warning/10 hover:shadow-card'
-          : 'bg-surface-white border-border-light hover:border-warning/40 hover:shadow-card',
+          : 'bg-surface-white border-hairline hover:border-warning/40 hover:shadow-card',
       ].join(' ')}
     >
       <div
         className={[
-          'inline-flex items-center justify-center w-11 h-11 rounded-lg flex-shrink-0',
-          hasNew ? 'bg-warning text-heading-light' : 'bg-warning/10 text-warning',
+          'inline-flex items-center justify-center w-11 h-11 rounded-image flex-shrink-0',
+          hasNew ? 'bg-warning text-white' : 'bg-warning/10 text-warning',
         ].join(' ')}
       >
         <svg
@@ -46,15 +46,15 @@ export function NewDiagnosisConsultationAlertCard() {
       <div className="flex flex-col gap-0.5 min-w-0">
         <span
           className={[
-            'text-nav font-display font-semibold transition-colors',
+            'text-sm font-display font-semibold transition-colors',
             hasNew
               ? 'text-warning'
-              : 'text-heading-dark group-hover:text-warning',
+              : 'text-ink group-hover:text-warning',
           ].join(' ')}
         >
           신규 진단서비스 신청 알림
         </span>
-        <span className="text-sm text-secondary-dark leading-snug">
+        <span className="text-sm text-muted leading-snug">
           {isLoading
             ? '불러오는 중...'
             : hasNew
@@ -64,7 +64,7 @@ export function NewDiagnosisConsultationAlertCard() {
       </div>
 
       {hasNew && (
-        <span className="ml-auto flex-shrink-0 inline-flex items-center justify-center min-w-6 h-6 px-1.5 rounded-pill bg-warning text-heading-light text-xs font-bold">
+        <span className="ml-auto flex-shrink-0 inline-flex items-center justify-center min-w-6 h-6 px-1.5 rounded-pill bg-warning text-white text-xs font-bold">
           {count}
         </span>
       )}

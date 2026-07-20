@@ -120,19 +120,19 @@ export function TimelineManageSection() {
   }
 
   return (
-    <section className="bg-surface-white rounded-xl border border-border-light p-6">
+    <section className="bg-surface-white rounded-card border border-hairline p-6">
       {/* 패널 헤더 */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div className="flex flex-col gap-0.5 min-w-0">
-          <h2 className="text-nav font-display font-semibold text-heading-dark">연혁 / 타임라인</h2>
-          <p className="text-xs text-secondary-dark [word-break:keep-all]">
+          <h2 className="text-sm font-display font-semibold text-ink">연혁 / 타임라인</h2>
+          <p className="text-xs text-muted [word-break:keep-all]">
             소개 페이지 History 섹션에 노출할 연혁을 등록·수정·삭제합니다.
           </p>
         </div>
         <button
           type="button"
           onClick={() => setIsAddModalOpen(true)}
-          className="inline-flex items-center justify-center shrink-0 bg-aircok-blue text-heading-light text-sm font-medium rounded-md px-4 py-2 min-h-[44px] hover:bg-aircok-blue-dark active:scale-[0.97] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:ring-offset-2"
+          className="inline-flex items-center justify-center shrink-0 bg-brand text-white text-sm font-medium rounded-btn px-4 py-2 min-h-11 hover:bg-brand-hover active:scale-[0.97] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
         >
           연혁 추가
         </button>
@@ -143,12 +143,12 @@ export function TimelineManageSection() {
         <div className="flex flex-col gap-3">
           {[1, 2, 3, 4].map((i) => (
             // h-[52px]: token 없음 — 접힘 그룹 헤더(px-4 py-3.5) 높이 근사, 스켈레톤 전용 1회성 수치
-            <div key={i} className="h-[52px] rounded-lg bg-surface-light animate-pulse" />
+            <div key={i} className="h-[52px] rounded-image bg-surface animate-pulse" />
           ))}
         </div>
       ) : items.length === 0 ? (
         /* 데이터 자체가 없는 빈 상태 */
-        <p className="text-secondary-dark text-sm py-6 text-center">등록된 연혁이 없습니다.</p>
+        <p className="text-muted text-sm py-6 text-center">등록된 연혁이 없습니다.</p>
       ) : (
         <div className="flex flex-col gap-6">
           {/* ── 도구 모음: 검색 + 요약 + 연도 필터 ── */}
@@ -157,7 +157,7 @@ export function TimelineManageSection() {
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="relative w-full sm:max-w-xs">
                 <svg
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-secondary-dark w-5 h-5 pointer-events-none"
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-muted w-5 h-5 pointer-events-none"
                   aria-hidden="true"
                   fill="none"
                   viewBox="0 0 24 24"
@@ -176,11 +176,11 @@ export function TimelineManageSection() {
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="연혁 내용 검색"
                   aria-label="연혁 내용 검색"
-                  className="w-full bg-surface-light rounded-md px-4 py-3 pl-10 text-[15px] text-heading-dark placeholder:text-secondary-dark focus:outline-none focus:ring-2 focus:ring-aircok-blue border-none"
+                  className="w-full bg-surface rounded-btn px-4 py-3 pl-10 text-sm text-ink placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-brand border-none"
                 />
               </div>
               {/* 총 건수 요약 — 필터 활성 시 "표시 N건 / 총 M건" */}
-              <p className="text-sm text-secondary-dark tabular-nums shrink-0">
+              <p className="text-sm text-muted tabular-nums shrink-0">
                 {hasActiveFilter ? `${visibleCount}건 / 총 ${totalCount}건` : `총 ${totalCount}건`}
               </p>
             </div>
@@ -200,8 +200,8 @@ export function TimelineManageSection() {
                 onClick={() => setSelectedYear('all')}
                 className={
                   selectedYear === 'all'
-                    ? 'shrink-0 rounded-pill px-5 py-2 min-h-[44px] text-[15px] font-medium bg-aircok-blue text-heading-light transition-colors tabular-nums focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:ring-offset-2'
-                    : 'shrink-0 rounded-pill px-5 py-2 min-h-[44px] text-[15px] font-medium bg-transparent text-body-dark hover:bg-surface-light transition-colors tabular-nums focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:ring-offset-2'
+                    ? 'shrink-0 rounded-pill px-5 py-2 min-h-11 text-sm font-medium bg-brand text-white transition-colors tabular-nums focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2'
+                    : 'shrink-0 rounded-pill px-5 py-2 min-h-11 text-sm font-medium bg-transparent text-ink-soft hover:bg-surface transition-colors tabular-nums focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2'
                 }
               >
                 전체
@@ -209,8 +209,8 @@ export function TimelineManageSection() {
                   aria-hidden="true"
                   className={
                     selectedYear === 'all'
-                      ? 'text-[12px] text-heading-light/70 ml-1.5 tabular-nums'
-                      : 'text-[12px] text-secondary-dark bg-surface-light rounded-pill px-1.5 py-0.5 ml-1.5 tabular-nums'
+                      ? 'text-xs text-white/70 ml-1.5 tabular-nums'
+                      : 'text-xs text-muted bg-surface rounded-pill px-1.5 py-0.5 ml-1.5 tabular-nums'
                   }
                 >
                   {counts.all}
@@ -218,7 +218,7 @@ export function TimelineManageSection() {
               </button>
 
               {/* 타임라인 축 구분선 */}
-              <span aria-hidden="true" className="shrink-0 w-px h-5 bg-border-light mx-1" />
+              <span aria-hidden="true" className="shrink-0 w-px h-5 bg-hairline mx-1" />
 
               {/* 연도 칩 (내림차순) */}
               {years.map((year) => (
@@ -231,8 +231,8 @@ export function TimelineManageSection() {
                   onClick={() => setSelectedYear(year)}
                   className={
                     selectedYear === year
-                      ? 'shrink-0 rounded-pill px-5 py-2 min-h-[44px] text-[15px] font-medium bg-aircok-blue text-heading-light transition-colors tabular-nums focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:ring-offset-2'
-                      : 'shrink-0 rounded-pill px-5 py-2 min-h-[44px] text-[15px] font-medium bg-transparent text-body-dark hover:bg-surface-light transition-colors tabular-nums focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:ring-offset-2'
+                      ? 'shrink-0 rounded-pill px-5 py-2 min-h-11 text-sm font-medium bg-brand text-white transition-colors tabular-nums focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2'
+                      : 'shrink-0 rounded-pill px-5 py-2 min-h-11 text-sm font-medium bg-transparent text-ink-soft hover:bg-surface transition-colors tabular-nums focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2'
                   }
                 >
                   {year}
@@ -240,8 +240,8 @@ export function TimelineManageSection() {
                     aria-hidden="true"
                     className={
                       selectedYear === year
-                        ? 'text-[12px] text-heading-light/70 ml-1.5 tabular-nums'
-                        : 'text-[12px] text-secondary-dark bg-surface-light rounded-pill px-1.5 py-0.5 ml-1.5 tabular-nums'
+                        ? 'text-xs text-white/70 ml-1.5 tabular-nums'
+                        : 'text-xs text-muted bg-surface rounded-pill px-1.5 py-0.5 ml-1.5 tabular-nums'
                     }
                   >
                     {counts[year]}
@@ -255,8 +255,8 @@ export function TimelineManageSection() {
           {groups.length === 0 ? (
             /* 검색·필터 결과 없음 (§8 검색 결과 없음 상태) */
             <div className="py-12 text-center">
-              <p className="text-[17px] text-secondary-dark [word-break:keep-all]">검색 결과가 없습니다.</p>
-              <p className="text-[15px] text-secondary-dark mt-2">다른 키워드나 연도로 검색해 보세요.</p>
+              <p className="text-lead text-muted [word-break:keep-all]">검색 결과가 없습니다.</p>
+              <p className="text-sm text-muted mt-2">다른 키워드나 연도로 검색해 보세요.</p>
             </div>
           ) : (
             <div className="flex flex-col gap-3">

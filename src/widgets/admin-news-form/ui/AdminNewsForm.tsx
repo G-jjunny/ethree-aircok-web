@@ -162,7 +162,7 @@ export function AdminNewsForm({ initialData, onSuccess }: Props) {
     >
       {/* 뉴스 타입 선택 */}
       <div className="flex flex-col gap-2">
-        <label className="text-heading-dark text-[14px] font-medium">
+        <label className="text-ink text-sm font-medium">
           뉴스 타입 <span className="text-error">*</span>
         </label>
         <div className="flex gap-6">
@@ -171,30 +171,30 @@ export function AdminNewsForm({ initialData, onSuccess }: Props) {
               type="radio"
               value="BLOG"
               {...register('type')}
-              className="accent-aircok-blue"
+              className="accent-brand"
             />
-            <span className="text-body-dark text-sm font-body">블로그형 (직접 작성)</span>
+            <span className="text-ink-soft text-sm font-body">블로그형 (직접 작성)</span>
           </label>
           <label className="flex items-center gap-2 cursor-pointer">
             <input
               type="radio"
               value="LINK"
               {...register('type')}
-              className="accent-aircok-blue"
+              className="accent-brand"
             />
-            <span className="text-body-dark text-sm font-body">링크형 (외부 기사)</span>
+            <span className="text-ink-soft text-sm font-body">링크형 (외부 기사)</span>
           </label>
         </div>
       </div>
 
       {/* 제목 */}
       <div className="flex flex-col gap-1">
-        <label className="text-heading-dark text-[14px] font-medium">
+        <label className="text-ink text-sm font-medium">
           제목 <span className="text-error">*</span>
         </label>
         <input
           {...register('title')}
-          className="border border-border-light rounded-md px-3 py-2 text-body-dark text-sm font-body focus:outline-none focus:ring-2 focus:ring-aircok-blue"
+          className="border border-hairline rounded-btn px-3 py-2 text-ink-soft text-sm font-body focus:outline-none focus:ring-2 focus:ring-brand"
           placeholder="뉴스 제목을 입력하세요"
         />
         {errors.title && (
@@ -204,13 +204,13 @@ export function AdminNewsForm({ initialData, onSuccess }: Props) {
 
       {/* 설명 */}
       <div className="flex flex-col gap-1">
-        <label className="text-heading-dark text-[14px] font-medium">
+        <label className="text-ink text-sm font-medium">
           설명 <span className="text-error">*</span>
         </label>
         <textarea
           {...register('description')}
           rows={3}
-          className="border border-border-light rounded-md px-3 py-2 text-body-dark text-sm font-body focus:outline-none focus:ring-2 focus:ring-aircok-blue resize-none"
+          className="border border-hairline rounded-btn px-3 py-2 text-ink-soft text-sm font-body focus:outline-none focus:ring-2 focus:ring-brand resize-none"
           placeholder="뉴스 요약 설명을 입력하세요"
         />
         {errors.description && (
@@ -220,31 +220,31 @@ export function AdminNewsForm({ initialData, onSuccess }: Props) {
 
       {/* 날짜 */}
       <div className="flex flex-col gap-1">
-        <label className="text-heading-dark text-[14px] font-medium">
+        <label className="text-ink text-sm font-medium">
           날짜
         </label>
         <input
           type="date"
           {...register('date')}
-          className="border border-border-light rounded-md px-3 py-2 text-body-dark text-sm font-body focus:outline-none focus:ring-2 focus:ring-aircok-blue w-48"
+          className="border border-hairline rounded-btn px-3 py-2 text-ink-soft text-sm font-body focus:outline-none focus:ring-2 focus:ring-brand w-48"
         />
       </div>
 
       {/* 장소 */}
       <div className="flex flex-col gap-1">
-        <label className="text-heading-dark text-[14px] font-medium">
+        <label className="text-ink text-sm font-medium">
           장소
         </label>
         <input
           {...register('location')}
-          className="border border-border-light rounded-md px-3 py-2 text-body-dark text-sm font-body focus:outline-none focus:ring-2 focus:ring-aircok-blue"
+          className="border border-hairline rounded-btn px-3 py-2 text-ink-soft text-sm font-body focus:outline-none focus:ring-2 focus:ring-brand"
           placeholder="장소 (선택)"
         />
       </div>
 
       {/* 커버 이미지 */}
       <div className="flex flex-col gap-2">
-        <label className="text-heading-dark text-[14px] font-medium">
+        <label className="text-ink text-sm font-medium">
           커버 이미지
         </label>
         {coverImageValue && (
@@ -252,14 +252,14 @@ export function AdminNewsForm({ initialData, onSuccess }: Props) {
           <img
             src={coverImageSrc}
             alt="커버 이미지 미리보기"
-            className="w-48 h-28 object-cover rounded-md border border-border-light"
+            className="w-48 h-28 object-cover rounded-btn border border-hairline"
           />
         )}
         <div className="flex gap-2">
           <button
             type="button"
             onClick={() => coverImageInputRef.current?.click()}
-            className="px-4 py-2 rounded-md border border-border-light text-body-dark text-sm hover:bg-surface-light transition-colors w-fit"
+            className="px-4 py-2 rounded-btn border border-hairline text-ink-soft text-sm hover:bg-surface transition-colors w-fit"
           >
             이미지 선택
           </button>
@@ -270,7 +270,7 @@ export function AdminNewsForm({ initialData, onSuccess }: Props) {
                 setValue('coverImage', '', { shouldDirty: true });
                 if (coverImageInputRef.current) coverImageInputRef.current.value = '';
               }}
-              className="px-4 py-2 rounded-md border border-error text-error text-sm hover:bg-error/10 transition-colors w-fit"
+              className="px-4 py-2 rounded-btn border border-error text-error text-sm hover:bg-error/10 transition-colors w-fit"
             >
               이미지 제거
             </button>
@@ -289,7 +289,7 @@ export function AdminNewsForm({ initialData, onSuccess }: Props) {
       {/* 본문 에디터 (BLOG 타입만) */}
       {newsType === 'BLOG' && (
         <div className="flex flex-col gap-1">
-          <label className="text-heading-dark text-[14px] font-medium">
+          <label className="text-ink text-sm font-medium">
             본문
           </label>
           <Controller
@@ -305,12 +305,12 @@ export function AdminNewsForm({ initialData, onSuccess }: Props) {
       {/* 외부 URL (LINK 타입만) */}
       {newsType === 'LINK' && (
         <div className="flex flex-col gap-1">
-          <label className="text-heading-dark text-[14px] font-medium">
+          <label className="text-ink text-sm font-medium">
             외부 뉴스 링크 URL <span className="text-error">*</span>
           </label>
           <input
             {...register('externalUrl')}
-            className="border border-border-light rounded-md px-3 py-2 text-body-dark text-sm font-body focus:outline-none focus:ring-2 focus:ring-aircok-blue"
+            className="border border-hairline rounded-btn px-3 py-2 text-ink-soft text-sm font-body focus:outline-none focus:ring-2 focus:ring-brand"
             placeholder="https://example.com/news/..."
           />
           {errors.externalUrl && (
@@ -330,13 +330,13 @@ export function AdminNewsForm({ initialData, onSuccess }: Props) {
               id="published"
               checked={field.value}
               onChange={(e) => field.onChange(e.target.checked)}
-              className="w-4 h-4 accent-aircok-blue"
+              className="w-4 h-4 accent-brand"
             />
           )}
         />
         <label
           htmlFor="published"
-          className="text-heading-dark text-[14px] font-medium cursor-pointer"
+          className="text-ink text-sm font-medium cursor-pointer"
         >
           발행
         </label>
@@ -347,13 +347,13 @@ export function AdminNewsForm({ initialData, onSuccess }: Props) {
         <button
           type="submit"
           disabled={createMutation.isPending || updateMutation.isPending}
-          className="px-6 py-2 bg-aircok-blue text-heading-light text-sm font-body rounded-md hover:bg-aircok-blue-dark transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+          className="px-6 py-2 bg-brand text-white text-sm font-body rounded-btn hover:bg-brand-hover transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
         >
           {createMutation.isPending || updateMutation.isPending ? '저장 중...' : initialData ? '수정 저장' : '작성 완료'}
         </button>
         <Link
           href="/console/news"
-          className="bg-surface-light text-heading-dark rounded-md px-6 py-2 font-semibold text-sm font-body hover:bg-border-light transition-colors"
+          className="bg-surface text-ink rounded-btn px-6 py-2 font-semibold text-sm font-body hover:bg-hairline transition-colors"
         >
           목록으로
         </Link>

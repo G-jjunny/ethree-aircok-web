@@ -131,7 +131,7 @@ export function AdminFaqView() {
         <button
           type="button"
           onClick={() => setShowCreateCategory(true)}
-          className="inline-flex items-center justify-center shrink-0 bg-aircok-blue text-heading-light text-sm font-medium rounded-md px-4 py-2 min-h-[44px] hover:bg-aircok-blue-dark active:scale-[0.97] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:ring-offset-2"
+          className="inline-flex items-center justify-center shrink-0 bg-brand text-white text-sm font-medium rounded-btn px-4 py-2 min-h-11 hover:bg-brand-hover active:scale-[0.97] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
         >
           카테고리 추가
         </button>
@@ -139,22 +139,22 @@ export function AdminFaqView() {
 
       {/* 콘텐츠 영역 */}
       <div className="p-6 lg:p-8">
-        <section className="bg-surface-white rounded-xl border border-border-light p-6">
+        <section className="bg-surface-white rounded-card border border-hairline p-6">
           {isLoading ? (
             /* 로딩 스켈레톤 — 카테고리 그룹 헤더 형태 */
             <div className="flex flex-col gap-3">
               {/* h-[52px]: token 없음 — 접힘 그룹 헤더(px-4 py-3.5) 높이 근사, 스켈레톤 전용 1회성 수치 */}
               {[1, 2, 3].map((i) => (
-                <div key={i} className="h-[52px] rounded-lg bg-surface-light animate-pulse" />
+                <div key={i} className="h-[52px] rounded-image bg-surface animate-pulse" />
               ))}
             </div>
           ) : categories.length === 0 ? (
             /* 데이터 자체가 없는 빈 상태 */
             <div className="py-12 text-center">
-              <p className="text-[17px] text-secondary-dark [word-break:keep-all]">
+              <p className="text-lead text-muted [word-break:keep-all]">
                 등록된 카테고리가 없습니다.
               </p>
-              <p className="text-[15px] text-secondary-dark mt-2">
+              <p className="text-sm text-muted mt-2">
                 카테고리 추가 버튼을 눌러 시작하세요.
               </p>
             </div>
@@ -164,7 +164,7 @@ export function AdminFaqView() {
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div className="relative w-full sm:max-w-xs">
                   <svg
-                    className="absolute left-3 top-1/2 -translate-y-1/2 text-secondary-dark w-5 h-5 pointer-events-none"
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-muted w-5 h-5 pointer-events-none"
                     aria-hidden="true"
                     fill="none"
                     viewBox="0 0 24 24"
@@ -183,10 +183,10 @@ export function AdminFaqView() {
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="카테고리명 또는 질문 검색"
                     aria-label="카테고리명 또는 질문 검색"
-                    className="w-full bg-surface-light rounded-md px-4 py-3 pl-10 text-[15px] text-heading-dark placeholder:text-secondary-dark focus:outline-none focus:ring-2 focus:ring-aircok-blue border-none"
+                    className="w-full bg-surface rounded-btn px-4 py-3 pl-10 text-sm text-ink placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-brand border-none"
                   />
                 </div>
-                <p className="text-sm text-secondary-dark tabular-nums shrink-0">
+                <p className="text-sm text-muted tabular-nums shrink-0">
                   총 {items.length}건
                 </p>
               </div>
@@ -194,10 +194,10 @@ export function AdminFaqView() {
               {/* ── 카테고리 그룹 아코디언 목록 / 검색 결과 없음 ── */}
               {groups.length === 0 ? (
                 <div className="py-12 text-center">
-                  <p className="text-[17px] text-secondary-dark [word-break:keep-all]">
+                  <p className="text-lead text-muted [word-break:keep-all]">
                     검색 결과가 없습니다.
                   </p>
-                  <p className="text-[15px] text-secondary-dark mt-2">
+                  <p className="text-sm text-muted mt-2">
                     다른 키워드로 검색해 보세요.
                   </p>
                 </div>

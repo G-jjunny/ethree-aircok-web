@@ -11,8 +11,8 @@ interface Props {
 
 const btnBase =
   'px-2 py-1 rounded text-sm transition-colors';
-const btnActive = 'bg-aircok-blue text-heading-light';
-const btnInactive = 'text-body-dark hover:bg-border-light';
+const btnActive = 'bg-brand text-white';
+const btnInactive = 'text-ink-soft hover:bg-hairline';
 
 function ToolbarButton({
   active,
@@ -35,7 +35,7 @@ function ToolbarButton({
 }
 
 function Divider() {
-  return <span className="w-px h-5 bg-border-light mx-0.5 self-center" />;
+  return <span className="w-px h-5 bg-hairline mx-0.5 self-center" />;
 }
 
 export function NewsEditorToolbar({ editor }: Props) {
@@ -66,7 +66,7 @@ export function NewsEditorToolbar({ editor }: Props) {
   };
 
   return (
-    <div className="flex gap-1 flex-wrap items-center border border-border-light rounded-t-md bg-surface-light px-2 py-1">
+    <div className="flex gap-1 flex-wrap items-center border border-hairline rounded-t-btn bg-surface px-2 py-1">
       {/* 텍스트 서식 */}
       <ToolbarButton
         active={editor.isActive('bold')}

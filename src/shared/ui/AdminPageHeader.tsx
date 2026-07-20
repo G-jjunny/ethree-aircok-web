@@ -15,18 +15,18 @@ export function AdminPageHeader({
 
   return (
     <div
-      className={`bg-surface-white border-b border-border-light px-6 lg:px-8 py-5${
+      className={`bg-surface-white border-b border-hairline px-6 lg:px-8 py-5${
         hasChildren ? ' flex items-center justify-between gap-4' : ''
       }`}
     >
       {/* title + description 묶음 */}
       <div>
         {/* token 없음: admin 헤딩 전용 22px — design.md 타이포그래피 스케일에 미정의 1회성 수치 */}
-        <h1 className="text-[22px] font-display font-semibold text-heading-dark leading-tight [word-break:keep-all]">
+        <h1 className="text-[22px] font-display font-semibold text-ink leading-tight [word-break:keep-all]">
           {title}
         </h1>
         {description && (
-          <p className="text-nav text-secondary-dark leading-[1.43] mt-0.5 [word-break:keep-all]">
+          <p className="text-sm text-muted leading-[1.43] mt-0.5 [word-break:keep-all]">
             {description}
           </p>
         )}

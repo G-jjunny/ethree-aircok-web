@@ -13,16 +13,16 @@ export function NewInquiryAlertCard() {
     <Link
       href="/console/inquiries"
       className={[
-        'group rounded-xl border p-5 flex items-center gap-4 transition-all',
+        'group rounded-card border p-5 flex items-center gap-4 transition-all',
         hasNew
-          ? 'bg-aircok-blue/5 border-aircok-blue/40 hover:bg-aircok-blue/10 hover:shadow-card'
-          : 'bg-surface-white border-border-light hover:border-aircok-blue/40 hover:shadow-card',
+          ? 'bg-brand/5 border-brand/40 hover:bg-brand/10 hover:shadow-card'
+          : 'bg-surface-white border-hairline hover:border-brand/40 hover:shadow-card',
       ].join(' ')}
     >
       <div
         className={[
-          'inline-flex items-center justify-center w-11 h-11 rounded-lg flex-shrink-0',
-          hasNew ? 'bg-aircok-blue text-heading-light' : 'bg-aircok-blue/10 text-aircok-blue',
+          'inline-flex items-center justify-center w-11 h-11 rounded-image flex-shrink-0',
+          hasNew ? 'bg-brand text-white' : 'bg-brand/10 text-brand',
         ].join(' ')}
       >
         <svg
@@ -44,15 +44,15 @@ export function NewInquiryAlertCard() {
       <div className="flex flex-col gap-0.5 min-w-0">
         <span
           className={[
-            'text-nav font-display font-semibold transition-colors',
+            'text-sm font-display font-semibold transition-colors',
             hasNew
-              ? 'text-aircok-blue'
-              : 'text-heading-dark group-hover:text-aircok-blue',
+              ? 'text-brand'
+              : 'text-ink group-hover:text-brand',
           ].join(' ')}
         >
           신규 문의 알림
         </span>
-        <span className="text-sm text-secondary-dark leading-snug">
+        <span className="text-sm text-muted leading-snug">
           {isLoading
             ? '불러오는 중...'
             : hasNew
@@ -62,7 +62,7 @@ export function NewInquiryAlertCard() {
       </div>
 
       {hasNew && (
-        <span className="ml-auto flex-shrink-0 inline-flex items-center justify-center min-w-6 h-6 px-1.5 rounded-pill bg-aircok-blue text-heading-light text-xs font-bold">
+        <span className="ml-auto flex-shrink-0 inline-flex items-center justify-center min-w-6 h-6 px-1.5 rounded-pill bg-brand text-white text-xs font-bold">
           {count}
         </span>
       )}

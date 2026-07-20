@@ -33,13 +33,13 @@ const STATUS_LABELS: Record<DiagnosisConsultationStatus, string> = {
 }
 
 const STATUS_CLASSES: Record<DiagnosisConsultationStatus, string> = {
-  NEW: 'bg-aircok-blue/10 text-aircok-blue',
+  NEW: 'bg-brand/10 text-brand',
   IN_PROGRESS: 'bg-warning/10 text-warning',
   DONE: 'bg-success/10 text-success',
 }
 
 const STATUS_SELECT_CLASSES: Record<DiagnosisConsultationStatus, string> = {
-  NEW: 'bg-aircok-blue/10 text-aircok-blue border-aircok-blue/20',
+  NEW: 'bg-brand/10 text-brand border-brand/20',
   IN_PROGRESS: 'bg-warning/10 text-warning border-warning/20',
   DONE: 'bg-success/10 text-success border-success/20',
 }
@@ -54,7 +54,7 @@ function StatusBadge({ status }: { status: DiagnosisConsultationStatus }) {
   return (
     <span
       className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium font-body ${
-        STATUS_CLASSES[status] ?? 'bg-surface-light text-secondary-dark'
+        STATUS_CLASSES[status] ?? 'bg-surface text-muted'
       }`}
     >
       {STATUS_LABELS[status] ?? status}
@@ -73,8 +73,8 @@ export function AdminDiagnosisConsultationListView() {
 
   if (isPending) {
     return (
-      <div className="flex flex-col items-center justify-center text-center gap-4 rounded-xl border border-border-light bg-surface-white px-6 py-16">
-        <p className="text-secondary-dark font-body text-nav leading-[1.43]">
+      <div className="flex flex-col items-center justify-center text-center gap-4 rounded-card border border-hairline bg-surface-white px-6 py-16">
+        <p className="text-muted font-body text-sm leading-[1.43]">
           불러오는 중...
         </p>
       </div>
@@ -83,8 +83,8 @@ export function AdminDiagnosisConsultationListView() {
 
   if (isError) {
     return (
-      <div className="flex flex-col items-center justify-center text-center gap-4 rounded-xl border border-border-light bg-surface-white px-6 py-16">
-        <p className="text-error font-body text-nav leading-[1.43] [word-break:keep-all]">
+      <div className="flex flex-col items-center justify-center text-center gap-4 rounded-card border border-hairline bg-surface-white px-6 py-16">
+        <p className="text-error font-body text-sm leading-[1.43] [word-break:keep-all]">
           신청 목록을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.
         </p>
         {/* min-h-11(44px) 은 Button size="sm" 에 없는 터치 타겟 보정 — 기존 min-h-[44px] 승계 */}
@@ -103,8 +103,8 @@ export function AdminDiagnosisConsultationListView() {
 
   if (!res || res.total === 0) {
     return (
-      <div className="flex flex-col items-center justify-center text-center gap-4 rounded-xl border border-border-light bg-surface-white px-6 py-16">
-        <p className="text-body-dark font-body text-nav leading-[1.43]">
+      <div className="flex flex-col items-center justify-center text-center gap-4 rounded-card border border-hairline bg-surface-white px-6 py-16">
+        <p className="text-ink-soft font-body text-sm leading-[1.43]">
           접수된 신청이 없습니다.
         </p>
       </div>
@@ -113,36 +113,36 @@ export function AdminDiagnosisConsultationListView() {
 
   return (
     <>
-      <div className="border border-border-light rounded-xl overflow-x-auto">
+      <div className="border border-hairline rounded-card overflow-x-auto">
         <table className="w-full text-sm">
-          <thead className="bg-surface-light">
+          <thead className="bg-surface">
             <tr>
-              <th className="text-left px-4 py-3 text-body-dark font-body font-medium whitespace-nowrap">
+              <th className="text-left px-4 py-3 text-ink-soft font-body font-medium whitespace-nowrap">
                 신청일시
               </th>
-              <th className="text-left px-4 py-3 text-body-dark font-body font-medium whitespace-nowrap">
+              <th className="text-left px-4 py-3 text-ink-soft font-body font-medium whitespace-nowrap">
                 성함
               </th>
-              <th className="text-left px-4 py-3 text-body-dark font-body font-medium whitespace-nowrap">
+              <th className="text-left px-4 py-3 text-ink-soft font-body font-medium whitespace-nowrap">
                 전화번호
               </th>
-              <th className="text-left px-4 py-3 text-body-dark font-body font-medium w-28">
+              <th className="text-left px-4 py-3 text-ink-soft font-body font-medium w-28">
                 상태
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-border-light">
+          <tbody className="divide-y divide-hairline">
             {res.data.map((item) => (
               <tr
                 key={item.id}
-                className="hover:bg-surface-light transition-colors cursor-pointer"
+                className="hover:bg-surface transition-colors cursor-pointer"
                 onClick={() => setSelected(item)}
               >
-                <td className="px-4 py-3 text-secondary-dark font-body whitespace-nowrap">
+                <td className="px-4 py-3 text-muted font-body whitespace-nowrap">
                   {formatDateTime(item.createdAt)}
                 </td>
-                <td className="px-4 py-3 text-body-dark font-body">{item.name}</td>
-                <td className="px-4 py-3 text-body-dark font-body">{item.phone}</td>
+                <td className="px-4 py-3 text-ink-soft font-body">{item.name}</td>
+                <td className="px-4 py-3 text-ink-soft font-body">{item.phone}</td>
                 <td className="px-4 py-3">
                   <StatusBadge status={item.status} />
                 </td>
@@ -161,7 +161,7 @@ export function AdminDiagnosisConsultationListView() {
       )}
 
       <div
-        className={`fixed inset-y-0 right-0 w-full max-w-md bg-surface-white border-l border-border-light z-50 flex flex-col shadow-card transition-transform duration-300 ${
+        className={`fixed inset-y-0 right-0 w-full max-w-md bg-surface-white border-l border-hairline z-50 flex flex-col shadow-card transition-transform duration-300 ${
           selected ? 'translate-x-0' : 'translate-x-full'
         }`}
         role="dialog"
@@ -252,14 +252,14 @@ function ConsultationDetailPanel({
 
   return (
     <>
-      <div className="flex items-center justify-between px-6 py-4 border-b border-border-light shrink-0">
-        <h2 className="text-[17px] font-display font-semibold text-heading-dark [word-break:keep-all] truncate pr-4">
+      <div className="flex items-center justify-between px-6 py-4 border-b border-hairline shrink-0">
+        <h2 className="text-lead font-display font-semibold text-ink [word-break:keep-all] truncate pr-4">
           {item.name}
         </h2>
         <button
           type="button"
           onClick={onClose}
-          className="shrink-0 p-2 rounded-md text-secondary-dark hover:text-heading-dark hover:bg-surface-light transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue"
+          className="shrink-0 p-2 rounded-btn text-muted hover:text-ink hover:bg-surface transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand"
           aria-label="닫기"
         >
           <svg
@@ -278,50 +278,50 @@ function ConsultationDetailPanel({
       <div className="flex-1 overflow-y-auto px-6 py-6 flex flex-col gap-6">
         <div className="flex items-center gap-3">
           <StatusBadge status={item.status} />
-          <span className="text-sm text-secondary-dark font-body">
+          <span className="text-sm text-muted font-body">
             {formatDateTime(item.createdAt)}
           </span>
         </div>
 
         <dl className="flex flex-col gap-3">
           <div className="flex flex-col gap-1">
-            <dt className="text-sm font-body font-medium text-secondary-dark">성함</dt>
-            <dd className="text-nav font-body text-heading-dark">{item.name}</dd>
+            <dt className="text-sm font-body font-medium text-muted">성함</dt>
+            <dd className="text-sm font-body text-ink">{item.name}</dd>
           </div>
           <div className="flex flex-col gap-1">
-            <dt className="text-sm font-body font-medium text-secondary-dark">전화번호</dt>
-            <dd className="text-nav font-body text-heading-dark">{item.phone}</dd>
+            <dt className="text-sm font-body font-medium text-muted">전화번호</dt>
+            <dd className="text-sm font-body text-ink">{item.phone}</dd>
           </div>
         </dl>
 
-        <div className="border-t border-border-light pt-6 flex flex-col gap-4">
-          <h3 className="text-sm font-display font-semibold text-heading-dark">상담 관리</h3>
+        <div className="border-t border-hairline pt-6 flex flex-col gap-4">
+          <h3 className="text-sm font-display font-semibold text-ink">상담 관리</h3>
 
           {isDetailPending ? (
             <div className="flex flex-col gap-4" aria-busy="true">
               {/* 상태 (select) */}
               <div className="flex flex-col gap-1">
-                <div className="h-3.5 w-8 rounded-sm bg-surface-light animate-pulse" />
-                <div className="h-9 w-24 rounded-full bg-surface-light animate-pulse" />
+                <div className="h-3.5 w-8 rounded bg-surface animate-pulse" />
+                <div className="h-9 w-24 rounded-full bg-surface animate-pulse" />
               </div>
               {/* 상담일자 (date) */}
               <div className="flex flex-col gap-1">
-                <div className="h-3.5 w-14 rounded-sm bg-surface-light animate-pulse" />
-                <div className="h-9 rounded-md bg-surface-light animate-pulse" />
+                <div className="h-3.5 w-14 rounded bg-surface animate-pulse" />
+                <div className="h-9 rounded-btn bg-surface animate-pulse" />
               </div>
               {/* 상담자 (text) */}
               <div className="flex flex-col gap-1">
-                <div className="h-3.5 w-12 rounded-sm bg-surface-light animate-pulse" />
-                <div className="h-9 rounded-md bg-surface-light animate-pulse" />
+                <div className="h-3.5 w-12 rounded bg-surface animate-pulse" />
+                <div className="h-9 rounded-btn bg-surface animate-pulse" />
               </div>
               {/* 추가내용 (textarea) */}
               <div className="flex flex-col gap-1">
-                <div className="h-3.5 w-14 rounded-sm bg-surface-light animate-pulse" />
-                <div className="h-24 rounded-md bg-surface-light animate-pulse" />
+                <div className="h-3.5 w-14 rounded bg-surface animate-pulse" />
+                <div className="h-24 rounded-btn bg-surface animate-pulse" />
               </div>
             </div>
           ) : isDetailError ? (
-            <div className="flex flex-col items-start gap-4 rounded-lg border border-border-light bg-surface-white p-4">
+            <div className="flex flex-col items-start gap-4 rounded-image border border-hairline bg-surface-white p-4">
               <p className="text-error font-body text-sm leading-[1.43] [word-break:keep-all]">
                 상담 상세 정보를 불러오지 못했습니다. 덮어쓰기 방지를 위해 저장이
                 비활성화되었습니다.
@@ -340,11 +340,11 @@ function ConsultationDetailPanel({
           ) : (
             <>
               <div className="flex flex-col gap-1">
-                <label className="text-sm font-body font-medium text-secondary-dark">상태</label>
+                <label className="text-sm font-body font-medium text-muted">상태</label>
                 <select
                   value={status}
                   onChange={(e) => setStatus(e.target.value as DiagnosisConsultationStatus)}
-                  className={`text-sm font-medium font-body rounded-full px-3 py-2 border focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue ${STATUS_SELECT_CLASSES[status]}`}
+                  className={`text-sm font-medium font-body rounded-full px-3 py-2 border focus:outline-none focus-visible:ring-2 focus-visible:ring-brand ${STATUS_SELECT_CLASSES[status]}`}
                 >
                   {STATUS_OPTIONS.map((opt) => (
                     <option key={opt.value} value={opt.value}>
@@ -355,34 +355,34 @@ function ConsultationDetailPanel({
               </div>
 
               <div className="flex flex-col gap-1">
-                <label className="text-sm font-body font-medium text-secondary-dark">상담일자</label>
+                <label className="text-sm font-body font-medium text-muted">상담일자</label>
                 <input
                   type="date"
                   value={consultationDate}
                   onChange={(e) => setConsultationDate(e.target.value)}
-                  className="bg-surface-light text-body-dark text-sm font-body rounded-md px-3 py-2 border border-border-light focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue"
+                  className="bg-surface text-ink-soft text-sm font-body rounded-btn px-3 py-2 border border-hairline focus:outline-none focus-visible:ring-2 focus-visible:ring-brand"
                 />
               </div>
 
               <div className="flex flex-col gap-1">
-                <label className="text-sm font-body font-medium text-secondary-dark">상담자</label>
+                <label className="text-sm font-body font-medium text-muted">상담자</label>
                 <input
                   type="text"
                   value={consultant}
                   onChange={(e) => setConsultant(e.target.value)}
                   placeholder="담당자 이름"
-                  className="bg-surface-light text-body-dark text-sm font-body rounded-md px-3 py-2 border border-border-light focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue placeholder:text-secondary-dark"
+                  className="bg-surface text-ink-soft text-sm font-body rounded-btn px-3 py-2 border border-hairline focus:outline-none focus-visible:ring-2 focus-visible:ring-brand placeholder:text-muted"
                 />
               </div>
 
               <div className="flex flex-col gap-1">
-                <label className="text-sm font-body font-medium text-secondary-dark">추가내용</label>
+                <label className="text-sm font-body font-medium text-muted">추가내용</label>
                 <textarea
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   placeholder="상담 메모"
                   rows={4}
-                  className="bg-surface-light text-body-dark text-sm font-body rounded-md px-3 py-2 border border-border-light focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue placeholder:text-secondary-dark resize-none"
+                  className="bg-surface text-ink-soft text-sm font-body rounded-btn px-3 py-2 border border-hairline focus:outline-none focus-visible:ring-2 focus-visible:ring-brand placeholder:text-muted resize-none"
                 />
               </div>
             </>
@@ -390,12 +390,12 @@ function ConsultationDetailPanel({
         </div>
       </div>
 
-      <div className="px-6 py-4 border-t border-border-light shrink-0">
+      <div className="px-6 py-4 border-t border-hairline shrink-0">
         <button
           type="button"
           onClick={handleSave}
           disabled={isSaveDisabled}
-          className="w-full inline-flex items-center justify-center bg-aircok-blue text-heading-light text-sm font-medium rounded-md px-4 py-2 min-h-[44px] hover:bg-aircok-blue-dark active:scale-[0.97] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed"
+          className="w-full inline-flex items-center justify-center bg-brand text-white text-sm font-medium rounded-btn px-4 py-2 min-h-11 hover:bg-brand-hover active:scale-[0.97] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed"
         >
           {isPending ? '저장 중...' : isDetailPending ? '불러오는 중...' : '저장'}
         </button>

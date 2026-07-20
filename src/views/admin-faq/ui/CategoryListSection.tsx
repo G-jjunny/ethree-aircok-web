@@ -34,13 +34,13 @@ export function CategoryListSection({
   }
 
   return (
-    <div className="bg-surface-white rounded-xl border border-border-light p-4 flex flex-col gap-3 h-fit">
-      <div className="flex items-center justify-between border-b border-border-light pb-3 mb-3">
-        <h2 className="text-nav font-semibold text-heading-dark">카테고리</h2>
+    <div className="bg-surface-white rounded-card border border-hairline p-4 flex flex-col gap-3 h-fit">
+      <div className="flex items-center justify-between border-b border-hairline pb-3 mb-3">
+        <h2 className="text-sm font-semibold text-ink">카테고리</h2>
         <button
           type="button"
           onClick={() => setShowCreateModal(true)}
-          className="inline-flex items-center justify-center bg-aircok-blue text-heading-light text-sm font-medium rounded-md px-4 py-2 min-h-[44px] hover:bg-aircok-blue-dark active:scale-[0.97] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-aircok-blue focus-visible:ring-offset-2"
+          className="inline-flex items-center justify-center bg-brand text-white text-sm font-medium rounded-btn px-4 py-2 min-h-11 hover:bg-brand-hover active:scale-[0.97] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
         >
           <svg
             className="w-4 h-4 mr-1.5"
@@ -64,16 +64,16 @@ export function CategoryListSection({
           {[1, 2, 3].map((i) => (
             <div
               key={i}
-              className="h-[44px] rounded-md bg-surface-light animate-pulse"
+              className="h-[44px] rounded-btn bg-surface animate-pulse"
             />
           ))}
         </div>
       ) : categories.length === 0 ? (
-        <div className="flex flex-col items-center justify-center text-center gap-4 rounded-xl border border-border-light bg-surface-white px-6 py-16">
-          <p className="text-nav text-secondary-dark [word-break:keep-all]">
+        <div className="flex flex-col items-center justify-center text-center gap-4 rounded-card border border-hairline bg-surface-white px-6 py-16">
+          <p className="text-sm text-muted [word-break:keep-all]">
             카테고리가 없습니다.
           </p>
-          <p className="text-xs text-secondary-dark [word-break:keep-all]">
+          <p className="text-xs text-muted [word-break:keep-all]">
             추가 버튼을 눌러 카테고리를 만드세요.
           </p>
         </div>
@@ -86,8 +86,8 @@ export function CategoryListSection({
                 key={category.id}
                 className={
                   isSelected
-                    ? 'flex items-center justify-between w-full rounded-md px-3 py-2.5 min-h-[44px] text-sm font-body font-semibold bg-aircok-blue/10 text-aircok-blue cursor-pointer transition-colors'
-                    : 'flex items-center justify-between w-full rounded-md px-3 py-2.5 min-h-[44px] text-sm font-body text-heading-dark cursor-pointer transition-colors hover:bg-surface-light'
+                    ? 'flex items-center justify-between w-full rounded-btn px-3 py-2.5 min-h-11 text-sm font-body font-semibold bg-brand/10 text-brand cursor-pointer transition-colors'
+                    : 'flex items-center justify-between w-full rounded-btn px-3 py-2.5 min-h-11 text-sm font-body text-ink cursor-pointer transition-colors hover:bg-surface'
                 }
                 onClick={() => onSelectCategory(category.id)}
                 role="button"
@@ -110,8 +110,8 @@ export function CategoryListSection({
                     }}
                     className={
                       isSelected
-                        ? 'inline-flex items-center justify-center w-7 h-7 rounded text-aircok-blue/60 hover:text-aircok-blue hover:bg-aircok-blue/10 transition-colors shrink-0'
-                        : 'inline-flex items-center justify-center w-7 h-7 rounded text-secondary-dark hover:text-heading-dark hover:bg-surface-light transition-colors shrink-0'
+                        ? 'inline-flex items-center justify-center w-7 h-7 rounded text-brand/60 hover:text-brand hover:bg-brand/10 transition-colors shrink-0'
+                        : 'inline-flex items-center justify-center w-7 h-7 rounded text-muted hover:text-ink hover:bg-surface transition-colors shrink-0'
                     }
                   >
                     {/* pencil icon */}
@@ -137,7 +137,7 @@ export function CategoryListSection({
                       e.stopPropagation()
                       setDeletingCategoryId(category.id)
                     }}
-                    className="inline-flex items-center justify-center w-7 h-7 rounded text-secondary-dark hover:text-error hover:bg-surface-light transition-colors shrink-0"
+                    className="inline-flex items-center justify-center w-7 h-7 rounded text-muted hover:text-error hover:bg-surface transition-colors shrink-0"
                   >
                     {/* trash2 icon */}
                     <svg

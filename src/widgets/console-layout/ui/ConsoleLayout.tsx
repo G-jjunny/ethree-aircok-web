@@ -71,16 +71,16 @@ export function ConsoleLayout({ children }: Props) {
   if (isError) return null;
 
   return (
-    <div className="min-h-screen bg-surface-light">
+    <div className="min-h-screen bg-surface">
       {/* 모바일 상단 바 */}
-      <div className="sticky top-0 z-30 flex items-center justify-between h-16 px-4 bg-surface-white border-b border-border-light lg:hidden">
+      <div className="sticky top-0 z-30 flex items-center justify-between h-16 px-4 bg-surface-white border-b border-hairline lg:hidden">
         <button
           type="button"
           onClick={() => setDrawerOpen(true)}
           aria-label="메뉴 열기"
           aria-expanded={drawerOpen}
           aria-controls="console-sidebar"
-          className="inline-flex items-center justify-center w-11 h-11 -ml-2 rounded-md text-heading-dark hover:bg-surface-light transition-colors"
+          className="inline-flex items-center justify-center w-11 h-11 -ml-2 rounded-btn text-ink hover:bg-surface transition-colors"
         >
           <svg
             className="w-6 h-6"
@@ -97,7 +97,7 @@ export function ConsoleLayout({ children }: Props) {
             />
           </svg>
         </button>
-        <span className="text-heading-dark font-display font-semibold text-[15px]">
+        <span className="text-ink font-display font-semibold text-sm">
           어드민 콘솔
         </span>
         <span className="w-11" aria-hidden="true" />
@@ -116,12 +116,12 @@ export function ConsoleLayout({ children }: Props) {
       <aside
         id="console-sidebar"
         aria-label="콘솔 메뉴"
-        className={`fixed inset-y-0 left-0 z-50 w-64 bg-surface-white border-r border-border-light flex flex-col transition-transform duration-200 lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 w-64 bg-surface-white border-r border-hairline flex flex-col transition-transform duration-200 lg:translate-x-0 ${
           drawerOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
-        <div className="flex items-center h-16 px-5 border-b border-aircok-blue/20 shrink-0">
-          <span className="text-heading-dark font-display font-semibold text-[15px]">
+        <div className="flex items-center h-16 px-5 border-b border-brand/20 shrink-0">
+          <span className="text-ink font-display font-semibold text-sm">
             어드민 콘솔
           </span>
         </div>
@@ -157,8 +157,8 @@ export function ConsoleLayout({ children }: Props) {
                     onClick={() => setDrawerOpen(false)}
                     className={
                       isNavActive(item.href)
-                        ? 'flex items-center gap-3 rounded-md px-3 py-2.5 min-h-[44px] text-sm font-body font-semibold bg-aircok-blue text-heading-light transition-colors'
-                        : 'flex items-center gap-3 rounded-md px-3 py-2.5 min-h-[44px] text-sm font-body text-secondary-dark hover:bg-surface-light hover:text-heading-dark transition-colors'
+                        ? 'flex items-center gap-3 rounded-btn px-3 py-2.5 min-h-11 text-sm font-body font-semibold bg-brand text-white transition-colors'
+                        : 'flex items-center gap-3 rounded-btn px-3 py-2.5 min-h-11 text-sm font-body text-muted hover:bg-surface hover:text-ink transition-colors'
                     }
                   >
                     {item.label}
@@ -168,16 +168,16 @@ export function ConsoleLayout({ children }: Props) {
             );
           })}
         </nav>
-        <div className="mt-auto border-t border-border-light p-3 flex flex-col gap-2 shrink-0">
+        <div className="mt-auto border-t border-hairline p-3 flex flex-col gap-2 shrink-0">
           {user && (
-            <span className="text-secondary-dark text-sm px-3 truncate">
+            <span className="text-muted text-sm px-3 truncate">
               {user.username}
             </span>
           )}
           <button
             type="button"
             onClick={() => setLogoutOpen(true)}
-            className="flex items-center gap-2 rounded-md px-3 py-2.5 min-h-[44px] text-sm font-body text-error hover:bg-surface-light transition-colors text-left"
+            className="flex items-center gap-2 rounded-btn px-3 py-2.5 min-h-11 text-sm font-body text-error hover:bg-surface transition-colors text-left"
           >
             로그아웃
           </button>
