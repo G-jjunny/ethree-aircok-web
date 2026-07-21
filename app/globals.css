@@ -173,10 +173,12 @@
      않게)하고 종료 후 최종 상태로 고정한다 — 히어로 요소는 fixed/sticky 를 감싸지 않아
      panel-fade 와 달리 잔류 transform 이 문제되지 않는다. 거리 16px·이징 ease-out 은
      HistoryTimeline(translate-y-4 / ease-out) 기준선과 통일한 값이며, 지속시간은
-     marquee/panel-fade 선례대로 토큰 값에 인라인한다. 섹션 스크롤 리빌은 키프레임이
-     아니라 공용 client 컴포넌트 ScrollReveal(src/shared/ui)이 Tailwind 유틸 클래스
-     토글로 처리한다(SSR 에 shown 출력 → No-JS 안전). */
-  --animate-fade-up: fade-up 600ms var(--ease-out) both;
+     marquee/panel-fade 선례대로 토큰 값에 인라인한다. 900ms 는 위 폴드 단독 시퀀스에
+     맞춘 여유 템포로, 스크롤 중 재생되는 섹션 리빌(ScrollReveal)보다 의도적으로 길다.
+     reveal-delay-4(560ms)까지 합쳐 히어로 전체가 약 1.46s 에 마무리된다. 섹션 스크롤
+     리빌은 키프레임이 아니라 공용 client 컴포넌트 ScrollReveal(src/shared/ui)이
+     Tailwind 유틸 클래스 토글로 처리한다(SSR 에 shown 출력 → No-JS 안전). */
+  --animate-fade-up: fade-up 900ms var(--ease-out) both;
 
   /* ────────────────────────────────────────────────────────────
      DEPRECATED ALIASES — 구 토큰 → 신 토큰 (빌드 무결성용)
@@ -311,17 +313,17 @@ body {
   transition-duration: var(--duration-fast, 200ms);
 }
 
-/* 스태거 지연 단계(80ms 스텝). 히어로 첫 렌더 고정 시퀀스(키프레임 animation-delay)의
+/* 스태거 지연 단계(140ms 스텝). 히어로 첫 렌더 고정 시퀀스(키프레임 animation-delay)의
    순차 등장에 쓴다. animation-delay/transition-delay 를 함께 설정해 키프레임(fade-up)
    스태거를 담당한다 — Tailwind delay-* 는 transition-delay 만 건드려 키프레임 진입엔
    못 쓰므로 별도 제공한다. 섹션 스크롤 리빌은 공용 ScrollReveal 컴포넌트가 담당하므로
    여기서는 히어로 진입 스태거 전용이다. */
-@utility reveal-delay-1 { animation-delay: 80ms;  transition-delay: 80ms; }
-@utility reveal-delay-2 { animation-delay: 160ms; transition-delay: 160ms; }
-@utility reveal-delay-3 { animation-delay: 240ms; transition-delay: 240ms; }
-@utility reveal-delay-4 { animation-delay: 320ms; transition-delay: 320ms; }
-@utility reveal-delay-5 { animation-delay: 400ms; transition-delay: 400ms; }
-@utility reveal-delay-6 { animation-delay: 480ms; transition-delay: 480ms; }
+@utility reveal-delay-1 { animation-delay: 140ms; transition-delay: 140ms; }
+@utility reveal-delay-2 { animation-delay: 280ms; transition-delay: 280ms; }
+@utility reveal-delay-3 { animation-delay: 420ms; transition-delay: 420ms; }
+@utility reveal-delay-4 { animation-delay: 560ms; transition-delay: 560ms; }
+@utility reveal-delay-5 { animation-delay: 700ms; transition-delay: 700ms; }
+@utility reveal-delay-6 { animation-delay: 840ms; transition-delay: 840ms; }
 
 /* ── Catalog 뷰어 푸터 페이지 진행 슬라이더 ──────────────────────
    input[type=range]의 트랙/썸은 Tailwind 유틸만으로 그라디언트를 줄 수 없어

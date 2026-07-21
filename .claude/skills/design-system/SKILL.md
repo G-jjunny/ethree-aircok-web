@@ -65,7 +65,7 @@ SSOT: `docs/design.md` · 구현: `app/globals.css @theme inline` · 공용 컴�
 - 그림자: `shadow-brand-sm` `shadow-brand` `shadow-soft` `shadow-float` `shadow-card`(관리자)
 - 모션: `duration-fast`(200ms) `ease-out`
 - 애니메이션: `animate-marquee-left/right`(로고 마퀴) · `animate-drift`(다크 섹션 `aria-hidden` 장식 orb 부유) · `animate-panel-fade`(탭 패널 진입). 신규 keyframes 는 `--animate-*` 토큰 + `@keyframes` 로 globals.css 에 정의하고 design.md 에 문서화한다(지속시간·이징은 토큰 값에 인라인).
-- 진입/스크롤 리빌(홈 랜딩, 이슈 #144): **히어로 첫 렌더** = 순수 CSS `animate-fade-up`(키프레임, fill both) + `reveal-delay-1~6`(80ms 스텝 스태거). base 에 `opacity-0` 두지 말 것(은닉은 키프레임 담당). **섹션 스크롤 진입** = 공용 client 컴포넌트 `<ScrollReveal>`(src/shared/ui, Tailwind 유틸 기반). SSR 에 shown 출력·마운트 후 hidden 주입 → **No-JS 안전**(영구 은닉 없음). ⚠️ CSS `.reveal`/`reveal-up/left/right/scale` 유틸은 **미채택·제거됨**(No-JS 영구 은닉 회귀 사유) — 섹션 리빌에 쓰지 말 것. 거리 16px·500/600ms·`ease-out` 로 HistoryTimeline 기준선과 통일, 바운스·과한 이동 금지. reduced-motion 은 전역 블록이 즉시 표시로 무효화(컴포넌트 재분기 금지). 마퀴 트랙엔 리빌/stagger 금지.
+- 진입/스크롤 리빌(홈 랜딩, 이슈 #144): **히어로 첫 렌더** = 순수 CSS `animate-fade-up`(키프레임, fill both) + `reveal-delay-1~6`(140ms 스텝 스태거). base 에 `opacity-0` 두지 말 것(은닉은 키프레임 담당). **섹션 스크롤 진입** = 공용 client 컴포넌트 `<ScrollReveal>`(src/shared/ui, Tailwind 유틸 기반). SSR 에 shown 출력·마운트 후 hidden 주입 → **No-JS 안전**(영구 은닉 없음). ⚠️ CSS `.reveal`/`reveal-up/left/right/scale` 유틸은 **미채택·제거됨**(No-JS 영구 은닉 회귀 사유) — 섹션 리빌에 쓰지 말 것. 거리 16px·`ease-out` 로 HistoryTimeline 기준선과 통일(지속시간은 히어로 첫 렌더만 900ms 로 여유 있게, 섹션 리빌은 기존 값 유지), 바운스·과한 이동 금지. reduced-motion 은 전역 블록이 즉시 표시로 무효화(컴포넌트 재분기 금지). 마퀴 트랙엔 리빌/stagger 금지.
 
 ### 카드 호버 표준 (className 레시피 — 공용 컴포넌트 아님)
 
