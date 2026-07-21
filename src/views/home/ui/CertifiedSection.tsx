@@ -1,3 +1,5 @@
+import { ScrollReveal } from '@/shared/ui';
+
 const CERTS = [
   '미세먼지 성능인증 1등급',
   '이산화탄소 1등급',
@@ -13,7 +15,10 @@ const CERTS = [
 export function CertifiedSection() {
   return (
     <section className="border-t border-white/6 bg-navy text-white">
-      <div className="content-container flex flex-wrap items-center justify-center gap-3.5 py-6">
+      <ScrollReveal
+        variant="fade-up"
+        className="content-container flex flex-wrap items-center justify-center gap-3.5 py-6"
+      >
         <span className="font-display text-eyebrow tracking-eyebrow text-white/40">
           CERTIFIED &amp; PROVEN
         </span>
@@ -24,7 +29,7 @@ export function CertifiedSection() {
             {cert}
           </span>
         ))}
-      </div>
+      </ScrollReveal>
     </section>
   );
 }

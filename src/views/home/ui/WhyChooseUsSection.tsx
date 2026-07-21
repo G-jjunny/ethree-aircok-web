@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { SITE } from '@/shared/config';
-import { SectionLabel } from '@/shared/ui';
+import { SectionLabel, ScrollReveal } from '@/shared/ui';
 import styles from './ourvalue.module.css';
 
 // 카드 로컬 메타: 번호·영문 eyebrow·플레이스홀더 줄무늬 명암.
@@ -24,7 +24,7 @@ export function WhyChooseUsSection() {
     <section className="bg-surface-white py-24">
       <div className="content-container">
         {/* 헤더 */}
-        <div className="flex items-end justify-between gap-6">
+        <ScrollReveal variant="fade-up" className="flex items-end justify-between gap-6">
           <div>
             <SectionLabel color="brand">WHY CHOOSE US</SectionLabel>
             <h2 className="mt-3 text-h2 font-extrabold tracking-headline text-ink">Our Value</h2>
@@ -35,13 +35,13 @@ export function WhyChooseUsSection() {
               →
             </span>
           </Link>
-        </div>
+        </ScrollReveal>
 
         {/* 3열 × 2행 그리드 */}
         <div className="mt-12 grid grid-cols-1 items-start gap-4 md:grid-cols-3">
           {/* 셀1 — 인트로 텍스트 (이미지 카드 아님) */}
           {/* 그리드 items-start 를 따라 카드와 같은 상단 라인에서 시작(top 정렬) */}
-          <div className="flex flex-col">
+          <ScrollReveal variant="fade-up" className="flex flex-col">
             <h3 className="text-xl font-extrabold leading-snug tracking-headline text-ink">
               보이지 않는 공기질까지 스마트하게 관리하는{' '}
               <span className="text-brand">AIoT 통합 솔루션</span>입니다.
@@ -50,14 +50,14 @@ export function WhyChooseUsSection() {
               거주자의 건강은 물론 기업 생산성과 건물 가치까지 높이는 스마트한 선택. 정확성·다양성·편리성·연계성
               네 가지 가치로 공기질 관리의 기준을 새롭게 정의합니다.
             </p>
-          </div>
+          </ScrollReveal>
 
           {/* 셀2~5 — 이미지 카드 4장 */}
           {features.map((feature, i) => {
             const meta = VALUE_META[i];
             return (
+              <ScrollReveal key={feature.title} variant="fade-up" delay={(i + 1) * 80}>
               <article
-                key={feature.title}
                 /* token 없음: Our Value 카드 11/9 비율 (aspect-featured 16/7·row-thumb 4/3 미대응 1회성) */
                 className="relative aspect-[11/9] overflow-hidden rounded-image"
               >
@@ -87,6 +87,7 @@ export function WhyChooseUsSection() {
                   </div>
                 </div>
               </article>
+              </ScrollReveal>
             );
           })}
 

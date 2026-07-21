@@ -1,7 +1,7 @@
 import { connection } from 'next/server'
 import { cacheLife, cacheTag } from 'next/cache'
 import { SITE } from '@/shared/config'
-import { SectionLabel, LogoMarquee } from '@/shared/ui'
+import { SectionLabel, LogoMarquee, ScrollReveal } from '@/shared/ui'
 import { getPartnerListServer, PARTNERS_CACHE_TAG, type Partner } from '@/entities/partner'
 
 async function getCachedPartners(): Promise<Partner[]> {
@@ -30,12 +30,12 @@ export async function ClientsSection() {
   return (
     <section className="bg-surface py-24">
       <div className="content-container flex flex-col gap-12">
-        <div className="mx-auto max-w-2xl text-center">
+        <ScrollReveal variant="fade-up" className="mx-auto max-w-2xl text-center">
           <SectionLabel color="brand">{eyebrow}</SectionLabel>
           <h2 className="mt-4 text-h5 font-extrabold tracking-headline text-ink">
             {title}
           </h2>
-        </div>
+        </ScrollReveal>
 
         {partners.length > 0 ? (
           <LogoMarquee

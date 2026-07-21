@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { SITE } from '@/shared/config';
-import { SectionLabel } from '@/shared/ui';
+import { SectionLabel, ScrollReveal } from '@/shared/ui';
 
 const TABS = [
   {
@@ -55,7 +55,7 @@ export function WhySmartAircokSection() {
     <section className="bg-surface py-24">
       <div className="content-container">
         {/* token 없음: max-w-[820px] — 인트로 프로즈 컬럼 너비. 프로즈 폭은 값이 매번 달라(500·640·720·760·820) 단일 토큰화 대상 아님, 코드베이스 공통 1회성 수치 규약 준수 */}
-        <div className="mx-auto max-w-[820px] text-center">
+        <ScrollReveal variant="fade-up" className="mx-auto max-w-[820px] text-center">
           <SectionLabel color="brand">WHY SMART AIRCOK</SectionLabel>
           <h2 className="mt-4 text-h2 font-extrabold leading-snug tracking-headline text-ink">
             미세먼지 심한데 공조기 작동 잘 되는지 궁금하다면?
@@ -65,8 +65,9 @@ export function WhySmartAircokSection() {
           <p className="mt-5 text-lead-sm leading-relaxed text-muted">
             스마트 에어콕은 실내 공기질 관리로 근무자의 생산성 향상과 기업 가치를 높입니다.
           </p>
-        </div>
+        </ScrollReveal>
 
+        <ScrollReveal variant="fade-up" delay={80}>
         {/* 탭 바 (연결형 · 이음새 없음 · 상단만 라운드) */}
         <div
           role="tablist"
@@ -148,6 +149,7 @@ export function WhySmartAircokSection() {
             </div>
           </div>
         </div>
+        </ScrollReveal>
 
         {/* 하단 링크 */}
         <div className="mt-6 text-center">

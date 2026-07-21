@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { SITE } from '@/shared/config';
-import { Button, SectionLabel } from '@/shared/ui';
+import { Button, SectionLabel, ScrollReveal } from '@/shared/ui';
 
 const PLATFORM_RADIAL =
   'radial-gradient(120% 100% at 20% 0%, var(--color-navy-tint), var(--color-navy) 60%)';
@@ -19,7 +19,7 @@ export function WhatYouGetSection() {
     >
       <div className="content-container grid items-center gap-14 py-24 md:grid-cols-2">
         {/* 좌 */}
-        <div>
+        <ScrollReveal variant="slide-left">
           <SectionLabel color="cyan">WHAT YOU GET</SectionLabel>
           <h2 className="mt-4 text-h3 font-extrabold leading-tight tracking-headline">
             {title}
@@ -39,17 +39,20 @@ export function WhatYouGetSection() {
               <Link href="/diagnosis">{cta}</Link>
             </Button>
           </div>
-        </div>
+        </ScrollReveal>
 
         {/* 우: 일러스트 플레이스홀더 + FREE REPORT 배지 */}
-        <div className="relative aspect-row-thumb overflow-hidden rounded-card border border-white/14 bg-white/5">
+        <ScrollReveal
+          variant="slide-right"
+          className="relative aspect-row-thumb overflow-hidden rounded-card border border-white/14 bg-white/5"
+        >
           <span className="absolute inset-0 flex items-center justify-center font-display text-nano tracking-eyebrow text-white/28">
             [ FREE REPORT 일러스트 자리 ]
           </span>
           <span className="absolute right-5 top-5 rounded-pill bg-cyan/16 px-3.5 py-1.5 font-display text-mini font-bold tracking-eyebrow text-cyan">
             FREE REPORT
           </span>
-        </div>
+        </ScrollReveal>
       </div>
     </section>
   );

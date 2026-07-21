@@ -44,24 +44,24 @@ export function HeroSection() {
       <div className="content-container relative z-10 grid items-center gap-14 py-24 md:grid-cols-[1.05fr_0.95fr]">
         {/* 좌: 카피 */}
         <div>
-          <div className="inline-flex items-center gap-2 rounded-pill border border-brand/40 bg-brand/12 px-3.5 py-1.5 text-eyebrow font-semibold text-brand-soft">
+          <div className="animate-fade-up inline-flex items-center gap-2 rounded-pill border border-brand/40 bg-brand/12 px-3.5 py-1.5 text-eyebrow font-semibold text-brand-soft">
             <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-cyan" />
             AIoT 실내 공기질 관리 플랫폼
           </div>
 
-          <h1 className="mt-6 text-hero font-extrabold leading-[1.08] tracking-headline">
+          <h1 className="animate-fade-up reveal-delay-1 mt-6 text-hero font-extrabold leading-[1.08] tracking-headline">
             보이지 않는 공기를
             <br />
             <span className="text-brand">콕콕</span> 집어 관리하다
           </h1>
 
-          <p className="mt-5 max-w-[500px] text-lead leading-relaxed text-white/68">
+          <p className="animate-fade-up reveal-delay-2 mt-5 max-w-[500px] text-lead leading-relaxed text-white/68">
             9종 센서로 실내 공기질을 실시간 측정·진단하고, AIoT 클라우드 플랫폼이 필요한
             행동요령까지 알려드립니다. 국민 모두가 언제 어디서나 건강한 공기를 마실 수 있는
             공간을 만듭니다.
           </p>
 
-          <div className="mt-6 flex flex-wrap gap-3.5">
+          <div className="animate-fade-up reveal-delay-3 mt-6 flex flex-wrap gap-3.5">
             <Button asChild variant="primary" size="md">
               <Link href="/services">제품 살펴보기 →</Link>
             </Button>
@@ -70,7 +70,7 @@ export function HeroSection() {
             </Button>
           </div>
 
-          <div className="mt-11 flex flex-wrap gap-6">
+          <div className="animate-fade-up reveal-delay-4 mt-11 flex flex-wrap gap-6">
             {STATS.map((stat) => (
               <div key={stat.label}>
                 <div className="font-display text-h6 font-extrabold">
@@ -83,8 +83,10 @@ export function HeroSection() {
           </div>
         </div>
 
-        {/* 우: 실시간 카드 */}
-        <HeroAqiCard />
+        {/* 우: 실시간 카드 (fade-up 은 바깥 래퍼에만 — float 와 transform 충돌 방지) */}
+        <div className="animate-fade-up reveal-delay-2">
+          <HeroAqiCard />
+        </div>
       </div>
     </section>
   );
