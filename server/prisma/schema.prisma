@@ -507,6 +507,8 @@ model AirDeviceItem {
 /// - HOME_VALUE_1 ~ HOME_VALUE_4: 홈 "Our Value" 이미지 카드 4장
 ///   (카피 변경 가능성 때문에 의미 기반이 아닌 위치 기반 명명) (#148).
 /// - HOME_REPORT_ILLUST: 홈 "FREE REPORT" 섹션 일러스트 (#148).
+/// - ABOUT_MISSION: 소개 페이지 Mission 섹션 우측 이미지 (#148).
+/// - DIAGNOSIS_HERO: 진단서비스 히어로 우측 이미지 카드 (#148).
 enum ProductImageSlot {
   MONITORING_DASHBOARD
   MONITORING_STATS
@@ -528,6 +530,8 @@ enum ProductImageSlot {
   HOME_VALUE_3               // 홈 Our Value 카드 3번
   HOME_VALUE_4               // 홈 Our Value 카드 4번
   HOME_REPORT_ILLUST         // 홈 FREE REPORT 섹션 일러스트
+  ABOUT_MISSION              // 소개 페이지 Mission 섹션 우측 이미지
+  DIAGNOSIS_HERO             // 진단서비스 히어로 우측 이미지 카드
 }
 
 /// `/services` 페이지 섹션 이미지 (슬롯 단위 고정 배치) (#services 1단계).
