@@ -77,6 +77,9 @@ services:
       - ./server/.env
     environment:
       DATABASE_URL: postgresql://postgres:jjunny@db:5432/aircok
+    # 이미지 기본 CMD(docker-entrypoint.sh)는 migrate deploy + seed 6종을 수행한다(Render 프로덕션용).
+    # 로컬 스택에서는 위 migrate 서비스가 이미 동일 작업을 마쳤으므로 중복 실행을 피해 기동만 한다.
+    command: node dist/src/main
     ports:
       - "3001:3001"
     restart: unless-stopped

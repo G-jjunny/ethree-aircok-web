@@ -38,25 +38,45 @@ RUN apt-get update \
 ENV NODE_ENV=production
 WORKDIR /app
 
-# node_modules 를 builder 에서 통째로 복사(devDeps 포함) 후 prod-only 로 정리.
-#   - bcrypt 등 네이티브 모듈 바이너리는 builder 에서 이미 빌드된 것을 재사용하므로
-#     runtime 에서 재컴파일/재다운로드(python/make/g++ 미보유)가 발생하지 않는다.
-#   - npm prune 은 삭제만 수행(재설치·rebuild 없음). --ignore-scripts 로 postinstall 방지.
-#   - prune 이 dependencies 를 판별하려면 package.json/package-lock.json 이 먼저 있어야 한다.
+# node_modules 를 builder 에서 통째로 복사(devDeps 포함). **prune 하지 않는다.**
+#
+#   [왜 npm prune --omit=dev 를 제거했나]
+#   - 프로덕션(Render) 기동 시 docker-entrypoint.sh 가 `prisma migrate deploy` 와
+#     ts-node 기반 seed 6종을 실행해야 하는데, 이들은 devDependencies 에 있는
+#     prisma CLI / ts-node / typescript / tsconfig-paths / @types/node 를 요구한다.
+#   - 특정 패키지만 prune 대상에서 되살리는 방식(node_modules 하위 디렉터리 선택 COPY)은
+#     전이 의존성과 .bin 심볼릭 링크가 쉽게 깨져 취약하다.
+#   - 따라서 가장 견고한 방법으로 devDeps 를 남긴다. 이미지 크기는 커지지만
+#     Render 무료 플랜에서 수용 가능하며, 기동 실패 리스크 제거가 우선이다.
+#   - bcrypt 등 네이티브 모듈 바이너리는 builder 에서 빌드된 것을 그대로 재사용한다
+#     (runtime 에는 python/make/g++ 가 없으므로 재설치·rebuild 를 하지 않는다).
 COPY package.json package-lock.json ./
 COPY --from=builder /app/node_modules ./node_modules
-RUN npm prune --omit=dev --ignore-scripts
 
 # 빌드 산출물 및 런타임 필요 자원 복사
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/prisma ./prisma
+# ts-node 기반 seed 실행에 필요(`ts-node --project tsconfig.json`)
+COPY --from=builder /app/tsconfig.json ./tsconfig.json
+# prisma.config.ts 는 런타임에도 필수다.
+#   schema.prisma 의 datasource 블록에는 url 이 없고 prisma.config.ts 의
+#   datasource.url(= process.env.DATABASE_URL)에만 존재한다. 이 파일이 없으면
+#   docker-entrypoint.sh 첫 줄의 `npx prisma migrate deploy` 가
+#   "The datasource.url property is required in your Prisma config file" 로 즉시 실패한다.
+COPY --from=builder /app/prisma.config.ts ./prisma.config.ts
 
-# prisma generate 산출물(생성 client) — prune 후에도 확실히 포함되도록 복사
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
-COPY --from=builder /app/node_modules/@prisma/client ./node_modules/@prisma/client
+# 시작 스크립트(마이그레이션 + 시드 + 서버 기동)
+#   sed: Windows 체크아웃(CRLF)으로 인한 `bad interpreter` 방지용 방어 코드.
+COPY docker-entrypoint.sh ./docker-entrypoint.sh
+RUN sed -i 's/\r$//' ./docker-entrypoint.sh && chmod +x ./docker-entrypoint.sh
 
+# 문서화 목적의 기본 포트. 실제 리슨 포트는 PORT 환경변수를 우선한다
+# (Render 는 PORT 를 자동 주입하며, main.ts 가 0.0.0.0:$PORT 로 바인딩한다).
+# EXPOSE 값이 실제 포트와 달라도 Render 동작에는 영향이 없다.
 EXPOSE 3001
 
-# start 스크립트와 동일: node dist/src/main
-CMD ["node", "dist/src/main"]
+# 프로덕션 기본 기동: migrate deploy + seed 6종 + node dist/src/main
+# (docker-compose 로컬 스택은 migrate 서비스가 이미 이를 수행하므로
+#  server 서비스에서 `command: node dist/src/main` 로 오버라이드한다)
+CMD ["./docker-entrypoint.sh"]
