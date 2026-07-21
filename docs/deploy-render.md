@@ -162,7 +162,15 @@ exec node dist/src/main
 | `/uploads/x.pdf` (상대경로, 레거시)           | `/uploads/x.pdf` (그대로) |
 | `https://pub-xxx.r2.dev/catalog/a.pdf` (R2)   | `/r2/catalog/a.pdf`      |
 | `https://api-host/uploads/a.pdf` (레거시 API) | `/uploads/a.pdf`         |
+| 그 외 미지 오리진 절대 URL                    | 원본 그대로              |
 | 파싱 실패                                     | 원본 그대로              |
+
+> pathname 환원은 **`NEXT_PUBLIC_API_URL` 오리진에 한정**합니다(레거시 `/uploads/*` 서빙 주체).
+> 미지 오리진까지 pathname 으로 깎으면, R2 호스트를 커스텀 도메인으로 교체했을 때 구 DB 레코드의
+> `pub-*.r2.dev` URL 이 매칭에서 빠지며 `/catalog/<uuid>.pdf` 404 로 **조용히 회귀**합니다(§5 서두의 그 버그).
+>
+> 또한 이 유틸은 `pathname` 만 취하므로 `?search`·`#hash` 는 **의도적으로 폐기**됩니다.
+> 현재는 퍼블릭 버킷(쿼리 없는 URL) 전제라 무해하나, presigned URL 도입 시 반드시 재검토해야 합니다.
 
 **채택 사유**
 
@@ -181,8 +189,17 @@ exec node dist/src/main
 
 ### 이미지 표시(`<img>`, `next/image`)는 절대 URL 직행 유지
 
-프록시 대상은 **PDF fetch 와 다운로드 링크** 뿐입니다. 이미지 표시는 CORS 제약이 없으므로
-기존대로 R2 절대 URL 을 그대로 사용하며(`remotePatterns` 로 허용), 불필요한 프록시 홉을 만들지 않습니다.
+프록시 대상은 **PDF fetch 와 다운로드 링크** 뿐입니다. 일반 이미지 표시(`<img>`, `next/image`)는
+CORS 응답 헤더를 요구하지 않으므로 기존대로 R2 절대 URL 을 그대로 사용하며(`remotePatterns` 로 허용),
+불필요한 프록시 홉을 만들지 않습니다.
+
+> **예외 — 3D WebGL 텍스처는 CORS 가 필요합니다(미해결 / 후속 과제).**
+> `src/views/catalog-3d/ui/Catalog3dScene.tsx` 의 `useTexture` 는 three.js `ImageLoader`(기본
+> `crossOrigin='anonymous'`) 경로를 사용합니다. WebGL 텍스처 업로드는 오염되지 않은(non-tainted)
+> 이미지를 요구하므로, 응답에 `Access-Control-Allow-Origin` 이 없으면 **image 타입 카탈로그 항목이
+> 3D 뷰어에서 로드 실패**할 수 있습니다(PDF 에서 렌더된 페이지는 dataURL 이라 무관).
+> 후속 과제: ① `pub-*.r2.dev` 응답의 `Access-Control-Allow-Origin` 실측 → ② 없으면 버킷 CORS 설정
+> 또는 3D 텍스처 경로만 `/r2` 경유로 전환. **별도 이슈로 처리**하며 이번 PR 범위 밖입니다.
 
 ---
 
