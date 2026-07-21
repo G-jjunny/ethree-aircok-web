@@ -1,5 +1,7 @@
+import { Suspense } from 'react'
 import Link from 'next/link'
-import { HeroBackgroundVideo, PagePlaceholder } from '@/shared/ui'
+import { HeroBackgroundVideo } from '@/shared/ui'
+import { ServiceHeroImage, ServiceHeroImageFallback } from './ServiceHeroImage'
 
 // 다크 radial (Blue-Tech 표준 Page Hero) — 토큰 var() 참조, 하드코딩 아님
 const HERO_RADIAL =
@@ -28,8 +30,9 @@ const STATS = [
  * 진단 페이지 히어로 — 2컬럼(카피 + 이미지 카드) 정적 서버 컴포넌트.
  *
  * PageHero 위젯은 단일 컬럼 텍스트 전용이라 스탯칩·듀얼 CTA·플로팅 배지 구성을 담지 못해
- * views 로컬로 구현한다. 데이터 페칭·상태 없음(정적). 우측 이미지 슬롯은 미정의이므로
- * 다크 톤 PagePlaceholder 로 렌더한다.
+ * views 로컬로 구현한다. 카피·스탯칩·플로팅 배지는 정적이며, 우측 이미지 카드만
+ * DIAGNOSIS_HERO 슬롯을 읽는 async 데이터 컴포넌트를 Suspense 경계로 감싸 스트리밍한다
+ * (슬롯 미등록이면 기존 다크 톤 폴백 그대로).
  */
 export function ServiceHeroSection() {
   return (
@@ -99,14 +102,11 @@ export function ServiceHeroSection() {
           </div>
         </div>
 
-        {/* 이미지 카드 컬럼 — 슬롯 미정의이므로 다크 폴백 + 정적 플로팅 배지 */}
+        {/* 이미지 카드 컬럼 — DIAGNOSIS_HERO 슬롯(미등록 시 다크 폴백) + 정적 플로팅 배지 */}
         <div className="relative">
-          <PagePlaceholder
-            variant="dark"
-            label="DIAGNOSIS"
-            rounded="rounded-card-lg"
-            className="aspect-[4/3] w-full shadow-float"
-          />
+          <Suspense fallback={<ServiceHeroImageFallback />}>
+            <ServiceHeroImage />
+          </Suspense>
           {/* token 없음: -left-3.5/-bottom-4 플로팅 배지 오프셋(1회성 실측) */}
           <div className="absolute -bottom-4 -left-3.5 rounded-image bg-surface-white px-5.5 py-3.5 text-ink shadow-float">
             <div className="text-mini text-muted">{COPY.badgeLabel}</div>

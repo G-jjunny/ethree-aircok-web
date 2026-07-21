@@ -1,13 +1,25 @@
+import { Suspense } from 'react';
 import Link from 'next/link';
 import { SITE } from '@/shared/config';
 import { Button, SectionLabel, ScrollReveal } from '@/shared/ui';
+import { HomeSlotImage } from './HomeSlotImage';
 
 const PLATFORM_RADIAL =
   'radial-gradient(120% 100% at 20% 0%, var(--color-navy-tint), var(--color-navy) 60%)';
 
+/** 슬롯(HOME_REPORT_ILLUST) 미등록/스트리밍 대기 중 렌더할 빈 일러스트 자리. */
+const ILLUST_FALLBACK = (
+  <span className="absolute inset-0 flex items-center justify-center font-display text-nano tracking-eyebrow text-white/28">
+    [ FREE REPORT 일러스트 자리 ]
+  </span>
+);
+
 /**
  * 플랫폼 / 무료 레포트 (시안 §7). navy radial 다크 배경, 좌: eyebrow(cyan) + h2 +
- * 체크리스트 3 + pill CTA, 우: 일러스트 플레이스홀더 + FREE REPORT 배지.
+ * 체크리스트 3 + pill CTA, 우: 슬롯 일러스트(미등록 시 플레이스홀더) + FREE REPORT 배지.
+ *
+ * 섹션은 정적 프레젠테이션이며 이미지 자리만 async 데이터 컴포넌트(HomeSlotImage)를
+ * Suspense 경계로 감싸 스트리밍한다 — ScrollReveal(slide-right) 래핑 구조는 그대로다.
  */
 export function WhatYouGetSection() {
   const { bullets, title, cta } = SITE.whatYouGet;
@@ -41,14 +53,20 @@ export function WhatYouGetSection() {
           </div>
         </ScrollReveal>
 
-        {/* 우: 일러스트 플레이스홀더 + FREE REPORT 배지 */}
+        {/* 우: 슬롯 일러스트(폴백=플레이스홀더) + FREE REPORT 배지 */}
         <ScrollReveal
           variant="slide-right"
           className="relative aspect-row-thumb overflow-hidden rounded-card border border-white/14 bg-white/5"
         >
-          <span className="absolute inset-0 flex items-center justify-center font-display text-nano tracking-eyebrow text-white/28">
-            [ FREE REPORT 일러스트 자리 ]
-          </span>
+          <Suspense fallback={ILLUST_FALLBACK}>
+            <HomeSlotImage
+              slot="HOME_REPORT_ILLUST"
+              alt="무료 공기질 리포트 일러스트"
+              sizes="(min-width: 768px) 50vw, 100vw"
+              fit="contain"
+              fallback={ILLUST_FALLBACK}
+            />
+          </Suspense>
           <span className="absolute right-5 top-5 rounded-pill bg-cyan/16 px-3.5 py-1.5 font-display text-mini font-bold tracking-eyebrow text-cyan">
             FREE REPORT
           </span>

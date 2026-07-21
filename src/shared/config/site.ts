@@ -661,6 +661,7 @@ export const SITE = {
       {
         label: "콘텐츠 관리",
         items: [
+          { label: "홈 페이지 관리", href: "/console/home" },
           { label: "소개 페이지 관리", href: "/console/about" },
           { label: "뉴스 관리", href: "/console/news" },
           { label: "FAQ 관리", href: "/console/faq" },
@@ -703,6 +704,7 @@ export const SITE = {
     ],
     aboutTabs: [
       { key: "team", label: "팀 이미지" },
+      { key: "section-images", label: "섹션 이미지" },
       { key: "values", label: "핵심가치" },
       { key: "timeline", label: "연혁" },
     ],
