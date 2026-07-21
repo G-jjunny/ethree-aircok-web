@@ -1,9 +1,12 @@
+import { Suspense } from 'react'
 import { SITE } from '@/shared/config'
-import { SectionLabel, PagePlaceholder } from '@/shared/ui'
+import { SectionLabel } from '@/shared/ui'
+import { MissionImage, MissionImageFallback } from './MissionImage'
 
 /**
- * MISSION (시안 §MISSION). 흰 배경, 좌 텍스트 / 우 이미지(4/3 플레이스홀더).
- * 정적 콘텐츠 — 이미지 자산 미확보로 줄무늬 플레이스홀더 처리.
+ * MISSION (시안 §MISSION). 흰 배경, 좌 텍스트 / 우 이미지(ABOUT_MISSION 슬롯).
+ * 섹션은 정적 프레젠테이션이며, 이미지 자리만 async 데이터 컴포넌트를 Suspense 로 감싼다
+ * (슬롯 미등록 시 기존 플레이스홀더가 그대로 폴백).
  */
 export function MissionSection() {
   const { eyebrow, title, body } = SITE.about.mission
@@ -19,12 +22,9 @@ export function MissionSection() {
           <p className="mt-5 text-lead-sm leading-relaxed text-muted">{body}</p>
         </div>
 
-        <PagePlaceholder
-          variant="surface"
-          rounded="rounded-card-lg"
-          className="aspect-row-thumb w-full"
-          label="회사 · 팀 이미지 자리"
-        />
+        <Suspense fallback={<MissionImageFallback />}>
+          <MissionImage />
+        </Suspense>
       </div>
     </section>
   )

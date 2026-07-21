@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query'
 import { teamImageListQueryOptions } from '@/entities/team-image'
 import { AdminPageHeader, AdminTabs, useAdminActiveTab } from '@/shared/ui'
 import { SITE } from '@/shared/config/site'
+import { AboutSectionImagesPanel } from './AboutSectionImagesPanel'
 import { TeamImageUploadSection } from './TeamImageUploadSection'
 import { TeamImageGridSection } from './TeamImageGridSection'
 import { TimelineManageSection } from './TimelineManageSection'
@@ -26,7 +27,7 @@ export function AdminAboutView() {
     <div>
       <AdminPageHeader
         title="소개 페이지 관리"
-        description="소개(About) 페이지의 팀 이미지·핵심가치·회사 연혁을 관리합니다."
+        description="소개(About) 페이지의 팀 이미지·섹션 이미지·핵심가치·회사 연혁을 관리합니다."
       />
 
       <AdminTabs tabs={tabs} label="소개 페이지 관리 탭" />
@@ -44,6 +45,15 @@ export function AdminAboutView() {
               <TeamImageGridSection images={images} isLoading={isLoading} />
             </div>
           )}
+        </div>
+
+        <div
+          role="tabpanel"
+          id="panel-section-images"
+          aria-labelledby="tab-section-images"
+          hidden={activeTab !== 'section-images'}
+        >
+          {activeTab === 'section-images' && <AboutSectionImagesPanel />}
         </div>
 
         <div
