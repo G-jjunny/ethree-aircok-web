@@ -172,9 +172,10 @@
      순차 등장한다. fill-mode both 로 0% 은닉 상태를 유지(스태거 지연 동안 미리 보이지
      않게)하고 종료 후 최종 상태로 고정한다 — 히어로 요소는 fixed/sticky 를 감싸지 않아
      panel-fade 와 달리 잔류 transform 이 문제되지 않는다. 거리 16px·이징 ease-out 은
-     스크롤 리빌(.reveal, 하단)과 통일한 기준선이며, 지속시간은 marquee/panel-fade
-     선례대로 토큰 값에 인라인한다. 뷰포트 진입 리빌은 키프레임이 아니라 .reveal 전이
-     유틸을 쓴다(교차 토글에 적합). */
+     HistoryTimeline(translate-y-4 / ease-out) 기준선과 통일한 값이며, 지속시간은
+     marquee/panel-fade 선례대로 토큰 값에 인라인한다. 섹션 스크롤 리빌은 키프레임이
+     아니라 공용 client 컴포넌트 ScrollReveal(src/shared/ui)이 Tailwind 유틸 클래스
+     토글로 처리한다(SSR 에 shown 출력 → No-JS 안전). */
   --animate-fade-up: fade-up 600ms var(--ease-out) both;
 
   /* ────────────────────────────────────────────────────────────
@@ -310,40 +311,11 @@ body {
   transition-duration: var(--duration-fast, 200ms);
 }
 
-/* ── Scroll reveal (전이 기반 뷰포트 진입 리빌) ────────────────────
-   공용 ScrollReveal(client, src/shared/ui)이 대상 요소에 `.reveal` + 방향 variant
-   (reveal-up/left/right/scale)를 부여하고, IntersectionObserver 교차 시
-   data-revealed="true" 를 토글해 최종 상태(opacity 1 · transform none)로 전이시킨다.
-   히어로 첫 렌더는 키프레임(animate-fade-up), 스크롤 진입은 이 전이 유틸을 쓴다
-   (교차마다 class/attr 토글하기엔 키프레임보다 전이가 적합하고, HistoryTimeline 의
-   IntersectionObserver + transition 선례와 동일 계열).
-   지속시간 500ms · 이징 var(--ease-out) · 거리 16px 는 HistoryTimeline
-   (translate-y-4 / duration-500 / ease-out) 기준선과 통일한 값이다(모션 정의 인라인
-   관행 — marquee 40s·panel-fade 400ms 와 동일 취급, 색/스페이싱 토큰 아님).
-   reduced-motion 에서는 하단 블록이 즉시 표시로 무효화한다. */
-@utility reveal {
-  opacity: 0;
-  transition-property: opacity, transform;
-  transition-duration: 500ms;
-  transition-timing-function: var(--ease-out);
-  &[data-revealed='true'] {
-    opacity: 1;
-    transform: none;
-  }
-}
-/* 방향 variant — 은닉 상태의 진입 방향/거리. 16px(=translate-y-4)·scale 0.97 은
-   과하지 않은 은은한 톤(바운스 없음). data-revealed 시 .reveal 이 transform:none 으로
-   덮어 최종 정지 위치로 이동한다(높은 특이도로 variant 를 이긴다). */
-@utility reveal-up    { transform: translateY(16px); }
-@utility reveal-left  { transform: translateX(-16px); }  /* 좌측에서 우측으로 진입(2컬럼 좌) */
-@utility reveal-right { transform: translateX(16px); }   /* 우측에서 좌측으로 진입(2컬럼 우) */
-@utility reveal-scale { transform: scale(0.97); }        /* 워드마크 — 아주 살짝 */
-
-/* 스태거 지연 단계(80ms 스텝). 히어로 고정 시퀀스(키프레임 animation-delay)와 카드
-   그리드 리빌(전이 transition-delay) 양쪽에서 쓰이도록 두 delay 를 함께 설정한다.
-   Tailwind delay-* 는 transition-delay 만 건드려 키프레임 진입엔 못 쓰므로 별도 제공.
-   리빌 래퍼는 hover 를 갖지 않는 전용 래퍼여야 한다(래퍼에 delay 를 두면 안쪽 카드
-   hover 전이는 영향받지 않는다). */
+/* 스태거 지연 단계(80ms 스텝). 히어로 첫 렌더 고정 시퀀스(키프레임 animation-delay)의
+   순차 등장에 쓴다. animation-delay/transition-delay 를 함께 설정해 키프레임(fade-up)
+   스태거를 담당한다 — Tailwind delay-* 는 transition-delay 만 건드려 키프레임 진입엔
+   못 쓰므로 별도 제공한다. 섹션 스크롤 리빌은 공용 ScrollReveal 컴포넌트가 담당하므로
+   여기서는 히어로 진입 스태거 전용이다. */
 @utility reveal-delay-1 { animation-delay: 80ms;  transition-delay: 80ms; }
 @utility reveal-delay-2 { animation-delay: 160ms; transition-delay: 160ms; }
 @utility reveal-delay-3 { animation-delay: 240ms; transition-delay: 240ms; }
@@ -467,15 +439,10 @@ body {
     animation: none;
   }
 
-  /* 스크롤 리빌: 초기 은닉(.reveal opacity:0 + variant transform)을 무효화해 교차 대기
-     없이 콘텐츠를 즉시 표시한다. animate-fade-up(히어로)은 animation:none 으로 자연
-     상태(visible)가 되므로 별도 처리 불필요(base 에 opacity-0 를 두지 않는 전제).
-     variant transform 을 이기도록 !important 로 고정한다. */
-  .reveal {
-    opacity: 1 !important;
-    transform: none !important;
-    transition: none !important;
-  }
+  /* animate-fade-up(히어로)은 위에서 animation:none 으로 자연 상태(visible)가 된다
+     (base 에 opacity-0 를 두지 않는 전제 — 은닉은 키프레임 0% 가 담당). 섹션 스크롤
+     리빌은 공용 ScrollReveal 컴포넌트가 SSR 에 shown 을 출력하므로 No-JS·reduced-motion
+     양쪽에서 즉시 표시되어 여기서 별도 처리할 CSS 유틸이 없다. */
 
   *,
   *::before,

@@ -174,23 +174,20 @@ AQI 바 그라디언트: `from-aqi-good via-brand via-aqi-warning to-aqi-bad`.
 
 ### 진입/스크롤 리빌 (홈 랜딩 애니메이션 · 이슈 #144)
 
-두 메커니즘으로 나뉜다. **첫 렌더(위 폴드)** 는 키프레임, **뷰포트 진입(스크롤)** 은 전이 기반이다.
+두 메커니즘으로 나뉜다. **첫 렌더(위 폴드)** 는 순수 CSS 키프레임, **뷰포트 진입(스크롤)** 은 공용 client 컴포넌트다.
 
-- **히어로 첫 렌더** = `animate-fade-up`(키프레임, fill both). JS 없이 마운트 시 자동 재생. 요소마다 `reveal-delay-*` 로 순차 등장. base 에 `opacity-0` 를 두지 않는다 — 은닉은 키프레임 0% 가 담당하고, reduced-motion 시 `animation:none` 이면 자연 상태(visible)가 된다.
-- **스크롤 리빌** = `.reveal` + 방향 variant(전이 기반). 공용 `ScrollReveal`(client)이 `.reveal reveal-<dir>` 를 부여하고 IntersectionObserver 교차 시 `data-revealed="true"` 를 토글해 최종 상태로 전이. HistoryTimeline 의 IO+transition 선례와 동일 계열.
+- **히어로 첫 렌더** = `animate-fade-up`(키프레임, fill both) + `reveal-delay-1~6`(80ms 스텝 스태거). JS 없이 마운트 시 자동 재생. 요소마다 `reveal-delay-*` 로 순차 등장. base 에 `opacity-0` 를 두지 않는다 — 은닉은 키프레임 0% 가 담당하고, reduced-motion 시 `animation:none` 이면 자연 상태(visible)가 된다.
+- **섹션 스크롤 리빌** = 공용 client 컴포넌트 `<ScrollReveal>`(`src/shared/ui`). Tailwind 유틸 클래스 기반으로 동작하며, **SSR 에는 표시(shown) 상태를 출력**하고 마운트 후에만 은닉(hidden)을 주입한 뒤 뷰포트 교차 시 표시로 전이한다 → **No-JS·reduced-motion 사용자에게도 콘텐츠가 항상 노출**된다(영구 은닉 회귀 없음). 섹션 리빌에 CSS `.reveal`/`reveal-*` 유틸을 쓰지 않는 이유가 이것이다(아래 note 참조).
 
 | 클래스 | 정의 | 용도 |
 | --- | --- | --- |
-| `reveal` | `opacity:0` + `transition:opacity,transform 500ms ease-out`; `[data-revealed=true]` → `opacity:1; transform:none` | 스크롤 리빌 베이스(은닉+전이). ScrollReveal 이 부여 |
-| `reveal-up` | 은닉 `translateY(16px)` | 헤더·카드 fade-up(기본 방향) |
-| `reveal-left` / `reveal-right` | 은닉 `translateX(∓16px)` | 2컬럼 좌/우 방향 슬라이드 |
-| `reveal-scale` | 은닉 `scale(0.97)` | 워드마크 — 아주 살짝 스케일 |
-| `reveal-delay-1`~`-6` | `animation-delay` + `transition-delay` = 80ms×N | 스태거 지연(히어로 키프레임·카드 그리드 전이 공용) |
+| `reveal-delay-1`~`-6` | `animation-delay` + `transition-delay` = 80ms×N | 히어로 첫 렌더 키프레임 스태거 지연(`animate-fade-up` 과 조합) |
 
-- **거리·시간 기준선**: 리빌 16px(=`translate-y-4`) · 500ms · `ease-out`, 히어로 키프레임 600ms · `ease-out` — 모두 `HistoryTimeline`(translate-y-4 / duration-500 / ease-out)과 통일. **과한 이동·바운스 금지.**
-- **스태거 스텝 80ms**: 카드 그리드는 60~90ms 권장 범위 안, 히어로 고정 시퀀스도 동일 스텝. `Tailwind delay-*` 는 `transition-delay` 만 건드려 키프레임 진입에 못 쓰므로 `reveal-delay-*` 가 두 delay 를 함께 설정한다.
-- **hover 충돌 회피**: 리빌 래퍼는 hover 를 갖지 않는 **전용 래퍼**여야 한다(래퍼에 `transition-delay` 를 두면 안쪽 카드의 hover 리프트 전이는 영향받지 않는다). ScrollReveal 은 자식마다 래퍼를 감싼다.
-- **reduced-motion**: 하단 전역 블록이 `animate-fade-up` 은 `animation:none`, `.reveal` 은 `opacity:1 !important; transform:none !important` 로 무효화 → **교차 대기 없이 즉시 표시**. 컴포넌트에서 재분기 금지. 마퀴(`animate-marquee-*`)에는 리빌/stagger 를 걸지 않는다(marquee-left/right 충돌 방지).
+> **미채택 note — CSS `.reveal`/`reveal-up/left/right/scale` 전이 유틸.** Round 1 에서 검토했던 `opacity:0` base + `data-revealed` 토글 방식의 CSS 스크롤 리빌 유틸은 **최종 미채택**했다. 이 방식은 초기 은닉이 CSS 에 하드 고정되어 **JS 비활성(No-JS) 사용자에게 콘텐츠가 영구 은닉**되는 접근성 회귀(#144 금지 사항)를 유발한다. 섹션 스크롤 리빌은 SSR 에 shown 을 출력하는 `<ScrollReveal>` 컴포넌트로 대체했고, 해당 CSS 유틸은 globals.css 에서 제거했다.
+
+- **거리·시간 기준선**: 히어로 키프레임 16px(=`translate-y-4`) · 600ms · `ease-out` — `HistoryTimeline`(translate-y-4 / duration-500 / ease-out)과 통일. `ScrollReveal` 도 동일 기준선을 유틸 클래스로 따른다. **과한 이동·바운스 금지.**
+- **스태거 스텝 80ms**: 히어로 고정 시퀀스는 `reveal-delay-*` 로 80ms 스텝. `Tailwind delay-*` 는 `transition-delay` 만 건드려 키프레임 진입에 못 쓰므로 `reveal-delay-*` 가 두 delay 를 함께 설정한다.
+- **reduced-motion**: 하단 전역 블록이 `animate-fade-up` 을 `animation:none` 으로 무효화 → 히어로가 자연 상태(visible)로 즉시 표시. 섹션 리빌은 `<ScrollReveal>` 이 SSR 에 shown 을 출력하므로 reduced-motion·No-JS 양쪽에서 이미 표시 상태다. 컴포넌트에서 재분기 금지. 마퀴(`animate-marquee-*`)에는 리빌/stagger 를 걸지 않는다(marquee-left/right 충돌 방지).
 
 - 지속시간·이징 키워드는 `--animate-*` 토큰 **값에 인라인**한다(별도 `--duration-*` 토큰을 만들지 않는다 — marquee `40s linear` 선례).
 - `drift` 진폭 `translate(30px,-24px)`·`panel-fade` 의 `translateY(10px)` 는 marquee 의 `translateX(-50%)` 와 같은 **패턴/방향 정의 자체**이므로 하드코딩 수치가 아니다.
