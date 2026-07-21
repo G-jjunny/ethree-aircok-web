@@ -1,7 +1,9 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useRef } from 'react'
 import type { CSSProperties, ElementType, ReactNode, Ref } from 'react'
+
+import { useIsomorphicLayoutEffect } from '@/shared/hooks'
 
 /** 리빌 모션 프리셋. 톤/타이밍은 모두 `transition-all duration-500 ease-out`로 통일. */
 export type ScrollRevealVariant = 'fade-up' | 'fade' | 'slide-left' | 'slide-right' | 'scale-in'
@@ -36,11 +38,15 @@ const TRANSITION_CLASSES = ['transition-all', 'duration-500', 'ease-out']
  *
  * 견고성:
  * - **No-JS / SSR / hydration 안전(progressive enhancement)**: SSR 출력에는 표시(shown) 클래스만
- *   들어가고 숨김/트랜지션 클래스는 없다. 숨김은 마운트 이후 effect에서 classList로만 적용하므로,
+ *   들어가고 숨김/트랜지션 클래스는 없다. 숨김은 마운트 이후 layout effect에서 classList로만 적용하므로,
  *   JS 비활성 환경에서도 콘텐츠가 항상 보인다.
  * - **prefers-reduced-motion: reduce**: effect를 조기 종료해 표시 상태를 유지한다(관찰·모션 없음).
- * - **깜빡임 방지**: 숨김 전환은 트랜지션이 꺼진 상태에서 즉시 적용하고, 강제 리플로우 후
- *   트랜지션을 켠다. 따라서 above-the-fold 요소는 fade-out 없이 진입 애니메이션만 재생된다.
+ * - **깜빡임(flash) 방지**: 숨김 클래스 주입을 `useIsomorphicLayoutEffect`(클라이언트=useLayoutEffect)로
+ *   **첫 페인트 이전**에 커밋한다. 따라서 above-the-fold 요소도 shown이 잠깐 보였다 사라지는 플래시 없이
+ *   숨김 상태로 첫 페인트된 뒤 진입 애니메이션만 재생된다. 리플로우로 숨김을 커밋한 뒤 트랜지션을 켠다.
+ * - **className 변경 견고성**: className 문자열이 바뀌면 React가 class 속성을 재기록하며
+ *   classList로 넣은 리빌 상태를 덮어쓴다. 이를 effect 의존성 `[variant, className]`로 감지해
+ *   리빌 상태를 재확립한다(리빌 완료분은 `hasRevealedRef`로 기억해 재숨김 없이 shown 유지).
  * - **once**: 뷰포트 진입(threshold 0.1) 시 1회 리빌 후 `observer.disconnect()`.
  */
 export function ScrollReveal({
@@ -51,8 +57,10 @@ export function ScrollReveal({
   children,
 }: ScrollRevealProps) {
   const ref = useRef<HTMLElement>(null)
+  // 리빌 1회 완료 여부. className 변경으로 effect가 재실행돼도 재숨김/재애니메이션 없이 shown을 유지한다.
+  const hasRevealedRef = useRef(false)
 
-  useEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     const el = ref.current
     if (!el) return
 
@@ -62,7 +70,15 @@ export function ScrollReveal({
     const hiddenClasses = VARIANT_CLASSES[variant].hidden.split(' ')
     const shownClasses = VARIANT_CLASSES[variant].shown.split(' ')
 
-    // 1) 표시 → 숨김으로 즉시 전환(트랜지션 미적용). 마운트 이후이므로 SSR/No-JS는 영향 없음.
+    // 이미 리빌된 요소인데 className 변경으로 React가 class를 재기록해 리빌 상태를 잃은 경우:
+    // 재숨김/재애니메이션 없이 트랜지션·shown 상태만 복구한다.
+    if (hasRevealedRef.current) {
+      el.classList.add(...TRANSITION_CLASSES, ...shownClasses)
+      el.classList.remove(...hiddenClasses)
+      return
+    }
+
+    // 1) 표시 → 숨김으로 즉시 전환(트랜지션 미적용). layout effect라 첫 페인트 전에 커밋된다.
     el.classList.remove(...shownClasses)
     el.classList.add(...hiddenClasses)
     // 2) 강제 리플로우로 숨김 상태를 커밋한 뒤 트랜지션을 켠다 → shown 복귀만 애니메이션.
@@ -75,6 +91,7 @@ export function ScrollReveal({
         if (entry.isIntersecting) {
           el.classList.remove(...hiddenClasses)
           el.classList.add(...shownClasses)
+          hasRevealedRef.current = true
           observer.disconnect()
         }
       },
@@ -83,7 +100,7 @@ export function ScrollReveal({
 
     observer.observe(el)
     return () => observer.disconnect()
-  }, [variant])
+  }, [variant, className])
 
   // SSR/초기 렌더: 표시(shown) 클래스만. 트랜지션·숨김 클래스는 effect에서 주입한다.
   const shown = VARIANT_CLASSES[variant].shown
