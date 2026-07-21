@@ -24,7 +24,7 @@ function resolveSameOriginPdfSrc(src: string): string {
 }
 
 /**
- * 카탈로그 항목 배열을 "페이지 이미지 src 배열"로 평탄화한다(2D/3D 공용 소비 형태).
+ * 카탈로그 항목 배열을 "페이지 이미지 src 배열"로 평탄화한다(뷰어 공용 소비 형태).
  * - image 항목: 단일 페이지(절대 URL)
  * - pdf 항목: shared 유틸 renderPdfToImages로 N페이지 dataURL을 펼침
  *

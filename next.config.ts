@@ -84,6 +84,12 @@ const nextConfig: NextConfig = {
         destination: '/contact#faq',
         permanent: true,
       },
+      // 3D 카탈로그 뷰어는 미채택으로 제거됨(이슈 #150). 구 경로는 2D 카탈로그로 영구 이전.
+      {
+        source: '/catalog/3d',
+        destination: '/catalog',
+        permanent: true,
+      },
     ];
   },
 
