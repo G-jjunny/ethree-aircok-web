@@ -87,6 +87,12 @@ const nextConfig: NextConfig = {
         destination: '/contact#faq',
         permanent: true,
       },
+      // 3D 카탈로그 뷰어는 미채택으로 제거됨(이슈 #150). 구 경로는 2D 카탈로그로 영구 이전.
+      {
+        source: '/catalog/3d',
+        destination: '/catalog',
+        permanent: true,
+      },
     ];
   },
 
@@ -104,7 +110,7 @@ const nextConfig: NextConfig = {
       },
       // Cloudflare R2 퍼블릭 버킷 동일출처 프록시.
       // R2 대시보드 CORS 설정 없이 pdf.js Range 요청과 `<a download>`를 모두 처리한다.
-      // 주의: 프리픽스로 `/catalog`를 쓰면 실제 페이지 라우트(`/catalog`, `/catalog/3d`)와
+      // 주의: 프리픽스로 `/catalog`를 쓰면 실제 페이지 라우트(`/catalog`)와
       // 충돌하므로 전용 프리픽스 `/r2`를 사용한다.
       {
         source: `${R2_PROXY_PREFIX}/:path*`,
