@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { renderPdfToImages } from '@/shared/lib'
+import { renderPdfToImages, resolveSameOriginUrl } from '@/shared/lib'
 import type { CatalogImage } from '@/entities/catalog'
 
 /** 이미지 항목은 백엔드 절대 URL로 보정한다(NewsImage 패턴, <img>는 cross-origin 허용). */
@@ -11,22 +11,10 @@ function resolveImageSrc(src: string): string {
 }
 
 /**
- * PDF는 동일 출처(`/uploads/...`)로 fetch해야 CORS가 발생하지 않으므로
- * 상대경로는 그대로 두고 절대 URL만 경로 부분으로 환원한다(rewrites가 동일출처 프록시).
- */
-function resolveSameOriginPdfSrc(src: string): string {
-  if (!src.startsWith('http')) return src
-  try {
-    return new URL(src).pathname
-  } catch {
-    return src
-  }
-}
-
-/**
  * 카탈로그 항목 배열을 "페이지 이미지 src 배열"로 평탄화한다(2D/3D 공용 소비 형태).
  * - image 항목: 단일 페이지(절대 URL)
- * - pdf 항목: shared 유틸 renderPdfToImages로 N페이지 dataURL을 펼침
+ * - pdf 항목: 동일출처 경로(`/r2/*`, 레거시 `/uploads/*`)로 환원 후
+ *   shared 유틸 renderPdfToImages로 N페이지 dataURL을 펼침
  *
  * PDF 렌더는 비동기·클라이언트 전용이므로 로딩 상태를 함께 노출한다.
  */
@@ -54,7 +42,7 @@ export function useCatalogPages(images: CatalogImage[]): {
           if (item.fileType === 'pdf') {
             try {
               return await renderPdfToImages(
-                resolveSameOriginPdfSrc(item.fileUrl),
+                resolveSameOriginUrl(item.fileUrl),
               )
             } catch {
               return [] as string[]
