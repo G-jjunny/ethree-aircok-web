@@ -75,6 +75,13 @@ const eslintConfig = defineConfig([
               from: { type: "entities" },
               allow: { to: { type: "shared" } },
             },
+            // shared는 슬라이스가 아닌 세그먼트(ui/lib/hooks/config/api…)로 구성되며
+            // 세그먼트 간 자유 합성이 정석 FSD다(shared/ui가 shared/hooks 훅을 사용하는 등).
+            // 최하위 레이어이므로 상향 의존이 생기지 않는다.
+            {
+              from: { type: "shared" },
+              allow: { to: { type: "shared" } },
+            },
             // Public API only: block deep/internal imports into another
             // slice (own-slice internal files are exempt by default).
             // Two entry points are public: index.ts (client-safe barrel) and

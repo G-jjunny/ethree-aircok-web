@@ -1,5 +1,5 @@
 import { SITE } from '@/shared/config';
-import { SectionLabel } from '@/shared/ui';
+import { SectionLabel, ScrollReveal } from '@/shared/ui';
 
 /**
  * ABOUT / 4-step 플로우 (시안 §5). 흰 배경, eyebrow + h2 + 리드 본문 + 4스텝(아이콘 박스 64px).
@@ -12,7 +12,7 @@ export function AboutAircokSection() {
     <section className="bg-surface-white py-24">
       <div className="content-container">
         {/* token 없음: max-w-[760px] — 인트로 프로즈 컬럼 너비. 프로즈 폭은 값이 매번 달라(500·640·720·760·820) 단일 토큰화 대상 아님, 코드베이스 공통 1회성 수치 규약 준수 */}
-        <div className="mx-auto max-w-[760px] text-center">
+        <ScrollReveal variant="fade-up" className="mx-auto max-w-[760px] text-center">
           <SectionLabel color="brand">ABOUT AIRCOK</SectionLabel>
           <h2 className="mt-3 text-h3 font-extrabold leading-tight tracking-headline text-ink">
             실내 공기질 관리 혁신을
@@ -24,7 +24,7 @@ export function AboutAircokSection() {
             자동보정 등 다수의 특허를 기반으로 측정에서 진단, 개선까지 이어지는 통합 공기질
             관리 사이클을 제공합니다.
           </p>
-        </div>
+        </ScrollReveal>
 
         {/* 4스텝: 아이콘 뒤 연속 점선 커넥터(데스크톱) */}
         <div className="relative mt-14">
@@ -38,7 +38,12 @@ export function AboutAircokSection() {
             {steps.map((step, i) => {
               const isLast = i === steps.length - 1;
               return (
-                <div key={step.step} className="flex flex-col items-center text-center">
+                <ScrollReveal
+                  key={step.step}
+                  variant="fade-up"
+                  delay={i * 80}
+                  className="flex flex-col items-center text-center"
+                >
                   <div
                     className={`relative z-10 flex h-16 w-16 items-center justify-center rounded-image border ${
                       isLast
@@ -57,7 +62,7 @@ export function AboutAircokSection() {
                   </div>
                   <div className="mt-4 text-lead font-bold text-ink">{step.title}</div>
                   <p className="mt-2 text-meta leading-relaxed text-muted">{step.description}</p>
-                </div>
+                </ScrollReveal>
               );
             })}
           </div>

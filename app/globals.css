@@ -166,6 +166,20 @@
   --animate-drift:      drift 18s ease-in-out infinite;
   --animate-panel-fade: panel-fade 400ms var(--ease-out);
 
+  /* Animation (진입 페이드업 · 홈 히어로 첫 렌더)
+     fade-up = 은은한 페이드 + 상향(16px) 진입. 히어로 첫 렌더에서 카피(eyebrow→
+     headline→body→CTA)와 실시간 카드가 animation-delay(reveal-delay-*) 스태거로
+     순차 등장한다. fill-mode both 로 0% 은닉 상태를 유지(스태거 지연 동안 미리 보이지
+     않게)하고 종료 후 최종 상태로 고정한다 — 히어로 요소는 fixed/sticky 를 감싸지 않아
+     panel-fade 와 달리 잔류 transform 이 문제되지 않는다. 거리 16px·이징 ease-out 은
+     HistoryTimeline(translate-y-4 / ease-out) 기준선과 통일한 값이며, 지속시간은
+     marquee/panel-fade 선례대로 토큰 값에 인라인한다. 900ms 는 위 폴드 단독 시퀀스에
+     맞춘 여유 템포로, 스크롤 중 재생되는 섹션 리빌(ScrollReveal)보다 의도적으로 길다.
+     reveal-delay-4(560ms)까지 합쳐 히어로 전체가 약 1.46s 에 마무리된다. 섹션 스크롤
+     리빌은 키프레임이 아니라 공용 client 컴포넌트 ScrollReveal(src/shared/ui)이
+     Tailwind 유틸 클래스 토글로 처리한다(SSR 에 shown 출력 → No-JS 안전). */
+  --animate-fade-up: fade-up 900ms var(--ease-out) both;
+
   /* ────────────────────────────────────────────────────────────
      DEPRECATED ALIASES — 구 토큰 → 신 토큰 (빌드 무결성용)
      각 컴포넌트 마이그레이션 완료 후 이 블록 전체를 삭제한다.
@@ -299,6 +313,18 @@ body {
   transition-duration: var(--duration-fast, 200ms);
 }
 
+/* 스태거 지연 단계(140ms 스텝). 히어로 첫 렌더 고정 시퀀스(키프레임 animation-delay)의
+   순차 등장에 쓴다. animation-delay/transition-delay 를 함께 설정해 키프레임(fade-up)
+   스태거를 담당한다 — Tailwind delay-* 는 transition-delay 만 건드려 키프레임 진입엔
+   못 쓰므로 별도 제공한다. 섹션 스크롤 리빌은 공용 ScrollReveal 컴포넌트가 담당하므로
+   여기서는 히어로 진입 스태거 전용이다. */
+@utility reveal-delay-1 { animation-delay: 140ms; transition-delay: 140ms; }
+@utility reveal-delay-2 { animation-delay: 280ms; transition-delay: 280ms; }
+@utility reveal-delay-3 { animation-delay: 420ms; transition-delay: 420ms; }
+@utility reveal-delay-4 { animation-delay: 560ms; transition-delay: 560ms; }
+@utility reveal-delay-5 { animation-delay: 700ms; transition-delay: 700ms; }
+@utility reveal-delay-6 { animation-delay: 840ms; transition-delay: 840ms; }
+
 /* ── Catalog 뷰어 푸터 페이지 진행 슬라이더 ──────────────────────
    input[type=range]의 트랙/썸은 Tailwind 유틸만으로 그라디언트를 줄 수 없어
    webkit/moz 의사요소로 직접 스타일한다. 트랙 = brand→cyan 그라디언트,
@@ -386,6 +412,16 @@ body {
   to   { opacity: 1; transform: translateY(0); }
 }
 
+/* ── 진입 페이드업 keyframes (히어로 첫 렌더) ──────────────────
+   translateY(16px) 는 "아래에서 살짝 올라오며 나타난다"는 진입 방향/거리 정의 자체다
+   (HistoryTimeline 의 translate-y-4 = 16px 기준선과 통일). transform/opacity 만 써서
+   레이아웃 시프트(CLS)가 없다. --animate-fade-up 이 fill both 로 소비해 시작 은닉/종료
+   고정을 처리하고, reduced-motion 에서는 animation:none 으로 자연 상태(visible)로 둔다. */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
 /* ── prefers-reduced-motion ───────────────────────────────────
    1) 무한 루프·진입 애니메이션은 완전히 끈다(animation:none). hero.module.css 의
       .float/.driftA/.driftB 와 동일한 프로젝트 관행이다. fill-mode 가 없으므로
@@ -400,9 +436,15 @@ body {
   .animate-marquee-left,
   .animate-marquee-right,
   .animate-drift,
-  .animate-panel-fade {
+  .animate-panel-fade,
+  .animate-fade-up {
     animation: none;
   }
+
+  /* animate-fade-up(히어로)은 위에서 animation:none 으로 자연 상태(visible)가 된다
+     (base 에 opacity-0 를 두지 않는 전제 — 은닉은 키프레임 0% 가 담당). 섹션 스크롤
+     리빌은 공용 ScrollReveal 컴포넌트가 SSR 에 shown 을 출력하므로 No-JS·reduced-motion
+     양쪽에서 즉시 표시되어 여기서 별도 처리할 CSS 유틸이 없다. */
 
   *,
   *::before,
