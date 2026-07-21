@@ -2,7 +2,7 @@
  * PDF 파일을 페이지별 이미지(dataURL)로 렌더링하는 도메인 무관 클라이언트 전용 유틸.
  *
  * pdf.js(`pdfjs-dist`)로 PDF를 로드해 각 페이지를 canvas에 렌더한 뒤
- * `toDataURL`로 PNG dataURL 배열을 반환한다. 2D/3D 뷰어 어느 슬라이스에도
+ * `toDataURL`로 PNG dataURL 배열을 반환한다. 특정 뷰어 슬라이스에
  * 종속되지 않으므로 shared 레이어에 위치한다.
  *
  * 주의:
