@@ -38,11 +38,16 @@
 | `INQUIRY_RECIPIENT_EMAIL` | 문의 알림 수신자                            | 직접 지정                                                         | ⬜   |
 | `CORS_ORIGIN`             | 허용 출처 (콤마 구분)                       | 보통 불필요(아래 설명). 필요 시 프론트 도메인                     | ⬜   |
 
-> 🚨 **`R2_PUBLIC_URL` 은 프론트 `next.config.ts` 의 `images.remotePatterns` 호스트와 반드시 일치해야 합니다.**
-> 현재 프론트에 등록된 호스트는 **`pub-046c2c24be4d444aaa70d8be1a5cd092.r2.dev`** 하나뿐입니다.
-> 따라서 백엔드 `R2_PUBLIC_URL` 은 `https://pub-046c2c24be4d444aaa70d8be1a5cd092.r2.dev` 이어야 합니다.
-> 다른 버킷이나 커스텀 도메인을 쓰려면 **프론트 `next.config.ts` 의 `images.remotePatterns` 도 함께 수정한 뒤 재배포**해야 합니다.
-> 등록되지 않은 호스트를 쓰면 `next/image` 최적화가 거부되어 이미지 요청이 **500** 으로 깨집니다.
+> 🚨 **`R2_PUBLIC_URL` 은 프론트의 R2 호스트 상수와 반드시 일치해야 합니다.**
+> 프론트는 `src/shared/lib/url/resolveSameOriginUrl.ts` 의 `R2_PUBLIC_HOST` 를 **단일 소스**로 삼아
+> ① `next.config.ts` 의 `images.remotePatterns` 호스트, ② `/r2/:path*` rewrite destination,
+> ③ 절대 URL → 동일출처 경로 환원 로직(`resolveSameOriginUrl`) 세 곳에서 함께 사용합니다.
+> 현재 값은 **`pub-046c2c24be4d444aaa70d8be1a5cd092.r2.dev`** 이므로
+> 백엔드 `R2_PUBLIC_URL` 은 `https://pub-046c2c24be4d444aaa70d8be1a5cd092.r2.dev` 이어야 합니다.
+> 다른 버킷이나 커스텀 도메인으로 바꾸려면 **`R2_PUBLIC_HOST` 상수를 수정하고 프론트를 재빌드·재배포**해야 합니다.
+> (이 값은 빌드 시점에 rewrite/번들로 굳어지므로 환경변수만 바꾸는 것으로는 반영되지 않습니다.)
+> 호스트가 어긋나면 `next/image` 최적화가 거부되어 이미지가 **500** 으로 깨지고,
+> `/r2` 프록시도 잘못된 버킷을 가리켜 PDF 뷰어·다운로드가 **404** 로 깨집니다.
 
 - ⬜ 항목(SMTP 6종)은 비워두면 **메일 발송만 건너뛰고** 문의 접수 자체는 정상 동작합니다.
 - `CORS_ORIGIN`: 프론트엔드는 `next.config.ts` 의 rewrite 프록시로 **동일 출처** 요청을 보내므로 CORS 가 발생하지 않습니다. 외부 도구/도메인에서 API 를 직접 호출해야 할 때만 설정하세요. 미설정 시 서버는 기본값 `http://localhost:3000` 만 허용합니다.
@@ -51,7 +56,7 @@
 
 | 이름                  | 용도                            | 획득 방법                                                     | 필수 |
 | --------------------- | ------------------------------- | ------------------------------------------------------------- | ---- |
-| `NEXT_PUBLIC_API_URL` | `/api/*`, `/uploads/*` 프록시 대상 | **스킴 포함 전체 URL** 직접 입력 (예: `https://aircok-server.onrender.com`) | ✅   |
+| `NEXT_PUBLIC_API_URL` | `/api/*`, 레거시 `/uploads/*` 프록시 대상 (R2 `/r2/*` 는 무관) | **스킴 포함 전체 URL** 직접 입력 (예: `https://aircok-server.onrender.com`) | ✅   |
 | `NODE_OPTIONS`        | 빌드 메모리 조정                | 빌드 OOM 발생 시에만 `--max-old-space-size=2048` 등            | ⬜   |
 
 > **왜 `fromService: { property: host }` 로 자동 연결하지 않나?**
@@ -131,30 +136,53 @@ exec node dist/src/main
 
 ---
 
-## 5. 알려진 미해결 이슈
+## 5. 카탈로그 R2 URL 대응 (해결 완료 — `/r2` 프록시 채택)
 
-### 🚨 신규 카탈로그 PDF 는 뷰어/다운로드가 동작하지 않습니다 (프론트 후속 수정 필요)
+### 문제 (해결됨)
 
-카탈로그 업로드 결과 URL 이 로컬 경로(`/uploads/xxx.pdf`)에서 **R2 절대 URL**(`https://pub-xxxx.r2.dev/catalog/<uuid>.pdf`)로 바뀌었습니다.
-그런데 프론트의 아래 파일들은 아직 **절대 URL 을 pathname 으로 환원해 동일출처 프록시(`/uploads/*`)로 처리**하는 로직을 갖고 있습니다.
+카탈로그 업로드 결과 URL 이 로컬 경로(`/uploads/xxx.pdf`)에서 **R2 절대 URL**(`https://pub-xxxx.r2.dev/catalog/<uuid>.pdf`)로 바뀌면서,
+절대 URL 을 `pathname` 으로 환원하던 프론트 로직이 `/catalog/<uuid>.pdf` 라는 존재하지 않는 경로를 만들어 **404** 가 났습니다.
 
-- `src/views/catalog/ui/resolveCatalogDownloadHref.ts`
-- `src/views/catalog/ui/useCatalogPages.ts`
-- `src/views/catalog-3d/ui/useCatalogPages.ts`
-- `src/views/admin-catalog/ui/SortableImageCard.tsx`
+> 📌 **정정**: 이 문제는 PDF 에 한정되지 않습니다. 다운로드 섹션의 **카탈로그 이미지 다운로드**(`<a download>` href)도
+> 동일한 환원 로직을 통과하므로 함께 영향을 받았습니다(백엔드 최초 보고는 "PDF 한정"으로 좁게 기술).
 
-R2 URL 의 pathname 은 `/catalog/<uuid>.pdf` 이므로 `next.config.ts` 의 rewrite 대상(`/api/*`, `/uploads/*`)에 걸리지 않고 **404** 가 납니다.
+### 채택안 — `/r2/:path*` 전용 프리픽스 rewrite 프록시
 
-> ⚠️ **이 수정은 백엔드 PR 범위 밖이며, 프론트엔드 후속 수정이 필요합니다.**
-> 조치 전까지 **신규 카탈로그 PDF 업로드는 뷰어/다운로드가 동작하지 않습니다.**
-> (레거시 `/uploads/*` 레코드와, 이미 R2 로 이관된 이미지 표시는 정상입니다.)
+`next.config.ts` 에 아래 rewrite 를 추가하고, 절대 URL → 동일출처 경로 변환을
+`src/shared/lib/url/resolveSameOriginUrl.ts` 단일 유틸로 통합했습니다.
 
-**해결 방향 2가지 (택1)**
+```ts
+{ source: '/r2/:path*', destination: `https://${R2_PUBLIC_HOST}/:path*` }
+```
 
-| 방향                              | 내용                                                                                                                 | 비고                                                                              |
-| --------------------------------- | -------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| (a) R2 CORS 허용 + 절대 URL 직접 사용 | R2 버킷에 프론트 도메인을 허용하는 CORS 규칙을 설정하고, 위 4개 파일에서 pathname 환원 로직을 제거해 절대 URL 을 그대로 사용 | pdf.js 뷰어가 크로스 오리진 fetch 를 하므로 CORS 필수. 프록시 홉이 없어 성능상 유리 |
-| (b) `next.config.ts` 에 R2 rewrite 추가 | `/catalog/:path*`(또는 R2 전용 프리픽스)를 R2 퍼블릭 URL 로 rewrite 해 기존 동일출처 처리 로직을 유지                     | CORS 설정 불필요하나 모든 PDF 트래픽이 Next 서버를 경유(무료 플랜 대역·시간 소모)   |
+변환 규칙:
+
+| 입력                                          | 출력                     |
+| --------------------------------------------- | ------------------------ |
+| `/uploads/x.pdf` (상대경로, 레거시)           | `/uploads/x.pdf` (그대로) |
+| `https://pub-xxx.r2.dev/catalog/a.pdf` (R2)   | `/r2/catalog/a.pdf`      |
+| `https://api-host/uploads/a.pdf` (레거시 API) | `/uploads/a.pdf`         |
+| 파싱 실패                                     | 원본 그대로              |
+
+**채택 사유**
+
+- R2 대시보드에서 **CORS 규칙을 수동 설정할 필요가 없음** (버킷 설정이 코드 리뷰/버전관리 밖에 있어 재현·감사가 어려움)
+- `<a download>` 속성은 **cross-origin 리소스에서 브라우저가 무시**하므로, 절대 URL 을 그대로 쓰면 다운로드가 아니라 탭 열기로 동작함 → 동일출처 프록시로만 회피 가능
+- 프리픽스를 `/catalog` 가 아닌 **`/r2` 로 지정해 실제 페이지 라우트(`/catalog`, `/catalog/3d`) 와의 충돌을 회피**
+- 기존 `/uploads/*` rewrite 를 그대로 두어 레거시 레코드 **하위호환 유지**
+
+**미채택안 — R2 CORS 허용 + 절대 URL 직접 사용**
+
+프록시 홉이 없어 대역·지연 면에서는 유리하지만, ① R2 대시보드 수동 CORS 설정이 배포 절차에 추가되고,
+② `<a download>` 의 cross-origin 무시 문제가 남아 다운로드 UX 가 깨지므로 채택하지 않았습니다.
+
+**트레이드오프**: 모든 PDF/다운로드 트래픽이 Next 서버를 경유하므로 무료 플랜의 대역·인스턴스 시간을 소모합니다.
+카탈로그 트래픽 비중이 커지면 커스텀 도메인 + R2 CORS 조합으로 재검토합니다.
+
+### 이미지 표시(`<img>`, `next/image`)는 절대 URL 직행 유지
+
+프록시 대상은 **PDF fetch 와 다운로드 링크** 뿐입니다. 이미지 표시는 CORS 제약이 없으므로
+기존대로 R2 절대 URL 을 그대로 사용하며(`remotePatterns` 로 허용), 불필요한 프록시 홉을 만들지 않습니다.
 
 ---
 
