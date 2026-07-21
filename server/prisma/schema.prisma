@@ -504,6 +504,9 @@ model AirDeviceItem {
 /// - DIAGNOSIS_COMPOSE_DEVICE / DIAGNOSIS_COMPOSE_MONITOR: 진단서비스 구성 섹션 이미지
 ///   (실내공기질 측정기 / 모니터링 서비스) (#124).
 /// - DIAGNOSIS_COMPARE_BEFORE / DIAGNOSIS_COMPARE_AFTER: 진단서비스 도입 전후 비교 섹션 이미지 (#124).
+/// - HOME_VALUE_1 ~ HOME_VALUE_4: 홈 "Our Value" 이미지 카드 4장
+///   (카피 변경 가능성 때문에 의미 기반이 아닌 위치 기반 명명) (#148).
+/// - HOME_REPORT_ILLUST: 홈 "FREE REPORT" 섹션 일러스트 (#148).
 enum ProductImageSlot {
   MONITORING_DASHBOARD
   MONITORING_STATS
@@ -520,6 +523,11 @@ enum ProductImageSlot {
   DIAGNOSIS_COMPOSE_MONITOR  // 모니터링 서비스
   DIAGNOSIS_COMPARE_BEFORE   // 도입 전
   DIAGNOSIS_COMPARE_AFTER    // 도입 후
+  HOME_VALUE_1               // 홈 Our Value 카드 1번
+  HOME_VALUE_2               // 홈 Our Value 카드 2번
+  HOME_VALUE_3               // 홈 Our Value 카드 3번
+  HOME_VALUE_4               // 홈 Our Value 카드 4번
+  HOME_REPORT_ILLUST         // 홈 FREE REPORT 섹션 일러스트
 }
 
 /// `/services` 페이지 섹션 이미지 (슬롯 단위 고정 배치) (#services 1단계).
