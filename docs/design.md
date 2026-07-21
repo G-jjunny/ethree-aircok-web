@@ -170,6 +170,27 @@ AQI 바 그라디언트: `from-aqi-good via-brand via-aqi-warning to-aqi-bad`.
 | `animate-marquee-left` / `-right` | `marquee-* 40s linear infinite` | 파트너 로고 2줄 무한 스크롤(`<LogoMarquee>`) |
 | `animate-drift` | `drift 18s ease-in-out infinite` | 다크 섹션 장식 orb 앰비언트 부유 |
 | `animate-panel-fade` | `panel-fade 400ms var(--ease-out)` | 탭 패널 진입 페이드 |
+| `animate-fade-up` | `fade-up 600ms var(--ease-out) both` | **히어로 첫 렌더** 진입(페이드+상향 16px). `reveal-delay-*` 스태거와 조합 |
+
+### 진입/스크롤 리빌 (홈 랜딩 애니메이션 · 이슈 #144)
+
+두 메커니즘으로 나뉜다. **첫 렌더(위 폴드)** 는 키프레임, **뷰포트 진입(스크롤)** 은 전이 기반이다.
+
+- **히어로 첫 렌더** = `animate-fade-up`(키프레임, fill both). JS 없이 마운트 시 자동 재생. 요소마다 `reveal-delay-*` 로 순차 등장. base 에 `opacity-0` 를 두지 않는다 — 은닉은 키프레임 0% 가 담당하고, reduced-motion 시 `animation:none` 이면 자연 상태(visible)가 된다.
+- **스크롤 리빌** = `.reveal` + 방향 variant(전이 기반). 공용 `ScrollReveal`(client)이 `.reveal reveal-<dir>` 를 부여하고 IntersectionObserver 교차 시 `data-revealed="true"` 를 토글해 최종 상태로 전이. HistoryTimeline 의 IO+transition 선례와 동일 계열.
+
+| 클래스 | 정의 | 용도 |
+| --- | --- | --- |
+| `reveal` | `opacity:0` + `transition:opacity,transform 500ms ease-out`; `[data-revealed=true]` → `opacity:1; transform:none` | 스크롤 리빌 베이스(은닉+전이). ScrollReveal 이 부여 |
+| `reveal-up` | 은닉 `translateY(16px)` | 헤더·카드 fade-up(기본 방향) |
+| `reveal-left` / `reveal-right` | 은닉 `translateX(∓16px)` | 2컬럼 좌/우 방향 슬라이드 |
+| `reveal-scale` | 은닉 `scale(0.97)` | 워드마크 — 아주 살짝 스케일 |
+| `reveal-delay-1`~`-6` | `animation-delay` + `transition-delay` = 80ms×N | 스태거 지연(히어로 키프레임·카드 그리드 전이 공용) |
+
+- **거리·시간 기준선**: 리빌 16px(=`translate-y-4`) · 500ms · `ease-out`, 히어로 키프레임 600ms · `ease-out` — 모두 `HistoryTimeline`(translate-y-4 / duration-500 / ease-out)과 통일. **과한 이동·바운스 금지.**
+- **스태거 스텝 80ms**: 카드 그리드는 60~90ms 권장 범위 안, 히어로 고정 시퀀스도 동일 스텝. `Tailwind delay-*` 는 `transition-delay` 만 건드려 키프레임 진입에 못 쓰므로 `reveal-delay-*` 가 두 delay 를 함께 설정한다.
+- **hover 충돌 회피**: 리빌 래퍼는 hover 를 갖지 않는 **전용 래퍼**여야 한다(래퍼에 `transition-delay` 를 두면 안쪽 카드의 hover 리프트 전이는 영향받지 않는다). ScrollReveal 은 자식마다 래퍼를 감싼다.
+- **reduced-motion**: 하단 전역 블록이 `animate-fade-up` 은 `animation:none`, `.reveal` 은 `opacity:1 !important; transform:none !important` 로 무효화 → **교차 대기 없이 즉시 표시**. 컴포넌트에서 재분기 금지. 마퀴(`animate-marquee-*`)에는 리빌/stagger 를 걸지 않는다(marquee-left/right 충돌 방지).
 
 - 지속시간·이징 키워드는 `--animate-*` 토큰 **값에 인라인**한다(별도 `--duration-*` 토큰을 만들지 않는다 — marquee `40s linear` 선례).
 - `drift` 진폭 `translate(30px,-24px)`·`panel-fade` 의 `translateY(10px)` 는 marquee 의 `translateX(-50%)` 와 같은 **패턴/방향 정의 자체**이므로 하드코딩 수치가 아니다.
