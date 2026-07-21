@@ -8,7 +8,8 @@
  * 주의:
  * - canvas/Worker는 브라우저 전용이므로 반드시 'use client' 컴포넌트/훅에서만 호출한다.
  * - pdf.js worker는 `import.meta.url` 기준 번들 자산으로 로드한다(Next16/Turbopack 호환).
- * - 동일 출처(`/uploads/...`)로 fetch해 CORS를 회피한다(cross-origin URL 전달 금지).
+ * - 동일 출처 프리픽스(`/r2/...` 또는 레거시 `/uploads/...`)로 fetch해 CORS를 회피한다.
+ *   cross-origin 절대 URL 전달 금지 — `resolveSameOriginUrl`로 먼저 환원할 것.
  */
 
 let workerConfigured = false
@@ -44,7 +45,7 @@ export interface RenderPdfToImagesOptions {
 /**
  * PDF URL을 받아 페이지별 PNG dataURL 배열을 반환한다.
  *
- * @param url PDF 파일 URL(동일 출처 상대경로 권장, 예: `/uploads/x.pdf`)
+ * @param url PDF 파일 URL(동일 출처 상대경로 필수, 예: `/r2/catalog/x.pdf` · `/uploads/x.pdf`)
  * @param options 렌더 옵션(scale, maxPages)
  * @returns 페이지 순서대로의 dataURL 배열
  */
