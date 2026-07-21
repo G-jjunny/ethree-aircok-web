@@ -63,6 +63,7 @@ export function WhatYouGetSection() {
               slot="HOME_REPORT_ILLUST"
               alt="무료 공기질 리포트 일러스트"
               sizes="(min-width: 768px) 50vw, 100vw"
+              fit="contain"
               fallback={ILLUST_FALLBACK}
             />
           </Suspense>

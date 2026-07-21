@@ -25,6 +25,8 @@ type HomeSlotImageProps = {
   alt: string;
   /** next/image sizes. fill 이미지이므로 레이아웃상 실제 표시 폭에 맞춘다. */
   sizes?: string;
+  /** object-fit. 기본 cover. 일러스트처럼 잘리면 안 되는 이미지는 contain. */
+  fit?: 'cover' | 'contain';
   /**
    * 슬롯 미등록(정상 케이스)일 때 렌더할 폴백.
    * Suspense fallback 에도 **동일한 노드**를 넘겨 스트리밍 전/후 레이아웃을 일치시킨다.
@@ -48,6 +50,7 @@ export async function HomeSlotImage({
   slot,
   alt,
   sizes = '100vw',
+  fit = 'cover',
   fallback = null,
 }: HomeSlotImageProps) {
   await connection();
@@ -68,7 +71,7 @@ export async function HomeSlotImage({
       alt={alt}
       fill
       sizes={sizes}
-      className="object-cover"
+      className={fit === 'contain' ? 'object-contain' : 'object-cover'}
     />
   );
 }

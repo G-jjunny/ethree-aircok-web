@@ -81,7 +81,8 @@ export function WhyChooseUsSection() {
                 <Suspense fallback={stripeFallback}>
                   <HomeSlotImage
                     slot={meta.slot}
-                    alt={feature.cardTitle}
+                    /* alt 는 마케팅 문장(cardTitle)이 아니라 카드를 식별하는 간결한 서술 */
+                    alt={`${feature.title} 카드 이미지`}
                     sizes="(min-width: 768px) 33vw, 100vw"
                     fallback={stripeFallback}
                   />

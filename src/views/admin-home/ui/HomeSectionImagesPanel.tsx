@@ -2,30 +2,36 @@
 
 import { ProductSectionImageManager } from '@/widgets/product-section-image-manager'
 import type { ProductSectionImageSlotConfig } from '@/widgets/product-section-image-manager'
+import { SITE } from '@/shared/config'
 
-/** 홈 Our Value 섹션의 고정 슬롯. 배열 순서 = 홈 화면 카드 순서(1:1 고정 매핑). */
-const VALUE_SLOTS: readonly ProductSectionImageSlotConfig[] = [
-  {
-    slot: 'HOME_VALUE_1',
-    label: '카드 01 · 정확성',
-    description: '국가 공인 1등급의 정확한 광산란 측정',
+/**
+ * 홈 Our Value 카드 슬롯 ID. 배열 순서 = 홈 화면 카드 순서 = `SITE.whyUs.features` 순서
+ * (WhyChooseUsSection 의 VALUE_META 와 동일한 1:1 고정 매핑).
+ */
+const VALUE_SLOT_IDS = [
+  'HOME_VALUE_1',
+  'HOME_VALUE_2',
+  'HOME_VALUE_3',
+  'HOME_VALUE_4',
+] as const satisfies readonly ProductSectionImageSlotConfig['slot'][]
+
+/**
+ * 라벨·설명 카피는 `SITE.whyUs.features` 를 SSOT 로 파생한다(하드코딩 복제 금지).
+ * features 길이가 슬롯 수보다 짧아도 깨지지 않도록 존재하는 카드만 노출한다.
+ */
+const VALUE_SLOTS: readonly ProductSectionImageSlotConfig[] = VALUE_SLOT_IDS.flatMap(
+  (slot, i) => {
+    const feature = SITE.whyUs.features.at(i)
+    if (!feature) return []
+    return [
+      {
+        slot,
+        label: `카드 0${i + 1} · ${feature.title}`,
+        description: feature.cardTitle,
+      },
+    ]
   },
-  {
-    slot: 'HOME_VALUE_2',
-    label: '카드 02 · 다양성',
-    description: '실내 8·실외 12항목 국내 최대 측정 범위',
-  },
-  {
-    slot: 'HOME_VALUE_3',
-    label: '카드 03 · 편리성',
-    description: '수기 일지를 자동 REPORT로 간편하게',
-  },
-  {
-    slot: 'HOME_VALUE_4',
-    label: '카드 04 · 연계성',
-    description: 'Our Value 네 번째 카드 이미지',
-  },
-]
+)
 
 /** 홈 FREE REPORT 섹션의 고정 슬롯. */
 const REPORT_SLOTS: readonly ProductSectionImageSlotConfig[] = [
