@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { renderPdfToImages } from '@/shared/lib'
+import { renderPdfToImages, resolveSameOriginUrl } from '@/shared/lib'
 import type { CatalogImage } from '@/entities/catalog'
 
 /** 이미지 항목은 백엔드 절대 URL로 보정한다(NewsImage 패턴). */
@@ -12,18 +12,9 @@ function resolveSrc(src: string): string {
   return src.startsWith('http') ? src : `${API_BASE}${src}`
 }
 
-/** PDF는 동일 출처(`/uploads/...`)로 fetch해 CORS를 회피한다. */
-function resolveSameOriginPdfSrc(src: string): string {
-  if (!src.startsWith('http')) return src
-  try {
-    return new URL(src).pathname
-  } catch {
-    return src
-  }
-}
-
 /**
  * PDF 항목의 첫 페이지 썸네일 dataURL을 비동기로 렌더한다.
+ * PDF는 동일 출처(`/r2/*`, 레거시 `/uploads/*`)로 fetch해 CORS를 회피한다.
  * 실패 시 null을 반환해 호출부가 플레이스홀더로 폴백하게 한다.
  */
 function usePdfThumbnail(enabled: boolean, fileUrl: string): string | null {
@@ -31,7 +22,7 @@ function usePdfThumbnail(enabled: boolean, fileUrl: string): string | null {
   useEffect(() => {
     if (!enabled) return
     let cancelled = false
-    void renderPdfToImages(resolveSameOriginPdfSrc(fileUrl), { maxPages: 1 })
+    void renderPdfToImages(resolveSameOriginUrl(fileUrl), { maxPages: 1 })
       .then((pages) => {
         if (!cancelled) setThumb(pages[0] ?? null)
       })

@@ -19,6 +19,7 @@
     "prisma:seed:news": "ts-node --project tsconfig.json prisma/seed-news.ts",
     "prisma:update:news-images": "ts-node --project tsconfig.json prisma/update-news-images.ts",
     "migrate:images-to-r2": "ts-node -r tsconfig-paths/register prisma/migrate-images-to-r2.ts",
+    "migrate:catalog-team-to-r2": "ts-node --project tsconfig.json prisma/migrate-catalog-team-to-r2.ts",
     "replace:news-seed-images": "ts-node --project tsconfig.json prisma/replace-news-seed-images.ts",
     "fill:blog-content": "ts-node --project tsconfig.json prisma/fill-blog-content.ts"
   },

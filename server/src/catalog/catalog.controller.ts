@@ -14,11 +14,10 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
-import { join } from 'path';
+import { memoryStorage } from 'multer';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CacheControlInterceptor } from '../common/interceptors/http-cache.interceptor';
-import { decodeAndSanitizeUploadFilename } from '../common/utils/upload-filename.util';
+import { R2Service } from '../upload/r2.service';
 import { CatalogService } from './catalog.service';
 import { CreateCatalogImageDto } from './dto/create-catalog-image.dto';
 import { UpdateCatalogImageDto } from './dto/update-catalog-image.dto';
@@ -34,13 +33,8 @@ const ALLOWED_UPLOAD_MIMETYPES = [
 ];
 
 const multerOptions = {
-  storage: diskStorage({
-    destination: join(__dirname, '..', '..', '..', 'public', 'uploads'),
-    filename: (_req: Express.Request, file: Express.Multer.File, cb: (error: Error | null, filename: string) => void) => {
-      const safe = decodeAndSanitizeUploadFilename(file.originalname);
-      cb(null, `${Date.now()}-${safe}`);
-    },
-  }),
+  // R2 업로드를 위해 메모리 버퍼에만 담는다(로컬 디스크 저장 없음).
+  storage: memoryStorage(),
   // 허용 목록 외 mimetype 은 거부한다.
   fileFilter: (
     _req: Express.Request,
@@ -61,7 +55,10 @@ const multerOptions = {
 
 @Controller('catalog')
 export class CatalogController {
-  constructor(private readonly catalogService: CatalogService) {}
+  constructor(
+    private readonly catalogService: CatalogService,
+    private readonly r2Service: R2Service,
+  ) {}
 
   /** GET /api/catalog — 공개 엔드포인트. */
   @UseInterceptors(new CacheControlInterceptor(60))
@@ -73,10 +70,12 @@ export class CatalogController {
   @UseGuards(JwtAuthGuard)
   @Post('uploads')
   @UseInterceptors(FileInterceptor('file', multerOptions))
-  uploadFile(@UploadedFile() file: Express.Multer.File) {
+  async uploadFile(@UploadedFile() file: Express.Multer.File) {
     // PDF 는 'pdf', 그 외 허용 이미지 타입은 'image' 로 분류해 응답한다.
     const fileType = file.mimetype === 'application/pdf' ? 'pdf' : 'image';
-    return { url: `/uploads/${file.filename}`, fileType };
+    // R2 로 업로드하고 절대 URL 을 반환한다(로컬 /uploads 경로 미사용).
+    const url = await this.r2Service.upload(file, 'catalog');
+    return { url, fileType };
   }
 
   @UseGuards(JwtAuthGuard)

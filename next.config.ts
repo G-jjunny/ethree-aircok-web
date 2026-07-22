@@ -1,4 +1,7 @@
 import type { NextConfig } from "next";
+// R2 호스트 단일 소스. 이 모듈은 다른 import가 없는 leaf 유틸이므로 config에서 안전하게 로드된다.
+// (프론트 런타임 코드는 `@/shared/lib` 배럴을 통해 동일 상수를 사용한다.)
+import { R2_PUBLIC_HOST, R2_PROXY_PREFIX } from './src/shared/lib/url/resolveSameOriginUrl';
 
 const API_ORIGIN = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
 
@@ -14,10 +17,10 @@ const nextConfig: NextConfig = {
     formats: ['image/avif', 'image/webp'],
     remotePatterns: [
       // Cloudflare R2 public bucket — 뉴스/서비스/카탈로그 이미지 원본.
-      // 업로드 이미지는 /uploads rewrite로 동일 출처 프록시되므로 별도 패턴 불필요.
+      // 레거시 업로드 이미지는 /uploads rewrite로 동일 출처 프록시된다.
       {
         protocol: 'https',
-        hostname: 'pub-046c2c24be4d444aaa70d8be1a5cd092.r2.dev',
+        hostname: R2_PUBLIC_HOST,
         pathname: '/**',
       },
     ],
@@ -99,11 +102,19 @@ const nextConfig: NextConfig = {
         source: '/api/:path*',
         destination: `${API_ORIGIN}/api/:path*`,
       },
-      // 정적 업로드(이미지·PDF)를 동일 출처로 프록시한다.
+      // 레거시 정적 업로드(이미지·PDF)를 동일 출처로 프록시한다(하위호환).
       // pdf.js가 동일 출처 `/uploads/xxx.pdf`로 fetch하면 CORS가 불필요하다.
       {
         source: '/uploads/:path*',
         destination: `${API_ORIGIN}/uploads/:path*`,
+      },
+      // Cloudflare R2 퍼블릭 버킷 동일출처 프록시.
+      // R2 대시보드 CORS 설정 없이 pdf.js Range 요청과 `<a download>`를 모두 처리한다.
+      // 주의: 프리픽스로 `/catalog`를 쓰면 실제 페이지 라우트(`/catalog`)와
+      // 충돌하므로 전용 프리픽스 `/r2`를 사용한다.
+      {
+        source: `${R2_PROXY_PREFIX}/:path*`,
+        destination: `https://${R2_PUBLIC_HOST}/:path*`,
       },
     ];
   },

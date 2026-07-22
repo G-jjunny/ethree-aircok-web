@@ -14,10 +14,9 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
-import { join } from 'path';
+import { memoryStorage } from 'multer';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { decodeAndSanitizeUploadFilename } from '../common/utils/upload-filename.util';
+import { R2Service } from '../upload/r2.service';
 import { TeamService } from './team.service';
 import { CreateTeamImageDto } from './dto/create-team-image.dto';
 import { UpdateTeamImageDto } from './dto/update-team-image.dto';
@@ -31,17 +30,8 @@ const ALLOWED_IMAGE_MIMETYPES = [
 ];
 
 const multerOptions = {
-  storage: diskStorage({
-    destination: join(__dirname, '..', '..', '..', 'public', 'uploads'),
-    filename: (
-      _req: Express.Request,
-      file: Express.Multer.File,
-      cb: (error: Error | null, filename: string) => void,
-    ) => {
-      const safe = decodeAndSanitizeUploadFilename(file.originalname);
-      cb(null, `${Date.now()}-${safe}`);
-    },
-  }),
+  // R2 업로드를 위해 메모리 버퍼에만 담는다(로컬 디스크 저장 없음).
+  storage: memoryStorage(),
   // 허용 목록 외 mimetype 은 거부한다.
   fileFilter: (
     _req: Express.Request,
@@ -62,7 +52,10 @@ const multerOptions = {
 
 @Controller('team-images')
 export class TeamController {
-  constructor(private readonly teamService: TeamService) {}
+  constructor(
+    private readonly teamService: TeamService,
+    private readonly r2Service: R2Service,
+  ) {}
 
   /** GET /api/team-images — 공개 엔드포인트. order ASC, createdAt ASC 정렬. */
   @Get()
@@ -70,12 +63,13 @@ export class TeamController {
     return this.teamService.findAll();
   }
 
-  /** POST /api/team-images/uploads — JWT 인증 필요. 이미지 업로드 후 { url } 반환. */
+  /** POST /api/team-images/uploads — JWT 인증 필요. R2 업로드 후 { url }(절대 URL) 반환. */
   @UseGuards(JwtAuthGuard)
   @Post('uploads')
   @UseInterceptors(FileInterceptor('file', multerOptions))
-  uploadFile(@UploadedFile() file: Express.Multer.File) {
-    return { url: `/uploads/${file.filename}` };
+  async uploadFile(@UploadedFile() file: Express.Multer.File) {
+    const url = await this.r2Service.upload(file, 'team');
+    return { url };
   }
 
   /**
