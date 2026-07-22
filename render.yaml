@@ -101,7 +101,19 @@ services:
     buildCommand: npm ci && npm run build
     startCommand: npm start
     envVars:
+      # API_URL: 서버 컴포넌트(SSR)가 백엔드를 직접 호출하는 베이스 URL 입니다.
+      #   src/entities/*/api/*ServerFetch.ts 들이 process.env.API_URL 로 읽어 홈·소개·뉴스 등
+      #   SSR 데이터를 백엔드에서 가져옵니다. 미설정 시 http://localhost:3001/api 로 폴백해
+      #   프론트 컨테이너 안에서 접속이 실패하므로 반드시 입력하세요.
+      #   ⚠ 형식: 스킴(https://) 포함 + 끝에 /api 까지. 예: https://aircok-server.onrender.com/api
+      #     아래 NEXT_PUBLIC_API_URL 은 오리진만(끝에 /api 없음)이라 접미사 때문에 값이 서로 다릅니다.
+      #   fromService: { property: host } 는 스킴이 빠져 부적합하므로 sync: false 로 직접 입력합니다.
+      - key: API_URL
+        sync: false
       # NEXT_PUBLIC_API_URL: next.config.ts 가 `${API_ORIGIN}/api/:path*` rewrite 대상으로 사용합니다.
+      #   ⚠ 형식: 오리진만 입력(끝에 /api 없음). rewrite 가 /api 를 자동으로 붙이므로,
+      #     여기에 /api 를 붙이면 /api/api 가 되어 프록시가 깨집니다.
+      #     그래서 위 API_URL(끝에 /api 포함)과는 접미사 때문에 값이 서로 다릅니다.
       #   ⚠ fromService: { property: host } 는 스킴(https://)이 빠진 호스트명만 반환하므로
       #     rewrite destination 이 유효한 절대 URL 이 되지 못해 빌드/프록시가 깨집니다.
       #     따라서 자동 연결 대신 sync: false 로 두고, 대시보드에서 스킴 포함 전체 URL

@@ -56,6 +56,7 @@
 
 | 이름                  | 용도                            | 획득 방법                                                     | 필수 |
 | --------------------- | ------------------------------- | ------------------------------------------------------------- | ---- |
+| `API_URL`             | 서버 컴포넌트(SSR)의 백엔드 직접 호출 베이스 | **스킴 포함 + 끝에 `/api`** 직접 입력 (예: `https://aircok-server.onrender.com/api`) | ✅   |
 | `NEXT_PUBLIC_API_URL` | `/api/*`, 레거시 `/uploads/*` 프록시 대상 (R2 `/r2/*` 는 무관) | **스킴 포함 전체 URL** 직접 입력 (예: `https://aircok-server.onrender.com`) | ✅   |
 | `NODE_OPTIONS`        | 빌드 메모리 조정                | 빌드 OOM 발생 시에만 `--max-old-space-size=2048` 등            | ⬜   |
 
@@ -63,6 +64,12 @@
 > Render 의 `host` property 는 **스킴이 빠진 호스트명**(`aircok-server.onrender.com`)만 반환합니다.
 > `next.config.ts` 는 이 값을 `${API_ORIGIN}/api/:path*` 형태의 rewrite destination 으로 사용하는데, 스킴이 없으면 유효한 절대 URL 이 아니어서 rewrite 가 깨집니다.
 > 그래서 `sync: false` 로 두고 대시보드에서 `https://` 를 포함한 전체 URL 을 직접 입력합니다.
+
+> **`API_URL` 과 `NEXT_PUBLIC_API_URL` 은 형식이 다릅니다 — 혼동 주의.**
+> - `API_URL` 은 **끝에 `/api` 를 포함**합니다 (예: `https://aircok-server.onrender.com/api`). 서버 컴포넌트가 `next.config.ts` rewrite 를 거치지 않고 백엔드를 **직접** 호출하기 때문입니다.
+> - `NEXT_PUBLIC_API_URL` 은 **오리진만**(끝에 `/api` 없음) 입력합니다. rewrite 가 `${API_ORIGIN}/api/:path*` 로 `/api` 를 자동으로 붙이므로, 여기에 `/api` 를 또 붙이면 `/api/api` 가 되어 프록시가 깨집니다.
+> - 두 값은 접미사 하나 때문에 서로 다르므로, 같은 오리진이라도 각각의 형식에 맞춰 입력해야 합니다.
+> - `API_URL` 도 빌드/런타임 환경변수이므로, 값 입력 후 **재배포**해야 반영됩니다.
 
 ---
 
@@ -77,8 +84,8 @@
    - 최소한 `JWT_SECRET`, `ADMIN_SEED_PASSWORD`, R2 5종은 **반드시** 입력해야 기동에 성공합니다.
 4. **백엔드 배포**
    Manual Deploy 또는 자동 배포로 `aircok-server` 를 배포하고, 로그에서 `migrate deploy` → seed → `Server running on ...` 순서를 확인합니다.
-5. **프론트 `NEXT_PUBLIC_API_URL` 입력**
-   `aircok-server` 의 실제 URL(`https://<서비스명>.onrender.com`)을 복사해 `aircok-web` Environment 에 입력합니다.
+5. **프론트 env 입력 (`API_URL`, `NEXT_PUBLIC_API_URL`)**
+   `aircok-server` 의 실제 URL(`https://<서비스명>.onrender.com`)을 복사해 `aircok-web` Environment 에 입력합니다. `NEXT_PUBLIC_API_URL` 은 **오리진 그대로**, `API_URL` 은 **끝에 `/api` 를 붙여**(`https://<서비스명>.onrender.com/api`) 입력합니다.
 6. **프론트 재배포**
    `NEXT_PUBLIC_API_URL` 은 빌드 시점에 `next.config.ts` rewrite 로 굳어지므로, 값 입력 후 **반드시 재배포**해야 반영됩니다.
 
