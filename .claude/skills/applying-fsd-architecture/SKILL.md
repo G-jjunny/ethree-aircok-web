@@ -89,6 +89,23 @@ import { UserCard } from '@/entities/user'
 import { UserCard } from '@/entities/user/ui/UserCard'
 ```
 
+### 서버 전용 심볼과 두 번째 진입점 (`server.ts`)
+
+서버 전용 코드(React `cache()`, `next/cache`의 `'use cache'`/`cacheTag`/`cacheLife`, 서버 사이드 페처)는 슬라이스 배럴 `index.ts`에 노출하지 않는다. 배럴이 서버 전용 모듈을 re-export하면 클라이언트가 client-safe 심볼만 import해도 번들러가 서버 모듈까지 클라이언트 번들로 끌어와, SSR에서 이를 호출하는 동적 라우트가 Next.js 16 렌더 워커 크래시로 500이 난다.
+
+- 서버 전용 모듈 최상단에 `import 'server-only';`를 선언한다.
+- 슬라이스는 두 개의 public 진입점을 갖는다: `index.ts`(클라이언트 안전 심볼) / `server.ts`(서버 전용 심볼). 클라이언트 컴포넌트는 `@/entities/<slice>`, 서버 컴포넌트는 `@/entities/<slice>/server`에서 import한다.
+- 타입 전용 export는 런타임 번들에 영향이 없어 `index.ts`에 유지 가능하다.
+- 레퍼런스: `src/entities/news/`(index=클라이언트 안전, server=`getNewsList`/`getNewsPost`/캐시 태그, `api/newsServerFetch.ts`=`import 'server-only'`).
+
+```typescript
+// 클라이언트 컴포넌트
+import { newsListQueryOptions } from '@/entities/news'
+
+// 서버 컴포넌트
+import { getNewsPost } from '@/entities/news/server'
+```
+
 ### 스택 규칙
 
 - 서버 상태/데이터 페칭: **TanStack Query** — queryOptions는 `entities/*/api` 또는 `features/*/api`

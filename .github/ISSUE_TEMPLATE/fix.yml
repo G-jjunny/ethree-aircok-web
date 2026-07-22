@@ -1,0 +1,51 @@
+name: "🐛 Bug Fix"
+description: 버그 수정
+labels: ["fix"]
+body:
+  - type: dropdown
+    id: scope
+    attributes:
+      label: 작업 범위
+      options:
+        - frontend
+        - backend
+        - fullstack
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: 버그 설명
+      description: 어떤 문제가 발생하고 있나요?
+      placeholder: 증상을 구체적으로 설명해주세요.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: 재현 방법
+      placeholder: |
+        1. ...으로 이동
+        2. ...을 클릭
+        3. 오류 발생
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: 기대 동작
+      placeholder: 정상적으로 동작했을 때 어떤 결과여야 하나요?
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: 환경
+      placeholder: |
+        - OS:
+        - 브라우저:
+        - 버전:

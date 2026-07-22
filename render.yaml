@@ -1,0 +1,114 @@
+# Render Blueprint — Aircok (무료 플랜 기준)
+#
+# 구성:
+#   - aircok-db     : PostgreSQL (free)
+#   - aircok-server : NestJS 백엔드, Docker 런타임 (server/Dockerfile)
+#   - aircok-web    : Next.js 프론트엔드, Node 런타임 (저장소 루트)
+#
+# ⚠ 무료 플랜의 세부 수치·정책(사용시간 한도, 유휴 스핀다운, DB 보존 기간 등)은
+#   자주 변경됩니다. 배포 시점에 Render 공식 문서에서 반드시 재확인하세요.
+#
+# ⚠ sync: false 항목은 Blueprint 로 값이 동기화되지 않습니다.
+#   Render 대시보드 > 각 서비스 > Environment 에서 직접 입력해야 배포가 성공합니다.
+#   자세한 값 설명은 docs/deploy-render.md 참고.
+
+databases:
+  - name: aircok-db
+    plan: free
+    region: singapore # services 와 동일 리전 필수. 생략 시 기본 리전(Oregon)에 생성되어 크로스 리전 지연 발생
+    databaseName: aircok
+    user: aircok
+
+services:
+  # ---------------------------------------------------------------- 백엔드 API
+  - type: web
+    name: aircok-server
+    runtime: docker
+    plan: free
+    region: singapore
+    dockerfilePath: ./server/Dockerfile
+    dockerContext: ./server
+    # NOTE: 별도의 헬스체크 전용 라우트(GET /healthz 등)가 서버에 없어 healthCheckPath 는 생략합니다.
+    #       필요해지면 백엔드에 헬스체크 엔드포인트를 먼저 추가한 뒤 여기에 명시하세요.
+    # NOTE: PORT 는 Render 가 자동 주입하므로 선언하지 않습니다(main.ts 가 0.0.0.0:$PORT 로 바인딩).
+    envVars:
+      # DB 연결 문자열 — 위 aircok-db 에서 자동 주입됩니다(입력 불필요).
+      - key: DATABASE_URL
+        fromDatabase:
+          name: aircok-db
+          property: connectionString
+      - key: NODE_ENV
+        value: production
+
+      # --- 인증/시드 -------------------------------------------------------
+      # JWT_SECRET: 관리자 로그인 토큰 서명 키. 임의의 긴 랜덤 문자열(32자 이상)을 생성해 입력.
+      - key: JWT_SECRET
+        sync: false
+      # ADMIN_SEED_PASSWORD: prisma/seed.ts 가 생성하는 초기 관리자 계정 비밀번호. 반드시 강한 값으로 입력.
+      - key: ADMIN_SEED_PASSWORD
+        sync: false
+
+      # --- 문의 알림 메일(SMTP) --------------------------------------------
+      # SMTP_HOST: 메일 서버 호스트 (예: smtp.gmail.com). 비우면 메일 발송만 건너뜁니다.
+      - key: SMTP_HOST
+        sync: false
+      # SMTP_PORT: 465(SSL) 또는 587(TLS).
+      - key: SMTP_PORT
+        sync: false
+      # SMTP_USER: SMTP 인증 계정.
+      - key: SMTP_USER
+        sync: false
+      # SMTP_PASS: SMTP 인증 비밀번호(Gmail 은 앱 비밀번호).
+      - key: SMTP_PASS
+        sync: false
+      # MAIL_FROM: 발신자 주소 (예: "스마트에어콕 <noreply@example.com>").
+      - key: MAIL_FROM
+        sync: false
+      # INQUIRY_RECIPIENT_EMAIL: 문의 알림을 수신할 관리자 이메일.
+      - key: INQUIRY_RECIPIENT_EMAIL
+        sync: false
+
+      # --- Cloudflare R2 이미지 스토리지 -----------------------------------
+      # CLOUDFLARE_ACCOUNT_ID: Cloudflare 대시보드 > 계정 ID.
+      - key: CLOUDFLARE_ACCOUNT_ID
+        sync: false
+      # R2_ACCESS_KEY_ID / R2_SECRET_ACCESS_KEY: R2 > API 토큰 발급 시 표시되는 값.
+      - key: R2_ACCESS_KEY_ID
+        sync: false
+      - key: R2_SECRET_ACCESS_KEY
+        sync: false
+      # R2_BUCKET_NAME: 업로드 대상 버킷 이름.
+      - key: R2_BUCKET_NAME
+        sync: false
+      # R2_PUBLIC_URL: 버킷 퍼블릭 접근 URL (예: https://pub-xxxx.r2.dev). 끝 슬래시 없이 입력.
+      - key: R2_PUBLIC_URL
+        sync: false
+
+      # --- CORS -------------------------------------------------------------
+      # CORS_ORIGIN: 프론트는 Next rewrite 프록시(동일 출처)로 호출하므로 보통 불필요합니다.
+      #   외부 출처에서 직접 호출해야 할 때만 콤마로 구분해 입력 (예: https://aircok-web.onrender.com).
+      #   미설정 시 서버는 기본값 http://localhost:3000 만 허용합니다.
+      - key: CORS_ORIGIN
+        sync: false
+
+  # ------------------------------------------------------------- 프론트엔드 웹
+  - type: web
+    name: aircok-web
+    runtime: node
+    plan: free
+    region: singapore
+    rootDir: .
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    envVars:
+      # NEXT_PUBLIC_API_URL: next.config.ts 가 `${API_ORIGIN}/api/:path*` rewrite 대상으로 사용합니다.
+      #   ⚠ fromService: { property: host } 는 스킴(https://)이 빠진 호스트명만 반환하므로
+      #     rewrite destination 이 유효한 절대 URL 이 되지 못해 빌드/프록시가 깨집니다.
+      #     따라서 자동 연결 대신 sync: false 로 두고, 대시보드에서 스킴 포함 전체 URL
+      #     (예: https://aircok-server.onrender.com)을 직접 입력하세요.
+      - key: NEXT_PUBLIC_API_URL
+        sync: false
+      # NODE_OPTIONS: Next 16 빌드가 무료 플랜 메모리 한도에서 OOM 으로 실패할 경우 사용.
+      #   필요할 때만 대시보드에서 값을 입력하세요 (예: --max-old-space-size=2048).
+      - key: NODE_OPTIONS
+        sync: false

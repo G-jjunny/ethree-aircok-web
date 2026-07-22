@@ -1,54 +1,85 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import { AppProviders } from "@/app/providers";
+import { pretendard, sora } from "@/shared/fonts";
+import { SITE } from "@/shared/config";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-// TODO: 실제 도메인으로 변경 (예: https://www.aircok.com)
-const BASE_URL = "https://www.aircok.com";
-
 export const metadata: Metadata = {
-  metadataBase: new URL(BASE_URL),
+  metadataBase: new URL(SITE.url),
 
   title: {
-    // TODO: 회사명으로 변경
-    default: "Aircok",
-    template: "%s | Aircok",
+    default: `${SITE.name} ${SITE.nameEn}`,
+    template: `%s | ${SITE.name}`,
   },
-  // TODO: 실제 사이트 설명으로 변경
-  description: "Aircok 공식 홈페이지입니다.",
+  description: SITE.description,
 
   openGraph: {
     type: "website",
     locale: "ko_KR",
-    url: BASE_URL,
-    // TODO: 회사명으로 변경
-    siteName: "Aircok",
-    title: "Aircok",
-    description: "Aircok 공식 홈페이지입니다.",
-    // app/opengraph-image.png 파일을 추가하면 자동 적용됨
+    url: SITE.url,
+    siteName: SITE.name,
+    title: `${SITE.name} ${SITE.nameEn}`,
+    description: SITE.description,
+    images: [
+      {
+        url: "/og-default.png",
+        width: 1200,
+        height: 630,
+        alt: SITE.name,
+      },
+    ],
   },
 
   twitter: {
     card: "summary_large_image",
-    title: "Aircok",
-    description: "Aircok 공식 홈페이지입니다.",
+    title: `${SITE.name} ${SITE.nameEn}`,
+    description: SITE.description,
+    images: ["/og-default.png"],
   },
 
-  // 검색엔진 인덱싱 기본 허용
   robots: {
     index: true,
     follow: true,
   },
+};
+
+/**
+ * Organization + WebSite 구조화 데이터(JSON-LD).
+ * 검색엔진에 회사 정체성·연락처·소셜 프로필을 명시한다. SITE 상수에서 매핑한다.
+ */
+const organizationJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: SITE.name,
+  legalName: SITE.legalName,
+  alternateName: SITE.nameEn,
+  url: SITE.url,
+  logo: `${SITE.url}/images/logos/logo.png`,
+  description: SITE.description,
+  contactPoint: {
+    "@type": "ContactPoint",
+    telephone: SITE.contact.phone,
+    email: SITE.contact.email,
+    contactType: "customer service",
+    areaServed: "KR",
+    availableLanguage: ["Korean"],
+  },
+  address: {
+    "@type": "PostalAddress",
+    streetAddress: SITE.contact.address,
+    addressCountry: "KR",
+  },
+  sameAs: Object.values(SITE.social).filter(Boolean),
+};
+
+const webSiteJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: SITE.name,
+  alternateName: SITE.nameEn,
+  url: SITE.url,
+  inLanguage: "ko-KR",
+  description: SITE.description,
 };
 
 export default function RootLayout({
@@ -59,10 +90,24 @@ export default function RootLayout({
   return (
     <html
       lang="ko"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${pretendard.variable} ${sora.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <AppProviders>{children}</AppProviders>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(organizationJsonLd),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(webSiteJsonLd),
+          }}
+        />
+        <AppProviders>
+          {children}
+        </AppProviders>
       </body>
     </html>
   );

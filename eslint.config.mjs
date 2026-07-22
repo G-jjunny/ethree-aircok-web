@@ -13,10 +13,20 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Backend (server/) is a separate NestJS project with its own
+    // eslint.config.mjs and its own lint command; it must not be
+    // linted by this frontend config.
+    "server/**",
+    // Node CJS build scripts (e.g. OG image generation) legitimately use
+    // require() and run outside the app bundle — exclude from app linting.
+    "scripts/**",
   ]),
   // FSD architecture boundaries: enforces the layer-direction import rule
-  // and slice public-API (index.ts) entry points described in CLAUDE.md
-  // under "FSD layers (src/)". See https://www.jsboundaries.dev/docs/setup/.
+  // and slice public-API entry points described in CLAUDE.md under
+  // "FSD layers (src/)". Public entry points are index.ts plus an optional
+  // server.ts (server-only additional public entry, e.g. @/entities/news/server
+  // for server-only fetch/cache symbols kept out of the client bundle).
+  // See https://www.jsboundaries.dev/docs/setup/.
   {
     files: ["src/**/*.{ts,tsx}", "app/**/*.{ts,tsx}"],
     plugins: { boundaries },
@@ -41,7 +51,7 @@ const eslintConfig = defineConfig([
           rules: [
             {
               from: { type: "next-app" },
-              allow: { to: { type: ["next-app", "fsd-app", "views", "widgets"] } },
+              allow: { to: { type: ["next-app", "fsd-app", "views", "widgets", "shared"] } },
             },
             {
               from: { type: "fsd-app" },
@@ -65,12 +75,21 @@ const eslintConfig = defineConfig([
               from: { type: "entities" },
               allow: { to: { type: "shared" } },
             },
+            // shared는 슬라이스가 아닌 세그먼트(ui/lib/hooks/config/api…)로 구성되며
+            // 세그먼트 간 자유 합성이 정석 FSD다(shared/ui가 shared/hooks 훅을 사용하는 등).
+            // 최하위 레이어이므로 상향 의존이 생기지 않는다.
+            {
+              from: { type: "shared" },
+              allow: { to: { type: "shared" } },
+            },
             // Public API only: block deep/internal imports into another
             // slice (own-slice internal files are exempt by default).
+            // Two entry points are public: index.ts (client-safe barrel) and
+            // server.ts (server-only additional public entry).
             {
               to: {
                 type: ["views", "widgets", "features", "entities"],
-                internalPath: "!index.ts",
+                internalPath: "!{index,server}.ts",
               },
               disallow: { from: { type: "*" } },
             },

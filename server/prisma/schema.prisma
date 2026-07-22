@@ -1,0 +1,595 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+/// 카탈로그 파일 종류 (#44). 이미지/PDF 업로드를 구분한다.
+/// - image: png/jpeg/webp/gif 등 이미지 파일
+/// - pdf: application/pdf 파일
+enum CatalogFileType {
+  image
+  pdf
+}
+
+/// 뉴스 게시물 타입 (#66). BLOG/LINK 이원화 정책.
+/// - BLOG: 에디터로 작성한 본문(content)을 가지는 블로그형 게시물.
+/// - LINK: 외부 URL(externalUrl)로 연결되는 링크형 게시물. content 불필요.
+enum NewsType {
+  BLOG
+  LINK
+}
+
+model AdminUser {
+  id             String   @id @default(cuid())
+  username       String   @unique
+  hashedPassword String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+/// 뉴스 게시물 (#66 타입 이원화).
+///
+/// 타입 정책:
+/// - type=BLOG(기본값): 에디터로 작성한 본문(content)을 가지는 게시물.
+///   content 를 채워 사용한다. externalUrl 은 null 로 두는 것을 권장.
+/// - type=LINK: 외부 URL(externalUrl)로 연결되는 링크형 게시물.
+///   externalUrl 이 필수이며, content 는 선택(요약 목적 허용 — NOT NULL 제약 없음).
+///
+/// content null 정책:
+/// - content 는 nullable(@db.Text). LINK 타입 신규 생성 시 미전달이면 null 저장.
+/// - BLOG 타입도 빈 문자열/null 모두 허용(서비스에서 null coalescing 처리).
+model NewsPost {
+  id          String    @id @default(cuid())
+  title       String
+  description String
+  /// 게시물 본문. BLOG 타입에서 사용. LINK 타입에서는 nullable.
+  content     String?   @db.Text
+  date        DateTime
+  location    String?
+  published   Boolean   @default(false)
+  coverImage  String?
+  /// 뉴스 타입. 기본값 BLOG.
+  type        NewsType  @default(BLOG)
+  /// 외부 링크 URL. type=LINK 일 때 필수.
+  externalUrl String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([published, date(sort: Desc)])
+}
+
+/// 문의하기(Inquiry) 접수 레코드.
+///
+/// 동적 폼 빌더 도입 정책 (#33):
+/// - 폼 필드 구성은 InquiryField 모델로 관리되며, 실제 제출 답안은 answers(Json)에
+///   필드 key → 값(string) 매핑으로 저장된다. 예: { "company": "...", "name": "...", ... }
+/// - answers 는 NOT NULL DEFAULT '{}' 이며, 값은 항상 문자열로 정규화되어 저장된다
+///   (서비스가 동적 검증 후 String 으로 강제). 정의(InquiryField)에 없는 key 는 저장하지 않는다.
+///
+/// 기존 고정 컬럼(company/name/phone/email/message) 호환 정책:
+/// - 동적 폼 도입 전 데이터 보존을 위해 고정 컬럼은 nullable 로 유지한다(삭제하지 않음).
+/// - 신규 접수는 고정 컬럼을 채우지 않고 answers 에만 저장한다(서비스 구현 기준).
+///   읽기 측(어드민 목록/메일)은 answers 를 단일 소스로 사용한다.
+/// - 마이그레이션 시점에 기존 행의 고정 컬럼 값을 answers JSONB 로 백필했다.
+/// - 고정 컬럼은 차후 별도 마이그레이션에서 제거될 수 있다(현재는 호환 목적 잔존).
+model Inquiry {
+  id        String   @id @default(cuid())
+  /// 동적 폼 답안. 필드 key → 문자열 값 매핑. NOT NULL, 기본 {}.
+  answers   Json     @default("{}")
+  company   String?
+  name      String?
+  phone     String?
+  email     String?
+  message   String?  @db.Text
+  status    String   @default("NEW")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status, createdAt(sort: Desc)])
+}
+
+/// 문의하기 동적 폼 필드 정의 (#33).
+///
+/// 어드민이 문의하기 폼의 필드 구성을 CRUD 로 관리한다. 공개 폼은
+/// GET /api/inquiry/fields 로 이 정의를 받아 동적으로 렌더링하고, 제출 시
+/// Inquiry.answers 에 key → 값 매핑으로 저장한다.
+///
+/// 컬럼 정책:
+/// - key: 폼 제출 answers 의 키이자 메일 템플릿 치환 변수(slug). 영소문자/숫자/언더스코어,
+///   첫 글자는 영소문자. 유니크. 생성 후 변경 불가(메일 템플릿/기존 answers 와의 정합성 보장).
+/// - type: 'text' | 'textarea' | 'email' | 'tel' (옵션형 미지원).
+/// - required: 필수 입력 여부. 서비스가 제출 시 동적 검증한다.
+/// - order: 폼 내 표시 순서(오름차순). 동률 시 createdAt 보조 정렬 권장.
+///
+/// 기본 5필드(company/name/phone/email/message)는 마이그레이션 INSERT 로 시드된다.
+/// 이들 key 는 메일 템플릿 치환 변수({{company}} 등)와 1:1 일치한다.
+model InquiryField {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  label       String
+  type        String
+  required    Boolean  @default(true)
+  placeholder String?
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+/// 문의 접수 알림 메일 설정 (싱글톤).
+///
+/// 운용 방식 (고정 PK 싱글톤):
+/// - 이 테이블에는 항상 id = 'singleton' 인 행 1개만 존재한다.
+/// - GET /api/inquiry/mail-setting: service 는 upsert({ where: { id: 'singleton' } })
+///   로 조회한다. 행이 없으면 기본값으로 lazy 생성 후 반환한다(아래 기본값 참고).
+/// - PUT /api/inquiry/mail-setting: upsert 로 id 'singleton' 행을 갱신(없으면 생성)한다.
+/// - 고정 PK 상수('singleton')를 사용해 항상 결과 1행을 유지한다.
+///
+/// lazy 생성 시 기본값:
+/// - recipientEmail: env INQUIRY_RECIPIENT_EMAIL 폴백, 없으면 빈 문자열
+/// - subjectTemplate: "[스마트에어콕] 새 문의가 접수되었습니다"
+/// - bodyTemplate: 기본 본문 템플릿 ({{...}} 치환 변수 포함)
+///
+/// 템플릿 치환 변수 (subjectTemplate / bodyTemplate 공통):
+/// - {{company}} {{name}} {{phone}} {{email}} {{message}}
+/// - MailService 가 발송 시 위 토큰을 해당 Inquiry 값으로 치환한다.
+model MailSetting {
+  id              String   @id @default("singleton")
+  recipientEmail  String
+  subjectTemplate String   @db.Text
+  bodyTemplate    String   @db.Text
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+/// 문의하기 페이지 지도 표시용 주소 설정 (싱글톤).
+///
+/// 운용 방식 (고정 PK 싱글톤):
+/// - 이 테이블에는 항상 id = 'singleton' 인 행 1개만 존재한다.
+/// - GET /api/inquiry/map-setting: service 는 upsert({ where: { id: 'singleton' } })
+///   로 조회한다. 행이 없으면 기본 주소값으로 lazy 생성 후 반환한다(아래 기본값 참고).
+///   이 GET 은 공개 엔드포인트(인증 불필요)로, 문의하기 페이지에서 지도 주소를 노출한다.
+/// - PUT /api/inquiry/map-setting: 어드민 전용. upsert 로 id 'singleton' 행을
+///   갱신(없으면 생성)한다.
+/// - 고정 PK 상수('singleton')를 사용해 항상 결과 1행을 유지한다.
+///
+/// lazy 생성 시 기본값:
+/// - address: "서울특별시 성동구 아차산로17길 49 성수 생각공장 데시앙플렉스 815호"
+///   (프론트 SITE 상수를 import 할 수 없으므로 백엔드 상수로 동일 값을 보유한다)
+///
+/// 컬럼 정책:
+/// - 주소 문자열(address) 만 보관한다. 지도 SDK 가 주소 → 좌표 변환을 담당하므로
+///   lat/lng 등 좌표 컬럼은 두지 않는다.
+model MapSetting {
+  id        String   @id @default("singleton")
+  address   String
+  /// 상세 주소(선택). DB drift 해소용 — nullable TEXT 컬럼과 정합(#126).
+  addressDetail String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+/// FAQ 카테고리 (예: "제품 관련", "실내공기질").
+///
+/// 운용 방식:
+/// - name 은 유니크. 중복 카테고리명 불가.
+/// - order 오름차순으로 공개 목록 노출.
+/// - 카테고리 삭제 시 연결된 FaqItem 이 존재하면 서비스 레이어에서 삭제 거부 또는 cascade 처리 결정.
+///   (현재 정책: onDelete Restrict — 항목이 있으면 카테고리 삭제 불가)
+model FaqCategory {
+  id        String    @id @default(cuid())
+  name      String    @unique
+  order     Int       @default(0)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  items     FaqItem[]
+}
+
+/// FAQ 개별 항목.
+///
+/// 컬럼 정책:
+/// - answer 는 줄바꿈/마크다운 포함 가능성으로 @db.Text 지정.
+/// - order 는 카테고리 내 표시 순서(오름차순). 동률 시 createdAt 보조 정렬 권장.
+/// - categoryId → FaqCategory 외래키. 카테고리 삭제 시 Restrict (카테고리에 항목 있으면 삭제 불가).
+model FaqItem {
+  id         String      @id @default(cuid())
+  categoryId String
+  category   FaqCategory @relation(fields: [categoryId], references: [id])
+  question   String
+  answer     String      @db.Text
+  order      Int         @default(0)
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+
+  @@index([categoryId, order])
+}
+
+/// 스마트에어콕 카탈로그 파일 (이미지/PDF) (#44).
+///
+/// 운용 방식:
+/// - 카탈로그 페이지에 노출되는 제품 카탈로그 이미지/PDF 를 어드민이 CRUD 로 관리한다.
+/// - 공개 목록(GET /api/catalog)은 order 오름차순으로 노출한다. 동률 시 createdAt 보조 정렬 권장.
+/// - 어드민은 드래그앤드롭으로 순서를 일괄 변경한다(PATCH /api/catalog/reorder).
+///
+/// 컬럼 정책:
+/// - fileUrl: POST /api/catalog/uploads (multipart, 필드명 `file`) 응답으로 받은
+///   URL 문자열(예: "/uploads/1781859080294-foo.pdf")을 보관한다. 파일 바이너리 아님.
+///   이미지/PDF 공통 URL 컬럼이며, 신규 레코드는 이 컬럼을 사용한다.
+/// - fileType: image | pdf. 업로드 응답의 fileType 을 그대로 저장. 기본값 image.
+/// - imageUrl: 하위호환/백필 잔재용 nullable 컬럼. 신규 레코드는 null 로 둔다(fileUrl 사용).
+/// - order: 표시 순서(오름차순). 기본값 0.
+model CatalogImage {
+  id        String          @id @default(cuid())
+  /// (하위호환) 구버전 이미지 URL. 신규 레코드는 null. 기존 데이터 보존용으로만 유지.
+  imageUrl  String?
+  /// 업로드된 카탈로그 파일 URL (예: "/uploads/xxx.pdf"). POST /api/catalog/uploads 응답값.
+  fileUrl   String?
+  /// 파일 종류(image | pdf). 업로드 응답 fileType 값을 저장. 기본값 image.
+  fileType  CatalogFileType @default(image)
+  /// 표시 순서(오름차순). 기본값 0.
+  order     Int             @default(0)
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+
+  @@index([order])
+}
+
+/// 파트너/고객사 구분 enum (#48).
+/// - partner: 파트너사
+/// - client: 고객사
+enum PartnerType {
+  partner
+  client
+}
+
+/// 사이트 기본 정보 싱글톤 (#48).
+///
+/// 운용 방식 (고정 PK 싱글톤):
+/// - 이 테이블에는 항상 id = 'singleton' 인 행 1개만 존재한다.
+/// - GET /api/site-info: service 는 findUnique({ where: { id: 'singleton' } }) 로 조회한다.
+///   행이 없으면 기본값으로 lazy 생성 후 반환한다.
+/// - PUT /api/site-info: upsert 로 id 'singleton' 행을 갱신(없으면 생성)한다. 관리자 인증 필요.
+///
+/// 컬럼 정책:
+/// - companyName, address, phone, email, bizNo, ceo 는 필수(NOT NULL).
+/// - fax, mailOrderNo, legalName, instagram, youtube, linkedin, facebook, kakaoUrl 은 선택(nullable).
+/// - legalName: 법인명(상호명과 다를 경우 사용). nullable.
+model SiteInfo {
+  id           String   @id @default("singleton")
+  companyName  String
+  legalName    String?
+  address      String
+  phone        String
+  email        String
+  bizNo        String
+  ceo          String
+  fax          String?
+  mailOrderNo  String?
+  instagram    String?
+  youtube      String?
+  linkedin     String?
+  facebook     String?
+  kakaoUrl     String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+/// 파트너사/고객사 목록 (#48).
+///
+/// 운용 방식:
+/// - type(PartnerType enum)으로 파트너사(partner)와 고객사(client)를 구분한다.
+/// - 공개 목록(GET /api/partners)은 order 오름차순, 동률 시 createdAt 보조 정렬.
+/// - 어드민은 드래그앤드롭으로 순서를 일괄 변경한다(PATCH /api/partners/reorder).
+/// - 로고 이미지는 POST /api/partners/:id/logo (multipart, 필드명 file) 로 업로드하며,
+///   업로드 후 해당 Partner 레코드의 logoUrl 을 갱신한다.
+///
+/// 컬럼 정책:
+/// - id: cuid (String). 기존 모델 패턴 통일.
+/// - logoUrl: nullable. 로고 이미지 미설정 파트너 허용.
+/// - order: 표시 순서(오름차순). 기본값 0.
+model Partner {
+  id        String      @id @default(cuid())
+  name      String
+  logoUrl   String?
+  type      PartnerType @default(partner)
+  order     Int         @default(0)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  @@index([order])
+}
+
+/// 에어콕 소개 페이지 OUR Team 섹션 이미지 (#57).
+///
+/// 운용 방식:
+/// - 팀 항목은 이미지만 보관한다(캡션/이름 없음). 이미지 URL + 표시 순서.
+/// - 공개 목록(GET /api/team-images)은 order 오름차순, 동률 시 createdAt 보조 정렬.
+/// - 단일 이미지 replace 방식: POST 시 기존 레코드 전체를 삭제 후 새 레코드를 생성한다(고아 레코드 방지).
+/// - 이미지는 POST /api/team-images/uploads (multipart, 필드명 file) 로 업로드 후 URL을 받아 레코드 생성.
+///
+/// 컬럼 정책:
+/// - id: cuid (String). 기존 모델 패턴 통일.
+/// - imageUrl: 업로드된 이미지 URL (예: "/uploads/xxx.png"). NOT NULL.
+/// - order: 표시 순서(오름차순). 기본값 0.
+model TeamImage {
+  id        String   @id @default(cuid())
+  imageUrl  String
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([order])
+}
+
+/// 에어콕 소개 페이지 연혁(타임라인) 항목 (#57).
+///
+/// 운용 방식:
+/// - 연혁 항목은 연도(year) + 월(month) + 이벤트 설명(content)으로 구성된다.
+/// - 공개 목록(GET /api/timelines)은 최신순으로 노출한다:
+///   year 내림차순 → month 내림차순 → 동률 시 createdAt 내림차순(보조).
+///
+/// 컬럼 정책:
+/// - id: cuid (String).
+/// - year: 연도(정수). 검증 범위 2000~2100 (DTO 레벨).
+/// - month: 월(정수). 검증 범위 1~12 (DTO 레벨).
+/// - content: 연혁 이벤트 설명. 비어있지 않은 문자열. NOT NULL.
+model TimelineItem {
+  id        String   @id @default(cuid())
+  year      Int
+  month     Int
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([year(sort: Desc), month(sort: Desc)])
+}
+
+/// 에어콕 소개(About) 페이지 IntroSection 핵심가치(Core Value) 카드 (#93).
+///
+/// 운용 방식:
+/// - 이전에는 프론트 `SITE.about.intro.values` 정적 배열로 하드코딩되어 있던 4개 카드
+///   (직원 생산성 향상 / 소유빌딩 가치상승 / 에너지 관리비용 개선 / 공기질 개선)를
+///   어드민이 CRUD + 순서변경 가능한 DB 콘텐츠로 전환한 모델이다.
+/// - 이미지/로고 없는 단순 텍스트 카드(제목 + 설명)이며, 파일 업로드 엔드포인트는 없다.
+/// - 공개 목록(GET /api/core-values)은 order 오름차순, 동률 시 createdAt 오름차순(보조) 정렬로 노출한다.
+/// - 어드민은 드래그앤드롭으로 순서를 일괄 변경한다(PATCH /api/core-values/reorder, body { items: [{ id, order }] }).
+///   reorder 는 트랜잭션 갱신 후 갱신된 전체 배열을 반환한다(partners 패턴).
+///
+/// 컬럼 정책:
+/// - id: cuid (String). 기존 모델 패턴 통일.
+/// - title: 카드 제목(짧은 문구). NOT NULL.
+/// - description: 카드 설명 문구. NOT NULL.
+/// - order: 표시 순서(오름차순). 기본값 0. order 미지정 생성 시 맨 뒤(마지막 order + 1)에 자동 채번한다.
+model CoreValue {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([order])
+}
+
+/// 진단 서비스 상담 신청 레코드 (#91).
+///
+/// 운용 방식:
+/// - 공개 폼(POST /api/diagnosis-consultation)으로 이름/전화번호를 접수한다 (인증 불필요).
+/// - 어드민(GET /api/diagnosis-consultation)에서 목록 조회, 상태 업데이트(PATCH)를 수행한다.
+///
+/// status 정책:
+/// - NEW: 신규 접수(기본값). 아직 상담이 시작되지 않은 상태.
+/// - IN_PROGRESS: 상담 진행 중.
+/// - DONE: 상담 완료.
+model DiagnosisConsultation {
+  id               String    @id @default(cuid())
+  name             String
+  phone            String
+  status           String    @default("NEW")
+  consultationDate DateTime?
+  consultant       String?
+  notes            String?   @db.Text
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  @@index([status, createdAt(sort: Desc)])
+}
+
+/// 공기질 측정기 모델(제품군) (#services 1단계).
+///
+/// 운용 방식:
+/// - `/services` 페이지 측정기 섹션에 노출되는 개별 측정기 모델(예: "SA-IL2 / SA-IEW", "SA-LCD")을
+///   어드민이 CRUD + 순서변경 가능한 DB 콘텐츠로 관리한다. 이전 정적 하드코딩 배열을 대체한다.
+/// - 공개 목록(GET /api/air-devices)은 published=true 인 레코드만 order 오름차순,
+///   동률 시 createdAt 오름차순(보조) 정렬로 노출한다. 중첩 items 도 order 오름차순으로 include 한다.
+/// - 어드민 목록(GET /api/air-devices/admin)은 미공개(published=false) 포함 전체를 반환한다.
+///   라우트 등록 순서 주의: 'admin' 은 반드시 GET /:id 보다 먼저 선언한다(현재 :id 단건 GET 은 없으나 컨벤션 유지).
+/// - 어드민은 드래그앤드롭으로 순서를 일괄 변경한다(PATCH /api/air-devices/reorder, body { items: [{ id, order }] }).
+///   reorder 는 트랜잭션 갱신 후 갱신된 어드민 전체 배열을 반환한다(partners 패턴 + published 포함).
+/// - 제품 사진은 POST /api/air-devices/:id/image (multipart, 필드명 file) 로 R2(folder: air-devices)에
+///   업로드하며, 업로드 후 해당 레코드의 imageUrl 을 갱신한다(partners 로고 패턴).
+///
+/// 컬럼 정책:
+/// - id: cuid (String). 기존 모델 패턴 통일.
+/// - name: 모델명(예: "SA-IL2 / SA-IEW"). NOT NULL.
+/// - subtitle: 모델 부제(예: "조달청 혁신제품 선정 모델"). NOT NULL.
+/// - badge: 카드에 노출되는 짧은 뱃지 문구(예: "조달청 혁신제품"). NOT NULL.
+/// - imageUrl: R2 업로드 후 받은 공개 이미지 절대 URL. nullable — 사진 미등록 모델을 허용한다.
+/// - size/weight/power/comm/storage/operatingTemp: 스펙 표에 그대로 출력되는 표시용 문자열이다.
+///   단위 파싱/정렬 요구가 없으므로 수치형이 아닌 String 으로 보관한다(예: "180 × 130 × 30 mm").
+///   모두 NOT NULL — 스펙 표의 행이 비지 않도록 생성 시 필수 입력을 강제한다.
+/// - order: 표시 순서(오름차순). 기본값 0. order 미지정 생성 시 맨 뒤(마지막 order + 1)에 자동 채번한다.
+/// - published: 공개 여부. 기본값 true — 어드민이 등록 즉시 노출되는 것이 기존 콘텐츠 모델 운용과 맞는다.
+///   (NewsPost 의 default(false) 와 다른 이유: 뉴스는 초안 작성 후 발행하는 워크플로가 있으나
+///   측정기 카드는 초안 개념이 없고 등록=노출이 기본이다.)
+/// - items: 측정 항목(AirDeviceItem) 1:N. 부모 삭제 시 Cascade 로 함께 삭제된다.
+model AirDevice {
+  id            String          @id @default(cuid())
+  /// 모델명(예: "SA-IL2 / SA-IEW").
+  name          String
+  /// 모델 부제(예: "조달청 혁신제품 선정 모델").
+  subtitle      String
+  /// 카드 뱃지 문구(예: "조달청 혁신제품").
+  badge         String
+  /// 제품 사진 R2 절대 URL. nullable(사진 미등록 허용).
+  imageUrl      String?
+  /// 크기 표시 문자열(예: "180 × 130 × 30 mm").
+  size          String
+  /// 무게 표시 문자열(예: "270 g (LTE 포함 300 g)").
+  weight        String
+  /// 전원 표시 문자열(예: "12V / 200mA").
+  power         String
+  /// 통신 방식 표시 문자열(예: "LTE / Ethernet / Wi-Fi 중 선택").
+  comm          String
+  /// 저장 방식 표시 문자열(예: "micro SD · 최장 3년").
+  storage       String
+  /// 동작 온도 표시 문자열(예: "-10℃ ~ 60℃").
+  operatingTemp String
+  /// 표시 순서(오름차순). 기본값 0.
+  order         Int             @default(0)
+  /// 공개 여부. 기본값 true.
+  published     Boolean         @default(true)
+  /// 측정 항목 목록. 부모 삭제 시 Cascade.
+  items         AirDeviceItem[]
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  @@index([published, order])
+}
+
+/// 공기질 측정기 모델의 측정 항목 (#services 1단계).
+///
+/// 운용 방식:
+/// - AirDevice 에 종속된 값 객체 성격의 자식 레코드다(예: { code: "PM2.5", label: "초미세먼지" }).
+///   독립 엔드포인트를 두지 않으며, 항상 부모 AirDevice 의 생성/수정 요청에 중첩되어 관리된다.
+/// - PATCH /api/air-devices/:id 에 items 가 전달되면 **전체 교체(replace-all)** 한다:
+///   해당 deviceId 의 기존 items 를 deleteMany 로 전부 삭제한 뒤 전달된 배열을 재생성하며,
+///   두 연산을 단일 트랜잭션으로 묶는다. items 미전달 시 기존 항목을 그대로 유지하고,
+///   items: [] 전달 시 전부 삭제한다(빈 배열은 "모두 지움"의 명시적 의사표시로 해석).
+///   → replace-all 이므로 자식 id 는 수정 때마다 재발급된다. 프론트는 item.id 를 영속 키로 신뢰하면 안 된다.
+/// - 조회 시 order 오름차순으로 include 된다.
+///
+/// 컬럼 정책:
+/// - id: cuid (String). replace-all 정책상 수정 시마다 새로 발급된다(위 참고).
+/// - deviceId: AirDevice 외래키. 부모 삭제 시 Cascade 로 함께 삭제된다(고아 레코드 방지).
+/// - code: 측정 항목 코드(예: "PM2.5", "CO₂"). 표시용 문자열이며 enum 화하지 않는다 —
+///   측정 항목이 제품군 확장에 따라 늘어나므로 스키마 마이그레이션 없이 추가 가능해야 한다.
+/// - label: 측정 항목 한글명(예: "초미세먼지").
+/// - order: 부모 내 표시 순서(오름차순). 기본값 0.
+model AirDeviceItem {
+  id       String    @id @default(cuid())
+  deviceId String
+  device   AirDevice @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  /// 측정 항목 코드(예: "PM2.5", "CO₂").
+  code     String
+  /// 측정 항목 한글명(예: "초미세먼지").
+  label    String
+  /// 부모 내 표시 순서(오름차순). 기본값 0.
+  order    Int       @default(0)
+
+  @@index([deviceId, order])
+}
+
+/// `/services` 페이지 섹션별 고정 이미지 슬롯 (#services 1단계).
+///
+/// 슬롯은 페이지 레이아웃상 위치가 고정된 이미지 자리다. 프론트 디자인과 1:1 대응하므로
+/// 슬롯 추가/제거는 반드시 프론트 변경과 함께 마이그레이션으로 처리한다.
+/// - MONITORING_DASHBOARD / MONITORING_STATS / MONITORING_DEVICES / MONITORING_DID: 모니터링 섹션 이미지.
+/// - DIAGNOSIS_VISIT / DIAGNOSIS_ANALYSIS / DIAGNOSIS_REPORT / DIAGNOSIS_PROPOSAL: 진단 서비스 섹션 이미지.
+/// - KITCHEN_BLACKBOX_PRODUCT / KITCHEN_BLACKBOX_DID / KITCHEN_AIRSHIELD_TECH: 주방 섹션 이미지
+///   (블랙박스 제품 사진 / 조리실 오염 현황 DID / 에어쉴드 특허 급기 기술).
+/// - DIAGNOSIS_COMPOSE_DEVICE / DIAGNOSIS_COMPOSE_MONITOR: 진단서비스 구성 섹션 이미지
+///   (실내공기질 측정기 / 모니터링 서비스) (#124).
+/// - DIAGNOSIS_COMPARE_BEFORE / DIAGNOSIS_COMPARE_AFTER: 진단서비스 도입 전후 비교 섹션 이미지 (#124).
+/// - HOME_VALUE_1 ~ HOME_VALUE_4: 홈 "Our Value" 이미지 카드 4장
+///   (카피 변경 가능성 때문에 의미 기반이 아닌 위치 기반 명명) (#148).
+/// - HOME_REPORT_ILLUST: 홈 "FREE REPORT" 섹션 일러스트 (#148).
+/// - ABOUT_MISSION: 소개 페이지 Mission 섹션 우측 이미지 (#148).
+/// - DIAGNOSIS_HERO: 진단서비스 히어로 우측 이미지 카드 (#148).
+enum ProductImageSlot {
+  MONITORING_DASHBOARD
+  MONITORING_STATS
+  MONITORING_DEVICES
+  MONITORING_DID
+  DIAGNOSIS_VISIT
+  DIAGNOSIS_ANALYSIS
+  DIAGNOSIS_REPORT
+  DIAGNOSIS_PROPOSAL
+  KITCHEN_BLACKBOX_PRODUCT
+  KITCHEN_BLACKBOX_DID
+  KITCHEN_AIRSHIELD_TECH
+  DIAGNOSIS_COMPOSE_DEVICE   // 실내공기질 측정기
+  DIAGNOSIS_COMPOSE_MONITOR  // 모니터링 서비스
+  DIAGNOSIS_COMPARE_BEFORE   // 도입 전
+  DIAGNOSIS_COMPARE_AFTER    // 도입 후
+  HOME_VALUE_1               // 홈 Our Value 카드 1번
+  HOME_VALUE_2               // 홈 Our Value 카드 2번
+  HOME_VALUE_3               // 홈 Our Value 카드 3번
+  HOME_VALUE_4               // 홈 Our Value 카드 4번
+  HOME_REPORT_ILLUST         // 홈 FREE REPORT 섹션 일러스트
+  ABOUT_MISSION              // 소개 페이지 Mission 섹션 우측 이미지
+  DIAGNOSIS_HERO             // 진단서비스 히어로 우측 이미지 카드
+}
+
+/// `/services` 페이지 섹션 이미지 (슬롯 단위 고정 배치) (#services 1단계).
+///
+/// 운용 방식 (슬롯 유니크 upsert):
+/// - "가변 목록 + 드래그앤드롭 정렬" 모델과 달리,
+///   이 모델은 **슬롯당 최대 1장**인 고정 배치 이미지를 보관한다. 따라서 order 컬럼도,
+///   reorder 엔드포인트도 두지 않는다(순서는 프론트 레이아웃이 결정한다).
+/// - slot 에 @unique 를 걸어 슬롯당 1행을 DB 레벨에서 강제한다.
+/// - PUT /api/product-images/:slot (multipart, 필드명 file): R2(folder: product-sections)에 업로드 후
+///   slot 기준 upsert 한다. 이미 있으면 imageUrl 교체, 없으면 생성 → 멱등한 PUT 시맨틱.
+/// - DELETE /api/product-images/:slot: 해당 슬롯 행을 삭제한다(204). 삭제 시 프론트는 폴백을 렌더한다.
+///   미등록 슬롯이어도 404 가 아니라 204 다 — 멱등하다. :slot 은 리소스 id 가 아니라 enum 으로 고정된
+///   슬롯 주소이므로 존재/부재가 갈리는 것은 "그 슬롯에 이미지가 있는가"뿐이고,
+///   PUT upsert 의 멱등성과 대칭을 이룬다(목표 상태인 빈 슬롯이 이미 달성된 재요청은 실패가 아니다).
+/// - GET /api/product-images: 등록된 슬롯 행 전체를 배열로 반환한다(미등록 슬롯은 응답에 없음).
+///   공개 엔드포인트이며 60초 HTTP 캐시(CacheControlInterceptor)가 걸린다.
+/// - GET /api/product-images/admin: 어드민 전용(JWT), 무캐시(no-store). 응답 스키마는 공개 GET 과 동일하다.
+///   필터 차이는 없고, 어드민이 업로드/삭제 직후 캐시된 구 응답을 보는 것을 막기 위한 분리다.
+/// - :slot 은 ProductImageSlot enum 값만 허용하며, 위반 시 ParseEnumPipe 가 400 을 반환한다.
+///
+/// 컬럼 정책:
+/// - id: cuid (String). 기존 모델 패턴 통일. 단, 이 모델의 실질 조회 키는 slot 이다.
+/// - slot: ProductImageSlot enum. @unique — 슬롯당 1행 보장(upsert 의 where 키).
+/// - imageUrl: R2 업로드 후 받은 공개 이미지 절대 URL. NOT NULL —
+///   이미지 없는 슬롯은 행 자체를 두지 않는다(빈 문자열 행을 허용하지 않음).
+model ProductSectionImage {
+  id        String           @id @default(cuid())
+  /// 이미지가 배치될 고정 슬롯. 슬롯당 1행(@unique).
+  slot      ProductImageSlot @unique
+  /// R2 업로드 후 받은 공개 이미지 절대 URL. NOT NULL.
+  imageUrl  String
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+}
+
+/// 진단서비스 신청 이유(고객 후기 카드). /diagnosis ServiceReviews 섹션.
+model ServiceReview {
+  id        String   @id @default(cuid())
+  quote     String   @db.Text  /// 인용문(신청 이유)
+  role      String              /// "대표", "연구원" 등
+  age       String              /// "50세" 등 자유 문자열("MZ세대" 같은 값 허용)
+  imageUrl  String?             /// 아바타 (nullable — 없으면 프론트 폴백)
+  order     Int      @default(0)
+  published Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([published, order])
+}
+
+/// 특허증·성능인증서 이미지(가변 갤러리). /diagnosis ServiceCerts 섹션.
+model Certification {
+  id        String   @id @default(cuid())
+  imageUrl  String
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([order])
+}
