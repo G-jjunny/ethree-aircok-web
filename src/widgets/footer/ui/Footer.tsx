@@ -71,7 +71,7 @@ export async function Footer() {
               height={71}
               className="h-8.5 w-auto"
             />
-            <p className="mt-4 text-sm leading-relaxed text-white/50">
+            <p className="mt-4 text-sm leading-relaxed text-white/70">
               보이지 않는 공기를 콕콕 집어 알려주는 측정·모니터링 기술로 고객에게 건강과
               안심을 제공합니다.
             </p>
@@ -82,7 +82,7 @@ export async function Footer() {
                     href={instagram}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-sm text-white/55 hover:text-white transition-colors duration-fast"
+                    className="text-sm text-white/60 hover:text-white transition-colors duration-fast"
                   >
                     Instagram
                   </Link>
@@ -92,7 +92,7 @@ export async function Footer() {
                     href={youtube}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-sm text-white/55 hover:text-white transition-colors duration-fast"
+                    className="text-sm text-white/60 hover:text-white transition-colors duration-fast"
                   >
                     YouTube
                   </Link>
@@ -102,7 +102,7 @@ export async function Footer() {
                     href={linkedin}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-sm text-white/55 hover:text-white transition-colors duration-fast"
+                    className="text-sm text-white/60 hover:text-white transition-colors duration-fast"
                   >
                     LinkedIn
                   </Link>
@@ -112,7 +112,7 @@ export async function Footer() {
           </div>
 
           {/* 우: 법인 정보 */}
-          <div className="text-sm leading-loose text-white/55">
+          <div className="text-meta leading-loose text-white/60">
             <div className="mb-1.5 font-bold text-white/85">{companyName}</div>
             <div>대표 {ceo}</div>
             <div>사업자등록번호 {bizNo}</div>
@@ -126,7 +126,7 @@ export async function Footer() {
         </div>
 
         {/* 하단: 카피라이트 + 브랜드 슬로건 */}
-        <div className="mt-11 flex flex-wrap items-center justify-between gap-3 border-t border-white/8 pt-6 text-xs text-white/35">
+        <div className="mt-11 flex flex-wrap items-center justify-between gap-3 border-t border-white/8 pt-6 text-xs text-white/40">
           <span>© {year} {SITE.footer.copyrightSuffix}</span>
           <span className="font-display tracking-label">CLEAN AIR · SMART SPACE</span>
         </div>

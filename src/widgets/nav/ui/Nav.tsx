@@ -39,7 +39,7 @@ export function Nav() {
             <Link
               key={link.href}
               href={link.href}
-              className="text-white/82 hover:text-white transition-colors duration-fast"
+              className="text-white/85 hover:text-white transition-colors duration-fast"
             >
               {link.label}
             </Link>
@@ -86,7 +86,7 @@ export function Nav() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-white/82 text-sm py-3 border-b border-white/8 last:border-b-0 hover:text-white transition-colors duration-fast"
+                className="text-white/85 text-sm py-3 border-b border-white/8 last:border-b-0 hover:text-white transition-colors duration-fast"
                 onClick={() => setMobileOpen(false)}
               >
                 {link.label}
