@@ -131,18 +131,38 @@ AQI 바 그라디언트: `from-aqi-good via-brand via-aqi-warning to-aqi-bad`.
 
 | 클래스 | px | 클래스 | px |
 | --- | --- | --- | --- |
-| `text-hero` | 60 | `text-h6` | 28 |
-| `text-display` | 56 | `text-subtitle` | 26 |
-| `text-h1` | 52 | `text-lead` | 17 |
-| `text-stat` | 46 | `text-lead-sm` | 16.5 |
-| `text-h2` | 44 | `text-meta` | 13.5 |
-| `text-h3` | 38 | `text-eyebrow` | 12.5 |
-| `text-h4` | 36 | `text-mini` | 11 |
-| `text-h5` | 34 | `text-nano` | 10.5 |
+| `text-hero` † | 60 | `text-h6` | 28 |
+| `text-stat-lg` † | 60 | `text-subtitle` | 26 |
+| `text-display` † | 56 | `text-lead` | 17 |
+| `text-h1` † | 52 | `text-lead-sm` | 16.5 |
+| `text-stat` † | 46 | `text-meta` | 13.5 |
+| `text-h2` † | 44 | `text-eyebrow` | 12.5 |
+| `text-section` † | 40 | `text-mini` | 11 |
+| `text-h3` † | 38 | `text-nano` | 10.5 |
+| `text-h4` † | 36 |  |  |
+| `text-h5` † | 34 |  |  |
+
+† = **fluid clamp 토큰**: 표의 px는 데스크탑(≥640px) 값. 360px에서 최소값(60~36px 계열 → 36 / 44~34px 계열 → 28)으로 시작해 640px(sm)에서 원값에 도달한다.
 
 **기본 유틸 재사용**: `text-7xl`(72) `text-5xl`(48) `text-2xl`(24) `text-xl`(20·22 근사) `text-lg`(18) `text-base`(16) `text-sm`(14·15 근사) `text-xs`(12).
 
-**반응형 축소 규칙 (모바일 우선 · 이슈 #155)**: 헤딩 토큰은 무접두(모바일)에서 축소값으로 시작하고 `sm:`에서 원값을 복원한다 — `text-hero`·`text-h1` → `text-4xl sm:text-{hero|h1}`(모바일 36), `text-h2`~`text-h5` → `text-h6 sm:text-{h2|h3|h4|h5}`(모바일 28). `text-h6` 이하 및 본문·캡션 스케일은 축소하지 않는다. (기존 정합 사례: `SectionHeader` 28→40, `HistoryTimeline` `text-h6 sm:text-h3`)
+**반응형 타이포 정책 (fluid 토큰 · 이슈 #155)**: 헤딩·통계 토큰은 **값 자체가 `clamp()`** 다 — 사용처는 단일 토큰 클래스만 쓰고 `text-4xl sm:text-hero` 같은 브레이크포인트 페어를 만들지 않는다. 360px에서 min, 640px(sm)에서 max에 도달하며, **≥640px에서는 clamp 상한으로 기존 데스크탑 값과 픽셀 동일(무회귀)**, 360~640px 구간만 선형 보간된다. `text-h6`(28) 이하 및 본문·캡션 스케일은 fluid를 적용하지 않는다(축소 없음 정책). 신규로 반복되는 반응형 수치는 사용처마다 페어를 붙이는 대신 **fluid 토큰 추가를 우선 검토**한다.
+
+산식: `preferred = (max−min)/2.8 vw + (min − (max−min)×9/7) px` (360→640px 선형, vw 계수는 소수 4자리 올림 → 640px에서 preferred ≥ max가 되어 clamp 상한이 max로 캡)
+
+| 토큰 | 360px min | preferred | ≥640px max |
+| --- | --- | --- | --- |
+| `text-hero` / `text-stat-lg` | 36 | `8.5715vw + 0.3214rem` | 60 |
+| `text-display` | 36 | `7.1429vw + 0.6429rem` | 56 |
+| `text-h1` | 36 | `5.7143vw + 0.9643rem` | 52 |
+| `text-stat` | 36 | `3.5715vw + 1.4464rem` | 46 |
+| `text-h2` | 28 | `5.7143vw + 0.4643rem` | 44 |
+| `text-section` | 28 | `4.2858vw + 0.7857rem` | 40 |
+| `text-h3` | 28 | `3.5715vw + 0.9464rem` | 38 |
+| `text-h4` | 28 | `2.8572vw + 1.1071rem` | 36 |
+| `text-h5` | 28 | `2.1429vw + 1.2679rem` | 34 |
+
+(구 페어 방식 정리: `SectionHeader`의 `text-[28px] sm:text-[40px]` → `text-section`, `HistoryTimeline`의 `text-h6 sm:text-h3` → `text-h3`, `Dark/LightStatCard`의 `text-4xl sm:text-6xl` → `text-stat-lg`로 수렴 완료)
 
 ### 트래킹 (letter-spacing)
 

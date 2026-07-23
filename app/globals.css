@@ -76,15 +76,20 @@
 
   /* ── Typography Scale (네이밍 토큰) ─────── */
   /* 비표준 사이즈만 네이밍. 표준 구간(72/48/24/20/18/16/14/12)은 기본 유틸 재사용. */
-  --text-hero:      3.75rem;      /* 60 · 히어로 h1 */
-  --text-display:   3.5rem;       /* 56 · 실시간 지수 큰 숫자 */
-  --text-h1:        3.25rem;      /* 52 · About 히어로 h1 */
-  --text-stat:      2.875rem;     /* 46 · STATS 숫자 */
-  --text-h2:        2.75rem;      /* 44 · Our Value h2 */
-  --text-h3:        2.375rem;     /* 38 · 섹션 h2/지표 숫자 */
-  --text-h4:        2.25rem;      /* 36 · Impact h2 */
-  --text-h5:        2.125rem;     /* 34 · About 섹션 h2 */
-  --text-h6:        1.75rem;      /* 28 · 히어로 통계/탭 패널 h3 */
+  /* 헤딩·통계 계열은 fluid clamp — 360px에서 min, 640px(sm)에서 max 도달 (#155)
+     preferred: vw계수 = (max−min)px ÷ 2.8 (소수 4자리 올림), 절편 = min − (max−min)×9/7 px
+     ≥640px는 clamp 상한으로 기존 데스크탑 값과 픽셀 동일(무회귀), 360~640px 구간만 유동 보간 */
+  --text-hero:      clamp(2.25rem, 8.5715vw + 0.3214rem, 3.75rem);  /* 60 · 히어로 h1 · 360px:36 */
+  --text-stat-lg:   clamp(2.25rem, 8.5715vw + 0.3214rem, 3.75rem);  /* 60 · Dark/LightStatCard 통계 숫자 (구 text-4xl sm:text-6xl) · 360px:36 */
+  --text-display:   clamp(2.25rem, 7.1429vw + 0.6429rem, 3.5rem);   /* 56 · 실시간 지수 큰 숫자 · 360px:36 */
+  --text-h1:        clamp(2.25rem, 5.7143vw + 0.9643rem, 3.25rem);  /* 52 · About 히어로 h1 · 360px:36 */
+  --text-stat:      clamp(2.25rem, 3.5715vw + 1.4464rem, 2.875rem); /* 46 · STATS 숫자 · 360px:36 */
+  --text-h2:        clamp(1.75rem, 5.7143vw + 0.4643rem, 2.75rem);  /* 44 · Our Value h2 · 360px:28 */
+  --text-section:   clamp(1.75rem, 4.2858vw + 0.7857rem, 2.5rem);   /* 40 · SectionHeader 표준 h2 (구 text-[28px] sm:text-[40px]) · 360px:28 */
+  --text-h3:        clamp(1.75rem, 3.5715vw + 0.9464rem, 2.375rem); /* 38 · 섹션 h2/지표 숫자 · 360px:28 */
+  --text-h4:        clamp(1.75rem, 2.8572vw + 1.1071rem, 2.25rem);  /* 36 · Impact h2 · 360px:28 */
+  --text-h5:        clamp(1.75rem, 2.1429vw + 1.2679rem, 2.125rem); /* 34 · About 섹션 h2 · 360px:28 */
+  --text-h6:        1.75rem;      /* 28 · 히어로 통계/탭 패널 h3 — 축소 없음 정책, fluid 미적용 */
   --text-subtitle:  1.625rem;     /* 26 · 탭 패널 h3 */
   --text-lead:      1.0625rem;    /* 17 · 히어로/step 본문 */
   --text-lead-sm:   1.03125rem;   /* 16.5 · 섹션 리드 본문 */
