@@ -43,7 +43,7 @@ export function NewsDetailHeroSection({ post }: Props) {
 
       {/* 타입 배지 */}
       <div className="mt-7">
-        <span className="inline-block rounded-pill border border-tint-border bg-tint px-3 py-1 text-xs font-bold text-brand">
+        <span className="inline-block rounded-pill border border-tint-border bg-tint px-3 py-1 text-mini font-bold text-brand">
           {badgeLabel}
         </span>
       </div>

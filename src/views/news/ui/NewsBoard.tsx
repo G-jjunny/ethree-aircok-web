@@ -58,7 +58,7 @@ function ClearIcon() {
 function ChevronIcon({ dir }: { dir: 'left' | 'right' }) {
   return (
     <svg
-      className="h-[18px] w-[18px]"
+      className="size-4.5"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
@@ -269,7 +269,7 @@ export function NewsBoard() {
               onClick={() => goToPage(currentPage - 1)}
               disabled={currentPage <= 1}
               aria-label="이전 페이지"
-              className="flex min-h-11 min-w-11 items-center justify-center rounded-[10px] border border-hairline bg-surface-white text-ink transition-colors hover:bg-surface disabled:opacity-40 disabled:hover:bg-transparent"
+              className="flex min-h-11 min-w-11 items-center justify-center rounded-btn border border-hairline bg-surface-white text-ink transition-colors hover:bg-surface disabled:opacity-40 disabled:hover:bg-transparent"
             >
               <ChevronIcon dir="left" />
             </button>
@@ -293,7 +293,7 @@ export function NewsBoard() {
                   type="button"
                   onClick={() => goToPage(slot)}
                   aria-current={active ? 'page' : undefined}
-                  className={`min-h-11 min-w-11 rounded-[10px] px-[10px] text-sm font-bold transition-colors ${
+                  className={`min-h-11 min-w-11 rounded-btn px-2.5 text-sm font-bold transition-colors ${
                     active
                       ? 'bg-brand text-brand-ink'
                       : 'border border-hairline bg-surface-white text-ink hover:bg-surface'
@@ -309,7 +309,7 @@ export function NewsBoard() {
               onClick={() => goToPage(currentPage + 1)}
               disabled={currentPage >= totalPages}
               aria-label="다음 페이지"
-              className="flex min-h-11 min-w-11 items-center justify-center rounded-[10px] border border-hairline bg-surface-white text-ink transition-colors hover:bg-surface disabled:opacity-40 disabled:hover:bg-transparent"
+              className="flex min-h-11 min-w-11 items-center justify-center rounded-btn border border-hairline bg-surface-white text-ink transition-colors hover:bg-surface disabled:opacity-40 disabled:hover:bg-transparent"
             >
               <ChevronIcon dir="right" />
             </button>
