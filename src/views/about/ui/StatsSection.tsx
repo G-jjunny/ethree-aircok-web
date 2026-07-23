@@ -18,11 +18,13 @@ const STAT_ICON_PATHS = [
  * BY THE NUMBERS (시안 §STATS). 다크 radial, 좌 2x2 스탯 글래스 카드 + 우 FEATURED
  * 인증 카드. 정적 콘텐츠(site.ts about.stats SSOT).
  *
- * 모바일(<sm): 스탯 4장을 2×2 컴팩트 그리드(셀 ≈142px@360)로, FEATURED 는 아래
- * 전폭 1장으로 배치한다. 카드 내부는 [아이콘(32px) → 수치 → 라벨] 세로 스택으로
- * 압축한다 — 셀 내부 폭 110px(142-p-4 좌우 32)에서 수치 "2018"(text-stat 36px@360
- * ≈86px)과 80px 아이콘의 가로 병치가 불가능하기 때문. sm 이상은 기존 가로 병치
- * (수치 좌 + size-9 아이콘 우) 구조를 완전 복원한다.
+ * 모바일(<sm): 스탯 4장을 1열 가로 행(수치 좌 고정폭 w-32 + 라벨 우)으로 쌓는다.
+ * 수치는 text-stat(fluid 36px@360)을 유지한 채 68px 컴팩트 행을 꽉 채우고, 라벨은
+ * 140px 폭에서 keep-all 최대 2줄로 수렴해 행 높이가 균일하다 — 2×2 그리드에서
+ * 라벨 줄수(1~3줄) 차이로 카드 높이가 들쭉날쭉하던 문제의 원천 제거. 장식 아이콘은
+ * 모바일에서 숨긴다(aria-hidden, 좌상단에 홀로 떠 보이는 문제 해소). FEATURED 는
+ * 아래 전폭 1장. sm 이상은 기존 2×2 그리드 + 가로 병치(수치 좌 + size-9 아이콘 우)
+ * 구조를 완전 복원한다.
  */
 export function StatsSection() {
   const { eyebrow, title, body, items, featured } = SITE.about.stats
@@ -41,30 +43,33 @@ export function StatsSection() {
         <p className="mt-4 max-w-[520px] text-lead-sm leading-relaxed text-white/70">{body}</p>
 
         <div className="mt-6 grid gap-3 sm:mt-12 sm:gap-6 lg:grid-cols-[2fr_0.82fr]">
-          {/* 좌: 2x2 스탯 글래스 카드 (모바일도 2×2 유지 — 셀 ≈142px@360) */}
-          <div className="grid grid-cols-2 gap-3 sm:gap-6">
+          {/* 좌: 스탯 글래스 카드 — 모바일 1열 가로 행(수치 좌 + 라벨 우), sm 이상 2×2 */}
+          <div className="grid gap-3 sm:grid-cols-2 sm:gap-6">
             {items.map((stat, i) => (
               <div
                 key={stat.label}
-                className="flex flex-col gap-3 rounded-card border border-white/12 bg-white/7 p-4 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:p-6"
+                className="flex items-center justify-between gap-3 rounded-card border border-white/12 bg-white/7 p-4 sm:gap-4 sm:p-6"
               >
-                <div className="order-2 sm:order-1">
-                  <div className="font-display text-stat font-extrabold leading-none">
+                {/* 모바일: [수치 w-32 고정폭 | 라벨] 가로 병치 — 4행의 수치·라벨
+                    시작선이 정렬되고 라벨(140px@360)이 keep-all 최대 2줄로 수렴해
+                    행 높이 균일. sm 이상 기존 세로 스택(수치 위 + 라벨 아래) 복원 */}
+                <div className="flex items-center gap-3 sm:block">
+                  <div className="w-32 shrink-0 font-display text-stat font-extrabold leading-none sm:w-auto">
                     {stat.value}
                     {stat.unit && (
                       <span className="ml-1 text-h6 text-cyan">{stat.unit}</span>
                     )}
                   </div>
-                  {/* 모바일 라벨 text-meta(12.5px@360): 110px 셀 내부 폭에서 keep-all
-                      (body 전역) 2~3줄 자연 개행. sm 이상 기존 text-sm 복원 */}
-                  <p className="mt-2 text-meta leading-snug text-white/60 sm:mt-3 sm:text-sm sm:leading-relaxed">
+                  {/* 라벨 text-sm(fluid 12.5px@360): §3 역할표 "스탯 라벨은 text-sm
+                      유지" 준수. 모바일은 leading-snug 로 2줄 컴팩트, sm 이상 복원 */}
+                  <p className="text-sm leading-snug text-white/60 sm:mt-3 sm:leading-relaxed">
                     {stat.label}
                   </p>
                 </div>
-                {/* 아이콘: 모바일 size-6(=32px, 커스텀 스케일) — 기존 size-9(80px)는
-                    142px 셀에서 과대. sm 이상 size-9 복원 */}
+                {/* 장식 아이콘: 모바일 숨김(68px 행에서 3요소 병치 시 과밀·부유 인상),
+                    sm 이상 size-9(80px) 복원 */}
                 <svg
-                  className="order-1 size-6 shrink-0 text-cyan sm:order-2 sm:size-9"
+                  className="hidden shrink-0 text-cyan sm:block sm:size-9"
                   fill="none"
                   viewBox="0 0 24 24"
                   strokeWidth={1.5}
