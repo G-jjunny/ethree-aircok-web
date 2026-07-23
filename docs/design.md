@@ -110,8 +110,9 @@ AQI 바 그라디언트: `from-aqi-good via-brand via-aqi-warning to-aqi-bad`.
 
 ### 다크 배경 위 반투명 (하드코딩 아님 — 기본 토큰 + opacity)
 
-- 본문 강/약: `text-white/85` · `text-white/75` · `text-white/70` · `text-white/68` · `text-white/62` · `text-white/60` (시안 실측 스텝 — opacity 자유값 허용, 하드코딩 아님)
-- 저대비 라벨/카피: `text-white/40` · `text-white/28`
+- **텍스트 4단계 (정규화 · 이슈 #155 후속)**: `text-white/85`(본문 강 — CTA 직결 핵심 리스트 등) · `text-white/70`(본문 — 리드·일반 본문) · `text-white/60`(보조 — 카드 내부 라벨·단위·장식 번호) · `text-white/40`(희미 — 저대비 eyebrow/카피). **새 코드는 이 4단계만 사용한다.**
+- 장식·워터마크(텍스트 위계 밖): `text-white/28`(플레이스홀더 워터마크) · `text-white/25`(구분점 `·` 등 순수 장식)
+- 구 자유값(`/90 /82 /75 /72 /68 /62 /55 /50 /35`)은 **마이그레이션 대상** — 홈은 정규화 완료(§3 텍스트 역할 표), 타 페이지는 각 페이지 통일 작업 시 4단계로 수렴한다
 - divider `border-white/8` · 아이콘 원 `border-white/20` · outline 버튼 `border-white/50`
 - 글래스 카드(다크 위 스탯 카드): 채움 `bg-white/7` · 보더 `border-white/12` — 시안 실측값 `.07`/`.12` 유지(About STATS, 홈 실시간 카드 재사용). 문서 SSOT 는 `.07`(= `bg-white/7`) 로 확정.
 - 브랜드 글로우 배경: `bg-brand/12` · `bg-brand/14` (배지·행동요령 팁), 보더 `border-brand/28` · `border-brand/40`
@@ -172,6 +173,26 @@ AQI 바 그라디언트: `from-aqi-good via-brand via-aqi-warning to-aqi-bad`.
 | `text-meta` | 12.5 | `0.3572vw + 0.7009rem` | 13.5 |
 
 (구 페어 방식 정리: `SectionHeader`의 `text-[28px] sm:text-[40px]` → `text-section`, `HistoryTimeline`의 `text-h6 sm:text-h3` → `text-h3`, `Dark/LightStatCard`의 `text-4xl sm:text-6xl` → `text-stat-lg`로 수렴 완료)
+
+### 텍스트 역할 표 (역할당 1종 · 이슈 #155 후속)
+
+같은 역할의 텍스트는 아래 조합 **1종만** 사용한다. 홈 8개 섹션 + HeroAqiCard 에 적용 완료 — **이후 다른 페이지 텍스트 통일 작업도 이 표를 그대로 재사용하는 기준**이다.
+
+| 역할 | 토큰 조합 | 라이트 색 | 다크 색 |
+| --- | --- | --- | --- |
+| 섹션 리드 (섹션 헤딩 아래 리드 문단) | `text-lead-sm leading-relaxed` | `text-muted` | `text-white/70` |
+| 히어로 리드 (h1이 `text-hero`/`text-h1`급인 페이지 히어로 한정) | `text-lead leading-relaxed` | — | `text-white/70` |
+| 패널·프로즈 본문 (탭 패널 설명 등 주 읽기 본문) | `text-base leading-relaxed` | `text-ink-soft`(강조) / `text-muted` | `text-white/70` |
+| 카드 제목 | `text-lg font-bold`~`font-extrabold` | `text-ink` | `text-white` |
+| 서브헤딩급 인트로 셀 제목 (카드 그리드의 텍스트 인트로 셀 — 카드 제목보다 1위계 위) | `text-xl font-extrabold` | `text-ink` | `text-white` |
+| 카드 본문 | `text-sm leading-relaxed` | `text-muted` | `text-white/70` |
+| 강조 리스트 항목 (다크 CTA 섹션 체크리스트 등 핵심 혜택) | `text-lead-sm leading-relaxed` | — | `text-white/85` |
+| 트러스트 스트립 항목 (인증 등 인라인 나열) | `text-sm font-medium` | `text-muted` | `text-white/70` |
+| 캡션·메타 (스텝 설명·통계 라벨·출처·단위) | `text-meta` (+긴 문장은 `leading-relaxed`) | `text-muted`(보조) / `text-faint`(희미·출처) | `text-white/60` |
+| eyebrow 계열 | `SectionLabel` 또는 `font-display text-eyebrow tracking-eyebrow` (기존 유지) | 기존 | 기존 |
+
+- 폰트 크기 반응형은 전역 fluid 토큰이 담당한다 — 역할 조합에 `sm:text-*` 페어를 덧붙이지 않는다. 페어는 fluid 로 표현 불가한 **의도적 모바일 위계 축소**(예: 홈 히어로 STATS 숫자 `text-xl sm:text-h6` — 모바일 3열 압축을 위해 fluid h6 하한 24px 보다 낮은 17px 필요)일 때만 사유 주석과 함께 허용한다.
+- 예외는 값 옆 주석 + 이 표 개정으로만 허용한다.
 
 ### 트래킹 (letter-spacing)
 
