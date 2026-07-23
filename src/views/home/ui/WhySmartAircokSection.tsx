@@ -131,13 +131,16 @@ export function WhySmartAircokSection() {
                 {tab.en}
               </SectionLabel>
               <h3 className="mt-3 text-subtitle font-extrabold text-ink">{stat.title}</h3>
-              <div className="mt-5 flex flex-wrap gap-6">
+              {/* 모바일: 수치별 세로 스택(값+라벨 베이스라인 인라인) — 3열 grid 는 "$15,500"(text-h3)이
+                  셀폭(~74px)을 넘어 토큰 floor 미만 축소가 필요하고 탭별 수치 1~3개 가변이라 빈 셀이 생김.
+                  세로 스택은 fluid text-h3 토큰을 그대로 유지한다. 데스크탑(≥sm)은 기존 flex wrap gap-6 복원 */}
+              <div className="mt-5 flex flex-col gap-2.5 sm:flex-row sm:flex-wrap sm:gap-6">
                 {tab.metrics.map((m) => (
-                  <div key={m.label}>
+                  <div key={m.label} className="flex items-baseline gap-2.5 sm:block">
                     <div className="font-display text-h3 font-extrabold text-brand">
                       {m.value}
                     </div>
-                    <div className="mt-1 text-meta text-muted">{m.label}</div>
+                    <div className="text-meta text-muted sm:mt-1">{m.label}</div>
                   </div>
                 ))}
               </div>
