@@ -113,7 +113,7 @@ export function ServiceTrustSection({ children }: { children?: ReactNode }) {
 
         {/* 통계밴드 */}
         <div
-          className="relative mt-5.5 overflow-hidden rounded-card-lg px-10.5 py-11 text-white"
+          className="relative mt-5.5 overflow-hidden rounded-card-lg px-5 py-11 text-white sm:px-10.5"
           style={{ backgroundImage: STAT_BAND_BG }}
         >
           <div
