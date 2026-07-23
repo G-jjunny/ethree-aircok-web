@@ -76,10 +76,17 @@ function ChromeDots() {
   )
 }
 
-/** 블록 텍스트 칼럼 — 큰 인덱스 넘버 + 제목 + 설명 + 태그 pill. */
-function BlockCopy({ block }: { block: (typeof BLOCKS)[number] }) {
+/** 블록 텍스트 칼럼 — 큰 인덱스 넘버 + 제목 + 설명 + 태그 pill.
+ *  `className` 은 lg+ 지그재그 복원용 order 유틸 주입 전용(호출부 참조). */
+function BlockCopy({
+  block,
+  className,
+}: {
+  block: (typeof BLOCKS)[number]
+  className?: string
+}) {
   return (
-    <div>
+    <div className={className}>
       <div className="font-display text-display font-light leading-none text-hairline">
         {block.index}
       </div>
@@ -190,34 +197,30 @@ export async function IndoorCloudSection() {
           {COPY.body}
         </p>
 
-        <div className="mt-16 flex flex-col gap-22">
+        <div className="mt-16 flex flex-col gap-16 sm:gap-22">
           {BLOCKS.map((block, i) => {
-            // 짝수 인덱스(01·03)는 텍스트-비주얼, 홀수(02·04)는 비주얼-텍스트로 좌우 교차.
+            // 짝수 인덱스(01·03)는 텍스트-비주얼, 홀수(02·04)는 비주얼-텍스트로 좌우 교차(lg+).
+            // DOM 순서는 항상 [텍스트 → 비주얼]로 고정한다 — 스택 구간(<lg)에서 전 스텝이
+            // [번호·제목·설명·칩] → [이미지] 순으로 통일되도록(번호가 스텝 리듬의 앵커).
+            // lg+ 지그재그는 DOM 재배열이 아니라 텍스트 칼럼의 `lg:order-2` 로 복원한다
+            // (그리드 배치만 뒤바뀌므로 데스크탑 시각·칼럼 비율 불변).
             const visualFirst = i % 2 === 1
-            const visual = <BlockVisual block={block} src={slotImages[block.slot]} />
-            const copy = <BlockCopy block={block} />
 
             return (
               <div
                 key={block.slot}
                 // token 없음: 0.82fr/1.18fr 은 시안의 텍스트:비주얼 칼럼 비율(레이아웃 분수 — 색·간격 토큰 아님)
-                className={`grid items-center gap-14 ${
+                className={`grid items-center gap-7.5 sm:gap-14 ${
                   visualFirst
                     ? 'lg:grid-cols-[1.18fr_0.82fr]'
                     : 'lg:grid-cols-[0.82fr_1.18fr]'
                 }`}
               >
-                {visualFirst ? (
-                  <>
-                    {visual}
-                    {copy}
-                  </>
-                ) : (
-                  <>
-                    {copy}
-                    {visual}
-                  </>
-                )}
+                <BlockCopy
+                  block={block}
+                  className={visualFirst ? 'lg:order-2' : undefined}
+                />
+                <BlockVisual block={block} src={slotImages[block.slot]} />
               </div>
             )
           })}
