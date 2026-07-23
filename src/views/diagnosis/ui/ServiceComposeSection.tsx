@@ -77,7 +77,7 @@ export async function ServiceComposeSection() {
         <div className="mt-13 grid grid-cols-1 gap-9.5 lg:grid-cols-2">
           {COMPOSE_BLOCKS.map((block) => (
             <div key={block.slot} className="flex flex-col">
-              <div className="text-base font-extrabold text-ink">
+              <div className="text-lg font-extrabold text-ink">
                 {block.title}
               </div>
               <p className="mt-2 text-sm leading-relaxed text-muted">
@@ -98,7 +98,7 @@ export async function ServiceComposeSection() {
 
         {/* 측정 항목 5뱃지 */}
         <div className="mt-6.5 rounded-card border border-hairline bg-surface-white px-5 py-7 sm:px-8.5 sm:py-9.5">
-          <div className="text-center text-base font-extrabold text-ink">
+          <div className="text-center text-lg font-extrabold text-ink">
             {COPY.itemsTitle}
           </div>
           <div className="mt-7.5 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">

@@ -78,7 +78,7 @@ export function ServiceHeroSection() {
                 key={stat.value}
                 className="rounded-image border border-white/12 bg-white/7 px-2.5 py-2.5 sm:px-5.5 sm:py-3.5"
               >
-                {/* text-h6(28) 은 fluid 미적용 토큰이라 모바일 축소를 로컬 페어(text-lg)로 보완 */}
+                {/* 의도적 페어(§3 예외): 모바일 3열 압축 — fluid h6 하한 24px 보다 낮은 16px(text-lg) 필요 */}
                 <div className="font-display text-lg font-extrabold text-cyan sm:text-h6">
                   {stat.value}
                 </div>

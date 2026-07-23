@@ -37,7 +37,7 @@ export function ServiceFlowSection() {
                 {step.en}
               </div>
               <div className="mt-2 text-xl font-extrabold">{step.ko}</div>
-              <p className="mt-2 text-sm leading-relaxed text-white/60">
+              <p className="mt-2 text-meta leading-relaxed text-white/60">
                 {step.desc}
               </p>
             </div>

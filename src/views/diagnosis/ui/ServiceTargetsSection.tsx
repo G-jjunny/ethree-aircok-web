@@ -59,6 +59,7 @@ export function ServiceTargetsSection() {
                 <Icon className="size-5 text-brand sm:size-8.5" strokeWidth={1.6} aria-hidden />
               </div>
               <div>
+                {/* 의도적 페어(§3 예외): 모바일 3×3 압축 — fluid 하한보다 낮은 12px 필요, sm 이상 카드 제목(text-lg) 복원 */}
                 <div className="text-xs font-bold text-ink [word-break:keep-all] sm:text-lg sm:font-extrabold">{title}</div>
                 <div className="mt-1 hidden text-sm text-muted sm:block">{sub}</div>
               </div>

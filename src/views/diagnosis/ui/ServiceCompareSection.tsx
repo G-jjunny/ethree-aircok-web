@@ -76,10 +76,10 @@ export async function ServiceCompareSection() {
           {/* BEFORE */}
           <div className="flex flex-col overflow-hidden rounded-card-lg border border-white/10 bg-white/4">
             <div className="px-7.5 pt-6.5 pb-5.5">
-              <div className="font-display text-xs font-bold uppercase tracking-caption text-white/50">
+              <div className="font-display text-xs font-bold uppercase tracking-caption text-white/40">
                 {BEFORE.en}
               </div>
-              <h3 className="mt-2 text-xl font-extrabold text-white/90">
+              <h3 className="mt-2 text-xl font-extrabold text-white/85">
                 {BEFORE.title[0]}
                 <br />
                 {BEFORE.title[1]}
@@ -100,7 +100,7 @@ export async function ServiceCompareSection() {
               {BEFORE.items.map((item) => (
                 <li
                   key={item}
-                  className="flex items-start gap-2.5 text-sm leading-relaxed text-white/72"
+                  className="flex items-start gap-2.5 text-sm leading-relaxed text-white/70"
                 >
                   <X className="mt-0.5 size-4 shrink-0 text-error" aria-hidden />
                   {item}

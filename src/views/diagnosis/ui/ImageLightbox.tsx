@@ -42,7 +42,7 @@ export function ImageLightbox({ src, alt }: ImageLightboxProps) {
           >
             <button
               type="button"
-              className="absolute top-2 right-2 text-heading-light text-3xl leading-none z-10"
+              className="absolute top-2 right-2 text-white text-3xl leading-none z-10"
               onClick={() => setIsOpen(false)}
               aria-label="닫기"
             >

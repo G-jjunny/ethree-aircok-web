@@ -77,7 +77,7 @@ export async function ServiceCertsSection() {
               <div className="mt-3 text-base font-extrabold text-ink">
                 {card.title}
               </div>
-              <p className="mt-2 text-xs leading-relaxed text-muted">{card.desc}</p>
+              <p className="mt-2 text-meta leading-relaxed text-muted">{card.desc}</p>
             </div>
           ))}
         </div>
