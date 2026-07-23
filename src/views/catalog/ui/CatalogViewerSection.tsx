@@ -166,7 +166,7 @@ export function CatalogViewerSection({ pages, images }: CatalogViewerSectionProp
             type="button"
             onClick={() => viewerRef.current?.flipPrev()}
             aria-label={V.prevLabel}
-            className="absolute left-3 z-10 flex h-11 w-11 items-center justify-center rounded-full border border-white/12 bg-white/7 text-white backdrop-blur hover:bg-white/12 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+            className="absolute left-1 z-10 flex h-11 w-11 sm:left-3 items-center justify-center rounded-full border border-white/12 bg-white/7 text-white backdrop-blur hover:bg-white/12 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
           >
             <ChevronLeft className="h-5 w-5" aria-hidden />
           </button>
@@ -181,7 +181,7 @@ export function CatalogViewerSection({ pages, images }: CatalogViewerSectionProp
             type="button"
             onClick={() => viewerRef.current?.flipNext()}
             aria-label={V.nextLabel}
-            className="absolute right-3 z-10 flex h-11 w-11 items-center justify-center rounded-full border border-white/12 bg-white/7 text-white backdrop-blur hover:bg-white/12 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+            className="absolute right-1 z-10 flex h-11 w-11 sm:right-3 items-center justify-center rounded-full border border-white/12 bg-white/7 text-white backdrop-blur hover:bg-white/12 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
           >
             <ChevronRight className="h-5 w-5" aria-hidden />
           </button>

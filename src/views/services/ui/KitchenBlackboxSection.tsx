@@ -85,7 +85,7 @@ export async function KitchenBlackboxSection() {
               sizes="(min-width: 1024px) 420px, 100vw"
             />
 
-            <div className="mt-5 grid grid-cols-2 gap-3">
+            <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
               {SPECS.map((spec) => (
                 <div
                   key={spec.label}
