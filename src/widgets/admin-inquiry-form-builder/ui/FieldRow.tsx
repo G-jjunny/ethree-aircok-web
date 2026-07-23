@@ -83,7 +83,7 @@ export function FieldRow({ field, prev, next }: Props) {
           onClick={() => prev && swapOrder(prev)}
           disabled={!prev || reordering}
           aria-label="위로 이동"
-          className="px-2 py-1 text-sm text-muted rounded-btn hover:bg-hairline transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+          className="inline-flex items-center justify-center px-2 py-1 max-sm:min-h-11 max-sm:min-w-11 text-sm text-muted rounded-btn hover:bg-hairline transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
         >
           ↑
         </button>
@@ -92,7 +92,7 @@ export function FieldRow({ field, prev, next }: Props) {
           onClick={() => next && swapOrder(next)}
           disabled={!next || reordering}
           aria-label="아래로 이동"
-          className="px-2 py-1 text-sm text-muted rounded-btn hover:bg-hairline transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+          className="inline-flex items-center justify-center px-2 py-1 max-sm:min-h-11 max-sm:min-w-11 text-sm text-muted rounded-btn hover:bg-hairline transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
         >
           ↓
         </button>
@@ -117,14 +117,14 @@ export function FieldRow({ field, prev, next }: Props) {
         <button
           type="button"
           onClick={() => setEditing(true)}
-          className="text-brand text-sm hover:opacity-70 transition-opacity"
+          className="inline-flex items-center justify-center max-sm:min-h-11 max-sm:min-w-11 text-brand text-sm hover:opacity-70 transition-opacity"
         >
           수정
         </button>
         <button
           type="button"
           onClick={() => setConfirmOpen(true)}
-          className="text-error text-sm hover:opacity-70 transition-opacity"
+          className="inline-flex items-center justify-center max-sm:min-h-11 max-sm:min-w-11 text-error text-sm hover:opacity-70 transition-opacity"
         >
           삭제
         </button>

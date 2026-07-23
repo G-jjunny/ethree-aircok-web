@@ -54,7 +54,7 @@ export function Nav() {
 
           <button
             type="button"
-            className="md:hidden flex flex-col gap-1.5 p-1"
+            className="md:hidden -m-2 flex min-h-11 min-w-11 flex-col items-center justify-center gap-1.5"
             aria-label="메뉴 열기"
             aria-expanded={mobileOpen}
             onClick={() => setMobileOpen((prev) => !prev)}
