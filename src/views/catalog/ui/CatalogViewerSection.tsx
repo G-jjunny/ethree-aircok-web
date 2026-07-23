@@ -104,7 +104,7 @@ export function CatalogViewerSection({ pages, images }: CatalogViewerSectionProp
               <FileText className="h-5 w-5" aria-hidden />
             </span>
             <span className="flex flex-col">
-              <span className="font-display text-white/85">{V.title}</span>
+              <span className="font-bold text-white">{V.title}</span>
               <span className="text-sm text-white/60">{V.subtitle}</span>
             </span>
           </div>

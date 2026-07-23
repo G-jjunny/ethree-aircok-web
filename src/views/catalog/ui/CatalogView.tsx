@@ -58,12 +58,12 @@ export function CatalogView() {
             <FlipBookPlaceholder />
           ) : isError ? (
             <div className="flex flex-col items-center justify-center gap-3 rounded-card border border-hairline bg-surface-white px-6 py-20 text-center">
-              <p className="text-sm text-ink">카탈로그를 불러오지 못했습니다.</p>
+              <p className="text-lg font-bold text-ink">카탈로그를 불러오지 못했습니다.</p>
               <p className="text-sm text-muted">잠시 후 다시 시도해 주세요.</p>
             </div>
           ) : images.length === 0 ? (
             <div className="flex flex-col items-center justify-center gap-3 rounded-card border border-hairline bg-surface-white px-6 py-20 text-center">
-              <p className="text-sm text-ink">등록된 카탈로그가 없습니다.</p>
+              <p className="text-lg font-bold text-ink">등록된 카탈로그가 없습니다.</p>
               <p className="text-sm text-muted">콘텐츠 준비 중입니다.</p>
             </div>
           ) : (
