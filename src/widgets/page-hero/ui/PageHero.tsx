@@ -35,7 +35,7 @@ export function PageHero({ eyebrow, headline, body }: PageHeroProps) {
       className="relative overflow-hidden bg-navy text-white"
       style={{ backgroundImage: HERO_RADIAL }}
     >
-      <div className="content-container py-24">
+      <div className="content-container py-14 sm:py-24">
         <div className="inline-flex rounded-pill border border-brand/40 bg-brand/12 px-3.5 py-1.5 text-eyebrow font-semibold text-brand-soft">
           {eyebrow}
         </div>

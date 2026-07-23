@@ -97,7 +97,7 @@ export async function ServiceComposeSection() {
         </div>
 
         {/* 측정 항목 5뱃지 */}
-        <div className="mt-6.5 rounded-card border border-hairline bg-surface-white px-8.5 py-9.5">
+        <div className="mt-6.5 rounded-card border border-hairline bg-surface-white px-5 py-7 sm:px-8.5 sm:py-9.5">
           <div className="text-center text-base font-extrabold text-ink">
             {COPY.itemsTitle}
           </div>
@@ -129,7 +129,7 @@ export async function ServiceComposeSection() {
         </div>
 
         {/* 이용 안내 6불릿 */}
-        <div className="mt-5.5 rounded-image border border-hairline bg-tint px-8.5 py-7.5">
+        <div className="mt-5.5 rounded-image border border-hairline bg-tint px-5 py-6 sm:px-8.5 sm:py-7.5">
           <div className="mb-3.5 text-sm font-bold text-ink">
             {COPY.notesTitle}
           </div>

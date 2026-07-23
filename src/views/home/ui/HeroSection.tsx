@@ -41,7 +41,7 @@ export function HeroSection() {
         className={`${styles.driftB} pointer-events-none absolute -bottom-32 right-32 h-[420px] w-[420px] rounded-full bg-radial from-cyan/40 to-transparent blur-2xl`}
       />
 
-      <div className="content-container relative z-10 grid items-center gap-14 py-24 md:grid-cols-[1.05fr_0.95fr]">
+      <div className="content-container relative z-10 grid items-center gap-10 py-14 sm:gap-14 sm:py-24 md:grid-cols-[1.05fr_0.95fr]">
         {/* 좌: 카피 */}
         <div>
           <div className="animate-fade-up inline-flex items-center gap-2 rounded-pill border border-brand/40 bg-brand/12 px-3.5 py-1.5 text-eyebrow font-semibold text-brand-soft">

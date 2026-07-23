@@ -17,8 +17,8 @@ import { CatalogDownloadsSection } from './CatalogDownloadsSection'
 function FlipBookPlaceholder() {
   return (
     <div className="flex justify-center py-20">
-      {/* token 없음: 960x640 — 플립북 양면(2페이지) 스프레드 고정 캔버스 치수 자리표시자 */}
-      <div className="h-[640px] w-[960px] max-w-full animate-pulse rounded-card-lg bg-surface" />
+      {/* token 없음: 960x640 — 플립북 양면(2페이지) 스프레드 고정 캔버스 치수 자리표시자(모바일은 뷰어 축소 렌더에 맞춰 h-[420px]로 완화) */}
+      <div className="h-[420px] w-[960px] max-w-full animate-pulse sm:h-[640px] rounded-card-lg bg-surface" />
     </div>
   )
 }
