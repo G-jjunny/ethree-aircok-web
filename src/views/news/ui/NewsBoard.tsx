@@ -20,6 +20,28 @@ const FILTERS: { value: FilterValue; label: string }[] = [
 // 서버 SSR prefetch(NewsBoardPrefetch)와 동일 값을 써야 queryKey가 일치한다.
 const PAGE_SIZE = NEWS_PAGE_SIZE;
 
+/**
+ * 페이지네이션 축약 슬롯(숫자 최대 7개): 첫/끝 + 현재 ±1 + 생략(…).
+ * 전체 페이지 번호를 모두 렌더하면 페이지 다수 시 모바일(360px)에서 가로 넘침이
+ * 발생하므로 슬롯 수를 고정한다. 'gap-*'는 생략 부호 자리 표시자다.
+ */
+type PageSlot = number | 'gap-left' | 'gap-right';
+
+function buildPageSlots(current: number, total: number): PageSlot[] {
+  if (total <= 7) {
+    return Array.from({ length: total }, (_, i) => i + 1);
+  }
+  // 경계(1·2·끝-1·끝 페이지)에서도 항상 7슬롯을 유지하도록 창을 보정한다.
+  const start = Math.max(2, Math.min(current - 1, total - 4));
+  const end = Math.min(total - 1, Math.max(current + 1, 5));
+  const slots: PageSlot[] = [1];
+  if (start > 2) slots.push('gap-left');
+  for (let page = start; page <= end; page += 1) slots.push(page);
+  if (end < total - 1) slots.push('gap-right');
+  slots.push(total);
+  return slots;
+}
+
 /** 돋보기 아이콘 */
 function SearchIcon() {
   return (
@@ -260,7 +282,7 @@ export function NewsBoard() {
         {/* 페이지네이션 */}
         {!isError && totalPages > 1 && (
           <nav
-            className="mt-11 flex items-center justify-center gap-2"
+            className="mt-11 flex flex-wrap items-center justify-center gap-2"
             aria-label="뉴스 목록 페이지"
           >
             <button
@@ -268,26 +290,37 @@ export function NewsBoard() {
               onClick={() => goToPage(currentPage - 1)}
               disabled={currentPage <= 1}
               aria-label="이전 페이지"
-              className="flex h-[40px] w-[40px] items-center justify-center rounded-[10px] border border-hairline bg-surface-white text-ink transition-colors hover:bg-surface disabled:opacity-40 disabled:hover:bg-transparent"
+              className="flex min-h-11 min-w-11 items-center justify-center rounded-[10px] border border-hairline bg-surface-white text-ink transition-colors hover:bg-surface disabled:opacity-40 disabled:hover:bg-transparent"
             >
               <ChevronIcon dir="left" />
             </button>
 
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => {
-              const active = p === currentPage;
+            {buildPageSlots(currentPage, totalPages).map((slot) => {
+              if (typeof slot !== 'number') {
+                return (
+                  <span
+                    key={slot}
+                    aria-hidden="true"
+                    className="flex min-h-11 min-w-11 items-center justify-center text-sm font-bold text-muted"
+                  >
+                    …
+                  </span>
+                );
+              }
+              const active = slot === currentPage;
               return (
                 <button
-                  key={p}
+                  key={slot}
                   type="button"
-                  onClick={() => goToPage(p)}
+                  onClick={() => goToPage(slot)}
                   aria-current={active ? 'page' : undefined}
-                  className={`h-[40px] min-w-[40px] rounded-[10px] px-[10px] text-sm font-bold transition-colors ${
+                  className={`min-h-11 min-w-11 rounded-[10px] px-[10px] text-sm font-bold transition-colors ${
                     active
                       ? 'bg-brand text-brand-ink'
                       : 'border border-hairline bg-surface-white text-ink hover:bg-surface'
                   }`}
                 >
-                  {p}
+                  {slot}
                 </button>
               );
             })}
@@ -297,7 +330,7 @@ export function NewsBoard() {
               onClick={() => goToPage(currentPage + 1)}
               disabled={currentPage >= totalPages}
               aria-label="다음 페이지"
-              className="flex h-[40px] w-[40px] items-center justify-center rounded-[10px] border border-hairline bg-surface-white text-ink transition-colors hover:bg-surface disabled:opacity-40 disabled:hover:bg-transparent"
+              className="flex min-h-11 min-w-11 items-center justify-center rounded-[10px] border border-hairline bg-surface-white text-ink transition-colors hover:bg-surface disabled:opacity-40 disabled:hover:bg-transparent"
             >
               <ChevronIcon dir="right" />
             </button>

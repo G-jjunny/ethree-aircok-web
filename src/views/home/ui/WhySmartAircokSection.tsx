@@ -68,11 +68,12 @@ export function WhySmartAircokSection() {
         </ScrollReveal>
 
         <ScrollReveal variant="fade-up" delay={80}>
-        {/* 탭 바 (연결형 · 이음새 없음 · 상단만 라운드) */}
+        {/* 탭 바 (연결형 · 이음새 없음 · 상단만 라운드) — 모바일은 AdminTabs식 가로 스크롤(스크롤바 숨김),
+            데스크탑은 4탭이 자연폭으로 모두 들어가므로 기존과 동일하게 flex-1 균등 분배 */}
         <div
           role="tablist"
           aria-label="스마트에어콕 도입 효과"
-          className="mt-12 flex overflow-hidden rounded-t-card border border-hairline"
+          className="mt-12 flex overflow-x-auto rounded-t-card border border-hairline [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
         >
           {TABS.map((t, i) => {
             const isActive = i === active;
@@ -85,7 +86,7 @@ export function WhySmartAircokSection() {
                 aria-selected={isActive}
                 aria-controls={`why-panel-${i}`}
                 onClick={() => setActive(i)}
-                className={`flex flex-1 items-center gap-3 border-b-2 px-4 py-4 text-left transition-colors duration-fast ${
+                className={`flex flex-1 items-center gap-3 whitespace-nowrap border-b-2 px-4 py-4 text-left transition-colors duration-fast ${
                   isActive
                     ? 'border-brand bg-surface-white'
                     : 'border-transparent bg-surface-2 hover:bg-surface-white/60'
