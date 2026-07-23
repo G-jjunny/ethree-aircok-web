@@ -36,7 +36,7 @@ const TARGETS: { icon: LucideIcon; title: string; sub: string }[] = [
  */
 export function ServiceTargetsSection() {
   return (
-    <section className="bg-surface py-24">
+    <section className="bg-surface py-14 sm:py-24">
       <div className="content-container">
         <div className="flex flex-col items-center text-center">
           <SectionLabel color="brand">{COPY.eyebrow}</SectionLabel>
@@ -49,18 +49,18 @@ export function ServiceTargetsSection() {
           </p>
         </div>
 
-        <div className="mt-13 grid grid-cols-1 gap-5.5 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-13 grid grid-cols-3 gap-2 sm:grid-cols-2 sm:gap-5.5 lg:grid-cols-3">
           {TARGETS.map(({ icon: Icon, title, sub }) => (
             <div
               key={title}
-              className="flex flex-col items-center gap-4 rounded-card border border-hairline bg-surface-white px-7.5 py-9.5 text-center"
+              className="flex flex-col items-center gap-2 rounded-card border border-hairline bg-surface-white px-2 py-4 text-center sm:gap-4 sm:px-7.5 sm:py-9.5"
             >
-              <div className="flex size-19 items-center justify-center rounded-full border border-tint-border bg-tint">
-                <Icon className="size-8.5 text-brand" strokeWidth={1.6} aria-hidden />
+              <div className="flex size-11 items-center justify-center rounded-full border border-tint-border bg-tint sm:size-19">
+                <Icon className="size-5 text-brand sm:size-8.5" strokeWidth={1.6} aria-hidden />
               </div>
               <div>
-                <div className="text-lg font-extrabold text-ink">{title}</div>
-                <div className="mt-1 text-sm text-muted">{sub}</div>
+                <div className="text-xs font-bold text-ink [word-break:keep-all] sm:text-lg sm:font-extrabold">{title}</div>
+                <div className="mt-1 hidden text-sm text-muted sm:block">{sub}</div>
               </div>
             </div>
           ))}
