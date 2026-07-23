@@ -121,9 +121,9 @@ export function WhySmartAircokSection() {
           role="tabpanel"
           id={`why-panel-${active}`}
           aria-labelledby={`why-tab-${active}`}
-          className="rounded-b-card border border-t-0 border-hairline bg-surface-white p-7"
+          className="rounded-b-card border border-t-0 border-hairline bg-surface-white p-5 sm:p-7"
         >
-          <div className="grid items-center gap-13 md:grid-cols-[0.85fr_1.15fr]">
+          <div className="grid items-center gap-8 md:gap-13 md:grid-cols-[0.85fr_1.15fr]">
             {/* 좌: eyebrow + 제목 + 지표 */}
             <div>
               <SectionLabel color="brand" size="sm">
