@@ -49,7 +49,7 @@ export function HeroSection() {
             AIoT 실내 공기질 관리 플랫폼
           </div>
 
-          <h1 className="animate-fade-up reveal-delay-1 mt-6 text-hero font-extrabold leading-[1.08] tracking-headline">
+          <h1 className="animate-fade-up reveal-delay-1 mt-6 text-4xl font-extrabold leading-[1.08] tracking-headline sm:text-hero">
             보이지 않는 공기를
             <br />
             <span className="text-brand">콕콕</span> 집어 관리하다

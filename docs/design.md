@@ -142,6 +142,8 @@ AQI 바 그라디언트: `from-aqi-good via-brand via-aqi-warning to-aqi-bad`.
 
 **기본 유틸 재사용**: `text-7xl`(72) `text-5xl`(48) `text-2xl`(24) `text-xl`(20·22 근사) `text-lg`(18) `text-base`(16) `text-sm`(14·15 근사) `text-xs`(12).
 
+**반응형 축소 규칙 (모바일 우선 · 이슈 #155)**: 헤딩 토큰은 무접두(모바일)에서 축소값으로 시작하고 `sm:`에서 원값을 복원한다 — `text-hero`·`text-h1` → `text-4xl sm:text-{hero|h1}`(모바일 36), `text-h2`~`text-h5` → `text-h6 sm:text-{h2|h3|h4|h5}`(모바일 28). `text-h6` 이하 및 본문·캡션 스케일은 축소하지 않는다. (기존 정합 사례: `SectionHeader` 28→40, `HistoryTimeline` `text-h6 sm:text-h3`)
+
 ### 트래킹 (letter-spacing)
 
 `tracking-wordmark`(-0.03em) · `tracking-headline`(-0.02em) · `tracking-label-sm`(0.05em) · `tracking-label`(0.1em) · `tracking-caption`(0.12em) · `tracking-eyebrow`(0.14em) · `tracking-eyebrow-lg`(0.18em) · `tracking-wide`(0.4em).

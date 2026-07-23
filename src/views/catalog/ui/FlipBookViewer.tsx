@@ -74,8 +74,14 @@ type PageFlipInstance = {
  */
 const PAGE_WIDTH = 480;
 const PAGE_HEIGHT = 640;
-/** 양면(스프레드) 한 쪽 최소/최대 폭 — landscape 전환 임계값 계산에 사용. */
-const PAGE_MIN_WIDTH = 320;
+/**
+ * 양면(스프레드) 한 쪽 최소/최대 폭 — landscape 전환 임계값 계산에 사용.
+ * MIN=240: 360px 뷰포트(컨테이너 가용폭 ~264px)에서 페이지가 좌우로 잘리지 않도록
+ * 가용폭 이하로 유지한다(이슈 #155). MIN_HEIGHT=320은 3:4(480×640) 비율 유지값 —
+ * minHeight 클램프가 축소된 최소폭에서 비율을 왜곡하지 않도록 함께 낮춘다.
+ */
+const PAGE_MIN_WIDTH = 240;
+const PAGE_MIN_HEIGHT = 320;
 const PAGE_MAX_WIDTH = 560;
 
 /**
@@ -445,7 +451,7 @@ export const FlipBookViewer = forwardRef<
           size="stretch"
           minWidth={PAGE_MIN_WIDTH}
           maxWidth={PAGE_MAX_WIDTH}
-          minHeight={420}
+          minHeight={PAGE_MIN_HEIGHT}
           maxHeight={760}
           showCover
           mobileScrollSupport
