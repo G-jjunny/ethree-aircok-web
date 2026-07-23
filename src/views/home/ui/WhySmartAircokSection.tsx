@@ -68,12 +68,13 @@ export function WhySmartAircokSection() {
         </ScrollReveal>
 
         <ScrollReveal variant="fade-up" delay={80}>
-        {/* 탭 바 (연결형 · 이음새 없음 · 상단만 라운드) — 모바일은 AdminTabs식 가로 스크롤(스크롤바 숨김),
-            데스크탑은 4탭이 자연폭으로 모두 들어가므로 기존과 동일하게 flex-1 균등 분배 */}
+        {/* 탭 바 (연결형 · 상단만 라운드) — 모바일은 2×2 그리드로 4탭 전부 노출(가로 스크롤·잘림 금지),
+            gap-px + bg-hairline 로 셀 사이 1px 구분선(연결형 유지). 데스크탑(≥sm)은 기존과 동일하게
+            flex-1 균등 4탭 + 영문/한글 2줄 라벨 복원 */}
         <div
           role="tablist"
           aria-label="스마트에어콕 도입 효과"
-          className="mt-12 flex overflow-x-auto rounded-t-card border border-hairline [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+          className="mt-12 grid grid-cols-2 gap-px overflow-hidden rounded-t-card border border-hairline bg-hairline sm:flex sm:gap-0 sm:bg-transparent"
         >
           {TABS.map((t, i) => {
             const isActive = i === active;
@@ -86,7 +87,7 @@ export function WhySmartAircokSection() {
                 aria-selected={isActive}
                 aria-controls={`why-panel-${i}`}
                 onClick={() => setActive(i)}
-                className={`flex flex-1 items-center gap-3 whitespace-nowrap border-b-2 px-4 py-4 text-left transition-colors duration-fast ${
+                className={`flex items-center justify-center gap-2 border-b-2 px-2 py-4 text-left transition-colors duration-fast sm:flex-1 sm:justify-start sm:gap-3 sm:whitespace-nowrap sm:px-4 ${
                   isActive
                     ? 'border-brand bg-surface-white'
                     : 'border-transparent bg-surface-2 hover:bg-surface-white/60'
@@ -101,13 +102,13 @@ export function WhySmartAircokSection() {
                 </span>
                 <span className="flex flex-col">
                   <span
-                    className={`font-display text-nano tracking-eyebrow ${
+                    className={`hidden font-display text-nano tracking-eyebrow sm:block ${
                       isActive ? 'text-brand' : 'text-muted'
                     }`}
                   >
                     {t.en}
                   </span>
-                  <span className={`font-bold ${isActive ? 'text-ink' : 'text-muted'}`}>
+                  <span className={`text-sm font-bold [word-break:keep-all] sm:text-base ${isActive ? 'text-ink' : 'text-muted'}`}>
                     {t.kr}
                   </span>
                 </span>
