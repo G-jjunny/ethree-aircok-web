@@ -57,7 +57,7 @@ export async function ContactFaqSection() {
         <div className="max-w-[640px]">
           {/* token 없음: max-w-[640px] 섹션 헤더 프로즈 폭(1회성) */}
           <SectionLabel color="brand">FAQ</SectionLabel>
-          <h2 className="mt-4 font-display text-h4 font-extrabold tracking-headline text-ink">
+          <h2 className="mt-4 text-h4 font-extrabold tracking-headline text-ink">
             자주 묻는 질문
           </h2>
           <p className="mt-4 text-lead-sm leading-relaxed text-muted [word-break:keep-all]">
