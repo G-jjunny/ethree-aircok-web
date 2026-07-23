@@ -87,10 +87,10 @@ function AqiCell({
 }) {
   return (
     <div className="rounded-btn bg-white/5 px-3.5 py-3">
-      <div className="text-xs text-white/55">{label}</div>
+      <div className="text-xs text-white/60">{label}</div>
       <div className="mt-1.5 flex items-baseline gap-1.5">
         <span className="font-display text-xl font-bold text-white">{value}</span>
-        <span className="text-xs text-white/50">{unit}</span>
+        <span className="text-xs text-white/60">{unit}</span>
         {status && (
           <span
             className={`ml-auto text-xs font-bold ${tone === 'good' ? 'text-aqi-good' : 'text-aqi-normal'}`}

@@ -108,7 +108,7 @@ export function WhySmartAircokSection() {
                   >
                     {t.en}
                   </span>
-                  <span className={`text-sm font-bold [word-break:keep-all] sm:text-base ${isActive ? 'text-ink' : 'text-muted'}`}>
+                  <span className={`text-base font-bold [word-break:keep-all] ${isActive ? 'text-ink' : 'text-muted'}`}>
                     {t.kr}
                   </span>
                 </span>

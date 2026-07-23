@@ -49,11 +49,12 @@ export function WhyChooseUsSection() {
           {/* 셀1 — 인트로 텍스트 (이미지 카드 아님) */}
           {/* 그리드 items-start 를 따라 카드와 같은 상단 라인에서 시작(top 정렬) */}
           <ScrollReveal variant="fade-up" className="flex flex-col">
+            {/* text-xl: 서브헤딩급 인트로 셀 제목 — 카드 제목(text-lg)보다 1위계 위 (design.md §3 역할표) */}
             <h3 className="text-xl font-extrabold leading-snug tracking-headline text-ink">
               보이지 않는 공기질까지 스마트하게 관리하는{' '}
               <span className="text-brand">AIoT 통합 솔루션</span>입니다.
             </h3>
-            <p className="mt-4 text-sm leading-relaxed text-muted">
+            <p className="mt-4 text-lead-sm leading-relaxed text-muted">
               거주자의 건강은 물론 기업 생산성과 건물 가치까지 높이는 스마트한 선택. 정확성·다양성·편리성·연계성
               네 가지 가치로 공기질 관리의 기준을 새롭게 정의합니다.
             </p>
@@ -93,7 +94,7 @@ export function WhyChooseUsSection() {
                   className="absolute inset-0 bg-linear-to-t from-navy-deep/90 via-navy-deep/20 to-transparent"
                 />
                 {/* 우상단 번호 */}
-                <div className="absolute right-5 top-4 font-display text-lg font-bold text-white/55">
+                <div className="absolute right-5 top-4 font-display text-lg font-bold text-white/60">
                   {meta.num}
                 </div>
                 {/* 하단 라벨 + 타이틀 */}
