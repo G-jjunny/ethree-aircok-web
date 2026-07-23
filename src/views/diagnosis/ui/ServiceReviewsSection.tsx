@@ -38,12 +38,12 @@ function ReviewAvatar({ review }: { review: ServiceReview }) {
 
 /**
  * 마퀴 트랙에 실리는 고정 폭 후기 카드 — 기존 그리드 카드 마크업 재사용.
- * 폭: 모바일 w-80(320) → sm 이상 w-88(352). LogoMarquee 의 w-40 대응(인용문 폭 확보 위해 확대).
+ * 폭: 모바일 w-72(288 — 360px 가용폭 296px 안에서 카드 1장이 온전히 보이도록 완화, #155) → sm 이상 w-88(352). LogoMarquee 의 w-40 대응(인용문 폭 확보 위해 확대).
  * flex-col + h-full 로 같은 행 카드 높이를 맞추고, 인용문은 line-clamp-3 로 캡, footer 는 mt-auto 로 하단 고정.
  */
 function ReviewCard({ review }: { review: ServiceReview }) {
   return (
-    <div className="flex h-full w-80 shrink-0 flex-col rounded-card border border-hairline bg-surface-white p-7.5 sm:w-88">
+    <div className="flex h-full w-72 shrink-0 flex-col rounded-card border border-hairline bg-surface-white p-7.5 sm:w-88">
       <Quote className="size-7.5 text-hairline" aria-hidden />
       <p className="mt-4 text-sm leading-loose text-ink line-clamp-3">
         {review.quote}

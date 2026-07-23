@@ -86,23 +86,23 @@ export function ServiceApplySection() {
             return (
               <div
                 key={step.no}
-                className="grid grid-cols-[64px_1fr] items-stretch gap-7.5"
+                className="grid grid-cols-[48px_1fr] items-stretch gap-4 sm:grid-cols-[64px_1fr] sm:gap-7.5"
               >
                 {/* 아이콘 + 세로 커넥터 */}
                 <div className="flex flex-col items-center gap-2">
                   <div
-                    className={`flex size-16 items-center justify-center rounded-image shadow-brand ${
+                    className={`flex size-12 items-center justify-center rounded-image shadow-brand sm:size-16 ${
                       isCyan ? 'bg-cyan' : 'bg-brand'
                     }`}
                   >
-                    <Icon className="size-7.5 text-white" strokeWidth={1.8} aria-hidden />
+                    <Icon className="size-6 text-white sm:size-7.5" strokeWidth={1.8} aria-hidden />
                   </div>
                   {!isLast && <div className="w-0.5 flex-1 bg-hairline" />}
                 </div>
 
                 {/* 카드 */}
                 <div
-                  className={`grid grid-cols-1 items-center gap-4 rounded-image border border-hairline bg-surface px-7.5 py-6.5 sm:grid-cols-[auto_1fr] sm:gap-8.5 ${
+                  className={`grid grid-cols-1 items-center gap-4 rounded-image border border-hairline bg-surface px-5 py-5 sm:grid-cols-[auto_1fr] sm:gap-8.5 sm:px-7.5 sm:py-6.5 ${
                     isLast ? '' : 'mb-11'
                   }`}
                 >

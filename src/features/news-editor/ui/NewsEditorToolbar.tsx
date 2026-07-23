@@ -10,7 +10,7 @@ interface Props {
 }
 
 const btnBase =
-  'px-2 py-1 rounded text-sm transition-colors';
+  'inline-flex items-center justify-center px-2 py-1 rounded text-sm transition-colors max-sm:min-h-11 max-sm:min-w-11';
 const btnActive = 'bg-brand text-white';
 const btnInactive = 'text-ink-soft hover:bg-hairline';
 

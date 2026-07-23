@@ -41,7 +41,7 @@ export function AdminCard({
     >
       {hasHeader && (
         <div
-          className={`flex items-start justify-between gap-4${
+          className={`flex flex-wrap items-start justify-between gap-4${
             hasBody ? ' mb-4' : ''
           }`}
         >

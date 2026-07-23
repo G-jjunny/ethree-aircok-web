@@ -55,7 +55,7 @@ export function IndoorDeviceCarousel({ devices }: { devices: AirDevice[] }) {
               type="button"
               onClick={goPrev}
               aria-label="이전 제품"
-              className="absolute left-5 top-1/2 z-20 flex h-11.5 w-11.5 -translate-y-1/2 items-center justify-center rounded-full border border-hairline bg-surface-white/92 text-brand shadow-card transition-colors duration-fast hover:bg-surface-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+              className="absolute left-2 top-1/2 z-20 flex h-11.5 w-11.5 -translate-y-1/2 items-center justify-center rounded-full border border-hairline bg-surface-white/92 text-brand shadow-card transition-colors duration-fast hover:bg-surface-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand sm:left-5"
             >
               <ChevronLeft className="h-5 w-5" />
             </button>
@@ -63,14 +63,16 @@ export function IndoorDeviceCarousel({ devices }: { devices: AirDevice[] }) {
               type="button"
               onClick={goNext}
               aria-label="다음 제품"
-              className="absolute right-5 top-1/2 z-20 flex h-11.5 w-11.5 -translate-y-1/2 items-center justify-center rounded-full border border-hairline bg-surface-white/92 text-brand shadow-card transition-colors duration-fast hover:bg-surface-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+              className="absolute right-2 top-1/2 z-20 flex h-11.5 w-11.5 -translate-y-1/2 items-center justify-center rounded-full border border-hairline bg-surface-white/92 text-brand shadow-card transition-colors duration-fast hover:bg-surface-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand sm:right-5"
             >
               <ChevronRight className="h-5 w-5" />
             </button>
           </>
         )}
 
-        {/* 카드 — 활성 카드는 크게(360) + 브랜드 글로우, 비활성은 작게(220) + 축소·감광 */}
+        {/* 카드 — 활성 카드는 크게(sm+ 360 / 모바일 224) + 브랜드 글로우, 비활성은 작게(220) + 축소·감광.
+            모바일(<sm)은 프레임 가용폭(~230px)에 비활성 카드가 들어갈 수 없어 활성 카드 1장만 노출한다
+            (이동은 화살표·dots 유지 — 캐러셀 상태 로직 무변경). */}
         <div className="relative z-10 flex min-h-75 items-center justify-center gap-6">
           {devices.map((device, i) => {
             const isActive = i === activeIndex
@@ -86,8 +88,8 @@ export function IndoorDeviceCarousel({ devices }: { devices: AirDevice[] }) {
                 onClick={() => setActive(i)}
                 aria-label={`${device.name} 선택`}
                 aria-pressed={isActive}
-                className={`group flex flex-none cursor-pointer flex-col items-center gap-3.5 rounded-card transition-transform duration-fast ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 ${
-                  isActive ? 'scale-100' : 'scale-90 hover:scale-95'
+                className={`group flex-none cursor-pointer flex-col items-center gap-3.5 rounded-card transition-transform duration-fast ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 ${
+                  isActive ? 'flex scale-100' : 'hidden scale-90 hover:scale-95 sm:flex'
                 }`}
               >
                 <SlotImage
@@ -98,10 +100,10 @@ export function IndoorDeviceCarousel({ devices }: { devices: AirDevice[] }) {
                   rounded="rounded-image"
                   className={`aspect-card max-w-full bg-surface-white transition-all duration-fast ease-out ${
                     isActive
-                      ? 'w-90 border border-hairline shadow-brand'
+                      ? 'w-56 border border-hairline shadow-brand sm:w-90'
                       : 'w-55 border border-hairline opacity-62 shadow-card group-hover:opacity-100'
                   }`}
-                  sizes="(min-width: 768px) 360px, 60vw"
+                  sizes="(min-width: 640px) 360px, 224px"
                 />
                 <span
                   className={`font-display text-meta font-bold tracking-headline ${
@@ -140,7 +142,7 @@ export function IndoorDeviceCarousel({ devices }: { devices: AirDevice[] }) {
           <span className="font-display text-2xl font-extrabold tracking-headline text-white">
             {activeDevice.name}
           </span>
-          <span className="text-meta text-white/80">{activeDevice.subtitle}</span>
+          <span className="text-meta text-white/85">{activeDevice.subtitle}</span>
         </div>
         {activeDevice.badge && (
           <span className="rounded-pill border border-white/32 bg-white/16 px-3.5 py-1.5 text-eyebrow font-bold text-white">
@@ -153,7 +155,7 @@ export function IndoorDeviceCarousel({ devices }: { devices: AirDevice[] }) {
       {activeDevice.items.length > 0 && (
         <div className="mt-5 rounded-card-lg border border-hairline bg-surface-white p-6 shadow-card">
           <div className="flex flex-wrap items-baseline justify-between gap-2">
-            <h3 className="text-lead font-extrabold text-ink">측정 항목</h3>
+            <h3 className="text-lg font-extrabold text-ink">측정 항목</h3>
             <p className="text-sm text-muted">
               온도·습도·미세먼지 등{' '}
               <b className="font-bold text-brand">{activeDevice.items.length}종</b>을
@@ -183,7 +185,7 @@ export function IndoorDeviceCarousel({ devices }: { devices: AirDevice[] }) {
             key={row.label}
             className="rounded-2xl border border-hairline bg-surface-white p-5"
           >
-            <dt className="font-display text-mini font-bold tracking-label text-muted">
+            <dt className="text-mini font-bold tracking-label text-muted">
               {row.label}
             </dt>
             <dd className="mt-2 text-base font-extrabold text-ink">{row.pick(activeDevice)}</dd>

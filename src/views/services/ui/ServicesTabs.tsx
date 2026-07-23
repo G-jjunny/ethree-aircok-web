@@ -120,7 +120,7 @@ export function ServicesTabs({
                 tabIndex={isActive ? 0 : -1}
                 onClick={() => setTab(t.key)}
                 onKeyDown={(e) => handleKeyDown(e, i)}
-                className={`flex flex-1 cursor-pointer flex-col items-start gap-0.5 border-b-2 px-5 py-4 text-left transition-colors duration-fast focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand ${
+                className={`flex flex-1 cursor-pointer flex-col items-start gap-0.5 border-b-2 px-3 py-4 text-left sm:px-5 transition-colors duration-fast focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand ${
                   isActive
                     ? `${t.activeBorder} text-ink`
                     : 'border-transparent text-faint hover:text-ink'

@@ -12,3 +12,5 @@ export {
   MAX_IMAGE_FILE_SIZE,
   IMAGE_FILE_ACCEPT,
 } from './image/validateImageFile'
+export { buildPageSlots } from './pagination/buildPageSlots'
+export type { PageSlot } from './pagination/buildPageSlots'

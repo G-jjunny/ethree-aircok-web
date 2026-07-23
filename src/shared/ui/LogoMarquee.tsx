@@ -31,18 +31,21 @@ export type LogoMarqueeProps = {
   ariaLabel?: string
 }
 
-/** 한 항목의 로고 타일 / 이름 칩. 한 마퀴 내 높이는 h-20 으로 통일해 정렬을 맞춘다. */
+/**
+ * 한 항목의 로고 타일 / 이름 칩. 한 마퀴 내 높이는 h-14(모바일)/sm:h-20 으로 통일해 정렬을 맞춘다.
+ * 모바일 축소(#155): 390px 에서 한 행에 3개 이상 보이도록 타일·로고·패딩을 sm 미만에서만 줄인다.
+ */
 function MarqueeCell({ item }: { item: LogoMarqueeItem }) {
   if (item.logoUrl) {
     return (
-      <div className="group relative flex h-20 w-full items-center justify-center overflow-hidden rounded-btn border border-hairline bg-surface-white px-6">
+      <div className="group relative flex h-14 w-full items-center justify-center overflow-hidden rounded-btn border border-hairline bg-surface-white px-4 sm:h-20 sm:px-6">
         <Image
           src={resolveLogoSrc(item.logoUrl)}
           alt={item.name}
           width={128}
           height={56}
           sizes="128px"
-          className="max-h-10 w-auto max-w-full object-contain transition-opacity duration-fast group-hover:opacity-30"
+          className="max-h-7 w-auto max-w-full object-contain transition-opacity duration-fast group-hover:opacity-30 sm:max-h-10"
         />
         <div className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-fast group-hover:opacity-100">
           <span className="px-2 text-center text-xs font-semibold text-ink">
@@ -53,9 +56,9 @@ function MarqueeCell({ item }: { item: LogoMarqueeItem }) {
     )
   }
 
-  // 이름 칩 폴백 — 로고 타일과 높이를 h-20 으로 통일(홈은 원래 h-16 이었으나 정렬 위해 승격).
+  // 이름 칩 폴백 — 로고 타일과 높이를 h-14/sm:h-20 으로 통일. 텍스트는 가독 하한 text-xs 까지만 축소.
   return (
-    <div className="flex h-20 w-full items-center justify-center rounded-btn border border-hairline bg-surface px-4 text-center text-sm font-medium text-faint">
+    <div className="flex h-14 w-full items-center justify-center rounded-btn border border-hairline bg-surface px-3 text-center text-xs font-medium text-faint sm:h-20 sm:px-4 sm:text-sm">
       {item.name}
     </div>
   )
@@ -79,14 +82,14 @@ function MarqueeRow({
       style={{ maskImage: MARQUEE_MASK, WebkitMaskImage: MARQUEE_MASK }}
     >
       <div
-        className={`flex w-max gap-4 ${
+        className={`flex w-max gap-3 sm:gap-4 ${
           direction === 'left' ? 'animate-marquee-left' : 'animate-marquee-right'
         } hover:[animation-play-state:paused]`}
       >
         {doubled.map((item, i) => (
           <div
             key={`${item.name}-${i}`}
-            className="w-40 shrink-0"
+            className="w-28 shrink-0 sm:w-40"
             aria-hidden={i >= items.length || undefined}
           >
             <MarqueeCell item={item} />
@@ -116,7 +119,7 @@ export function LogoMarquee({
     const topRow = items.filter((_, i) => i % 2 === 0)
     const bottomRow = items.filter((_, i) => i % 2 === 1)
     return (
-      <div role="group" aria-label={ariaLabel} className="flex flex-col gap-4">
+      <div role="group" aria-label={ariaLabel} className="flex flex-col gap-3 sm:gap-4">
         <MarqueeRow items={topRow} direction="left" />
         <MarqueeRow items={bottomRow} direction="right" />
       </div>

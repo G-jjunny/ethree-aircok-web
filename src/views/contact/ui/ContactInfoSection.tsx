@@ -86,7 +86,7 @@ function InfoCardBody({ card }: { card: InfoCard }) {
       <p className="mt-5 font-display text-mini font-semibold uppercase tracking-eyebrow text-muted">
         {card.label}
       </p>
-      <p className="mt-1 text-xs text-faint">{card.title}</p>
+      <p className="mt-1 text-meta text-faint">{card.title}</p>
       <p className="mt-1.5 text-lg font-bold leading-snug text-ink [word-break:keep-all]">
         {card.value}
       </p>

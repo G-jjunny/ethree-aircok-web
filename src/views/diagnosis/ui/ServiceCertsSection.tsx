@@ -77,7 +77,7 @@ export async function ServiceCertsSection() {
               <div className="mt-3 text-base font-extrabold text-ink">
                 {card.title}
               </div>
-              <p className="mt-2 text-xs leading-relaxed text-muted">{card.desc}</p>
+              <p className="mt-2 text-meta leading-relaxed text-muted">{card.desc}</p>
             </div>
           ))}
         </div>
@@ -88,7 +88,7 @@ export async function ServiceCertsSection() {
             <div className="mb-4 text-sm font-bold text-muted">
               {COPY.galleryLabel}
             </div>
-            <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 lg:grid-cols-6">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
               {certifications.map((cert, index) => (
                 <CertGalleryItem
                   key={cert.id}

@@ -19,7 +19,8 @@ import { buildInquirySchema, type InquiryFormValues } from '../model/inquirySche
 
 /** 시안 .sa-field 스타일 — hairline 보더 + rounded-btn + brand focus ring */
 const FIELD_CLASS =
-  'w-full bg-surface-white rounded-btn border border-hairline px-4 py-3 text-base text-ink placeholder:text-faint ' +
+  // text-input(16 고정): text-base 는 fluid(모바일 15px)라 iOS 포커스 자동 줌 트리거 — 인풋은 16px 고정 유지
+  'w-full bg-surface-white rounded-btn border border-hairline px-4 py-3 text-input text-ink placeholder:text-faint ' +
   'focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/28 transition-colors'
 
 /** tel 입력 sanitize: 계약 허용 문자(숫자/공백/+ - ( ))만 남긴다 */

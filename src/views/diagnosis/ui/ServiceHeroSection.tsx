@@ -51,7 +51,7 @@ export function ServiceHeroSection() {
         style={{ backgroundImage: HERO_RADIAL }}
       />
 
-      <div className="content-container relative z-10 grid items-center gap-14 py-24 lg:grid-cols-[1.05fr_0.95fr]">
+      <div className="content-container relative z-10 grid items-center gap-10 py-14 sm:gap-14 sm:py-24 lg:grid-cols-[1.05fr_0.95fr]">
         {/* 카피 컬럼 */}
         <div>
           <p className="font-display text-eyebrow font-semibold uppercase tracking-eyebrow-lg text-cyan">
@@ -70,32 +70,39 @@ export function ServiceHeroSection() {
             {COPY.bodySuffix}
           </p>
 
-          {/* 스탯칩 3개 */}
-          <div className="mt-8.5 flex flex-wrap gap-3">
+          {/* 스탯칩 3개 — 모바일 3열 grid 한 줄(셀 ~93px), sm 이상 기존 flex 복원.
+              칩 시각(보더·배경·라운드)은 유지하고 크기만 반응형(#155) */}
+          <div className="mt-8.5 grid grid-cols-3 gap-2 sm:flex sm:flex-wrap sm:gap-3">
             {STATS.map((stat) => (
               <div
                 key={stat.value}
-                className="rounded-image border border-white/12 bg-white/7 px-5.5 py-3.5"
+                className="rounded-image border border-white/12 bg-white/7 px-2.5 py-2.5 sm:px-5.5 sm:py-3.5"
               >
-                <div className="font-display text-h6 font-extrabold text-cyan">
+                {/* 의도적 페어(§3 예외): 모바일 3열 압축 — fluid h6 하한 24px 보다 낮은 16px(text-lg) 필요 */}
+                <div className="font-display text-lg font-extrabold text-cyan sm:text-h6">
                   {stat.value}
                 </div>
-                <div className="mt-0.5 text-mini text-white/60">{stat.label}</div>
+                <div className="mt-0.5 text-mini text-white/60 [word-break:keep-all]">
+                  {stat.label}
+                </div>
               </div>
             ))}
           </div>
 
           {/* 듀얼 CTA */}
           <div className="mt-9.5 flex flex-wrap gap-3.5">
+            {/* raw Link 유지(공용 Button primary 는 그라디언트라 교체 시 데스크탑 시각 변화).
+                Button md 와 동일한 반응형 패턴만 적용 — sm 이상은 현행(px-7.5 py-4 text-base) 픽셀 동일,
+                min-h-11 은 44px 터치 타깃(데스크탑 높이 56px 라 no-op)(#155) */}
             <Link
               href="#apply"
-              className="rounded-btn bg-brand px-7.5 py-4 text-base font-bold text-brand-ink shadow-brand"
+              className="inline-flex min-h-11 items-center justify-center rounded-btn bg-brand px-5 py-3 text-sm font-bold text-brand-ink shadow-brand sm:px-7.5 sm:py-4 sm:text-base"
             >
               {COPY.ctaPrimary}
             </Link>
             <Link
               href="#flow"
-              className="rounded-btn border border-white/32 px-7.5 py-4 text-base font-semibold text-white"
+              className="inline-flex min-h-11 items-center justify-center rounded-btn border border-white/32 px-5 py-3 text-sm font-semibold text-white sm:px-7.5 sm:py-4 sm:text-base"
             >
               {COPY.ctaSecondary}
             </Link>

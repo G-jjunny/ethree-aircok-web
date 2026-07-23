@@ -25,7 +25,7 @@ export function NewsFilterSection({
         value={search}
         onChange={(e) => onSearchChange(e.target.value)}
         placeholder="제목으로 검색..."
-        className="border border-hairline rounded-btn px-3 py-2 text-ink-soft text-sm font-body focus:outline-none focus:ring-2 focus:ring-brand w-56"
+        className="border border-hairline rounded-btn px-3 py-2 text-ink-soft text-sm font-body focus:outline-none focus:ring-2 focus:ring-brand w-full sm:w-56"
       />
 
       {/* 발행상태 필터 */}

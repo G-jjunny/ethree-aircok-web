@@ -75,7 +75,7 @@ export function LightStatCard({
           </span>
         )}
         {/* 대형 수치: 절제된 다크 그레이 — 블루 아님(블루는 액센트 룰/아이콘/레이블에만) */}
-        <span className="text-6xl font-bold leading-none text-heading-dark">
+        <span className="text-stat-lg font-bold leading-none text-heading-dark">
           {stat}
         </span>
       </div>

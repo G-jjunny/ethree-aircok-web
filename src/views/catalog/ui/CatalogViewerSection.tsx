@@ -104,12 +104,13 @@ export function CatalogViewerSection({ pages, images }: CatalogViewerSectionProp
               <FileText className="h-5 w-5" aria-hidden />
             </span>
             <span className="flex flex-col">
-              <span className="font-display text-white/85">{V.title}</span>
+              <span className="font-bold text-white">{V.title}</span>
               <span className="text-sm text-white/60">{V.subtitle}</span>
             </span>
           </div>
 
-          <div className="flex items-center gap-2">
+          {/* 모바일(360px): 줌(152)+전체화면(44)+PDF(~130)+gap ≈ 340px > 유효폭 320px — wrap 허용으로 두 줄 배치(#155) */}
+          <div className="flex flex-wrap items-center justify-end gap-2">
             {/* 줌 컨트롤 (− / % / +) */}
             <div className="flex items-center gap-1">
               <GlassButton onClick={() => viewerRef.current?.zoomOut()} label={V.zoomOutLabel}>
@@ -165,7 +166,7 @@ export function CatalogViewerSection({ pages, images }: CatalogViewerSectionProp
             type="button"
             onClick={() => viewerRef.current?.flipPrev()}
             aria-label={V.prevLabel}
-            className="absolute left-3 z-10 flex h-11 w-11 items-center justify-center rounded-full border border-white/12 bg-white/7 text-white backdrop-blur hover:bg-white/12 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+            className="absolute left-1 z-10 flex h-11 w-11 sm:left-3 items-center justify-center rounded-full border border-white/12 bg-white/7 text-white backdrop-blur hover:bg-white/12 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
           >
             <ChevronLeft className="h-5 w-5" aria-hidden />
           </button>
@@ -180,7 +181,7 @@ export function CatalogViewerSection({ pages, images }: CatalogViewerSectionProp
             type="button"
             onClick={() => viewerRef.current?.flipNext()}
             aria-label={V.nextLabel}
-            className="absolute right-3 z-10 flex h-11 w-11 items-center justify-center rounded-full border border-white/12 bg-white/7 text-white backdrop-blur hover:bg-white/12 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+            className="absolute right-1 z-10 flex h-11 w-11 sm:right-3 items-center justify-center rounded-full border border-white/12 bg-white/7 text-white backdrop-blur hover:bg-white/12 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
           >
             <ChevronRight className="h-5 w-5" aria-hidden />
           </button>

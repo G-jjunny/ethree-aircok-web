@@ -6,6 +6,7 @@ import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import type { NewsType } from '@/entities/news';
 import { newsListQueryOptions, NEWS_PAGE_SIZE } from '@/entities/news';
 import { useDebouncedValue } from '@/shared/hooks';
+import { buildPageSlots } from '@/shared/lib';
 import { NewsCard } from './NewsCard';
 
 type FilterValue = 'ALL' | NewsType;
@@ -57,7 +58,7 @@ function ClearIcon() {
 function ChevronIcon({ dir }: { dir: 'left' | 'right' }) {
   return (
     <svg
-      className="h-[18px] w-[18px]"
+      className="size-4.5"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
@@ -260,7 +261,7 @@ export function NewsBoard() {
         {/* 페이지네이션 */}
         {!isError && totalPages > 1 && (
           <nav
-            className="mt-11 flex items-center justify-center gap-2"
+            className="mt-11 flex flex-wrap items-center justify-center gap-2"
             aria-label="뉴스 목록 페이지"
           >
             <button
@@ -268,26 +269,37 @@ export function NewsBoard() {
               onClick={() => goToPage(currentPage - 1)}
               disabled={currentPage <= 1}
               aria-label="이전 페이지"
-              className="flex h-[40px] w-[40px] items-center justify-center rounded-[10px] border border-hairline bg-surface-white text-ink transition-colors hover:bg-surface disabled:opacity-40 disabled:hover:bg-transparent"
+              className="flex min-h-11 min-w-11 items-center justify-center rounded-btn border border-hairline bg-surface-white text-ink transition-colors hover:bg-surface disabled:opacity-40 disabled:hover:bg-transparent"
             >
               <ChevronIcon dir="left" />
             </button>
 
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => {
-              const active = p === currentPage;
+            {buildPageSlots(currentPage, totalPages).map((slot) => {
+              if (typeof slot !== 'number') {
+                return (
+                  <span
+                    key={slot}
+                    aria-hidden="true"
+                    className="flex min-h-11 min-w-11 items-center justify-center text-sm font-bold text-muted"
+                  >
+                    …
+                  </span>
+                );
+              }
+              const active = slot === currentPage;
               return (
                 <button
-                  key={p}
+                  key={slot}
                   type="button"
-                  onClick={() => goToPage(p)}
+                  onClick={() => goToPage(slot)}
                   aria-current={active ? 'page' : undefined}
-                  className={`h-[40px] min-w-[40px] rounded-[10px] px-[10px] text-sm font-bold transition-colors ${
+                  className={`min-h-11 min-w-11 rounded-btn px-2.5 text-sm font-bold transition-colors ${
                     active
                       ? 'bg-brand text-brand-ink'
                       : 'border border-hairline bg-surface-white text-ink hover:bg-surface'
                   }`}
                 >
-                  {p}
+                  {slot}
                 </button>
               );
             })}
@@ -297,7 +309,7 @@ export function NewsBoard() {
               onClick={() => goToPage(currentPage + 1)}
               disabled={currentPage >= totalPages}
               aria-label="다음 페이지"
-              className="flex h-[40px] w-[40px] items-center justify-center rounded-[10px] border border-hairline bg-surface-white text-ink transition-colors hover:bg-surface disabled:opacity-40 disabled:hover:bg-transparent"
+              className="flex min-h-11 min-w-11 items-center justify-center rounded-btn border border-hairline bg-surface-white text-ink transition-colors hover:bg-surface disabled:opacity-40 disabled:hover:bg-transparent"
             >
               <ChevronIcon dir="right" />
             </button>

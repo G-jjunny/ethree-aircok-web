@@ -60,7 +60,7 @@ export function AboutAircokSection() {
                       {step.step}
                     </span>
                   </div>
-                  <div className="mt-4 text-lead font-bold text-ink">{step.title}</div>
+                  <div className="mt-4 text-lg font-bold text-ink">{step.title}</div>
                   <p className="mt-2 text-meta leading-relaxed text-muted">{step.description}</p>
                 </ScrollReveal>
               );

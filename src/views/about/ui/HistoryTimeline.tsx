@@ -98,6 +98,13 @@ function groupByYear(
  * 연혁 타임라인 인터랙션 leaf.
  * 서버에서 조회한 timelines를 props로 받아, 비어 있으면 SITE 폴백으로 정규화한다.
  * 아코디언(펼침 연도 Set) + IntersectionObserver fade-in을 소유한다.
+ *
+ * 반응형 구조: 모바일(<sm)은 1열 스택 — 연도 헤더 행(전폭 터치 영역, min-h-11=44px)
+ * 아래에 이벤트 목록이 전폭(≈282px@360)으로 펼쳐진다. 기존 2칼럼 그리드를 모바일에
+ * 유지하면 이벤트 가용폭이 ~190px로 좁아져 월 항목이 3~5자 단위로 잘게 개행되는
+ * 판독성 문제가 있었다. 레일/노드 장식은 sm 미만에서 숨기고 이벤트별 최소 도트
+ * 인디케이터만 남긴다. sm 이상은 기존 2칼럼(sticky 연도, 레일·노드, minmax 가드)
+ * 구조를 완전 복원한다.
  */
 export function HistoryTimeline({ timelines }: { timelines: TimelineItem[] }) {
   const useApiData = Array.isArray(timelines) && timelines.length > 0
@@ -154,7 +161,7 @@ export function HistoryTimeline({ timelines }: { timelines: TimelineItem[] }) {
   }, [historyGroups])
 
   return (
-    // History Timeline (Spine 변형) — 연도 컬럼 + 연속 레일 + 노드
+    // History Timeline (Spine 변형) — 모바일 1열 스택 / sm+ 연도 컬럼 + 연속 레일 + 노드
     <ol className="flex flex-col">
       {historyGroups.map((group, groupIdx) => {
         const isOpen = expandedYears.has(group.year)
@@ -162,9 +169,14 @@ export function HistoryTimeline({ timelines }: { timelines: TimelineItem[] }) {
           <li
             key={group.year}
             ref={(el) => { groupRefs.current[groupIdx] = el }}
-            className="grid grid-cols-[88px_1fr] gap-6 opacity-0 translate-y-4 transition-all duration-500 ease-out md:grid-cols-[120px_1fr] md:gap-10"
+            // 모바일: flex 1열 스택(연도 헤더 행 → 이벤트 전폭). sm+ 2칼럼 그리드 복원.
+            // 연도 열 minmax(88px,max-content): sm~md 구간에서 fluid text-h3 연도(≈38px)+셰브론이
+            // 고정 88px를 넘으면 열이 내용만큼 늘어나 우측 레일·노드와 겹치지 않게 한다
+            className="flex flex-col opacity-0 translate-y-4 transition-all duration-500 ease-out sm:grid sm:grid-cols-[minmax(88px,max-content)_1fr] sm:gap-6 md:grid-cols-[120px_1fr] md:gap-10"
           >
-            {/* 연도 컬럼 (데스크탑 sticky) — 클릭 시 해당 연도 아코디언 토글.
+            {/* 연도 헤더 — 클릭 시 해당 연도 아코디언 토글.
+                모바일: 전폭 가로 행(연도+N건 좌 / 셰브론 우), min-h-11(44px) 터치 영역.
+                sm+: 기존 연도 컬럼(세로 스택, 데스크탑 sticky) 복원.
                 top-24(96px) 오프셋 = Nav 높이 + 여백 확보(표준 스페이싱 토큰) */}
             <button
               type="button"
@@ -172,30 +184,30 @@ export function HistoryTimeline({ timelines }: { timelines: TimelineItem[] }) {
               onClick={() => toggleYear(group.year)}
               aria-expanded={isOpen}
               aria-controls={`history-year-${group.year}`}
-              className="group flex w-full items-start justify-between gap-2 self-start rounded-btn pb-6 text-left cursor-pointer transition-colors hover:bg-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 md:sticky md:top-24 md:p-2"
+              className="group flex min-h-11 w-full items-center justify-between gap-2 rounded-btn py-2 text-left cursor-pointer transition-colors hover:bg-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 sm:min-h-0 sm:items-start sm:self-start sm:py-0 sm:pb-6 md:sticky md:top-24 md:p-2"
             >
-              <span className="flex flex-col">
-                <span className="font-display text-h6 font-extrabold leading-none text-brand sm:text-h3">
+              <span className="flex items-baseline gap-2 sm:flex-col sm:items-stretch sm:gap-0">
+                <span className="font-display text-h3 font-extrabold leading-none text-brand">
                   {group.year}
                 </span>
-                <span className="mt-1.5 text-xs font-medium text-muted">
+                <span className="text-meta font-medium text-muted sm:mt-1.5">
                   {group.eventCount}건
                 </span>
               </span>
               <ChevronDown
                 aria-hidden="true"
-                className={`mt-1 h-5 w-5 shrink-0 text-muted transition-transform duration-300 ease-in-out group-hover:text-brand ${isOpen ? 'rotate-180' : 'rotate-0'}`}
+                className={`h-5 w-5 shrink-0 text-muted transition-transform duration-300 ease-in-out group-hover:text-brand sm:mt-1 ${isOpen ? 'rotate-180' : 'rotate-0'}`}
               />
             </button>
-            {/* 이벤트 컬럼 + 레일 */}
+            {/* 이벤트 컬럼 — 모바일은 헤더 아래 전폭, 레일/노드 장식은 sm+ 전용 */}
             <div className="relative pb-6">
               <span
                 aria-hidden="true"
-                className="absolute bottom-0 left-1 top-1.5 w-px bg-hairline"
+                className="absolute bottom-0 left-1 top-1.5 hidden w-px bg-hairline sm:block"
               />
               <span
                 aria-hidden="true"
-                className="absolute left-0 top-1 h-2.5 w-2.5 rounded-pill bg-brand ring-4 ring-surface"
+                className="absolute left-0 top-1 hidden h-2.5 w-2.5 rounded-pill bg-brand ring-4 ring-surface sm:block"
               />
               {/* 아코디언 콘텐츠 — grid-rows 트릭으로 높이 애니메이션 (max-h 아님) */}
               <div
@@ -205,8 +217,8 @@ export function HistoryTimeline({ timelines }: { timelines: TimelineItem[] }) {
                 className={`grid transition-all duration-300 ease-in-out ${isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}
               >
                 <div className="overflow-hidden">
-                  {/* 월 2단계 묶음 */}
-                  <div className="flex flex-col gap-4 pl-8">
+                  {/* 월 2단계 묶음 — 모바일 pl-0(전폭 판독)+pt-2, sm+ 레일 우측 pl-8 복원 */}
+                  <div className="flex flex-col gap-4 pt-2 sm:pl-8 sm:pt-0">
                     {group.months.map((monthGroup) => (
                       <div key={monthGroup.monthNum}>
                         <p className="mb-2 text-sm font-bold text-brand">
@@ -216,14 +228,15 @@ export function HistoryTimeline({ timelines }: { timelines: TimelineItem[] }) {
                           {monthGroup.contents.map((content, idx) => (
                             <li
                               key={`${monthGroup.monthNum}-${idx}`}
-                              className="relative flex [word-break:keep-all]"
+                              className="relative flex pl-3.5 [word-break:keep-all] sm:pl-0"
                             >
-                              {/* token 없음: 이벤트 노드를 레일 중심(pl-8 기준 -27px)에 맞추는 1회성 정렬 오프셋 */}
+                              {/* 모바일: 좌측 최소 도트 인디케이터(left-0, li pl-3.5 들여쓰기).
+                                  token 없음: sm+ 이벤트 노드를 레일 중심(pl-8 기준 -27px)에 맞추는 1회성 정렬 오프셋 */}
                               <span
                                 aria-hidden="true"
-                                className="absolute -left-[27px] top-2 h-1.5 w-1.5 rounded-pill bg-hairline"
+                                className="absolute left-0 top-2 h-1.5 w-1.5 rounded-pill bg-hairline sm:-left-[27px]"
                               />
-                              <span className="text-lead leading-relaxed text-ink-soft">
+                              <span className="text-base leading-relaxed text-ink-soft">
                                 {content}
                               </span>
                             </li>

@@ -17,8 +17,8 @@ import { CatalogDownloadsSection } from './CatalogDownloadsSection'
 function FlipBookPlaceholder() {
   return (
     <div className="flex justify-center py-20">
-      {/* token 없음: 960x640 — 플립북 양면(2페이지) 스프레드 고정 캔버스 치수 자리표시자 */}
-      <div className="h-[640px] w-[960px] max-w-full animate-pulse rounded-card-lg bg-surface" />
+      {/* token 없음: 960x640 — 플립북 양면(2페이지) 스프레드 고정 캔버스 치수 자리표시자(모바일은 뷰어 축소 렌더에 맞춰 h-[420px]로 완화) */}
+      <div className="h-[420px] w-[960px] max-w-full animate-pulse sm:h-[640px] rounded-card-lg bg-surface" />
     </div>
   )
 }
@@ -58,12 +58,12 @@ export function CatalogView() {
             <FlipBookPlaceholder />
           ) : isError ? (
             <div className="flex flex-col items-center justify-center gap-3 rounded-card border border-hairline bg-surface-white px-6 py-20 text-center">
-              <p className="text-sm text-ink">카탈로그를 불러오지 못했습니다.</p>
+              <p className="text-lg font-bold text-ink">카탈로그를 불러오지 못했습니다.</p>
               <p className="text-sm text-muted">잠시 후 다시 시도해 주세요.</p>
             </div>
           ) : images.length === 0 ? (
             <div className="flex flex-col items-center justify-center gap-3 rounded-card border border-hairline bg-surface-white px-6 py-20 text-center">
-              <p className="text-sm text-ink">등록된 카탈로그가 없습니다.</p>
+              <p className="text-lg font-bold text-ink">등록된 카탈로그가 없습니다.</p>
               <p className="text-sm text-muted">콘텐츠 준비 중입니다.</p>
             </div>
           ) : (

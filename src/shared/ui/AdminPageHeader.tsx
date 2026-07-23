@@ -16,7 +16,7 @@ export function AdminPageHeader({
   return (
     <div
       className={`bg-surface-white border-b border-hairline px-6 lg:px-8 py-5${
-        hasChildren ? ' flex items-center justify-between gap-4' : ''
+        hasChildren ? ' flex flex-wrap items-center justify-between gap-4' : ''
       }`}
     >
       {/* title + description 묶음 */}

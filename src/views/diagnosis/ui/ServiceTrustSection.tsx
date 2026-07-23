@@ -113,7 +113,7 @@ export function ServiceTrustSection({ children }: { children?: ReactNode }) {
 
         {/* 통계밴드 */}
         <div
-          className="relative mt-5.5 overflow-hidden rounded-card-lg px-10.5 py-11 text-white"
+          className="relative mt-5.5 overflow-hidden rounded-card-lg px-5 py-11 text-white sm:px-10.5"
           style={{ backgroundImage: STAT_BAND_BG }}
         >
           <div
@@ -130,10 +130,10 @@ export function ServiceTrustSection({ children }: { children?: ReactNode }) {
                   {value}
                   {unit && <span className="text-xl text-cyan">{unit}</span>}
                 </div>
-                <div className="mt-2.5 text-meta font-semibold text-white/82">
+                <div className="mt-2.5 text-sm font-semibold text-white/60">
                   {label}
                 </div>
-                <div className="mt-1 text-xs text-white/50">{caption}</div>
+                <div className="mt-1 text-meta text-white/40">{caption}</div>
               </div>
             ))}
           </div>

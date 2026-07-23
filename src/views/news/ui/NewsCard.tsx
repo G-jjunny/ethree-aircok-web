@@ -99,7 +99,7 @@ function CardBody({ item }: Props) {
   return (
     <div className="flex flex-1 flex-col p-6">
       {/* 메타: 타입 라벨 · 날짜 */}
-      <div className="flex items-center gap-2 text-xs">
+      <div className="flex items-center gap-2 text-meta">
         <span className="font-bold text-ink">{isLink ? '외부 링크' : '게시글'}</span>
         <span className="text-faint">·</span>
         <time className="text-muted" dateTime={item.date}>
@@ -107,7 +107,7 @@ function CardBody({ item }: Props) {
         </time>
       </div>
 
-      <h3 className="mt-2.5 text-lg font-extrabold leading-snug tracking-tight text-ink line-clamp-2">
+      <h3 className="mt-2.5 text-lg font-extrabold leading-snug tracking-headline text-ink line-clamp-2">
         {item.title}
       </h3>
 

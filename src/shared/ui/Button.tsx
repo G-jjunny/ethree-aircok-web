@@ -52,9 +52,11 @@ const VARIANT: Record<ButtonVariant, string> = {
 // 가로 패딩은 클린 그리드 스텝(px-5/px-6)만 사용 — globals 의 --spacing-5~10 임시 오염을
 // 피하고(px-7=48px 회귀 방지) 오염 제거 후에도 자연스럽게 20/24px 로 안착한다.
 // 세로/최소높이는 안정 스텝(py-2.5=10, py-4=16, min-h-11=44 터치타겟).
+// sm 은 데스크톱 40px 시각 스펙 유지, 모바일(<sm)에서만 max-sm:min-h-11 로 44px 터치 타겟 보장(#155).
+// md 는 모바일에서 px-5 py-3 text-sm 으로 축소하고 sm: 에서 현행 스펙 복원 — min-h-11 은 유지(#155).
 const SIZE: Record<ButtonSize, string> = {
-  sm: 'px-5 py-2.5 text-sm',
-  md: 'px-6 py-4 text-base min-h-11',
+  sm: 'px-5 py-2.5 text-sm max-sm:min-h-11',
+  md: 'px-5 py-3 text-sm sm:px-6 sm:py-4 sm:text-base min-h-11',
 }
 
 function composeClasses({

@@ -86,31 +86,35 @@ export async function TeamSection() {
           <p className="mt-4 text-lead-sm leading-relaxed text-muted">{body}</p>
         </div>
 
-        {/* 팀 사진 (와이드) + 하단 그라디언트 오버레이 + 흰 텍스트 */}
-        <div className="relative aspect-featured w-full overflow-hidden rounded-card-lg">
-          {firstImage ? (
-            <Image
-              src={resolveSrc(firstImage.imageUrl)}
-              alt={title}
-              fill
-              sizes="(min-width: 1240px) 1176px, 100vw"
-              className="object-cover"
-            />
-          ) : (
-            <PagePlaceholder
-              variant="dark"
-              rounded="rounded-none"
-              className="h-full w-full"
-            />
-          )}
-          {/* 하단 그라디언트 오버레이 — 흰 텍스트 대비 */}
-          <div className="absolute inset-0 bg-linear-to-t from-navy-deep/80 to-transparent" />
-          <div className="absolute inset-x-0 bottom-0 p-8">
+        {/* 팀 사진 + 캡션 — 모바일(<sm)은 16/7 높이(~130px)에 오버레이 캡션이 넘치므로
+            사진 16/10(aspect-card) + 캡션을 사진 아래 navy 블록으로 흐름 배치,
+            sm+는 와이드(16/7) + 오버레이 캡션 현행 복원 */}
+        <div className="relative w-full overflow-hidden rounded-card-lg">
+          <div className="relative aspect-card w-full sm:aspect-featured">
+            {firstImage ? (
+              <Image
+                src={resolveSrc(firstImage.imageUrl)}
+                alt={title}
+                fill
+                sizes="(min-width: 1240px) 1176px, 100vw"
+                className="object-cover"
+              />
+            ) : (
+              <PagePlaceholder
+                variant="dark"
+                rounded="rounded-none"
+                className="h-full w-full"
+              />
+            )}
+            {/* 하단 그라디언트 오버레이 — 흰 텍스트 대비(모바일에선 아래 navy 캡션 블록과 색이 이어짐) */}
+            <div className="absolute inset-0 bg-linear-to-t from-navy-deep/80 to-transparent" />
+          </div>
+          <div className="bg-navy-deep p-4 sm:absolute sm:inset-x-0 sm:bottom-0 sm:bg-transparent sm:p-8">
             <SectionLabel color="cyan" size="sm">
               {photoEyebrow}
             </SectionLabel>
             {/* token 없음: max-w-[520px] 오버레이 캡션 프로즈 폭(1회성) */}
-            <p className="mt-2 max-w-[520px] text-lg font-semibold leading-snug text-white">
+            <p className="mt-2 max-w-[520px] text-lg font-bold leading-snug text-white">
               {photoCaption}
             </p>
           </div>
@@ -123,7 +127,7 @@ export async function TeamSection() {
               key={card.title}
               className="flex flex-col gap-3 rounded-2xl border border-hairline bg-surface p-6"
             >
-              <h3 className="font-display text-base font-semibold text-brand">
+              <h3 className="text-lg font-bold text-ink">
                 {card.title}
               </h3>
               <p className="text-sm leading-relaxed text-muted">{card.description}</p>

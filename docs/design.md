@@ -110,8 +110,9 @@ AQI 바 그라디언트: `from-aqi-good via-brand via-aqi-warning to-aqi-bad`.
 
 ### 다크 배경 위 반투명 (하드코딩 아님 — 기본 토큰 + opacity)
 
-- 본문 강/약: `text-white/85` · `text-white/75` · `text-white/70` · `text-white/68` · `text-white/62` · `text-white/60` (시안 실측 스텝 — opacity 자유값 허용, 하드코딩 아님)
-- 저대비 라벨/카피: `text-white/40` · `text-white/28`
+- **텍스트 4단계 (정규화 · 이슈 #155 후속)**: `text-white/85`(본문 강 — CTA 직결 핵심 리스트 등) · `text-white/70`(본문 — 리드·일반 본문) · `text-white/60`(보조 — 카드 내부 라벨·단위·장식 번호) · `text-white/40`(희미 — 저대비 eyebrow/카피). **새 코드는 이 4단계만 사용한다.**
+- 장식·워터마크(텍스트 위계 밖): `text-white/28`(플레이스홀더 워터마크) · `text-white/25`(구분점 `·` 등 순수 장식)
+- 구 자유값(`/90 /82 /75 /72 /68 /62 /55 /50 /35`)은 **마이그레이션 대상** — 홈은 정규화 완료(§3 텍스트 역할 표), 타 페이지는 각 페이지 통일 작업 시 4단계로 수렴한다
 - divider `border-white/8` · 아이콘 원 `border-white/20` · outline 버튼 `border-white/50`
 - 글래스 카드(다크 위 스탯 카드): 채움 `bg-white/7` · 보더 `border-white/12` — 시안 실측값 `.07`/`.12` 유지(About STATS, 홈 실시간 카드 재사용). 문서 SSOT 는 `.07`(= `bg-white/7`) 로 확정.
 - 브랜드 글로우 배경: `bg-brand/12` · `bg-brand/14` (배지·행동요령 팁), 보더 `border-brand/28` · `border-brand/40`
@@ -131,16 +132,68 @@ AQI 바 그라디언트: `from-aqi-good via-brand via-aqi-warning to-aqi-bad`.
 
 | 클래스 | px | 클래스 | px |
 | --- | --- | --- | --- |
-| `text-hero` | 60 | `text-h6` | 28 |
-| `text-display` | 56 | `text-subtitle` | 26 |
-| `text-h1` | 52 | `text-lead` | 17 |
-| `text-stat` | 46 | `text-lead-sm` | 16.5 |
-| `text-h2` | 44 | `text-meta` | 13.5 |
-| `text-h3` | 38 | `text-eyebrow` | 12.5 |
-| `text-h4` | 36 | `text-mini` | 11 |
-| `text-h5` | 34 | `text-nano` | 10.5 |
+| `text-hero` † | 60 | `text-h6` † | 28 |
+| `text-stat-lg` † | 60 | `text-subtitle` † | 26 |
+| `text-display` † | 56 | `text-lead` † | 17 |
+| `text-h1` † | 52 | `text-lead-sm` † | 16.5 |
+| `text-stat` † | 46 | `text-meta` † | 13.5 |
+| `text-h2` † | 44 | `text-eyebrow` | 12.5 |
+| `text-section` † | 40 | `text-mini` | 11 |
+| `text-h3` † | 38 | `text-nano` | 10.5 |
+| `text-h4` † | 36 |  |  |
+| `text-h5` † | 34 | `text-input` | 16 고정 |
 
-**기본 유틸 재사용**: `text-7xl`(72) `text-5xl`(48) `text-2xl`(24) `text-xl`(20·22 근사) `text-lg`(18) `text-base`(16) `text-sm`(14·15 근사) `text-xs`(12).
+† = **fluid clamp 토큰**: 표의 px는 데스크탑(≥640px) 값. 360px에서 최소값(헤딩: 60~36px 계열 → 36 / 44~34px 계열 → 28 / 본문·서브: 산식 표 참조)으로 시작해 640px(sm)에서 원값에 도달한다. `text-input`(16 고정)은 폼 인풋/에디터 전용 — iOS 포커스 자동 줌 방지용으로 fluid 를 적용하지 않는다.
+
+**기본 유틸 재사용**: `text-7xl`(72) `text-5xl`(48) `text-2xl`(24) `text-xl`(20·22 근사)† `text-lg`(18)† `text-base`(16)† `text-sm`(14·15 근사)† `text-xs`(12). — `text-xl/lg/base/sm` 은 `@theme` 오버라이드로 **fluid clamp** 다(산식 표 참조). `text-xs`(12)는 최소 가독 플로어라 오버라이드하지 않는다. line-height 페어(`--text-sm--line-height` 등)는 v4 기본 비율값을 명시 재정의해 보존한다.
+
+**반응형 타이포 정책 (fluid 토큰 · 이슈 #155)**: 헤딩·통계 토큰은 **값 자체가 `clamp()`** 다 — 사용처는 단일 토큰 클래스만 쓰고 `text-4xl sm:text-hero` 같은 브레이크포인트 페어를 만들지 않는다. 360px에서 min, 640px(sm)에서 max에 도달하며, **≥640px에서는 clamp 상한으로 기존 데스크탑 값과 픽셀 동일(무회귀)**, 360~640px 구간만 선형 보간된다. 본문·라벨 계열(`text-xl/lg/base/sm`, `h6/subtitle/lead/lead-sm/meta`)도 동일 산식의 fluid 다 — 구 "h6 이하 축소 없음" 정책은 #155 후속으로 **개정**되었다. 단 12px 플로어(접근성)에 근접한 `text-xs`(12)·`eyebrow`(12.5)·`mini`(11)·`nano`(10.5)는 fluid 미적용이며, 폼 인풋/에디터(iOS 포커스 줌 방지)는 fluid `text-base` 대신 `text-input`(16 고정)을 쓴다. 신규로 반복되는 반응형 수치는 사용처마다 페어를 붙이는 대신 **fluid 토큰 추가를 우선 검토**한다.
+
+산식: `preferred = (max−min)/2.8 vw + (min − (max−min)×9/7) px` (360→640px 선형, vw 계수는 소수 4자리 올림 → 640px에서 preferred ≥ max가 되어 clamp 상한이 max로 캡)
+
+| 토큰 | 360px min | preferred | ≥640px max |
+| --- | --- | --- | --- |
+| `text-hero` / `text-stat-lg` | 36 | `8.5715vw + 0.3214rem` | 60 |
+| `text-display` | 36 | `7.1429vw + 0.6429rem` | 56 |
+| `text-h1` | 36 | `5.7143vw + 0.9643rem` | 52 |
+| `text-stat` | 36 | `3.5715vw + 1.4464rem` | 46 |
+| `text-h2` | 28 | `5.7143vw + 0.4643rem` | 44 |
+| `text-section` | 28 | `4.2858vw + 0.7857rem` | 40 |
+| `text-h3` | 28 | `3.5715vw + 0.9464rem` | 38 |
+| `text-h4` | 28 | `2.8572vw + 1.1071rem` | 36 |
+| `text-h5` | 28 | `2.1429vw + 1.2679rem` | 34 |
+| `text-h6` | 24 | `1.4286vw + 1.1786rem` | 28 |
+| `text-subtitle` | 22 | `1.4286vw + 1.0536rem` | 26 |
+| `text-xl` | 17 | `1.0715vw + 0.8214rem` | 20 |
+| `text-lg` | 16 | `0.7143vw + 0.8393rem` | 18 |
+| `text-lead` | 15 | `0.7143vw + 0.7768rem` | 17 |
+| `text-lead-sm` | 15 | `0.5358vw + 0.817rem` | 16.5 |
+| `text-base` | 15 | `0.3572vw + 0.8572rem` | 16 |
+| `text-sm` | 12.5 | `0.5358vw + 0.6607rem` | 14 |
+| `text-meta` | 12.5 | `0.3572vw + 0.7009rem` | 13.5 |
+
+(구 페어 방식 정리: `SectionHeader`의 `text-[28px] sm:text-[40px]` → `text-section`, `HistoryTimeline`의 `text-h6 sm:text-h3` → `text-h3`, `Dark/LightStatCard`의 `text-4xl sm:text-6xl` → `text-stat-lg`로 수렴 완료)
+
+### 텍스트 역할 표 (역할당 1종 · 이슈 #155 후속)
+
+같은 역할의 텍스트는 아래 조합 **1종만** 사용한다. 홈 8개 섹션 + HeroAqiCard 에 적용 완료 — **이후 다른 페이지 텍스트 통일 작업도 이 표를 그대로 재사용하는 기준**이다.
+
+| 역할 | 토큰 조합 | 라이트 색 | 다크 색 |
+| --- | --- | --- | --- |
+| 섹션 리드 (섹션 헤딩 아래 리드 문단) | `text-lead-sm leading-relaxed` | `text-muted` | `text-white/70` |
+| 히어로 리드 (h1이 `text-hero`/`text-h1`급인 페이지 히어로 한정) | `text-lead leading-relaxed` | — | `text-white/70` |
+| 패널·프로즈 본문 (탭 패널 설명 등 주 읽기 본문) | `text-base leading-relaxed` | `text-ink-soft`(강조) / `text-muted` | `text-white/70` |
+| 카드 제목 | `text-lg font-bold`~`font-extrabold` | `text-ink` | `text-white` |
+| 서브헤딩급 인트로 셀 제목 (카드 그리드의 텍스트 인트로 셀 — 카드 제목보다 1위계 위) | `text-xl font-extrabold` | `text-ink` | `text-white` |
+| 카드 본문 | `text-sm leading-relaxed` | `text-muted` | `text-white/70` |
+| 강조 리스트 항목 (다크 CTA 섹션 체크리스트 등 핵심 혜택) | `text-lead-sm leading-relaxed` | — | `text-white/85` |
+| 트러스트 스트립 항목 (인증 등 인라인 나열) | `text-sm font-medium` | `text-muted` | `text-white/70` |
+| 캡션·메타 (스텝 설명·통계 라벨·출처·단위) | `text-meta` (+긴 문장은 `leading-relaxed`) | `text-muted`(보조) / `text-faint`(희미·출처) | `text-white/60` |
+| eyebrow 계열 | `SectionLabel` 또는 `font-display text-eyebrow tracking-eyebrow` (기존 유지) | 기존 | 기존 |
+
+- 폰트 크기 반응형은 전역 fluid 토큰이 담당한다 — 역할 조합에 `sm:text-*` 페어를 덧붙이지 않는다. 페어는 fluid 로 표현 불가한 **의도적 모바일 위계 축소**(예: 홈 히어로 STATS 숫자 `text-xl sm:text-h6` — 모바일 3열 압축을 위해 fluid h6 하한 24px 보다 낮은 17px 필요)일 때만 사유 주석과 함께 허용한다.
+- **통계/스탯 라벨 예외**: 큰 숫자 옆 통계 라벨은 `text-meta` 로 낮추지 않고 `text-sm` **크기를 유지**하며, 색만 보조 단계(라이트 `text-muted` / 다크 `text-white/60`)로 낮춘다 — 숫자 대비 라벨 가독 균형(소개 STATS 선례).
+- 예외는 값 옆 주석 + 이 표 개정으로만 허용한다.
 
 ### 트래킹 (letter-spacing)
 

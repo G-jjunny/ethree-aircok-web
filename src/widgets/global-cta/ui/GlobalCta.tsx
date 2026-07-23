@@ -55,7 +55,7 @@ export async function GlobalCta() {
       />
       <div className="content-container relative flex flex-wrap items-center justify-between gap-8 py-20">
         <div>
-          <p className="font-display text-eyebrow font-semibold uppercase tracking-eyebrow-lg text-white/80">
+          <p className="font-display text-eyebrow font-semibold uppercase tracking-eyebrow-lg text-white/70">
             Clean air starts here
           </p>
           <h2 className="mt-2.5 text-h3 font-extrabold leading-tight tracking-headline">
@@ -65,7 +65,7 @@ export async function GlobalCta() {
             시설에 맞는 공기질 관리 솔루션을 상담해 드립니다.
           </p>
           <p className="mt-3 text-sm text-white/70">
-            메일 문의 <span className="font-semibold text-white/90">{email}</span>
+            메일 문의 <span className="font-semibold text-white/85">{email}</span>
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-3.5">

@@ -68,11 +68,13 @@ export function WhySmartAircokSection() {
         </ScrollReveal>
 
         <ScrollReveal variant="fade-up" delay={80}>
-        {/* 탭 바 (연결형 · 이음새 없음 · 상단만 라운드) */}
+        {/* 탭 바 (연결형 · 상단만 라운드) — 모바일은 2×2 그리드로 4탭 전부 노출(가로 스크롤·잘림 금지),
+            gap-px + bg-hairline 로 셀 사이 1px 구분선(연결형 유지). 데스크탑(≥sm)은 기존과 동일하게
+            flex-1 균등 4탭 + 영문/한글 2줄 라벨 복원 */}
         <div
           role="tablist"
           aria-label="스마트에어콕 도입 효과"
-          className="mt-12 flex overflow-hidden rounded-t-card border border-hairline"
+          className="mt-12 grid grid-cols-2 gap-px overflow-hidden rounded-t-card border border-hairline bg-hairline sm:flex sm:gap-0 sm:bg-transparent"
         >
           {TABS.map((t, i) => {
             const isActive = i === active;
@@ -85,7 +87,7 @@ export function WhySmartAircokSection() {
                 aria-selected={isActive}
                 aria-controls={`why-panel-${i}`}
                 onClick={() => setActive(i)}
-                className={`flex flex-1 items-center gap-3 border-b-2 px-4 py-4 text-left transition-colors duration-fast ${
+                className={`flex items-center justify-center gap-2 border-b-2 px-2 py-4 text-left transition-colors duration-fast sm:flex-1 sm:justify-start sm:gap-3 sm:whitespace-nowrap sm:px-4 ${
                   isActive
                     ? 'border-brand bg-surface-white'
                     : 'border-transparent bg-surface-2 hover:bg-surface-white/60'
@@ -100,13 +102,13 @@ export function WhySmartAircokSection() {
                 </span>
                 <span className="flex flex-col">
                   <span
-                    className={`font-display text-nano tracking-eyebrow ${
+                    className={`hidden font-display text-nano tracking-eyebrow sm:block ${
                       isActive ? 'text-brand' : 'text-muted'
                     }`}
                   >
                     {t.en}
                   </span>
-                  <span className={`font-bold ${isActive ? 'text-ink' : 'text-muted'}`}>
+                  <span className={`text-base font-bold [word-break:keep-all] ${isActive ? 'text-ink' : 'text-muted'}`}>
                     {t.kr}
                   </span>
                 </span>
@@ -120,22 +122,25 @@ export function WhySmartAircokSection() {
           role="tabpanel"
           id={`why-panel-${active}`}
           aria-labelledby={`why-tab-${active}`}
-          className="rounded-b-card border border-t-0 border-hairline bg-surface-white p-7"
+          className="rounded-b-card border border-t-0 border-hairline bg-surface-white p-5 sm:p-7"
         >
-          <div className="grid items-center gap-13 md:grid-cols-[0.85fr_1.15fr]">
+          <div className="grid items-center gap-8 md:gap-13 md:grid-cols-[0.85fr_1.15fr]">
             {/* 좌: eyebrow + 제목 + 지표 */}
             <div>
               <SectionLabel color="brand" size="sm">
                 {tab.en}
               </SectionLabel>
               <h3 className="mt-3 text-subtitle font-extrabold text-ink">{stat.title}</h3>
-              <div className="mt-5 flex flex-wrap gap-6">
+              {/* 모바일: 수치별 세로 스택(값+라벨 베이스라인 인라인) — 3열 grid 는 "$15,500"(text-h3)이
+                  셀폭(~74px)을 넘어 토큰 floor 미만 축소가 필요하고 탭별 수치 1~3개 가변이라 빈 셀이 생김.
+                  세로 스택은 fluid text-h3 토큰을 그대로 유지한다. 데스크탑(≥sm)은 기존 flex wrap gap-6 복원 */}
+              <div className="mt-5 flex flex-col gap-2.5 sm:flex-row sm:flex-wrap sm:gap-6">
                 {tab.metrics.map((m) => (
-                  <div key={m.label}>
+                  <div key={m.label} className="flex items-baseline gap-2.5 sm:block">
                     <div className="font-display text-h3 font-extrabold text-brand">
                       {m.value}
                     </div>
-                    <div className="mt-1 text-meta text-muted">{m.label}</div>
+                    <div className="text-meta text-muted sm:mt-1">{m.label}</div>
                   </div>
                 ))}
               </div>

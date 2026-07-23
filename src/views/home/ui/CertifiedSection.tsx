@@ -24,7 +24,7 @@ export function CertifiedSection() {
         </span>
         <span aria-hidden className="h-4 w-px bg-white/14" />
         {CERTS.map((cert, i) => (
-          <span key={cert} className="text-sm font-medium text-white/75">
+          <span key={cert} className="text-sm font-medium text-white/70">
             {i > 0 && <span className="mr-3.5 text-white/25">·</span>}
             {cert}
           </span>

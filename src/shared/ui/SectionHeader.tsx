@@ -31,7 +31,7 @@ export function SectionHeader({
         </span>
       )}
       <Tag
-        className={`text-[28px] sm:text-[40px] font-semibold leading-[1.10] tracking-[-0.3px] [word-break:keep-all] ${maxWidth} ${
+        className={`text-section font-semibold leading-[1.10] tracking-[-0.3px] [word-break:keep-all] ${maxWidth} ${
           isDark ? 'text-heading-light' : 'text-heading-dark'
         }`}
       >

@@ -61,7 +61,7 @@ export function CatalogDownloadsSection({ images }: CatalogDownloadsSectionProps
   return (
     <section className="flex flex-col gap-6">
       <div className="flex flex-col gap-1">
-        <h2 className="text-xl font-bold text-ink">{V.downloadsTitle}</h2>
+        <h2 className="text-xl font-extrabold text-ink">{V.downloadsTitle}</h2>
         <p className="text-sm text-muted">{V.downloadsDescription}</p>
       </div>
 
@@ -80,7 +80,7 @@ export function CatalogDownloadsSection({ images }: CatalogDownloadsSectionProps
             </span>
 
             <div className="flex flex-col gap-1">
-              <span className="font-semibold text-ink">{item.label}</span>
+              <span className="text-lg font-bold text-ink">{item.label}</span>
               <span className="text-sm text-muted">{item.meta}</span>
             </div>
 

@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState, useEffect, useRef } from 'react';
 import type { NewsSummary } from '@/entities/news';
+import { buildPageSlots } from '@/shared/lib';
 import { DeleteButton } from './DeleteButton';
 
 const PAGE_SIZE = 20;
@@ -45,14 +46,14 @@ function PreviewPanel({
         onClick={onClose}
       />
       {/* 패널 */}
-      <div className="fixed inset-y-0 right-0 w-96 bg-surface-white shadow-card z-50 flex flex-col">
+      <div className="fixed inset-y-0 right-0 w-full max-w-md bg-surface-white shadow-card z-50 flex flex-col">
         {/* 헤더 */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-hairline">
           <h3 className="text-ink-soft text-base font-body font-semibold">미리보기</h3>
           <button
             type="button"
             onClick={onClose}
-            className="text-muted hover:text-ink-soft transition-colors text-lg leading-none"
+            className="inline-flex items-center justify-center text-muted hover:text-ink-soft transition-colors text-lg leading-none max-sm:min-h-11 max-sm:min-w-11"
           >
             ✕
           </button>
@@ -136,7 +137,9 @@ export function NewsTableSection({ items }: Props) {
 
   return (
     <div className="bg-surface-white rounded-card border border-hairline overflow-hidden">
-      <table className="w-full border-collapse">
+      {/* 모바일(가용 312px)에서 표가 붕괴하지 않도록 표 영역만 가로 스크롤 — 라운드 카드 시각은 바깥 래퍼가 유지 */}
+      <div className="overflow-x-auto">
+        <table className="w-full border-collapse">
         <thead className="bg-surface border-b border-hairline">
           <tr>
             {/* text-[13px]: token 없음 — 테이블 헤더 전용 중간 캡션 크기(xs=12px, sm=14px 사이) */}
@@ -164,10 +167,10 @@ export function NewsTableSection({ items }: Props) {
               className="hover:bg-surface transition-colors cursor-pointer"
               onClick={() => setSelectedItem(item)}
             >
-              <td className="px-4 py-4 text-sm text-ink-soft font-body max-w-xs truncate">
+              <td className="px-4 py-4 text-sm text-ink-soft font-body min-w-45 max-w-xs truncate">
                 {item.title}
               </td>
-              <td className="px-4 py-4 text-sm text-muted font-body">
+              <td className="px-4 py-4 text-sm text-muted font-body whitespace-nowrap">
                 {formatDate(item.date)}
               </td>
               <td className="px-4 py-4">
@@ -201,45 +204,63 @@ export function NewsTableSection({ items }: Props) {
             </tr>
           ))}
         </tbody>
-      </table>
+        </table>
+      </div>
 
       {/* 페이지네이션 */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between px-4 py-3 border-t border-hairline">
+        <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-3 border-t border-hairline">
           {/* text-[13px]: token 없음 — 테이블 캡션 전용 중간 크기(xs=12px, sm=14px 사이) */}
           <p className="text-muted text-[13px] font-body">
             {items.length}개 중{' '}
             {(currentPage - 1) * PAGE_SIZE + 1}–
             {Math.min(currentPage * PAGE_SIZE, items.length)}개 표시
           </p>
-          <div className="flex items-center gap-1">
+          <div className="flex flex-wrap items-center gap-1">
             <button
               type="button"
               onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
               disabled={currentPage === 1}
-              className="w-8 h-8 rounded text-sm font-body transition-colors text-ink-soft hover:bg-surface disabled:opacity-40 disabled:cursor-not-allowed"
+              aria-label="이전 페이지"
+              className="min-h-11 min-w-11 rounded text-sm font-body transition-colors text-ink-soft hover:bg-surface disabled:opacity-40 disabled:cursor-not-allowed"
             >
               ←
             </button>
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-              <button
-                key={page}
-                type="button"
-                onClick={() => setCurrentPage(page)}
-                className={`w-8 h-8 rounded text-sm font-body transition-colors ${
-                  page === currentPage
-                    ? 'bg-brand text-white'
-                    : 'text-ink-soft hover:bg-surface'
-                }`}
-              >
-                {page}
-              </button>
-            ))}
+            {buildPageSlots(currentPage, totalPages).map((slot) => {
+              if (typeof slot !== 'number') {
+                return (
+                  <span
+                    key={slot}
+                    aria-hidden="true"
+                    className="flex min-h-11 min-w-11 items-center justify-center text-sm font-body text-muted"
+                  >
+                    …
+                  </span>
+                );
+              }
+              const active = slot === currentPage;
+              return (
+                <button
+                  key={slot}
+                  type="button"
+                  onClick={() => setCurrentPage(slot)}
+                  aria-current={active ? 'page' : undefined}
+                  className={`min-h-11 min-w-11 rounded text-sm font-body transition-colors ${
+                    active
+                      ? 'bg-brand text-white'
+                      : 'text-ink-soft hover:bg-surface'
+                  }`}
+                >
+                  {slot}
+                </button>
+              );
+            })}
             <button
               type="button"
               onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
               disabled={currentPage === totalPages}
-              className="w-8 h-8 rounded text-sm font-body transition-colors text-ink-soft hover:bg-surface disabled:opacity-40 disabled:cursor-not-allowed"
+              aria-label="다음 페이지"
+              className="min-h-11 min-w-11 rounded text-sm font-body transition-colors text-ink-soft hover:bg-surface disabled:opacity-40 disabled:cursor-not-allowed"
             >
               →
             </button>

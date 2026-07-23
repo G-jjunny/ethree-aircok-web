@@ -69,7 +69,7 @@ export function DarkStatCard({
       <span className="text-xs font-semibold uppercase tracking-widest text-aircok-blue-light">
         {category}
       </span>
-      <span className="text-6xl font-bold leading-none text-heading-light">
+      <span className="text-stat-lg font-bold leading-none text-heading-light">
         {stat}
       </span>
       {/* lg:min-h-[2.4em]: 4열 좁은 폭에서 1줄/2줄 제목 모두 동일 영역 점유 → description 시작점 통일 (design.md "title 정렬 규칙") */}
