@@ -44,7 +44,7 @@ export function HeroAqiCard() {
 
         {/* 큰 지수 + 상태 */}
         <div className="mt-1.5 flex items-baseline gap-3">
-          <span className="font-display text-display font-extrabold leading-none text-white">
+          <span className="font-display text-4xl sm:text-display font-extrabold leading-none text-white">
             {idx}
           </span>
           <span className="rounded-pill bg-aqi-good/16 px-3 py-1 text-sm font-bold text-aqi-good">

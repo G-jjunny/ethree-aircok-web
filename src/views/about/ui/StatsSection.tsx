@@ -43,7 +43,7 @@ export function StatsSection() {
                 className="flex items-center justify-between gap-4 rounded-card border border-white/12 bg-white/7 p-6"
               >
                 <div>
-                  <div className="font-display text-stat font-extrabold leading-none">
+                  <div className="font-display text-4xl sm:text-stat font-extrabold leading-none">
                     {stat.value}
                     {stat.unit && (
                       <span className="ml-1 text-h6 text-cyan">{stat.unit}</span>

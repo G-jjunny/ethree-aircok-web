@@ -43,7 +43,7 @@ export function KitchenBrandSection() {
       <div className="relative z-10 content-container flex flex-col items-center gap-5 py-24 text-center">
         <ChefLabel tone="chef-soft">{`${SITE.airChef.nameEn} SYSTEM`}</ChefLabel>
         <div className="inline-flex flex-col items-center gap-3">
-          <span className="font-display text-5xl font-extrabold tracking-headline text-white">
+          <span className="font-display text-4xl sm:text-5xl font-extrabold tracking-headline text-white">
             {SITE.airChef.nameEn}
           </span>
           <h2 className="text-h6 sm:text-h5 font-extrabold tracking-headline text-white">

@@ -80,7 +80,7 @@ function ChromeDots() {
 function BlockCopy({ block }: { block: (typeof BLOCKS)[number] }) {
   return (
     <div>
-      <div className="font-display text-display font-light leading-none text-hairline">
+      <div className="font-display text-4xl sm:text-display font-light leading-none text-hairline">
         {block.index}
       </div>
       <h3 className="mt-3.5 text-subtitle font-extrabold tracking-headline text-ink">
