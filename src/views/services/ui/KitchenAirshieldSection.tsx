@@ -104,9 +104,9 @@ const TIERS: {
 const TIER_TONE = {
   card: 'bg-white/4 border-white/10 hover:bg-chef/12 hover:border-chef-soft/35',
   badge:
-    'bg-white/8 border-white/16 text-white/75 group-hover:bg-chef-soft/20 group-hover:border-chef-soft/40 group-hover:text-chef-soft',
-  specLabel: 'text-white/50 group-hover:text-chef-soft',
-  specValue: 'text-white/90 group-hover:text-white',
+    'bg-white/8 border-white/16 text-white/70 group-hover:bg-chef-soft/20 group-hover:border-chef-soft/40 group-hover:text-chef-soft',
+  specLabel: 'text-white/60 group-hover:text-chef-soft',
+  specValue: 'text-white/85 group-hover:text-white',
 }
 
 /**
@@ -145,9 +145,9 @@ export async function KitchenAirshieldSection() {
         <ChefLabel tone="chef-soft">{COPY.eyebrow}</ChefLabel>
         <h2 className="mt-3 text-h5 font-extrabold tracking-headline text-white">
           {COPY.title}{' '}
-          <span className="text-lg font-semibold text-white/55">{COPY.subtitle}</span>
+          <span className="text-lg font-semibold text-white/60">{COPY.subtitle}</span>
         </h2>
-        <p className="mt-3 text-lead-sm leading-relaxed text-white/68">
+        <p className="mt-3 text-lead-sm leading-relaxed text-white/70">
           {COPY.body.map((line, i) => (
             <Fragment key={line}>
               {i > 0 && <br />}
@@ -182,8 +182,8 @@ export async function KitchenAirshieldSection() {
                   <Icon className="size-5.5" />
                 </span>
                 <div>
-                  <h3 className="text-lead font-extrabold text-white">{title}</h3>
-                  <p className="mt-2 text-meta leading-relaxed text-white/62">{body}</p>
+                  <h3 className="text-lg font-extrabold text-white">{title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-white/70">{body}</p>
                 </div>
               </li>
             ))}

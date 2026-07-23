@@ -135,7 +135,7 @@ export function ServicesTabs({
                 >
                   {t.en}
                 </span>
-                <span className="text-sm font-bold sm:text-base">{t.ko}</span>
+                <span className="text-base font-bold">{t.ko}</span>
               </button>
             )
           })}

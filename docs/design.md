@@ -192,6 +192,7 @@ AQI 바 그라디언트: `from-aqi-good via-brand via-aqi-warning to-aqi-bad`.
 | eyebrow 계열 | `SectionLabel` 또는 `font-display text-eyebrow tracking-eyebrow` (기존 유지) | 기존 | 기존 |
 
 - 폰트 크기 반응형은 전역 fluid 토큰이 담당한다 — 역할 조합에 `sm:text-*` 페어를 덧붙이지 않는다. 페어는 fluid 로 표현 불가한 **의도적 모바일 위계 축소**(예: 홈 히어로 STATS 숫자 `text-xl sm:text-h6` — 모바일 3열 압축을 위해 fluid h6 하한 24px 보다 낮은 17px 필요)일 때만 사유 주석과 함께 허용한다.
+- **통계/스탯 라벨 예외**: 큰 숫자 옆 통계 라벨은 `text-meta` 로 낮추지 않고 `text-sm` **크기를 유지**하며, 색만 보조 단계(라이트 `text-muted` / 다크 `text-white/60`)로 낮춘다 — 숫자 대비 라벨 가독 균형(소개 STATS 선례).
 - 예외는 값 옆 주석 + 이 표 개정으로만 허용한다.
 
 ### 트래킹 (letter-spacing)

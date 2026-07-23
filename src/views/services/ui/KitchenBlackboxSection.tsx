@@ -103,7 +103,7 @@ export async function KitchenBlackboxSection() {
           <div className="flex flex-col overflow-hidden rounded-image border border-hairline shadow-card transition-all duration-fast ease-out hover:-translate-y-1 hover:border-chef-tint-border hover:shadow-float">
             <div className="flex items-center gap-2 bg-navy px-4.5 py-3">
               <span className="size-2.5 rounded-full bg-aqi-good" />
-              <span className="font-display text-mini text-white/60">{COPY.didTitle}</span>
+              <span className="text-mini text-white/60">{COPY.didTitle}</span>
             </div>
             <SlotImage
               src={slotImages.KITCHEN_BLACKBOX_DID}

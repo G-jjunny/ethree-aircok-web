@@ -65,7 +65,7 @@ export function IndoorBrandSection() {
           </h2>
         </div>
         {/* token 없음: max-w-[660px] 중앙 정렬 리드 프로즈 폭(1회성) */}
-        <p className="max-w-[660px] text-lead-sm leading-relaxed text-white/72">
+        <p className="max-w-[660px] text-lead-sm leading-relaxed text-white/70">
           {COPY.body}
         </p>
       </div>

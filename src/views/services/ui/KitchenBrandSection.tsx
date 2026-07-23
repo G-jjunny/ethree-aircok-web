@@ -43,6 +43,7 @@ export function KitchenBrandSection() {
       <div className="relative z-10 content-container flex flex-col items-center gap-5 py-24 text-center">
         <ChefLabel tone="chef-soft">{`${SITE.airChef.nameEn} SYSTEM`}</ChefLabel>
         <div className="inline-flex flex-col items-center gap-3">
+          {/* 의도적 페어(§3 예외): 워드마크 전용 36→48px — fluid 토큰에 48px 상한이 없다(h1=52·stat=46) */}
           <span className="font-display text-4xl sm:text-5xl font-extrabold tracking-headline text-white">
             {SITE.airChef.nameEn}
           </span>
@@ -51,7 +52,7 @@ export function KitchenBrandSection() {
           </h2>
         </div>
         {/* token 없음: max-w-[660px] 중앙 정렬 리드 프로즈 폭(1회성) */}
-        <p className="max-w-[660px] text-lead-sm leading-relaxed text-white/72">
+        <p className="max-w-[660px] text-lead-sm leading-relaxed text-white/70">
           {COPY.body}
         </p>
       </div>

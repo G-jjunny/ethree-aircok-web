@@ -142,7 +142,7 @@ export function IndoorDeviceCarousel({ devices }: { devices: AirDevice[] }) {
           <span className="font-display text-2xl font-extrabold tracking-headline text-white">
             {activeDevice.name}
           </span>
-          <span className="text-meta text-white/80">{activeDevice.subtitle}</span>
+          <span className="text-meta text-white/85">{activeDevice.subtitle}</span>
         </div>
         {activeDevice.badge && (
           <span className="rounded-pill border border-white/32 bg-white/16 px-3.5 py-1.5 text-eyebrow font-bold text-white">
@@ -155,7 +155,7 @@ export function IndoorDeviceCarousel({ devices }: { devices: AirDevice[] }) {
       {activeDevice.items.length > 0 && (
         <div className="mt-5 rounded-card-lg border border-hairline bg-surface-white p-6 shadow-card">
           <div className="flex flex-wrap items-baseline justify-between gap-2">
-            <h3 className="text-lead font-extrabold text-ink">측정 항목</h3>
+            <h3 className="text-lg font-extrabold text-ink">측정 항목</h3>
             <p className="text-sm text-muted">
               온도·습도·미세먼지 등{' '}
               <b className="font-bold text-brand">{activeDevice.items.length}종</b>을
@@ -185,7 +185,7 @@ export function IndoorDeviceCarousel({ devices }: { devices: AirDevice[] }) {
             key={row.label}
             className="rounded-2xl border border-hairline bg-surface-white p-5"
           >
-            <dt className="font-display text-mini font-bold tracking-label text-muted">
+            <dt className="text-mini font-bold tracking-label text-muted">
               {row.label}
             </dt>
             <dd className="mt-2 text-base font-extrabold text-ink">{row.pick(activeDevice)}</dd>

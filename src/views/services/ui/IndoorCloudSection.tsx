@@ -141,7 +141,7 @@ function BlockVisual({
     <div className="overflow-hidden rounded-image border border-hairline shadow-card transition-all duration-fast ease-out hover:-translate-y-1 hover:border-tint-border hover:shadow-float">
       <div className="flex items-center gap-2 bg-navy px-4 py-3">
         <ChromeDots />
-        <span className="ml-3 font-display text-mini tracking-label-sm text-white/50">
+        <span className="ml-3 font-display text-mini tracking-label-sm text-white/60">
           {block.chrome}
         </span>
       </div>
