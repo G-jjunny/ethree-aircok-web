@@ -53,7 +53,7 @@ function PreviewPanel({
           <button
             type="button"
             onClick={onClose}
-            className="text-muted hover:text-ink-soft transition-colors text-lg leading-none"
+            className="inline-flex items-center justify-center text-muted hover:text-ink-soft transition-colors text-lg leading-none max-sm:min-h-11 max-sm:min-w-11"
           >
             ✕
           </button>
