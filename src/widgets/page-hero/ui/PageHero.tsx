@@ -41,7 +41,7 @@ export function PageHero({ eyebrow, headline, body }: PageHeroProps) {
         </div>
 
         {/* token 없음: leading-[1.12] 디스플레이 헤드라인 행간 — 시안 실측 1회성(big-headline 행간은 섹션마다 달라 단일 토큰화 대상 아님, 홈 HeroSection leading-[1.08]과 동일 관행) */}
-        <h1 className="mt-6 max-w-reading text-4xl sm:text-h1 font-extrabold leading-[1.12] tracking-headline">
+        <h1 className="mt-6 max-w-reading text-h1 font-extrabold leading-[1.12] tracking-headline">
           {headline.prefix}
           {headline.highlight && (
             <span className="text-brand">{headline.highlight}</span>

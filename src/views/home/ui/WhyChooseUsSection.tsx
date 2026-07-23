@@ -34,7 +34,7 @@ export function WhyChooseUsSection() {
         <ScrollReveal variant="fade-up" className="flex items-end justify-between gap-6">
           <div>
             <SectionLabel color="brand">WHY CHOOSE US</SectionLabel>
-            <h2 className="mt-3 text-h6 sm:text-h2 font-extrabold tracking-headline text-ink">Our Value</h2>
+            <h2 className="mt-3 text-h2 font-extrabold tracking-headline text-ink">Our Value</h2>
           </div>
           <Link href="/services" className="group hidden items-center gap-3 sm:flex">
             <span className="font-display text-mini tracking-eyebrow text-muted">VIEW MORE</span>

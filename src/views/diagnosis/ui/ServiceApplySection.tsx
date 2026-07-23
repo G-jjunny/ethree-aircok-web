@@ -70,7 +70,7 @@ export function ServiceApplySection() {
       <div className="content-container">
         <div className="flex flex-col items-center text-center">
           <SectionLabel color="brand">{COPY.eyebrow}</SectionLabel>
-          <h2 className="mt-3 text-h6 sm:text-h5 font-extrabold tracking-headline text-ink">
+          <h2 className="mt-3 text-h5 font-extrabold tracking-headline text-ink">
             {COPY.titleLines[0]}
             <br />
             {COPY.titleLines[1]}

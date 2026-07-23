@@ -38,7 +38,7 @@ export function KitchenFlowSection() {
     <section className="bg-surface-white pb-24 pt-16">
       <div className="content-container">
         <ChefLabel>{COPY.eyebrow}</ChefLabel>
-        <h2 className="mt-3 text-h6 sm:text-h5 font-extrabold tracking-headline text-ink">
+        <h2 className="mt-3 text-h5 font-extrabold tracking-headline text-ink">
           {SITE.airChef.name} 구성 및 프로세스
         </h2>
         {/* token 없음: max-w-[640px] 섹션 리드 프로즈 폭(1회성) */}

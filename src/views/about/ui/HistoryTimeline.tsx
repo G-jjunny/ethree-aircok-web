@@ -175,7 +175,7 @@ export function HistoryTimeline({ timelines }: { timelines: TimelineItem[] }) {
               className="group flex w-full items-start justify-between gap-2 self-start rounded-btn pb-6 text-left cursor-pointer transition-colors hover:bg-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 md:sticky md:top-24 md:p-2"
             >
               <span className="flex flex-col">
-                <span className="font-display text-h6 font-extrabold leading-none text-brand sm:text-h3">
+                <span className="font-display text-h3 font-extrabold leading-none text-brand">
                   {group.year}
                 </span>
                 <span className="mt-1.5 text-xs font-medium text-muted">

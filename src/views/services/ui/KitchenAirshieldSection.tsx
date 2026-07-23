@@ -143,7 +143,7 @@ export async function KitchenAirshieldSection() {
 
       <div className="relative z-10 content-container">
         <ChefLabel tone="chef-soft">{COPY.eyebrow}</ChefLabel>
-        <h2 className="mt-3 text-h6 sm:text-h5 font-extrabold tracking-headline text-white">
+        <h2 className="mt-3 text-h5 font-extrabold tracking-headline text-white">
           {COPY.title}{' '}
           <span className="text-lg font-semibold text-white/55">{COPY.subtitle}</span>
         </h2>

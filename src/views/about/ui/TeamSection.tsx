@@ -80,7 +80,7 @@ export async function TeamSection() {
         {/* 중앙 헤더 — token 없음: max-w-[640px] 중앙 정렬 헤더 프로즈 폭(1회성) */}
         <div className="mx-auto max-w-[640px] text-center">
           <SectionLabel color="brand">{eyebrow}</SectionLabel>
-          <h2 className="mt-4 text-h6 sm:text-h5 font-extrabold tracking-headline text-ink">
+          <h2 className="mt-4 text-h5 font-extrabold tracking-headline text-ink">
             {title}
           </h2>
           <p className="mt-4 text-lead-sm leading-relaxed text-muted">{body}</p>

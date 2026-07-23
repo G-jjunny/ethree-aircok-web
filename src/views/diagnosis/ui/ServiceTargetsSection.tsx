@@ -40,7 +40,7 @@ export function ServiceTargetsSection() {
       <div className="content-container">
         <div className="flex flex-col items-center text-center">
           <SectionLabel color="brand">{COPY.eyebrow}</SectionLabel>
-          <h2 className="mt-3 text-h6 sm:text-h5 font-extrabold tracking-headline text-ink">
+          <h2 className="mt-3 text-h5 font-extrabold tracking-headline text-ink">
             {COPY.title}
           </h2>
           {/* token 없음: max-w-[600px] 섹션 리드 프로즈 폭(1회성) */}

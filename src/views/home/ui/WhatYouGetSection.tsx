@@ -33,7 +33,7 @@ export function WhatYouGetSection() {
         {/* 좌 */}
         <ScrollReveal variant="slide-left">
           <SectionLabel color="cyan">WHAT YOU GET</SectionLabel>
-          <h2 className="mt-4 text-h6 sm:text-h3 font-extrabold leading-tight tracking-headline">
+          <h2 className="mt-4 text-h3 font-extrabold leading-tight tracking-headline">
             {title}
           </h2>
           <ul className="mt-6 flex flex-col gap-4">

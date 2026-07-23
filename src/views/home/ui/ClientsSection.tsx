@@ -32,7 +32,7 @@ export async function ClientsSection() {
       <div className="content-container flex flex-col gap-12">
         <ScrollReveal variant="fade-up" className="mx-auto max-w-2xl text-center">
           <SectionLabel color="brand">{eyebrow}</SectionLabel>
-          <h2 className="mt-4 text-h6 sm:text-h5 font-extrabold tracking-headline text-ink">
+          <h2 className="mt-4 text-h5 font-extrabold tracking-headline text-ink">
             {title}
           </h2>
         </ScrollReveal>

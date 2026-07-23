@@ -58,7 +58,7 @@ export async function GlobalCta() {
           <p className="font-display text-eyebrow font-semibold uppercase tracking-eyebrow-lg text-white/80">
             Clean air starts here
           </p>
-          <h2 className="mt-2.5 text-h6 sm:text-h3 font-extrabold leading-tight tracking-headline">
+          <h2 className="mt-2.5 text-h3 font-extrabold leading-tight tracking-headline">
             건강한 공기, 지금 시작하세요
           </h2>
           <p className="mt-3.5 text-base text-white/85">

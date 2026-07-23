@@ -15,7 +15,7 @@ export function ContactFormSection() {
           {/* 좌: 문의 폼 */}
           <div>
             <SectionLabel color="brand">Inquiry</SectionLabel>
-            <h2 className="mt-4 font-display text-h6 sm:text-h4 font-extrabold tracking-headline text-ink">
+            <h2 className="mt-4 font-display text-h4 font-extrabold tracking-headline text-ink">
               문의 남기기
             </h2>
             <p className="mt-4 text-lead-sm leading-relaxed text-muted [word-break:keep-all]">

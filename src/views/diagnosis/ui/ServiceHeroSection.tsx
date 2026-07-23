@@ -58,7 +58,7 @@ export function ServiceHeroSection() {
             {COPY.eyebrow}
           </p>
           {/* token 없음: leading-[1.14] 디스플레이 헤드라인 행간 — 시안 실측 1회성 */}
-          <h1 className="mt-5.5 text-4xl sm:text-h1 font-extrabold leading-[1.14] tracking-headline">
+          <h1 className="mt-5.5 text-h1 font-extrabold leading-[1.14] tracking-headline">
             {COPY.headlinePrefix}
             <br />
             {COPY.headlineSuffix}

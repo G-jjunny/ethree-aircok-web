@@ -51,7 +51,7 @@ export async function KitchenBlackboxSection() {
     <section className="bg-surface-white py-24">
       <div className="content-container">
         <ChefLabel>{COPY.eyebrow}</ChefLabel>
-        <h2 className="mt-3 text-h6 sm:text-h5 font-extrabold tracking-headline text-ink">
+        <h2 className="mt-3 text-h5 font-extrabold tracking-headline text-ink">
           {COPY.title}{' '}
           <span className="text-lg font-semibold text-muted">{COPY.subtitle}</span>
         </h2>

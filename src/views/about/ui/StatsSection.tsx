@@ -29,7 +29,7 @@ export function StatsSection() {
       <div className="content-container">
         <SectionLabel color="cyan">{eyebrow}</SectionLabel>
         {/* token 없음: max-w-[640px]/[520px] 섹션 헤더·리드 프로즈 폭(1회성, 섹션마다 상이) */}
-        <h2 className="mt-4 max-w-[640px] text-h6 sm:text-h5 font-extrabold tracking-headline">
+        <h2 className="mt-4 max-w-[640px] text-h5 font-extrabold tracking-headline">
           {title}
         </h2>
         <p className="mt-4 max-w-[520px] text-lead-sm text-white/62">{body}</p>
@@ -43,7 +43,7 @@ export function StatsSection() {
                 className="flex items-center justify-between gap-4 rounded-card border border-white/12 bg-white/7 p-6"
               >
                 <div>
-                  <div className="font-display text-4xl sm:text-stat font-extrabold leading-none">
+                  <div className="font-display text-stat font-extrabold leading-none">
                     {stat.value}
                     {stat.unit && (
                       <span className="ml-1 text-h6 text-cyan">{stat.unit}</span>
@@ -72,7 +72,7 @@ export function StatsSection() {
             <SectionLabel color="cyan" size="sm">
               {featured.eyebrow}
             </SectionLabel>
-            <div className="mt-4 font-display text-4xl sm:text-hero font-extrabold leading-none">
+            <div className="mt-4 font-display text-hero font-extrabold leading-none">
               {featured.value}
               <span className="ml-1 text-h6 text-cyan">{featured.unit}</span>
             </div>

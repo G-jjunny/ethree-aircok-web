@@ -60,7 +60,7 @@ export function IndoorBrandSection() {
             height={71}
             style={{ width: 'auto', height: '40px' }}
           />
-          <h2 className="text-h6 sm:text-h5 font-extrabold tracking-headline text-white">
+          <h2 className="text-h5 font-extrabold tracking-headline text-white">
             {COPY.title}
           </h2>
         </div>

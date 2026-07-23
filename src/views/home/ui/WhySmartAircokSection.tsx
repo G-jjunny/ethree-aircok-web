@@ -57,7 +57,7 @@ export function WhySmartAircokSection() {
         {/* token 없음: max-w-[820px] — 인트로 프로즈 컬럼 너비. 프로즈 폭은 값이 매번 달라(500·640·720·760·820) 단일 토큰화 대상 아님, 코드베이스 공통 1회성 수치 규약 준수 */}
         <ScrollReveal variant="fade-up" className="mx-auto max-w-[820px] text-center">
           <SectionLabel color="brand">WHY SMART AIRCOK</SectionLabel>
-          <h2 className="mt-4 text-h6 sm:text-h2 font-extrabold leading-snug tracking-headline text-ink">
+          <h2 className="mt-4 text-h2 font-extrabold leading-snug tracking-headline text-ink">
             미세먼지 심한데 공조기 작동 잘 되는지 궁금하다면?
             <br />
             <span className="text-brand">스마트에어콕</span>을 만나보세요
