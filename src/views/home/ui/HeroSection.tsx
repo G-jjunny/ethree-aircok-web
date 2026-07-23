@@ -70,14 +70,14 @@ export function HeroSection() {
             </Button>
           </div>
 
-          <div className="animate-fade-up reveal-delay-4 mt-11 flex flex-wrap gap-6">
+          <div className="animate-fade-up reveal-delay-4 mt-11 grid grid-cols-3 gap-3 sm:flex sm:flex-wrap sm:gap-6">
             {STATS.map((stat) => (
               <div key={stat.label}>
-                <div className="font-display text-h6 font-extrabold">
+                <div className="font-display text-xl sm:text-h6 font-extrabold">
                   {stat.value}
                   {stat.unit && <span className="text-cyan">{stat.unit}</span>}
                 </div>
-                <div className="mt-0.5 text-sm text-white/55">{stat.label}</div>
+                <div className="mt-0.5 text-xs sm:text-sm text-white/55 [word-break:keep-all]">{stat.label}</div>
               </div>
             ))}
           </div>
