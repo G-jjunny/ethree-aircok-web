@@ -45,7 +45,7 @@ function PreviewPanel({
         onClick={onClose}
       />
       {/* 패널 */}
-      <div className="fixed inset-y-0 right-0 w-96 bg-surface-white shadow-card z-50 flex flex-col">
+      <div className="fixed inset-y-0 right-0 w-full max-w-md bg-surface-white shadow-card z-50 flex flex-col">
         {/* 헤더 */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-hairline">
           <h3 className="text-ink-soft text-base font-body font-semibold">미리보기</h3>
@@ -136,7 +136,9 @@ export function NewsTableSection({ items }: Props) {
 
   return (
     <div className="bg-surface-white rounded-card border border-hairline overflow-hidden">
-      <table className="w-full border-collapse">
+      {/* 모바일(가용 312px)에서 표가 붕괴하지 않도록 표 영역만 가로 스크롤 — 라운드 카드 시각은 바깥 래퍼가 유지 */}
+      <div className="overflow-x-auto">
+        <table className="w-full border-collapse">
         <thead className="bg-surface border-b border-hairline">
           <tr>
             {/* text-[13px]: token 없음 — 테이블 헤더 전용 중간 캡션 크기(xs=12px, sm=14px 사이) */}
@@ -164,10 +166,10 @@ export function NewsTableSection({ items }: Props) {
               className="hover:bg-surface transition-colors cursor-pointer"
               onClick={() => setSelectedItem(item)}
             >
-              <td className="px-4 py-4 text-sm text-ink-soft font-body max-w-xs truncate">
+              <td className="px-4 py-4 text-sm text-ink-soft font-body min-w-45 max-w-xs truncate">
                 {item.title}
               </td>
-              <td className="px-4 py-4 text-sm text-muted font-body">
+              <td className="px-4 py-4 text-sm text-muted font-body whitespace-nowrap">
                 {formatDate(item.date)}
               </td>
               <td className="px-4 py-4">
@@ -201,7 +203,8 @@ export function NewsTableSection({ items }: Props) {
             </tr>
           ))}
         </tbody>
-      </table>
+        </table>
+      </div>
 
       {/* 페이지네이션 */}
       {totalPages > 1 && (
