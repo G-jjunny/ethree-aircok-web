@@ -152,8 +152,9 @@ export function IndoorDeviceCarousel({ devices }: { devices: AirDevice[] }) {
       </div>
 
       {/* ── 측정 항목 ── */}
+      {/* 모바일은 p-4 로 압축해 2열 칩에 한글명 폭을 확보한다(sm+ 기존 p-6 복원). */}
       {activeDevice.items.length > 0 && (
-        <div className="mt-5 rounded-card-lg border border-hairline bg-surface-white p-6 shadow-card">
+        <div className="mt-5 rounded-card-lg border border-hairline bg-surface-white p-4 shadow-card sm:p-6">
           <div className="flex flex-wrap items-baseline justify-between gap-2">
             <h3 className="text-lg font-extrabold text-ink">측정 항목</h3>
             <p className="text-sm text-muted">
@@ -166,29 +167,39 @@ export function IndoorDeviceCarousel({ devices }: { devices: AirDevice[] }) {
             {activeDevice.items.map((item) => (
               <div
                 key={item.id}
-                className="rounded-btn border border-tint-border bg-tint px-4 py-3.5"
+                className="rounded-btn border border-tint-border bg-tint px-3 py-3 sm:px-4 sm:py-3.5"
               >
                 <div className="font-display text-eyebrow font-bold text-brand">
                   {item.code}
                 </div>
-                <div className="mt-1 text-meta font-semibold text-ink">{item.label}</div>
+                {/* 모바일 위계 축소(사유): fluid text-meta 하한 12.5px로는 360px 2열 칩 내폭(~102px)에
+                    최장 한글명 "총휘발성유기화합물"(9자 ≈ 112px)이 닿는다 — text-mini(11px ≈ 99px)로 축소.
+                    break-words 는 API 동적 라벨이 그마저 넘칠 때의 비상 줄바꿈(전역 keep-all 하 오버플로 방지). */}
+                <div className="mt-1 break-words text-mini font-semibold text-ink sm:text-meta">
+                  {item.label}
+                </div>
               </div>
             ))}
           </div>
         </div>
       )}
 
-      {/* ── 기본 스펙 ── */}
-      <dl className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {/* ── 기본 스펙 ──
+          모바일: 정의 리스트형 행(라벨 좌 + 값 우 정렬, hairline 룰) — 전폭 카드 6장 세로
+          나열(~640px) 대비 절반 이하(~260px)로 압축한다. 값은 API 동적 문자열이라 행 방식이
+          가용 폭(~235px)을 온전히 주고, sm+ 는 기존 카드 그리드를 그대로 복원한다. */}
+      <dl className="mt-5 sm:grid sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
         {SPEC_ROWS.map((row) => (
           <div
             key={row.label}
-            className="rounded-2xl border border-hairline bg-surface-white p-5"
+            className="flex items-baseline justify-between gap-4 border-b border-hairline py-2.5 sm:block sm:rounded-2xl sm:border sm:bg-surface-white sm:p-5"
           >
-            <dt className="text-mini font-bold tracking-label text-muted">
+            <dt className="shrink-0 text-mini font-bold tracking-label text-muted">
               {row.label}
             </dt>
-            <dd className="mt-2 text-base font-extrabold text-ink">{row.pick(activeDevice)}</dd>
+            <dd className="text-right text-base font-extrabold text-ink sm:mt-2 sm:text-left">
+              {row.pick(activeDevice)}
+            </dd>
           </div>
         ))}
       </dl>
