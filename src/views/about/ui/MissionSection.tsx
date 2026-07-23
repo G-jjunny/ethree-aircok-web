@@ -16,7 +16,7 @@ export function MissionSection() {
       <div className="content-container grid items-start gap-14 md:grid-cols-[0.9fr_1.1fr]">
         <div>
           <SectionLabel color="brand">{eyebrow}</SectionLabel>
-          <h2 className="mt-4 text-h5 font-extrabold tracking-headline text-ink">
+          <h2 className="mt-4 text-h6 sm:text-h5 font-extrabold tracking-headline text-ink">
             {title}
           </h2>
           <p className="mt-5 text-lead-sm leading-relaxed text-muted">{body}</p>

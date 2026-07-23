@@ -49,7 +49,7 @@ export function NewsDetailHeroSection({ post }: Props) {
       </div>
 
       {/* 제목 */}
-      <h1 className="mt-4 text-h5 font-extrabold leading-tight tracking-headline text-ink [word-break:keep-all] [text-wrap:pretty]">
+      <h1 className="mt-4 text-h6 sm:text-h5 font-extrabold leading-tight tracking-headline text-ink [word-break:keep-all] [text-wrap:pretty]">
         {post.title}
       </h1>
 

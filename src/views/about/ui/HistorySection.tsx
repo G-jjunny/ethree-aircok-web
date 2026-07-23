@@ -37,7 +37,7 @@ export async function HistorySection() {
         {/* 좌: 라벨 (데스크탑 sticky). top-24(96px) 오프셋 = Nav 높이 + 여백 확보(표준 스페이싱 토큰) */}
         <div className="md:sticky md:top-24 md:self-start">
           <SectionLabel color="brand">{eyebrow}</SectionLabel>
-          <h2 className="mt-4 text-h5 font-extrabold tracking-headline text-ink">
+          <h2 className="mt-4 text-h6 sm:text-h5 font-extrabold tracking-headline text-ink">
             {title}
           </h2>
         </div>

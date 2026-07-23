@@ -14,7 +14,7 @@ export function AboutAircokSection() {
         {/* token 없음: max-w-[760px] — 인트로 프로즈 컬럼 너비. 프로즈 폭은 값이 매번 달라(500·640·720·760·820) 단일 토큰화 대상 아님, 코드베이스 공통 1회성 수치 규약 준수 */}
         <ScrollReveal variant="fade-up" className="mx-auto max-w-[760px] text-center">
           <SectionLabel color="brand">ABOUT AIRCOK</SectionLabel>
-          <h2 className="mt-3 text-h3 font-extrabold leading-tight tracking-headline text-ink">
+          <h2 className="mt-3 text-h6 sm:text-h3 font-extrabold leading-tight tracking-headline text-ink">
             실내 공기질 관리 혁신을
             <br />
             선도하는 <span className="text-brand">AIoT 전문기업</span>

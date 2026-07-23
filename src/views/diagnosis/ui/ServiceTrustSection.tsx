@@ -87,7 +87,7 @@ export function ServiceTrustSection({ children }: { children?: ReactNode }) {
         {/* token 없음: max-w-[640px] 헤더 프로즈 폭(1회성) */}
         <div className="max-w-[640px]">
           <SectionLabel color="brand">{COPY.eyebrow}</SectionLabel>
-          <h2 className="mt-3 text-h5 font-extrabold leading-tight tracking-headline text-ink">
+          <h2 className="mt-3 text-h6 sm:text-h5 font-extrabold leading-tight tracking-headline text-ink">
             {COPY.titlePrefix}
             <br />
             {COPY.titleSuffix}

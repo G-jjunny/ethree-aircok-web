@@ -67,7 +67,7 @@ export async function ServiceCompareSection() {
           <span className="inline-block rounded-pill border border-brand/40 bg-brand/18 px-4.5 py-2 text-sm font-bold text-brand-soft">
             {COPY.badge}
           </span>
-          <h2 className="mt-4.5 text-h5 font-extrabold tracking-headline">
+          <h2 className="mt-4.5 text-h6 sm:text-h5 font-extrabold tracking-headline">
             {COPY.title}
           </h2>
         </div>
