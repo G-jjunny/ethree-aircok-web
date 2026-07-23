@@ -50,7 +50,7 @@ export function PageHero({ eyebrow, headline, body }: PageHeroProps) {
         </h1>
 
         {/* token 없음: max-w-[560px] 히어로 본문 프로즈 폭(1회성) */}
-        <p className="mt-5 max-w-[560px] text-lead leading-relaxed text-white/68">
+        <p className="mt-5 max-w-[560px] text-lead leading-relaxed text-white/70">
           {body}
         </p>
       </div>

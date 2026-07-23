@@ -114,7 +114,7 @@ export async function TeamSection() {
               {photoEyebrow}
             </SectionLabel>
             {/* token 없음: max-w-[520px] 오버레이 캡션 프로즈 폭(1회성) */}
-            <p className="mt-2 max-w-[520px] text-lg font-semibold leading-snug text-white">
+            <p className="mt-2 max-w-[520px] text-lg font-bold leading-snug text-white">
               {photoCaption}
             </p>
           </div>
@@ -127,7 +127,7 @@ export async function TeamSection() {
               key={card.title}
               className="flex flex-col gap-3 rounded-2xl border border-hairline bg-surface p-6"
             >
-              <h3 className="font-display text-base font-semibold text-brand">
+              <h3 className="text-lg font-bold text-ink">
                 {card.title}
               </h3>
               <p className="text-sm leading-relaxed text-muted">{card.description}</p>

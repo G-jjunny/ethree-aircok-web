@@ -32,7 +32,7 @@ export function StatsSection() {
         <h2 className="mt-4 max-w-[640px] text-h5 font-extrabold tracking-headline">
           {title}
         </h2>
-        <p className="mt-4 max-w-[520px] text-lead-sm text-white/62">{body}</p>
+        <p className="mt-4 max-w-[520px] text-lead-sm leading-relaxed text-white/70">{body}</p>
 
         <div className="mt-12 grid gap-6 lg:grid-cols-[2fr_0.82fr]">
           {/* 좌: 2x2 스탯 글래스 카드 */}
@@ -49,7 +49,7 @@ export function StatsSection() {
                       <span className="ml-1 text-h6 text-cyan">{stat.unit}</span>
                     )}
                   </div>
-                  <p className="mt-3 text-sm leading-relaxed text-white/62">
+                  <p className="mt-3 text-sm leading-relaxed text-white/60">
                     {stat.label}
                   </p>
                 </div>

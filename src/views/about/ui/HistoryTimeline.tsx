@@ -162,7 +162,9 @@ export function HistoryTimeline({ timelines }: { timelines: TimelineItem[] }) {
           <li
             key={group.year}
             ref={(el) => { groupRefs.current[groupIdx] = el }}
-            className="grid grid-cols-[88px_1fr] gap-6 opacity-0 translate-y-4 transition-all duration-500 ease-out md:grid-cols-[120px_1fr] md:gap-10"
+            // 연도 열 minmax(88px,max-content): sm~md 구간에서 fluid text-h3 연도(≈38px)+셰브론이
+            // 고정 88px를 넘으면 열이 내용만큼 늘어나 우측 레일·노드와 겹치지 않게 한다
+            className="grid grid-cols-[minmax(88px,max-content)_1fr] gap-6 opacity-0 translate-y-4 transition-all duration-500 ease-out md:grid-cols-[120px_1fr] md:gap-10"
           >
             {/* 연도 컬럼 (데스크탑 sticky) — 클릭 시 해당 연도 아코디언 토글.
                 top-24(96px) 오프셋 = Nav 높이 + 여백 확보(표준 스페이싱 토큰) */}
@@ -178,7 +180,7 @@ export function HistoryTimeline({ timelines }: { timelines: TimelineItem[] }) {
                 <span className="font-display text-h3 font-extrabold leading-none text-brand">
                   {group.year}
                 </span>
-                <span className="mt-1.5 text-xs font-medium text-muted">
+                <span className="mt-1.5 text-meta font-medium text-muted">
                   {group.eventCount}건
                 </span>
               </span>
@@ -223,7 +225,7 @@ export function HistoryTimeline({ timelines }: { timelines: TimelineItem[] }) {
                                 aria-hidden="true"
                                 className="absolute -left-[27px] top-2 h-1.5 w-1.5 rounded-pill bg-hairline"
                               />
-                              <span className="text-lead leading-relaxed text-ink-soft">
+                              <span className="text-base leading-relaxed text-ink-soft">
                                 {content}
                               </span>
                             </li>
