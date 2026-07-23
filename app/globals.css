@@ -76,9 +76,10 @@
 
   /* ── Typography Scale (네이밍 토큰) ─────── */
   /* 비표준 사이즈만 네이밍. 표준 구간(72/48/24/20/18/16/14/12)은 기본 유틸 재사용. */
-  /* 헤딩·통계 계열은 fluid clamp — 360px에서 min, 640px(sm)에서 max 도달 (#155)
+  /* 헤딩·통계·본문 계열은 fluid clamp — 360px에서 min, 640px(sm)에서 max 도달 (#155)
      preferred: vw계수 = (max−min)px ÷ 2.8 (소수 4자리 올림), 절편 = min − (max−min)×9/7 px
-     ≥640px는 clamp 상한으로 기존 데스크탑 값과 픽셀 동일(무회귀), 360~640px 구간만 유동 보간 */
+     ≥640px는 clamp 상한으로 기존 데스크탑 값과 픽셀 동일(무회귀), 360~640px 구간만 유동 보간
+     모바일 min 은 12px 플로어(접근성) 준수 — 12px 근접 토큰(xs/eyebrow/mini/nano)은 fluid 미적용 */
   --text-hero:      clamp(2.25rem, 8.5715vw + 0.3214rem, 3.75rem);  /* 60 · 히어로 h1 · 360px:36 */
   --text-stat-lg:   clamp(2.25rem, 8.5715vw + 0.3214rem, 3.75rem);  /* 60 · Dark/LightStatCard 통계 숫자 (구 text-4xl sm:text-6xl) · 360px:36 */
   --text-display:   clamp(2.25rem, 7.1429vw + 0.6429rem, 3.5rem);   /* 56 · 실시간 지수 큰 숫자 · 360px:36 */
@@ -89,14 +90,34 @@
   --text-h3:        clamp(1.75rem, 3.5715vw + 0.9464rem, 2.375rem); /* 38 · 섹션 h2/지표 숫자 · 360px:28 */
   --text-h4:        clamp(1.75rem, 2.8572vw + 1.1071rem, 2.25rem);  /* 36 · Impact h2 · 360px:28 */
   --text-h5:        clamp(1.75rem, 2.1429vw + 1.2679rem, 2.125rem); /* 34 · About 섹션 h2 · 360px:28 */
-  --text-h6:        1.75rem;      /* 28 · 히어로 통계/탭 패널 h3 — 축소 없음 정책, fluid 미적용 */
-  --text-subtitle:  1.625rem;     /* 26 · 탭 패널 h3 */
-  --text-lead:      1.0625rem;    /* 17 · 히어로/step 본문 */
-  --text-lead-sm:   1.03125rem;   /* 16.5 · 섹션 리드 본문 */
-  --text-meta:      0.84375rem;   /* 13.5 · step 설명/통계 라벨/eyebrow 대 */
+  --text-h6:        clamp(1.5rem, 1.4286vw + 1.1786rem, 1.75rem);     /* 28 · 히어로 통계/탭 패널 h3 · 360px:24 (축소 없음 정책 개정 #155 후속) */
+  --text-subtitle:  clamp(1.375rem, 1.4286vw + 1.0536rem, 1.625rem);  /* 26 · 탭 패널 h3 · 360px:22 */
+  --text-lead:      clamp(0.9375rem, 0.7143vw + 0.7768rem, 1.0625rem);   /* 17 · 히어로/step 본문 · 360px:15 */
+  --text-lead-sm:   clamp(0.9375rem, 0.5358vw + 0.817rem, 1.03125rem);   /* 16.5 · 섹션 리드 본문 · 360px:15 */
+  --text-meta:      clamp(0.78125rem, 0.3572vw + 0.7009rem, 0.84375rem); /* 13.5 · step 설명/통계 라벨/eyebrow 대 · 360px:12.5 */
+  /* ↓ 12px 플로어 근접/이하 — fluid 미적용 */
   --text-eyebrow:   0.78125rem;   /* 12.5 · eyebrow/배지/팁 */
   --text-mini:      0.6875rem;    /* 11 · 카드 eyebrow(소)/mini 라벨 */
   --text-nano:      0.65625rem;   /* 10.5 · 탭 en 라벨/이미지 자리 라벨 */
+
+  /* ── Tailwind 기본 스케일 오버라이드 (본문 fluid · #155 후속) ──
+     기본 text-xl/lg/base/sm 도 동일 산식의 clamp 로 전역 자동 축소 — 사이트·관리자 전역 파급.
+     text-xs(12)는 최소 가독 플로어라 오버라이드하지 않는다.
+     line-height 페어는 v4 기본값(비율 calc)을 명시 재정의해 보존 — 비율값이라 fluid 폰트에도 유효. */
+  --text-xl:   clamp(1.0625rem, 1.0715vw + 0.8214rem, 1.25rem);   /* 20 · 360px:17 */
+  --text-xl--line-height: calc(1.75 / 1.25);
+  --text-lg:   clamp(1rem, 0.7143vw + 0.8393rem, 1.125rem);       /* 18 · 360px:16 */
+  --text-lg--line-height: calc(1.75 / 1.125);
+  --text-base: clamp(0.9375rem, 0.3572vw + 0.8572rem, 1rem);      /* 16 · 360px:15 */
+  --text-base--line-height: calc(1.5 / 1);
+  --text-sm:   clamp(0.78125rem, 0.5358vw + 0.6607rem, 0.875rem); /* 14 · 360px:12.5 */
+  --text-sm--line-height: calc(1.25 / 0.875);
+
+  /* ── 폼 인풋 고정 사이즈 (fluid 미적용) ──
+     iOS Safari 는 input/textarea/select/contenteditable 폰트가 16px 미만이면 포커스 시 자동 줌.
+     16px 이상이 필요한 편집 요소는 text-base(fluid, 모바일 15px) 대신 text-input 을 쓴다. */
+  --text-input: 1rem;                        /* 16 고정 · 폼 인풋/에디터 */
+  --text-input--line-height: calc(1.5 / 1);  /* text-base 기본 행간과 동일 */
 
   /* ── Tracking (letter-spacing) ──────────── */
   --tracking-wordmark:   -0.03em;   /* 워드마크 */
