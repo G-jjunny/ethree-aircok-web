@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState, useEffect, useRef } from 'react';
 import type { NewsSummary } from '@/entities/news';
+import { buildPageSlots } from '@/shared/lib';
 import { DeleteButton } from './DeleteButton';
 
 const PAGE_SIZE = 20;
@@ -208,41 +209,58 @@ export function NewsTableSection({ items }: Props) {
 
       {/* 페이지네이션 */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between px-4 py-3 border-t border-hairline">
+        <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-3 border-t border-hairline">
           {/* text-[13px]: token 없음 — 테이블 캡션 전용 중간 크기(xs=12px, sm=14px 사이) */}
           <p className="text-muted text-[13px] font-body">
             {items.length}개 중{' '}
             {(currentPage - 1) * PAGE_SIZE + 1}–
             {Math.min(currentPage * PAGE_SIZE, items.length)}개 표시
           </p>
-          <div className="flex items-center gap-1">
+          <div className="flex flex-wrap items-center gap-1">
             <button
               type="button"
               onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
               disabled={currentPage === 1}
-              className="w-8 h-8 rounded text-sm font-body transition-colors text-ink-soft hover:bg-surface disabled:opacity-40 disabled:cursor-not-allowed"
+              aria-label="이전 페이지"
+              className="min-h-11 min-w-11 rounded text-sm font-body transition-colors text-ink-soft hover:bg-surface disabled:opacity-40 disabled:cursor-not-allowed"
             >
               ←
             </button>
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-              <button
-                key={page}
-                type="button"
-                onClick={() => setCurrentPage(page)}
-                className={`w-8 h-8 rounded text-sm font-body transition-colors ${
-                  page === currentPage
-                    ? 'bg-brand text-white'
-                    : 'text-ink-soft hover:bg-surface'
-                }`}
-              >
-                {page}
-              </button>
-            ))}
+            {buildPageSlots(currentPage, totalPages).map((slot) => {
+              if (typeof slot !== 'number') {
+                return (
+                  <span
+                    key={slot}
+                    aria-hidden="true"
+                    className="flex min-h-11 min-w-11 items-center justify-center text-sm font-body text-muted"
+                  >
+                    …
+                  </span>
+                );
+              }
+              const active = slot === currentPage;
+              return (
+                <button
+                  key={slot}
+                  type="button"
+                  onClick={() => setCurrentPage(slot)}
+                  aria-current={active ? 'page' : undefined}
+                  className={`min-h-11 min-w-11 rounded text-sm font-body transition-colors ${
+                    active
+                      ? 'bg-brand text-white'
+                      : 'text-ink-soft hover:bg-surface'
+                  }`}
+                >
+                  {slot}
+                </button>
+              );
+            })}
             <button
               type="button"
               onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
               disabled={currentPage === totalPages}
-              className="w-8 h-8 rounded text-sm font-body transition-colors text-ink-soft hover:bg-surface disabled:opacity-40 disabled:cursor-not-allowed"
+              aria-label="다음 페이지"
+              className="min-h-11 min-w-11 rounded text-sm font-body transition-colors text-ink-soft hover:bg-surface disabled:opacity-40 disabled:cursor-not-allowed"
             >
               →
             </button>

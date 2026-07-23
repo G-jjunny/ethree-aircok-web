@@ -6,6 +6,7 @@ import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import type { NewsType } from '@/entities/news';
 import { newsListQueryOptions, NEWS_PAGE_SIZE } from '@/entities/news';
 import { useDebouncedValue } from '@/shared/hooks';
+import { buildPageSlots } from '@/shared/lib';
 import { NewsCard } from './NewsCard';
 
 type FilterValue = 'ALL' | NewsType;
@@ -19,28 +20,6 @@ const FILTERS: { value: FilterValue; label: string }[] = [
 // 페이지 크기는 entities/news의 단일 출처(NEWS_PAGE_SIZE)를 사용한다.
 // 서버 SSR prefetch(NewsBoardPrefetch)와 동일 값을 써야 queryKey가 일치한다.
 const PAGE_SIZE = NEWS_PAGE_SIZE;
-
-/**
- * 페이지네이션 축약 슬롯(숫자 최대 7개): 첫/끝 + 현재 ±1 + 생략(…).
- * 전체 페이지 번호를 모두 렌더하면 페이지 다수 시 모바일(360px)에서 가로 넘침이
- * 발생하므로 슬롯 수를 고정한다. 'gap-*'는 생략 부호 자리 표시자다.
- */
-type PageSlot = number | 'gap-left' | 'gap-right';
-
-function buildPageSlots(current: number, total: number): PageSlot[] {
-  if (total <= 7) {
-    return Array.from({ length: total }, (_, i) => i + 1);
-  }
-  // 경계(1·2·끝-1·끝 페이지)에서도 항상 7슬롯을 유지하도록 창을 보정한다.
-  const start = Math.max(2, Math.min(current - 1, total - 4));
-  const end = Math.min(total - 1, Math.max(current + 1, 5));
-  const slots: PageSlot[] = [1];
-  if (start > 2) slots.push('gap-left');
-  for (let page = start; page <= end; page += 1) slots.push(page);
-  if (end < total - 1) slots.push('gap-right');
-  slots.push(total);
-  return slots;
-}
 
 /** 돋보기 아이콘 */
 function SearchIcon() {

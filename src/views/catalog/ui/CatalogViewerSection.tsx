@@ -109,7 +109,8 @@ export function CatalogViewerSection({ pages, images }: CatalogViewerSectionProp
             </span>
           </div>
 
-          <div className="flex items-center gap-2">
+          {/* 모바일(360px): 줌(152)+전체화면(44)+PDF(~130)+gap ≈ 340px > 유효폭 320px — wrap 허용으로 두 줄 배치(#155) */}
+          <div className="flex flex-wrap items-center justify-end gap-2">
             {/* 줌 컨트롤 (− / % / +) */}
             <div className="flex items-center gap-1">
               <GlassButton onClick={() => viewerRef.current?.zoomOut()} label={V.zoomOutLabel}>
